@@ -1,0 +1,994 @@
+<!-- Trip Editor Modal -->
+
+
+<div *ngIf="showModal" class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title fw-bold">{{ isEditingTrip ? 'Edit Trip' : 'Add New Trip' }}</h5>
+        <button type="button" class="btn-close btn-close-white" (click)="onCloseModal()"></button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Trip Modal Tabs -->
+        <ul class="nav nav-tabs nav-fill mb-4 border-bottom">
+          <li class="nav-item">
+            <button class="nav-link fw-medium" [class.active]="activeTripTab === 'basic'"
+              (click)="setActiveTripTab('basic')">
+              📝 Basic Info
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link fw-medium" [class.active]="activeTripTab === 'details'"
+              (click)="setActiveTripTab('details')">
+              ⭐ Highlights
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link fw-medium" [class.active]="activeTripTab === 'availability'"
+              (click)="setActiveTripTab('availability')">
+              📅 Availability
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link fw-medium" [class.active]="activeTripTab === 'itinerary'"
+              (click)="setActiveTripTab('itinerary')">
+              🗓️ Itinerary
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link fw-medium" [class.active]="activeTripTab === 'images'"
+              (click)="setActiveTripTab('images')">
+              🖼️ Images
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link fw-medium" [class.active]="activeTripTab === 'imagemodel'"
+              (click)="setActiveTripTab('imagemodel')">
+              🆕 Image Model
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link fw-medium" [class.active]="activeTripTab === 'inclusions'"
+              (click)="setActiveTripTab('inclusions')">
+              ✅ Inclusions & Exclusions
+            </button>
+          </li>
+        </ul>
+
+        <!-- Progress Indicator -->
+        <div class="progress mb-4" style="height: 8px;">
+          <div class="progress-bar bg-success" role="progressbar" [style.width.%]="getFormProgress()"
+            aria-valuenow="getFormProgress()" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+
+        <form>
+          <!-- Basic Info Tab -->
+          <div *ngIf="activeTripTab === 'basic'" class="p-4">
+            <div class="alert alert-info mb-4">
+              <h6 class="alert-heading fw-bold">🚀 Basic Information</h6>
+              <p class="mb-0">Start by providing the essential details about your trip. This information will be
+                displayed to potential travelers.</p>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label for="name" class="form-label fw-medium">Trip Name</label>
+                <input type="text" id="name" [(ngModel)]="tripForm.name" name="name" placeholder="Enter trip name"
+                  class="form-control" [class.is-valid]="tripForm.name?.trim() !== ''"
+                  [class.is-invalid]="tripForm.name?.trim() === ''" required>
+                <div *ngIf="tripForm.name?.trim() === ''" class="invalid-feedback">
+                  Trip name is required
+                </div>
+                <div *ngIf="tripForm.name?.trim() !== ''" class="valid-feedback">
+                  ✓ Trip name looks good
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <label for="destination" class="form-label fw-medium">Destination</label>
+                <input type="text" id="destination" [(ngModel)]="tripForm.destination" name="destination"
+                  placeholder="Enter destination" class="form-control"
+                  [class.is-valid]="tripForm.destination?.trim() !== ''"
+                  [class.is-invalid]="tripForm.destination?.trim() === ''" required>
+                <div *ngIf="tripForm.destination?.trim() === ''" class="invalid-feedback">
+                  Destination is required
+                </div>
+                <div *ngIf="tripForm.destination?.trim() !== ''" class="valid-feedback">
+                  ✓ Destination looks good
+                </div>
+              </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label for="duration" class="form-label fw-medium">Duration</label>
+                <input type="text" id="duration" [(ngModel)]="tripForm.duration" name="duration"
+                  placeholder="e.g., 3 days" class="form-control" [class.is-valid]="tripForm.duration?.trim() !== ''"
+                  [class.is-invalid]="tripForm.duration?.trim() === ''" required>
+                <div *ngIf="tripForm.duration?.trim() === ''" class="invalid-feedback">
+                  Duration is required
+                </div>
+                <div *ngIf="tripForm.duration?.trim() !== ''" class="valid-feedback">
+                  ✓ Duration looks good
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <label for="basePrice" class="form-label fw-medium">Base Price ($)</label>
+                <input type="number" id="basePrice" [(ngModel)]="tripForm.basePrice" name="basePrice" placeholder="0.00"
+                  min="0" step="0.01" class="form-control" [class.is-valid]="(tripForm.basePrice || 0) > 0"
+                  [class.is-invalid]="(tripForm.basePrice || 0) <= 0" (ngModelChange)="onBasePriceChange()" required>
+                <div *ngIf="(tripForm.basePrice || 0) <= 0" class="invalid-feedback">
+                  Base price must be greater than 0
+                </div>
+                <div *ngIf="(tripForm.basePrice || 0) > 0" class="valid-feedback">
+                  ✓ Base price looks good
+                </div>
+              </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label for="totalCapacity" class="form-label fw-medium">Total Capacity</label>
+                <input type="number" id="totalCapacity" [(ngModel)]="tripForm.maxCapacity" name="totalCapacity"
+                  placeholder="0" min="1" class="form-control" [class.is-valid]="(tripForm.maxCapacity || 0) > 0"
+                  [class.is-invalid]="(tripForm.maxCapacity || 0) <= 0" (ngModelChange)="onTotalCapacityChange()"
+                  required>
+                <div *ngIf="(tripForm.maxCapacity || 0) <= 0" class="invalid-feedback">
+                  Total capacity must be greater than 0
+                </div>
+                <div *ngIf="(tripForm.maxCapacity || 0) > 0" class="valid-feedback">
+                  ✓ Total capacity looks good
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <label for="category" class="form-label fw-medium">Category</label>
+                <select id="category" [(ngModel)]="tripForm.categoryId" name="categoryId" class="form-select"
+                  [class.is-valid]="(tripForm.categoryId || 0) > 0" [class.is-invalid]="(tripForm.categoryId || 0) <= 0"
+                  required>
+                  <option value="0">Select category</option>
+                  <option *ngFor="let category of allCategories" [value]="category.id">{{ category.name }}</option>
+                </select>
+                <div *ngIf="(tripForm.categoryId || 0) <= 0" class="invalid-feedback">
+                  Category is required
+                </div>
+                <div *ngIf="(tripForm.categoryId || 0) > 0" class="valid-feedback">
+                  ✓ Category looks good
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="description" class="form-label fw-medium">Description</label>
+              <textarea id="description" [(ngModel)]="tripForm.description" name="description"
+                placeholder="Enter trip description" rows="6" class="form-control"
+                [class.is-valid]="tripForm.description?.trim() !== ''"
+                [class.is-invalid]="tripForm.description?.trim() === ''" required></textarea>
+              <div *ngIf="tripForm.description?.trim() === ''" class="invalid-feedback">
+                Description is required
+              </div>
+              <div *ngIf="tripForm.description?.trim() !== ''" class="valid-feedback">
+                ✓ Description looks good
+              </div>
+            </div>
+
+            <!-- Trip Details moved from separate tab -->
+            <div class="alert alert-info mb-4">
+              <h6 class="alert-heading fw-bold">📋 Trip Details</h6>
+              <p class="mb-0">Configure the technical specifications and requirements for your trip. This information
+                helps travelers understand what to expect and prepare accordingly.</p>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label for="difficulty" class="form-label fw-medium">Difficulty Level</label>
+                <select id="difficulty" [(ngModel)]="tripForm.difficulty" name="difficulty" class="form-select"
+                  [class.is-valid]="tripForm.difficulty" [class.is-invalid]="!tripForm.difficulty" required>
+                  <option value="">Select difficulty level</option>
+                  <option value="EASY">Easy - Suitable for all fitness levels</option>
+                  <option value="MODERATE">Moderate - Some physical activity required</option>
+                  <option value="CHALLENGING">Challenging - High fitness level recommended</option>
+                </select>
+                <small class="form-text text-muted">Choose the appropriate difficulty level for your trip</small>
+                <div *ngIf="!tripForm.difficulty" class="invalid-feedback">
+                  Difficulty level is required
+                </div>
+                <div *ngIf="tripForm.difficulty" class="valid-feedback">
+                  ✓ Difficulty level looks good
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <label for="groupSizeMin" class="form-label fw-medium">Group Size (Min)</label>
+                <input type="number" id="groupSizeMin" [(ngModel)]="tripForm.groupSizeMin" name="groupSizeMin"
+                  placeholder="1" min="1" class="form-control" [class.is-valid]="(tripForm.groupSizeMin || 0) > 0"
+                  [class.is-invalid]="(tripForm.groupSizeMin || 0) <= 0" required>
+                <small class="form-text text-muted">Minimum number of people required for the trip</small>
+                <div *ngIf="(tripForm.groupSizeMin || 0) <= 0" class="invalid-feedback">
+                  Minimum group size must be greater than 0
+                </div>
+                <div *ngIf="(tripForm.groupSizeMin || 0) > 0" class="valid-feedback">
+                  ✓ Minimum group size looks good
+                </div>
+              </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label for="groupSizeMax" class="form-label fw-medium">Group Size (Max)</label>
+                <input type="number" id="groupSizeMax" [(ngModel)]="tripForm.groupSizeMax" name="groupSizeMax"
+                  placeholder="20" min="1" class="form-control"
+                  [class.is-valid]="(tripForm.groupSizeMax || 0) >= (tripForm.groupSizeMin || 0)"
+                  [class.is-invalid]="(tripForm.groupSizeMax || 0) < (tripForm.groupSizeMin || 0)" required>
+                <small class="form-text text-muted">Maximum number of people allowed on the trip</small>
+                <div *ngIf="(tripForm.groupSizeMax || 0) < (tripForm.groupSizeMin || 0)" class="invalid-feedback">
+                  Maximum group size must be greater than or equal to minimum
+                </div>
+                <div *ngIf="(tripForm.groupSizeMax || 0) >= (tripForm.groupSizeMin || 0)" class="valid-feedback">
+                  ✓ Maximum group size looks good
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <label for="bestTime" class="form-label fw-medium">Best Time to Visit</label>
+                <input type="text" id="bestTime" [(ngModel)]="tripForm.bestTime" name="bestTime"
+                  placeholder="e.g., March to October" class="form-control"
+                  [class.is-valid]="tripForm.bestTime?.trim() !== ''"
+                  [class.is-invalid]="tripForm.bestTime?.trim() === ''" required>
+                <small class="form-text text-muted">Specify the optimal time period for this trip</small>
+                <div *ngIf="tripForm.bestTime?.trim() === ''" class="invalid-feedback">
+                  Best time to visit is required
+                </div>
+                <div *ngIf="tripForm.bestTime?.trim() !== ''" class="valid-feedback">
+                  ✓ Best time to visit looks good
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="cancellationPolicy" class="form-label fw-medium">Cancellation Policy</label>
+              <input type="text" id="cancellationPolicy" [(ngModel)]="tripForm.cancellationPolicy"
+                name="cancellationPolicy" placeholder="e.g., Free cancellation up to 7 days before" class="form-control"
+                [class.is-valid]="tripForm.cancellationPolicy?.trim() !== ''"
+                [class.is-invalid]="tripForm.cancellationPolicy?.trim() === ''" required>
+              <small class="form-text text-muted">Explain your cancellation and refund policy</small>
+              <div *ngIf="tripForm.cancellationPolicy?.trim() === ''" class="invalid-feedback">
+                Cancellation policy is required
+              </div>
+              <div *ngIf="tripForm.cancellationPolicy?.trim() !== ''" class="valid-feedback">
+                ✓ Cancellation policy looks good
+              </div>
+            </div>
+
+            <!-- Save/Add Trip Basic Info Button -->
+            <div class="mb-4 text-end">
+              <button type="button" class="btn btn-primary btn-sm" 
+                      (click)="saveTripBasicInfo()"
+                      [disabled]="!isBasicInfoValid()"
+                      [title]="(trip?.id ? 'Update Trip Basic Info' : 'Create New Trip')">
+                <i class="bi" [class.bi-check-circle]="trip?.id" [class.bi-plus-circle]="!trip?.id"></i>
+                {{ trip?.id ? '💾 Update Trip' : '➕ Create Trip' }}
+              </button>
+              <small class="form-text text-muted d-block mt-2">
+                {{ trip?.id ? 'Update the basic trip information' : 'Create a new trip with the entered information' }}
+              </small>
+            </div>
+          </div>
+
+          <!-- Images Tab -->
+          <div *ngIf="activeTripTab === 'images'" class="p-4">
+            <div class="alert alert-info mb-4">
+              <h6 class="alert-heading fw-bold">🖼️ Trip Images</h6>
+              <p class="mb-0">Add and manage images for your trip. The first image will be used as the main display
+                image.</p>
+            </div>
+
+            <!-- Main Image Section -->
+            <div class="mb-4">
+              <label for="mainImage" class="form-label fw-medium">Main Image URL</label>
+              <div class="input-group">
+                <input type="url" id="mainImage" [(ngModel)]="tripForm.mainImage" name="mainImage"
+                  placeholder="https://example.com/main-image.jpg" class="form-control"
+                  [class.is-valid]="tripForm.mainImage?.trim() !== '' && isValidUrl(tripForm.mainImage || '')"
+                  [class.is-invalid]="tripForm.mainImage?.trim() === '' || !isValidUrl(tripForm.mainImage || '')"
+                  required>
+                <button class="btn btn-outline-secondary" type="button" (click)="generateRandomImage()">
+                  🎲 Random
+                </button>
+                <button class="btn btn-success" type="button" (click)="saveMainImage()" [disabled]="!tripForm.mainImage?.trim()">
+                  💾 Save
+                </button>
+              </div>
+              <div *ngIf="tripForm.mainImage?.trim() === ''" class="invalid-feedback">
+                Main image URL is required
+              </div>
+              <div *ngIf="tripForm.mainImage?.trim() !== '' && !isValidUrl(tripForm.mainImage || '')"
+                class="invalid-feedback">
+                Please enter a valid image URL
+              </div>
+              <div *ngIf="tripForm.mainImage?.trim() !== '' && isValidUrl(tripForm.mainImage || '')"
+                class="valid-feedback">
+                ✓ Main image URL looks good
+              </div>
+
+              <!-- Main Image Preview -->
+              <div *ngIf="tripForm.mainImage?.trim() !== '' && isValidUrl(tripForm.mainImage || '')" class="mt-3">
+                <label class="form-label fw-medium">Main Image Preview</label>
+                <div class="border rounded p-3 bg-light">
+                  <img [src]="tripForm.mainImage" [alt]="tripForm.name || 'Trip main image'" class="img-fluid rounded"
+                    style="max-height: 300px; object-fit: cover;">
+                </div>
+              </div>
+            </div>
+
+            <!-- Additional Images Section -->
+            <div class="mb-4">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <label class="form-label fw-medium mb-0">Additional Images</label>
+                <button type="button" class="btn btn-success btn-sm" (click)="addImage()">
+                  ➕ Add Image
+                </button>
+              </div>
+
+              <div *ngIf="(tripForm.images?.length || 0) === 0" class="text-center py-4 text-muted">
+                <p class="mb-2">No additional images added yet</p>
+                <p class="small">Click "Add Image" to add more images to your trip gallery</p>
+              </div>
+
+              <div *ngIf="(tripForm.images?.length || 0) > 0" class="row g-3">
+                <div *ngFor="let image of tripForm.images; let i = index" class="col-md-6 col-lg-4">
+                  <div class="card border-0 shadow-sm h-100">
+                    <div class="position-relative">
+                      <img [src]="image?.imageUrl" [alt]="'Trip image ' + (i + 1)" class="card-img-top"
+                        style="height: 200px; object-fit: cover;">
+                      <div class="position-absolute top-0 end-0 p-2">
+                        <button type="button" class="btn btn-success btn-sm" (click)="saveImage(i)" 
+                                [disabled]="!image.imageUrl.trim()" title="Save Image">
+                          {{ image.id ? '💾' : '+' }}
+                        </button>
+                        <button type="button" class="btn btn-danger btn-sm" (click)="removeImage(i)">
+                          🗑️
+                        </button>
+                      </div>
+                    </div>
+                    <div class="card-body p-3">
+                      <div class="input-group input-group-sm">
+                        <input type="url" [ngModel]="tripForm.images?.[i]?.imageUrl"
+                          (ngModelChange)="updateImageUrl(i, $event)" [name]="'image' + i" placeholder="Image URL"
+                          class="form-control"
+                          [class.is-valid]="tripForm.images?.[i]?.imageUrl?.trim() !== '' && isValidUrl(tripForm.images?.[i]?.imageUrl || '')"
+                          [class.is-invalid]="tripForm.images?.[i]?.imageUrl?.trim() === '' || !isValidUrl(tripForm.images?.[i]?.imageUrl || '')">
+                        <button class="btn btn-outline-secondary btn-sm" type="button"
+                          (click)="generateRandomImageForIndex(i)">
+                          🎲
+                        </button>
+                        <button type="button" class="btn btn-success btn-sm" (click)="saveImage(i)" 
+                                [disabled]="!image.imageUrl.trim()" class="btn btn-success btn-sm" (click)="saveImage(i)" 
+                                [disabled]="!image.imageUrl.trim()" title="Save Image">
+                          {{ image.id ? '💾' : '+' }}
+                        </button>
+                      </div>
+                      <div
+                        *ngIf="tripForm.images?.[i]?.imageUrl?.trim() === '' || !isValidUrl(tripForm.images?.[i]?.imageUrl || '')"
+                        class="invalid-feedback d-block">
+                        Please enter a valid image URL
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Image Management Tips -->
+            <div class="alert alert-warning">
+              <h6 class="alert-heading fw-bold">💡 Tips for Great Trip Images</h6>
+              <ul class="mb-0">
+                <li>Use high-quality images (minimum 800x600 pixels)</li>
+                <li>Include a mix of landscape and detail shots</li>
+                <li>Show the destination, activities, and accommodations</li>
+                <li>Ensure images are properly licensed for commercial use</li>
+                <li>Optimize images for web (compress without losing quality)</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Image Model Tab (NEW - ID-based Image Management) -->
+          <div *ngIf="activeTripTab === 'imagemodel'" class="p-4">
+            <div class="alert alert-success mb-4">
+              <h6 class="alert-heading fw-bold">🆕 New Image Management System</h6>
+              <p class="mb-0">This is the new ID-based image management system using TripImageModel. Upload images directly to the server and manage them with full control.</p>
+            </div>
+
+            <!-- Main Image Section -->
+            <div class="mb-4">
+              <label class="form-label fw-medium">Main Image</label>
+              <div class="d-flex align-items-center gap-3 mb-3">
+                <div *ngIf="mainImageModel" class="position-relative">
+                  <img [src]="baseUrlResizeImage + '/' + mainImageModel.id" 
+                       [alt]="mainImageModel.description || 'Main trip image'" 
+                       class="img-fluid rounded border"
+                       style="max-height: 200px; object-fit: cover;">
+                  <div class="position-absolute top-0 end-0 p-1">
+                    <span class="badge bg-success">Main</span>
+                  </div>
+                </div>
+                <div *ngIf="!mainImageModel" class="text-center py-4 text-muted border rounded bg-light" style="width: 200px;">
+                  <p class="mb-0 small">No main image set</p>
+                </div>
+              </div>
+              
+              <div class="d-flex gap-2">
+                <button type="button" class="btn btn-primary btn-sm" (click)="openFileUploadDialog()">
+                  📁 Upload Main Image
+                </button>
+                <button *ngIf="mainImageModel" type="button" class="btn btn-outline-warning btn-sm" (click)="removeMainImage()">
+                  🗑️ Remove Main
+                </button>
+              </div>
+            </div>
+
+            <!-- Image Upload Section -->
+            <div class="mb-4">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <label class="form-label fw-medium mb-0">Upload New Image</label>
+                <!-- Hidden file input for programmatic access -->
+                <input type="file" id="hiddenImageFile" #fileInput (change)="onFileSelected($event)" 
+                       class="d-none" accept="image/*">
+                
+                <button type="button" class="btn btn-success btn-sm" (click)="openFileUploadDialog()">
+                  ➕ Upload Image
+                </button>
+              </div>
+              
+              <!-- <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                  <div class="mb-3">
+                    <label for="imageDescription" class="form-label">Image Description</label>
+                    <input type="text" id="imageDescription" [(ngModel)]="newImageDescription" 
+                           name="imageDescription" class="form-control" placeholder="Describe this image...">
+                  </div>
+                  
+                  <div class="mb-3">
+                    <label for="imageFile" class="form-label">Select Image File</label>
+                    <input type="file" id="imageFile" #fileInput (change)="onFileSelected($event)" 
+                           class="form-control" accept="image/*">
+                    <div class="form-text">Supported formats: JPEG, PNG, GIF. Max size: 10MB</div>
+                  </div>
+                  
+                  <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-primary" (click)="uploadSelectedImage()" 
+                            [disabled]="!selectedFile || !newImageDescription.trim()">
+                      📤 Upload Image
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" (click)="clearFileSelection()">
+                      🗑️ Clear
+                    </button>
+                  </div>
+                </div>
+              </div> -->
+            </div>
+
+            <!-- Image Gallery Section -->
+            <div class="mb-4">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <label class="form-label fw-medium mb-0">Image Gallery</label>
+                <div class="d-flex gap-2">
+                  <button type="button" class="btn btn-outline-primary btn-sm" (click)="refreshImageGallery()">
+                    🔄 Refresh
+                  </button>
+                  <button type="button" class="btn btn-outline-success btn-sm" (click)="reorderImages()">
+                    📋 Reorder
+                  </button>
+                </div>
+              </div>
+
+              <div *ngIf="(tripImageModels?.length || 0) === 0" class="text-center py-4 text-muted">
+                <p class="mb-2">No images uploaded yet</p>
+                <p class="small">Upload your first image to get started!</p>
+              </div>
+
+              <div *ngIf="(tripImageModels?.length || 0) > 0" class="row g-3">
+                <div *ngFor="let image of tripImageModels; let i = index" class="col-md-6 col-lg-4">
+                  <div class="card border-0 shadow-sm h-100">
+                    <div class="position-relative">
+                      <img [src]="baseUrlResizeImage + '/' + image.id" 
+                           [alt]="image.description || 'Trip image'" 
+                           class="card-img-top"
+                           style="height: 200px; object-fit: cover;">
+                      <div class="position-absolute top-0 end-0 p-2">
+                        <button type="button" class="btn btn-success btn-sm" 
+                                (click)="setMainImage(image)" 
+                                [disabled]="image.isMainImage"
+                                [title]="image.isMainImage ? 'Already main image' : 'Set as main image'">
+                          {{ image.isMainImage ? '⭐' : '⭐' }}
+                        </button>
+                        <button type="button" class="btn btn-warning btn-sm" 
+                                (click)="toggleImageStatus(image)"
+                                [title]="image.isActive ? 'Deactivate' : 'Activate'">
+                          {{ image.isActive ? '👁️' : '🚫' }}
+                        </button>
+                        <button type="button" class="btn btn-danger btn-sm" 
+                                (click)="deleteImageModel(image)"
+                                title="Delete image">
+                          🗑️
+                        </button>
+                      </div>
+                      <div class="position-absolute top-0 start-0 p-2">
+                        <span class="badge bg-secondary">{{ image.sortOrder }}</span>
+                      </div>
+                    </div>
+                    <div class="card-body p-3">
+                      <h6 class="card-title small mb-2">{{ image.description || 'No description' }}</h6>
+                      <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">{{ image.fileName }}</small>
+                        <small class="text-muted">{{ image.fileSize ? (image.fileSize / 1024).toFixed(1) + ' KB' : 'N/A' }}</small>
+                      </div>
+                      
+                      <!-- Sort Order Controls -->
+                      <div class="mt-2 d-flex gap-1">
+                        <!-- Left arrow (move up) - only show if not first -->
+                        <button *ngIf="i > 0" type="button" class="btn btn-outline-secondary btn-sm" 
+                                (click)="moveImageUp(image)" title="Move left (earlier in sequence)">
+                          ⬅️
+                        </button>
+                        <!-- Right arrow (move down) - only show if not last -->
+                        <button *ngIf="i < tripImageModels.length - 1" type="button" class="btn btn-outline-secondary btn-sm" 
+                                (click)="moveImageDown(image)" title="Move right (later in sequence)">
+                          ➡️
+                        </button>
+                      </div>
+                      
+                      <!-- Edit Description -->
+                      <div class="mt-2">
+                        <input type="text" [ngModel]="image.description" 
+                               (ngModelChange)="updateImageDescription(image, $event)"
+                               [name]="'imageDescription' + image.id"
+                               class="form-control form-control-sm" 
+                               placeholder="Edit description...">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Image Management Tips -->
+            <div class="alert alert-info">
+              <h6 class="alert-heading fw-bold">💡 New Image System Features</h6>
+              <ul class="mb-0">
+                <li>Direct file upload to server (no external URLs needed)</li>
+                <li>Automatic image resizing and optimization</li>
+                <li>Full control over image order and main image selection</li>
+                <li>Image metadata management (descriptions, status, etc.)</li>
+                <li>Secure file storage with ID-based access</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Highlights Tab (formerly Trip Details) -->
+          <div *ngIf="activeTripTab === 'details'" class="p-4">
+            <div class="alert alert-info mb-4">
+              <h6 class="alert-heading fw-bold">⭐ Trip Highlights</h6>
+              <p class="mb-0">Add key attractions and memorable experiences that make this trip special. These
+                highlights will be prominently displayed to attract potential travelers.</p>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-medium">Highlights</label>
+              <small class="form-text text-muted d-block mb-2">Add key attractions and memorable experiences that make
+                this trip special</small>
+              <div class="border border-2 border-dashed border-secondary rounded p-3 bg-light">
+                <div *ngFor="let highlight of tripForm.highlights || []; let i = index"
+                  class="d-flex align-items-center gap-2 mb-2 p-2 bg-white rounded border">
+                  <!-- Up/Down Arrow Buttons -->
+                  <div class="d-flex flex-column gap-1">
+                                        <!-- Up Arrow - hidden for first item -->
+                    <button *ngIf="i > 0" type="button" class="btn btn-outline-secondary btn-sm"
+                            (click)="moveHighlightUp(i)" title="Move Up" style="padding: 1px 4px; font-size: 10px;">
+                      ↑
+                    </button>
+                    <!-- Down Arrow - hidden for last item -->
+                    <button *ngIf="i < (tripForm.highlights?.length || 0) - 1" type="button" 
+                            class="btn btn-outline-secondary btn-sm" (click)="moveHighlightDown(i)" 
+                            title="Move Down" style="padding: 1px 4px; font-size: 10px;">
+                      ↓
+                    </button>
+                  </div>
+                  
+                  <input type="text" [(ngModel)]="highlight.highlight" [name]="'highlight' + i"
+                    placeholder="Enter highlight" class="form-control flex-grow-1">
+                  <button type="button" class="btn btn-outline-primary btn-sm" (click)="saveHighlight(i)"
+                    [title]="(highlight.id ? 'Update Highlight' : 'Create Highlight')" 
+                    [disabled]="!highlight.highlight.trim()">
+                    {{ highlight.id ? '💾' : '+' }}
+                  </button>
+                  <button type="button" class="btn btn-outline-danger btn-sm rounded-circle"
+                    (click)="removeHighlight(i)" title="Remove Highlight">×</button>
+                </div>
+                <button type="button" class="btn btn-success" (click)="addHighlight()">+ Add Highlight</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Availability Tab -->
+          <div *ngIf="activeTripTab === 'availability'" class="p-4">
+            <div class="alert alert-info mb-4">
+              <h6 class="alert-heading fw-bold">📅 Availability Management</h6>
+              <p class="mb-0">Manage trip dates, capacity, and pricing. Add specific dates when your trip is available
+                and configure pricing for each date.</p>
+            </div>
+
+            <!-- Add New Date Section -->
+            <div class="card availability-card mb-4">
+              <div class="card-header bg-primary text-white">
+                <h6 class="mb-0 fw-bold">➕ Add New Date</h6>
+              </div>
+              <div class="card-body">
+                <div class="row g-3">
+                  <div class="col-md-4">
+                    <label for="newDate" class="form-label fw-medium">Date</label>
+                    <input type="date" id="newDate" [(ngModel)]="newAvailabilityDate" name="newDate"
+                      class="form-control" [min]="getTodayDate()">
+                  </div>
+                  <div class="col-md-2">
+                    <label for="newMaxCapacity" class="form-label fw-medium">Max Capacity</label>
+                    <input type="number" id="newMaxCapacity" [(ngModel)]="newAvailabilityMaxCapacity"
+                      name="newMaxCapacity" placeholder="30" min="1" [max]="tripForm.maxCapacity || 0"
+                      class="form-control">
+                  </div>
+                  <div class="col-md-2">
+                    <label for="newAvailableSpots" class="form-label fw-medium">Available Spots</label>
+                    <input type="number" id="newAvailableSpots" [(ngModel)]="newAvailabilitySpots"
+                      name="newAvailableSpots" placeholder="30" min="1" [max]="newAvailabilityMaxCapacity || 0"
+                      class="form-control">
+                  </div>
+                  <div class="col-md-2">
+                    <label for="newPrice" class="form-label fw-medium">Price ($)</label>
+                    <input type="number" id="newPrice" [(ngModel)]="newAvailabilityPrice"
+                      name="newPrice" placeholder="0.00" min="0" step="0.01"
+                      class="form-control">
+                  </div>
+                  <div class="col-md-2 d-flex align-items-end">
+                    <button type="button" class="btn btn-primary w-100" (click)="addAvailabilityDate()"
+                      [disabled]="!newAvailabilityDate || !newAvailabilityMaxCapacity || !newAvailabilitySpots || newAvailabilityPrice <= 0">
+                      Add Date
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Existing Availability Management -->
+            <div class="card availability-card">
+              <div class="card-header bg-success text-white">
+                <h6 class="mb-0 fw-bold">📊 Manage Existing Dates</h6>
+              </div>
+              <div class="card-body">
+                <div *ngIf="(tripForm.availability?.length || 0) === 0" class="text-center py-4">
+                  <div class="text-muted mb-3">
+                    <i class="fs-1">📅</i>
+                  </div>
+                  <h6 class="text-muted">No availability dates set yet</h6>
+                  <p class="text-muted small">Add dates above to start managing trip availability</p>
+                </div>
+
+                <div *ngIf="(tripForm.availability?.length || 0) > 0" class="table-responsive">
+                  <table class="table table-hover availability-table">
+                    <thead class="table-light">
+                      <tr>
+                        <th>Date</th>
+                        <th>Max Capacity</th>
+                        <th>Available Spots</th>
+                        <th>Price ($)</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let avail of tripForm.availability; let i = index" class="align-middle">
+                        <td>
+                          <strong>{{ formatDate(avail.date) }}</strong>
+                        </td>
+                        <td>
+                          <input type="number" [(ngModel)]="avail.maxCapacity" [name]="'maxCapacity' + i" min="1"
+                            [max]="tripForm.maxCapacity || 0" class="form-control form-control-sm availability-input">
+                        </td>
+                        <td>
+                          <input type="number" [(ngModel)]="avail.availableSpots" [name]="'available' + i" min="0"
+                            [max]="avail.maxCapacity || 0" class="form-control form-control-sm availability-input">
+                        </td>
+                        <td>
+                          <input type="number" [(ngModel)]="avail.price" [name]="'price' + i" min="0" step="0.01"
+                            class="form-control form-control-sm availability-input">
+                        </td>
+                        <td>
+                          <span class="badge availability-status-badge" [class]="getAvailabilityStatusClass(avail)">
+                            {{ getAvailabilityStatus(avail) }}
+                          </span>
+                        </td>
+                        <td>
+                          <div class="d-flex gap-1">
+                            <button type="button" class="btn btn-outline-success btn-sm"
+                              (click)="saveAvailabilityDate(i)" 
+                              [title]="(avail.id ? 'Update Availability' : 'Create Availability')"
+                              [disabled]="!avail.date || avail.maxCapacity <= 0 || avail.availableSpots <= 0 || avail.price <= 0">
+                              {{ avail.id ? '💾' : '+' }}
+                            </button>
+                            <button type="button" class="btn btn-outline-danger btn-sm"
+                              (click)="removeAvailabilityDate(i)" title="Remove Date">
+                              🗑️
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Itinerary Tab -->
+          <div *ngIf="activeTripTab === 'itinerary'" class="p-4">
+            <div class="alert alert-info mb-4">
+              <h6 class="alert-heading fw-bold">🗓️ Itinerary Planning</h6>
+              <p class="mb-0">Create a detailed day-by-day itinerary for your trip. Include activities, meals, and
+                timing to give travelers a clear understanding of their journey.</p>
+            </div>
+
+            <div class="bg-light rounded p-3">
+              <div *ngFor="let day of tripForm.itinerary || []; let dayIndex = index"
+                class="bg-white border rounded mb-3 overflow-hidden">
+                <div class="bg-primary text-white p-3 d-flex justify-content-between align-items-center">
+                  <h6 class="mb-0 fw-bold">🗓️ Day {{ day.dayNumber }}</h6>
+                  <div class="d-flex gap-1">
+                    <button type="button" class="btn btn-outline-success btn-sm rounded-circle"
+                      (click)="saveItineraryDay(dayIndex)" 
+                      [title]="(day.id ? 'Update Day' : 'Create Day')"
+                      [disabled]="!day.title.trim() || !day.description.trim()">
+                      {{ day.id ? '💾' : '+' }}
+                    </button>
+                    <button type="button" class="btn btn-outline-light btn-sm rounded-circle"
+                      (click)="removeItineraryDay(dayIndex)" title="Remove Day">×</button>
+                  </div>
+                </div>
+
+                <div class="p-3">
+                  <div class="mb-3">
+                    <label class="form-label fw-medium">Title</label>
+                    <input type="text" [(ngModel)]="day.title" [name]="'itineraryTitle' + dayIndex"
+                      placeholder="Day title" class="form-control">
+                    <small class="form-text text-muted">Brief title for this day (e.g., "Arrival & City Tour")</small>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label fw-medium">Description</label>
+                    <textarea [(ngModel)]="day.description" [name]="'itineraryDescription' + dayIndex"
+                      placeholder="Day description" rows="3" class="form-control"></textarea>
+                    <small class="form-text text-muted">Detailed overview of what happens on this day</small>
+                  </div>
+
+                  <!-- Activities -->
+                  <div class="mb-3" *ngIf="day.id !== null && day.id !== undefined && day.id !== 0">
+                    <label class="form-label fw-medium">Activities</label>
+                    <small class="form-text text-muted d-block mb-2">Schedule activities with specific times and
+                      descriptions</small>
+                    <div class="border border-2 border-dashed border-secondary rounded p-3 bg-light">
+                      <div *ngFor="let activity of day.activities || []; let activityIndex = index"
+                        class="d-flex align-items-center gap-2 mb-2 p-2 bg-white rounded border">
+                        <!-- Up/Down Arrow Buttons -->
+                        <div class="d-flex flex-column gap-1">
+                          <!-- Up Arrow - hidden for first item -->
+                          <button *ngIf="activityIndex > 0" type="button" class="btn btn-outline-secondary btn-sm"
+                                  (click)="moveActivityUp(dayIndex, activityIndex)" title="Move Up" style="padding: 1px 4px; font-size: 10px;">
+                            ↑
+                          </button>
+                          <!-- Down Arrow - hidden for last item -->
+                          <button *ngIf="activityIndex < (day.activities?.length || 0) - 1" type="button"
+                                  class="btn btn-outline-secondary btn-sm" (click)="moveActivityDown(dayIndex, activityIndex)"
+                                  title="Move Down" style="padding: 1px 4px; font-size: 10px;">
+                            ↓
+                          </button>
+                        </div>
+                        <div class="row g-2 flex-grow-1">
+                          <div class="col-md-4">
+                            <input type="text" [ngModel]="day.activities[activityIndex].time"
+                              (ngModelChange)="updateActivityTime(dayIndex, activityIndex, $event)"
+                              [name]="'activityTime' + dayIndex + '_' + activityIndex"
+                              placeholder="Time (e.g., 09:00 AM)" class="form-control">
+                          </div>
+                          <div class="col-md-8">
+                            <input type="text" [ngModel]="day.activities[activityIndex].description"
+                              (ngModelChange)="updateActivityDescription(dayIndex, activityIndex, $event)"
+                              [name]="'activityDescription' + dayIndex + '_' + activityIndex"
+                              placeholder="Activity description" class="form-control">
+                          </div>
+                        </div>
+                        <button type="button" class="btn btn-outline-success btn-sm rounded-circle me-1"
+                          (click)="saveActivity(dayIndex, activityIndex)"
+                          [title]="(day.activities[activityIndex].id ? 'Update Activity' : 'Create Activity')"
+                          [disabled]="!day.activities[activityIndex].time.trim() || !day.activities[activityIndex].description.trim()">
+                          {{ day.activities[activityIndex].id ? '💾' : '+' }}
+                        </button>
+                        <button type="button" class="btn btn-outline-danger btn-sm rounded-circle"
+                          (click)="removeActivity(dayIndex, activityIndex)">×</button>
+                      </div>
+                      <button type="button" class="btn btn-success" (click)="addActivity(dayIndex)">+ Add
+                        Activity</button>
+                    </div>
+                  </div>
+
+                  <!-- Meals -->
+                  <div class="mb-3" *ngIf="day.id !== null && day.id !== undefined && day.id !== 0">
+                    <label class="form-label fw-medium">Meals</label>
+                    <small class="form-text text-muted d-block mb-2">Include meal arrangements and
+                      descriptions</small>
+                    <div class="border border-2 border-dashed border-secondary rounded p-3 bg-light">
+                      <div *ngFor="let meal of day.meals || []; let mealIndex = index"
+                        class="d-flex align-items-center gap-2 mb-2 p-2 bg-white rounded border">
+                        <!-- Up/Down Arrow Buttons -->
+                        <div class="d-flex flex-column gap-1">
+                          <!-- Up Arrow - hidden for first item -->
+                          <button *ngIf="mealIndex > 0" type="button" class="btn btn-outline-secondary btn-sm"
+                                  (click)="moveMealUp(dayIndex, mealIndex)" title="Move Up" style="padding: 1px 4px; font-size: 10px;">
+                            ↑
+                          </button>
+                          <!-- Down Arrow - hidden for last item -->
+                          <button *ngIf="mealIndex < (day.meals?.length || 0) - 1" type="button"
+                                  class="btn btn-outline-secondary btn-sm" (click)="moveMealDown(dayIndex, mealIndex)"
+                                  title="Move Down" style="padding: 1px 4px; font-size: 10px;">
+                            ↓
+                          </button>
+                        </div>
+                        <div class="row g-2 flex-grow-1">
+                          <div class="col-md-4">
+                            <input type="text" [ngModel]="day.meals[mealIndex].mealType"
+                              (ngModelChange)="updateMealType(dayIndex, mealIndex, $event)"
+                              [name]="'mealType' + dayIndex + '_' + mealIndex"
+                              placeholder="Meal type (e.g., Breakfast, Lunch, Dinner)" class="form-control">
+                          </div>
+                          <div class="col-md-8">
+                            <input type="text" [ngModel]="day.meals[mealIndex].description"
+                              (ngModelChange)="updateMealDescription(dayIndex, mealIndex, $event)"
+                              [name]="'mealDescription' + dayIndex + '_' + mealIndex" placeholder="Meal description"
+                              class="form-control">
+                          </div>
+                        </div>
+                        <button type="button" class="btn btn-outline-success btn-sm rounded-circle me-1"
+                          (click)="saveMeal(dayIndex, mealIndex)"
+                          [title]="(day.meals[mealIndex].id ? 'Update Meal' : 'Create Meal')"
+                          [disabled]="!day.meals[mealIndex].mealType.trim() || !day.meals[mealIndex].description.trim()">
+                          {{ day.meals[mealIndex].id ? '💾' : '+' }}
+                        </button>
+                        <button type="button" class="btn btn-outline-danger btn-sm rounded-circle"
+                          (click)="removeMeal(dayIndex, mealIndex)">×</button>
+                      </div>
+                      <button type="button" class="btn btn-success" (click)="addMeal(dayIndex)">+ Add Meal</button>
+                    </div>
+                  </div>
+
+                  <!-- Message when itinerary day is not saved yet -->
+                  <div *ngIf="day.id === null" class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Save this itinerary day first</strong> before adding activities and meals.
+                  </div>
+                </div>
+              </div>
+              <button type="button" class="btn btn-success" (click)="addItineraryDay()">+ Add Itinerary Day</button>
+            </div>
+          </div>
+
+          <!-- Inclusions & Exclusions Tab -->
+          <div *ngIf="activeTripTab === 'inclusions'" class="p-4">
+            <div class="alert alert-info mb-4">
+              <h6 class="alert-heading fw-bold">✅ Inclusions & Exclusions</h6>
+              <p class="mb-0">Clearly define what's included and what's not included in your trip package. This helps
+                set proper expectations and avoid misunderstandings.</p>
+            </div>
+
+            <div class="bg-white border border-success border-start border-start-4 rounded p-3 mb-3">
+              <h5 class="text-success fw-bold mb-3">✅ Inclusions</h5>
+              <small class="form-text text-muted d-block mb-3">List all services, accommodations, and items included
+                in the trip price</small>
+              <div class="border border-2 border-dashed border-secondary rounded p-3 bg-light">
+                                 <div *ngFor="let inclusion of tripForm.inclusions || []; let i = index"
+                   class="d-flex align-items-center gap-2 mb-2 p-2 bg-white rounded border">
+                   <!-- Up/Down Arrow Buttons -->
+                   <div class="d-flex flex-column gap-1">
+                                        <!-- Up Arrow - hidden for first item -->
+                   <button *ngIf="i > 0" type="button" class="btn btn-outline-secondary btn-sm" 
+                           (click)="moveInclusionUp(i)" title="Move Up" style="padding: 1px 4px; font-size: 10px;">
+                     ↑
+                   </button>
+                   <!-- Down Arrow - hidden for last item -->
+                   <button *ngIf="i < (tripForm.inclusions?.length || 0) - 1" type="button" 
+                           class="btn btn-outline-secondary btn-sm" (click)="moveInclusionDown(i)" 
+                           title="Move Down" style="padding: 1px 4px; font-size: 10px;">
+                     ↓
+                   </button>
+                   </div>
+                   
+                   <input type="text" [(ngModel)]="inclusion.inclusion" [name]="'inclusion' + i"
+                     placeholder="Enter inclusion item" class="form-control flex-grow-1">
+                   <button type="button" class="btn btn-outline-success btn-sm rounded-circle me-1"
+                     (click)="saveInclusion(i)" 
+                     [title]="(inclusion.id ? 'Update Inclusion' : 'Create Inclusion')"
+                     [disabled]="!inclusion.inclusion.trim()">
+                     {{ inclusion.id ? '💾' : '+' }}
+                   </button>
+                   <button type="button" class="btn btn-outline-danger btn-sm rounded-circle"
+                     (click)="removeInclusion(i)" title="Remove Inclusion">×</button>
+                 </div>
+                <button type="button" class="btn btn-success" (click)="addInclusion()">+ Add Inclusion</button>
+              </div>
+            </div>
+
+            <div class="bg-white border border-danger border-start border-start-4 rounded p-3">
+              <h5 class="text-danger fw-bold mb-3">❌ Exclusions</h5>
+              <small class="form-text text-muted d-block mb-3">List items and services that are NOT included in the
+                trip price</small>
+              <div class="border border-2 border-dashed border-secondary rounded p-3 bg-light">
+                                 <div *ngFor="let exclusion of tripForm.exclusions || []; let i = index"
+                   class="d-flex align-items-center gap-2 mb-2 p-2 bg-white rounded border">
+                   <!-- Up/Down Arrow Buttons -->
+                   <div class="d-flex flex-column gap-1">
+                                        <!-- Up Arrow - hidden for first item -->
+                   <button *ngIf="i > 0" type="button" class="btn btn-outline-secondary btn-sm" 
+                           (click)="moveExclusionUp(i)" title="Move Up" style="padding: 1px 4px; font-size: 10px;">
+                     ↑
+                   </button>
+                   <!-- Down Arrow - hidden for last item -->
+                   <button *ngIf="i < (tripForm.exclusions?.length || 0) - 1" type="button" 
+                           class="btn btn-outline-secondary btn-sm" (click)="moveExclusionDown(i)" 
+                           title="Move Down" style="padding: 1px 4px; font-size: 10px;">
+                     ↓
+                   </button>
+                   </div>
+                   
+                   <input type="text" [(ngModel)]="exclusion.exclusion" [name]="'exclusion' + i"
+                     placeholder="Enter exclusion item" class="form-control flex-grow-1">
+                   <button type="button" class="btn btn-outline-success btn-sm rounded-circle me-1"
+                     (click)="saveExclusion(i)" 
+                     [title]="(exclusion.id ? 'Update Exclusion' : 'Create Exclusion')"
+                     [disabled]="!exclusion.exclusion.trim()">
+                     {{ exclusion.id ? '💾' : '+' }}
+                   </button>
+                   <button type="button" class="btn btn-outline-danger btn-sm rounded-circle"
+                     (click)="removeExclusion(i)" title="Remove Exclusion">×</button>
+                 </div>
+                <button type="button" class="btn btn-success" (click)="addExclusion()">+ Add Exclusion</button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <div class="d-flex justify-content-between align-items-center w-100">
+          <div>
+            <button *ngIf="activeTripTab !== 'basic'" class="btn btn-outline-secondary me-2"
+              (click)="previousTripTab()">
+              ← Previous
+            </button>
+          </div>
+          <div class="text-center">
+            <span class="badge bg-secondary px-3 py-2">{{ getTripTabTitle() }}</span>
+          </div>
+          <div>
+            <button *ngIf="activeTripTab !== 'inclusions'" class="btn btn-outline-secondary me-2"
+              (click)="nextTripTab()" [disabled]="!isCurrentTabValid()">
+              Next →
+            </button>
+            <button class="btn btn-primary" (click)="onSaveTrip()" [disabled]="!isFormComplete() || isLoading">
+              <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2" role="status"
+                aria-hidden="true"></span>
+              {{ isEditingTrip ? 'Update Trip' : 'Add Trip' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

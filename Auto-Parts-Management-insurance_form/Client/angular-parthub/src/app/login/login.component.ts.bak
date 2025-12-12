@@ -1,0 +1,162 @@
+import { Component, OnInit } from '@angular/core';
+import { AuthService } from '../_services/auth.service';
+import { StorageService } from '../_services/storage.service';
+import { Router } from '@angular/router';
+import { EventBusService } from '../_shared/event-bus.service';
+import { EventData } from '../_shared/event.class';
+
+@Component({
+  selector: 'app-login',
+  templateUrl: './login.component.html',
+  styleUrls: ['./login.component.css']
+})
+export class LoginComponent implements OnInit {
+  form: any = {
+    username: null,
+    password: null
+  };
+
+  isActivated = false;
+  counterFailed: any = 0;
+
+  showResentComformation = false;
+
+  isLoggedIn = false;
+  isLoginFailed = false;
+  errorMessage = '';
+  roles: string[] = [];
+
+  constructor(private authService: AuthService,
+    private eventBusService: EventBusService,
+    private userService: UserService,
+    private router: Router,
+    private storageService: StorageService) {
+    this.isActivated = false;
+    this.showResentComformation = false;
+
+  }
+
+  ngOnInit(): void {
+    if (this.storageService.isLoggedIn()) {
+      this.isLoggedIn = true;
+      this.roles = this.storageService.getUser().roles;
+
+      this.userService.getUserById(this.storageService.getUser().id).subscribe({
+        next: result => {
+          //console.log(result);
+          let user = new User();
+          user = result;
+          if (user.partMarketOnly == true) {
+            this.router.navigateByUrl('/autoparts');
+          } else {
+            this.router.navigateByUrl('/home');
+          }
+
+        }
+      })
+
+      // this.router.navigateByUrl('/home');
+    } else {
+      this.eventBusService.emit(new EventData('noshow', 0));
+    }
+  }
+
+  register(): void {
+    this.router.navigateByUrl('/register');
+  }
+
+  onSubmit(): void {
+    const { username, password } = this.form;
+    console.log("===login");
+    this.authService.login(username, password).subscribe({
+      next: data => {
+        this.storageService.saveUser(data);
+
+        this.isLoginFailed = false;
+        this.isLoggedIn = true;
+        this.roles = this.storageService.getUser().roles;
+        this.isActivated = this.storageService.getUser().activated;
+
+        if (!this.isActivated) {
+          this.isLoginFailed = true;
+          this.isLoggedIn = false;
+          this.storageService.clean();
+          this.showResentComformation = true;
+          this.errorMessage = "user is not activated, please check your mailbox for activation";
+        } else {
+          this.reloadPage();
+          // this.userService.getUserById(this.storageService.getUser().id).subscribe({
+          //   next: result => {
+          //     console.log(result);
+          //     let user = new User();
+          //     user = result;
+          //     if (user.partMarketOnly == true) {
+          //       this.router.navigateByUrl('/autoparts');
+          //     } else {
+          //       this.router.navigateByUrl('/home');
+          //     }
+
+          //   }
+          // })
+
+        }
+
+      },
+      error: err => {
+        this.errorMessage = err.error.message;
+        this.isLoginFailed = true;
+        this.counterFailed++;
+        // console.log(this.counterFailed);
+      }
+    });
+  }
+
+  reloadPage(): void {
+    window.location.reload();
+  }
+
+  forgetPassword(): void {
+    const { username, password } = this.form;
+    console.log(username);
+    this.authService.forgetPasswordRequest(username, username).subscribe({
+      next: result => {
+
+      }, error: err => {
+        this.errorMessage = err.error.message;
+        this.isLoginFailed = true;
+      }
+    })
+  }
+  resendEmail(): void {
+    const { username, password } = this.form;
+    console.log("===login");
+    this.authService.resendEmail(username, password).subscribe({
+      next: data => {
+        this.storageService.saveUser(data);
+
+        this.isLoginFailed = false;
+        this.isLoggedIn = true;
+        this.roles = this.storageService.getUser().roles;
+        this.isActivated = this.storageService.getUser().activated;
+
+        if (!this.isActivated) {
+          this.isLoginFailed = true;
+          this.isLoggedIn = false;
+          this.storageService.clean();
+          this.showResentComformation = true;
+          this.errorMessage = "email sent, please check your mailbox";
+        } else {
+          this.reloadPage();
+          this.router.navigateByUrl('/dashbaord');
+        }
+
+      },
+      error: err => {
+        this.errorMessage = err.error.message;
+        this.isLoginFailed = true;
+      }
+    });
+  }
+
+
+}

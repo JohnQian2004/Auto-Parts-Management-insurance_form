@@ -1,0 +1,125 @@
+.hide {
+    display: none;
+}
+
+.inner-addon {
+    position: relative;
+}
+
+.inner-addon .far,
+.inner-addon .fas {
+    position: absolute;
+    padding: 10px 30px;
+    z-index: 100;
+    cursor: pointer;
+}
+
+.left-addon .far,
+.left-addon .fas {
+    left: 0px;
+}
+
+.right-addon .far,
+.right-addon .fas {
+    right: 0px;
+}
+
+.left-addon input {
+    padding-left: 30px;
+}
+
+.right-addon input {
+    padding-right: 30px;
+}
+
+/* .select without-icon {
+    appearance: none;
+    background-image: url('');
+} */
+
+.blink {
+    animation: blinker 1s step-start infinite;
+}
+
+@keyframes blinker {
+    50% {
+        opacity: 0;
+    }
+}
+
+
+/* Magnification effect when hovered */
+img.magnify4 {
+    transform: scale(4);
+    /* Adjust scale value for desired magnification */
+    z-index: 10000;
+  }
+  
+  /* Magnification effect when hovered */
+  img.magnify2 {
+    transform: scale(2);
+    /* Adjust scale value for desired magnification */
+    z-index: 10000;
+  }
+  
+  /* Container holding the image and the text */
+  .containerImage {
+    position: relative;
+    text-align: center;
+    color: white;
+  }
+  
+  /* Bottom left text */
+  .bottom-left {
+    position: absolute;
+    bottom: 8px;
+    left: 16px;
+  }
+  
+  /* Top left text */
+  .top-left {
+    position: absolute;
+    top: 8px;
+    left: 16px;
+  }
+  
+  /* Top left text */
+  .top-left-0 {
+    position: absolute;
+    top: 3px;
+    left: 0px;
+  }
+  
+  .top-left-8 {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+  }
+  
+  /* Top right text */
+  
+  .top-right-6 {
+    position: absolute;
+    top: 6px;
+    right: 16px;
+  }
+  
+  .top-right {
+    position: absolute;
+    top: 8px;
+    right: 16px;
+  }
+  
+  /* Bottom right text */
+  .bottom-right {
+    position: absolute;
+    bottom: 8px;
+    right: 16px;
+  }
+  
+  /* Bottom right text */
+  .bottom-right-4 {
+    position: absolute;
+    bottom: 4px;
+    right: 8px;
+  }

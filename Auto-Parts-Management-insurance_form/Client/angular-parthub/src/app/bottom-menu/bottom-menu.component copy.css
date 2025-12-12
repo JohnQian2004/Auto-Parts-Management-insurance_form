@@ -1,0 +1,57 @@
+/* Fixed bottom menu */
+.fixed-bottom {
+  border-top: 1px solid #ffffff; /* Optional: Adds a subtle line on top */
+  z-index: 10;
+  border-radius: 0 0 15px 15px; /* Rounded bottom corners */
+}
+
+/* Make the labels clickable and give some spacing */
+label {
+  transition: all 0.3s ease; /* Smooth transition for hover and active state */
+  cursor: pointer;
+}
+
+label:hover {
+  transform: scale(1.1); /* Slightly enlarge on hover */
+}
+
+/* Container for the icon and badge to prevent layout shift */
+.icon-container {
+  position: relative;  /* Important: Badge is positioned relative to this container */
+}
+
+/* Icon style */
+.icon {
+  font-size: 24px;  /* Control icon size */
+}
+
+/* Active tab styles */
+.text-success {
+  color: #28a745 !important;  /* Green text for active tab */
+}
+
+.text-warning {
+  color: #ffc107 !important; /* Yellow text for active tab */
+}
+
+/* Badge for unread messages (pill) */
+.unread-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: #f44336; /* Red background for unread messages */
+  color: white;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Prevent the badge from moving during hover */
+label:hover .icon {
+  transform: scale(1.1); /* Slightly enlarge on hover */
+}

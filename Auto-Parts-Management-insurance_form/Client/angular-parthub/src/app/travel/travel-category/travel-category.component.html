@@ -1,0 +1,27 @@
+<div 
+  class="card border-0 shadow-sm h-100"
+  [class.border-primary]="isSelected()"
+  [class.border-2]="isSelected()"
+  style="transition: transform 0.2s ease;"
+>
+  <div class="position-relative">
+    <img [src]="category.imageUrl" [alt]="category.name" class="card-img-top"
+      style="height: 200px; object-fit: cover;">
+    <div class="position-absolute top-0 end-0 m-2">
+      <span class="badge bg-primary fs-6">{{ category.id }}</span>
+    </div>
+  </div>
+  
+  <div class="card-body">
+    <h5 class="card-title fw-bold mb-2">{{ category.name }}</h5>
+    <p class="card-text text-muted mb-3">{{ category.description }}</p>
+    
+ 
+    
+    <div class="d-flex justify-content-center align-items-center">
+      <small class="text-muted">
+        📊 {{ tripsCount }} trips
+      </small>
+    </div>
+  </div>
+</div> 

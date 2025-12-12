@@ -1,0 +1,109 @@
+.upload-zone {
+    border: 2px dashed #007bff;
+    border-radius: 10px;
+    padding: 40px;
+    text-align: center;
+    background-color: #f8f9fa;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.upload-zone:hover {
+    border-color: #0056b3;
+    background-color: #e3f2fd;
+}
+
+.upload-zone.dragover {
+    border-color: #28a745;
+    background-color: #d4edda;
+    transform: scale(1.02);
+}
+
+.stat-box {
+    padding: 20px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: 1px solid #dee2e6;
+    transition: transform 0.2s ease;
+}
+
+.stat-box:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card {
+    border: none;
+    border-radius: 12px;
+}
+
+.card-header {
+    border-radius: 12px 12px 0 0 !important;
+}
+
+.progress {
+    border-radius: 10px;
+}
+
+.btn {
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+.table th {
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: #495057;
+}
+
+.badge {
+    font-size: 0.75rem;
+}
+
+.alert {
+    border-radius: 10px;
+}
+
+/* Animation for success state */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card.shadow-sm {
+    animation: fadeInUp 0.5s ease;
+}
+
+/* Spinner customization */
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
+}
+
+/* File info styling */
+.bg-light {
+    background-color: #f8f9fa !important;
+    border: 1px solid #e9ecef;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .stat-box {
+        margin-bottom: 1rem;
+    }
+
+    .upload-zone {
+        padding: 20px;
+    }
+
+    .btn {
+        margin-bottom: 0.5rem;
+    }
+}

@@ -1,0 +1,134 @@
+/* Minimal CSS for Travel Admin Component - Status Badge Colors Only */
+
+/* Status Badge Colors */
+.status-badge.green,
+.payment-badge.green {
+  background-color: #198754 !important;
+  color: white !important;
+}
+
+.status-badge.orange,
+.payment-badge.orange {
+  background-color: #fd7e14 !important;
+  color: white !important;
+}
+
+.status-badge.red,
+.payment-badge.red {
+  background-color: #dc3545 !important;
+  color: white !important;
+}
+
+.status-badge.gray,
+.payment-badge.gray {
+  background-color: #6c757d !important;
+  color: white !important;
+}
+
+/* Customer Status Badge Colors */
+.customer-status-badge.active {
+  background-color: #198754 !important;
+  color: white !important;
+}
+
+.customer-status-badge.inactive {
+  background-color: #6c757d !important;
+  color: white !important;
+}
+
+.customer-status-badge.vip {
+  background-color: #ffc107 !important;
+  color: #000 !important;
+}
+
+/* Background gradient for main container */
+.bg-gradient {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+/* Category Active Status Toggle Styles */
+.form-check-input:checked {
+  background-color: #198754;
+  border-color: #198754;
+}
+
+.form-check-input:focus {
+  border-color: #198754;
+  box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25);
+}
+
+.form-check-label .text-success {
+  font-weight: 600;
+}
+
+.form-check-label .text-muted {
+  font-weight: 500;
+}
+
+/* Metadata Section Styles */
+.metadata-section {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 10px 12px;
+  border-left: 3px solid #dee2e6;
+}
+
+.metadata-section .d-flex {
+  font-size: 0.8rem;
+}
+
+.metadata-section .d-flex > div {
+  white-space: nowrap;
+}
+
+.metadata-section .text-success {
+  font-weight: 500;
+}
+
+.metadata-section .text-danger {
+  font-weight: 500;
+}
+
+.metadata-section .fw-medium {
+  font-weight: 500;
+}
+
+/* Availability Tab Styles */
+.availability-table {
+  font-size: 0.9rem;
+}
+
+.availability-table th {
+  font-weight: 600;
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.availability-table td {
+  vertical-align: middle;
+}
+
+.availability-input {
+  width: 80px !important;
+  text-align: center;
+}
+
+.availability-price-input {
+  width: 100px !important;
+  text-align: center;
+}
+
+.availability-status-badge {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+}
+
+.availability-card {
+  border: none;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.availability-card .card-header {
+  border-bottom: none;
+  font-weight: 600;
+}

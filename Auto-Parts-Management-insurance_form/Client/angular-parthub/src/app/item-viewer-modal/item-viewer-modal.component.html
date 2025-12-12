@@ -1,0 +1,26 @@
+<!-- item-viewer-modal.component.html -->
+<div class="modal-backdrop" (click)="close()"></div>
+<div class="modal-content">
+  <h2>Edit Claim</h2>
+
+  <div>
+    <label for="name">Name</label>
+    <span>{{claim?.name}}</span>
+  </div>
+  <div>
+    <label for="age">amount</label>
+    <span>{{claim?.amount}}</span>
+
+  </div>
+  
+  <div>
+  
+    <div>
+
+    </div>
+    <div>
+      <button type="button" (click)="updateClaim()">Save</button>
+      <button type="button" (click)="close()">Close</button>
+    </div>
+
+  </div>

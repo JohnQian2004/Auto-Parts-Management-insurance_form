@@ -1,0 +1,29 @@
+<div class="d-flex justify-content-around fixed-bottom bg-navy text-white p-1"
+    style="height: 60px; border-radius: 0 0 15px 15px;">
+  
+  <div *ngFor="let item of bottomMenuSetting; let i = index">
+    <!-- Hidden radio button to handle the selection -->
+    <input type="radio" name="tab" [id]="'tab' + i" [(ngModel)]="selectedTab" [value]="i" (change)="onTabChange(i)" hidden />
+
+    <!-- Label with dynamic classes for the selected tab -->
+    <label class="d-flex flex-column align-items-center py-2 px-3 cursor-pointer" [for]="'tab' + i"
+           [ngClass]="[selectedTab === i ? item.menuTextColorActive : item.menuTextColor]" 
+           [title]="item.tooltip">
+      
+      <!-- Container for the icon with relative positioning -->
+      <div class="icon-container position-relative">
+        <!-- Font Awesome icons dynamically assigned -->
+        <i [class]="item.icon" class="icon"></i>
+
+        <!-- Notification Badge -->
+        <span *ngIf="item.notification > 0" 
+              [ngClass]="item.badgeColor || 'bg-danger'" 
+              class="badge-pill unread-badge fw-700">
+          {{ item.notification }}
+        </span>
+      </div>
+
+      <span class="mt-1 fs-12">{{ item.label }}</span> <!-- Tab label -->
+    </label>
+  </div>
+</div>

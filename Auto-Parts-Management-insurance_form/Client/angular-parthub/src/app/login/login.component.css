@@ -1,0 +1,26 @@
+
+.hide {
+    display: none;
+  }
+  .inner-addon { 
+      position: relative; 
+  }
+  .inner-addon .far, .inner-addon .fas {
+    position: absolute;
+    padding: 10px 30px;
+    z-index: 100;
+    cursor: pointer;
+  }
+  .left-addon .far, .left-addon .fas  { left:  0px; }
+  .right-addon .far, .right-addon .fas { right: 0px; }
+  
+  .left-addon input  { padding-left:  30px; }
+  .right-addon input { padding-right: 30px; }
+  
+  
+  .center {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }

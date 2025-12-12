@@ -1,0 +1,511 @@
+<div class="container-fluid overflow-hidden">
+  <div class="row vh-100 overflow-auto">
+    <div class="col-12 col-sm-3 col-xl-2 px-sm-2 px-0 bg-dark d-flex sticky-top">
+      <div
+        class="d-flex flex-sm-column flex-row flex-grow-1 align-items-center align-items-sm-start px-3 pt-2 text-white">
+        <a href="/" class="d-flex align-items-center pb-sm-3 mb-md-0 me-md-auto text-white text-decoration-none">
+          <span class="fs-5">A<span class="d-none d-sm-inline">admin Panel</span></span>
+        </a>
+        <ul
+          class="nav nav-pills flex-sm-column flex-row flex-nowrap flex-shrink-1 flex-sm-grow-0 flex-grow-1 mb-sm-auto mb-0 justify-content-center align-items-center align-items-sm-start"
+          id="menu">
+          <li class="nav-item">
+            <a href="/home" class="nav-link px-sm-0 px-2">
+              <i class="fs-5 bi-house"></i><span class="ms-1 d-none d-sm-inline">Home</span>
+            </a>
+          </li>
+          <li>
+            <a href="/admin2" data-bs-toggle="collapse" class="nav-link px-sm-0 px-2">
+              <i class="fs-5 bi-speedometer2"></i><span class="ms-1 d-none d-sm-inline">Dashboard</span> </a>
+          </li>
+          <li>
+            <a (click)="navigateTo()" class="nav-link px-sm-0 px-2">
+              <i class="fs-5 bi-table"></i><span class="ms-1 d-none d-sm-inline">Test Route</span></a>
+          </li>
+          <li class="dropdown">
+            <a href="/admin2" class="nav-link dropdown-toggle px-sm-0 px-1" id="dropdown" data-bs-toggle="dropdown"
+              aria-expanded="false">
+              <i class="fs-5 bi-bootstrap"></i><span class="ms-1 d-none d-sm-inline">Settings</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdown">
+              <li><a class="dropdown-item" href="/admin2">Client Config</a></li>
+              <li><a class="dropdown-item" href="/admin2">System Settings</a></li>
+              <li><a class="dropdown-item" href="/admin2">Site Profile</a></li>
+              <li>
+                <hr class="dropdown-divider">
+              </li>
+              <li><a class="dropdown-item" href="/admin2">Sign out</a></li>
+            </ul>
+          </li>
+          <li>
+            <a href="/admin2" class="nav-link px-sm-0 px-2">
+              <i class="fs-5 bi-grid"></i><span class="ms-1 d-none d-sm-inline">Auto Parts</span></a>
+          </li>
+          <li>
+            <a href="/admin2" class="nav-link px-sm-0 px-2">
+              <i class="fs-5 bi-people"></i><span class="ms-1 d-none d-sm-inline">Customers</span> </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="col d-flex flex-column h-sm-100">
+      <main class="row overflow-auto">
+        <div class="col pt-4">
+
+
+          <div class="grey-bg container-fluid">
+            <section id="minimal-statistics">
+              <div class="row">
+                <div class="col-12 mt-3 mb-1">
+                  <h4 class="text-uppercase">Site Overview</h4>
+                  <p>Statistics</p>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-xl-3 col-sm-6 col-12">
+                  <div class="card">
+                    <div class="card-content">
+                      <div class="card-body">
+                        <div class="media d-flex">
+                          <div class="align-self-center">
+                            <i class="icon-pencil primary font-large-2 float-left"></i>
+                          </div>
+                          <div class="media-body text-right">
+                            <h3>278</h3>
+                            <span>New Posts</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-xl-3 col-sm-6 col-12">
+                  <div class="card">
+                    <div class="card-content">
+                      <div class="card-body">
+                        <div class="media d-flex">
+                          <div class="align-self-center">
+                            <i class="icon-speech warning font-large-2 float-left"></i>
+                          </div>
+                          <div class="media-body text-right">
+                            <h3>156</h3>
+                            <span>New Users</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-xl-3 col-sm-6 col-12">
+                  <div class="card">
+                    <div class="card-content">
+                      <div class="card-body">
+                        <div class="media d-flex">
+                          <div class="align-self-center">
+                            <i class="icon-graph success font-large-2 float-left"></i>
+                          </div>
+                          <div class="media-body text-right">
+                            <h3>64.89 %</h3>
+                            <span>Bounce Rate</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-xl-3 col-sm-6 col-12">
+                  <div class="card">
+                    <div class="card-content">
+                      <div class="card-body">
+                        <div class="media d-flex">
+                          <div class="align-self-center">
+                            <i class="icon-pointer danger font-large-2 float-left"></i>
+                          </div>
+                          <div class="media-body text-right">
+                            <h3>423</h3>
+                            <span>Total Visits</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-xl-3 col-sm-6 col-12">
+                  <div class="card">
+                    <div class="card-content">
+                      <div class="card-body">
+                        <div class="media d-flex">
+                          <div class="media-body text-left">
+                            <h3 class="danger">278</h3>
+                            <span>New Projects</span>
+                          </div>
+                          <div class="align-self-center">
+                            <i class="icon-rocket danger font-large-2 float-right"></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-xl-3 col-sm-6 col-12">
+                  <div class="card">
+                    <div class="card-content">
+                      <div class="card-body">
+                        <div class="media d-flex">
+                          <div class="media-body text-left">
+                            <h3 class="success">156</h3>
+                            <span>New Clients</span>
+                          </div>
+                          <div class="align-self-center">
+                            <i class="icon-user success font-large-2 float-right"></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-xl-3 col-sm-6 col-12">
+                  <div class="card">
+                    <div class="card-content">
+                      <div class="card-body">
+                        <div class="media d-flex">
+                          <div class="media-body text-left">
+                            <h3 class="warning">64.89 %</h3>
+                            <span>Conversion Rate</span>
+                          </div>
+                          <div class="align-self-center">
+                            <i class="icon-pie-chart warning font-large-2 float-right"></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-xl-3 col-sm-6 col-12">
+                  <div class="card">
+                    <div class="card-content">
+                      <div class="card-body">
+                        <div class="media d-flex">
+                          <div class="media-body text-left">
+                            <h3 class="primary">423</h3>
+                            <span>Support Tickets</span>
+                          </div>
+                          <div class="align-self-center">
+                            <i class="icon-support primary font-large-2 float-right"></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-xl-3 col-sm-6 col-12">
+                  <div class="card">
+                    <div class="card-content">
+                      <div class="card-body">
+                        <div class="media d-flex">
+                          <div class="media-body text-left">
+                            <h3 class="primary">278</h3>
+                            <span>New Posts</span>
+                          </div>
+                          <div class="align-self-center">
+                            <i class="icon-book-open primary font-large-2 float-right"></i>
+                          </div>
+                        </div>
+                        <div class="progress mt-1 mb-0" style="height: 7px;">
+                          <div class="progress-bar bg-primary" role="progressbar" style="width: 80%" aria-valuenow="80"
+                            aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-xl-3 col-sm-6 col-12">
+                  <div class="card">
+                    <div class="card-content">
+                      <div class="card-body">
+                        <div class="media d-flex">
+                          <div class="media-body text-left">
+                            <h3 class="warning">156</h3>
+                            <span>New Comments</span>
+                          </div>
+                          <div class="align-self-center">
+                            <i class="icon-bubbles warning font-large-2 float-right"></i>
+                          </div>
+                        </div>
+                        <div class="progress mt-1 mb-0" style="height: 7px;">
+                          <div class="progress-bar bg-warning" role="progressbar" style="width: 35%" aria-valuenow="35"
+                            aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-xl-3 col-sm-6 col-12">
+                  <div class="card">
+                    <div class="card-content">
+                      <div class="card-body">
+                        <div class="media d-flex">
+                          <div class="media-body text-left">
+                            <h3 class="success">64.89 %</h3>
+                            <span>Bounce Rate</span>
+                          </div>
+                          <div class="align-self-center">
+                            <i class="icon-cup success font-large-2 float-right"></i>
+                          </div>
+                        </div>
+                        <div class="progress mt-1 mb-0" style="height: 7px;">
+                          <div class="progress-bar bg-success" role="progressbar" style="width: 60%" aria-valuenow="60"
+                            aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-xl-3 col-sm-6 col-12">
+                  <div class="card">
+                    <div class="card-content">
+                      <div class="card-body">
+                        <div class="media d-flex">
+                          <div class="media-body text-left">
+                            <h3 class="danger">423</h3>
+                            <span>Total Visits</span>
+                          </div>
+                          <div class="align-self-center">
+                            <i class="icon-direction danger font-large-2 float-right"></i>
+                          </div>
+                        </div>
+                        <div class="progress mt-1 mb-0" style="height: 7px;">
+                          <div class="progress-bar bg-danger" role="progressbar" style="width: 40%" aria-valuenow="40"
+                            aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section id="stats-subtitle">
+              <div class="row">
+                <div class="col-12 mt-3 mb-1">
+                  <h4 class="text-uppercase">Statistics With Subtitle</h4>
+                  <p>Statistics on minimal cards with Title &amp; Sub Title.</p>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-xl-6 col-md-12">
+                  <div class="card overflow-hidden">
+                    <div class="card-content">
+                      <div class="card-body cleartfix">
+                        <div class="media align-items-stretch">
+                          <div class="align-self-center">
+                            <i class="icon-pencil primary font-large-2 mr-2"></i>
+                          </div>
+                          <div class="media-body">
+                            <h4>Total Posts</h4>
+                            <span>Monthly posts</span>
+                          </div>
+                          <div class="align-self-center">
+                            <h1>18,000</h1>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-xl-6 col-md-12">
+                  <div class="card">
+                    <div class="card-content">
+                      <div class="card-body cleartfix">
+                        <div class="media align-items-stretch">
+                          <div class="align-self-center">
+                            <i class="icon-speech warning font-large-2 mr-2"></i>
+                          </div>
+                          <div class="media-body">
+                            <h4>Total Comments</h4>
+                            <span>Monthly comments</span>
+                          </div>
+                          <div class="align-self-center">
+                            <h1>84,695</h1>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-xl-6 col-md-12">
+                  <div class="card">
+                    <div class="card-content">
+                      <div class="card-body cleartfix">
+                        <div class="media align-items-stretch">
+                          <div class="align-self-center">
+                            <h1 class="mr-2">$76,456.00</h1>
+                          </div>
+                          <div class="media-body">
+                            <h4>Total Sales</h4>
+                            <span>Monthly Sales Amount</span>
+                          </div>
+                          <div class="align-self-center">
+                            <i class="icon-heart danger font-large-2"></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-xl-6 col-md-12">
+                  <div class="card">
+                    <div class="card-content">
+                      <div class="card-body cleartfix">
+                        <div class="media align-items-stretch">
+                          <div class="align-self-center">
+                            <h1 class="mr-2">$36,000.00</h1>
+                          </div>
+                          <div class="media-body">
+                            <h4>Total Cost</h4>
+                            <span>Monthly Cost</span>
+                          </div>
+                          <div class="align-self-center">
+                            <i class="icon-wallet success font-large-2"></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <div class="col-md-12">
+            <div>{{ content }}</div>
+          </div>
+
+
+          <div class="col-md-12" *ngIf="users">
+            <table class="col-md-12">
+              <tr>
+                <th>Id</th>
+                <th>Type</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Bussiness Name</th>
+                <th>Address</th>
+                <th>Action/Delete</th>
+              </tr>
+              <tr *ngFor="let user of users; let i = index" (click)="getAllFromUser(user.id)">
+                <td> {{ user.id }} </td>
+
+                <td> <select class="form-control" name="role" #type="ngModel" size="1" [(ngModel)]="user.roles[0].name"
+                    required>
+                    <option value="ROLE_USER" selected>Individual</option>
+                    <option value="ROLE_SHOP">Auto Shop</option>
+                    <option value="ROLE_RECYCLER">Auto Recycler</option>
+                    <option value="ROLE_ADMIN">Admin</option>
+                  </select>
+                  {{ user.roles[0].name }}
+                </td>
+                <td> {{ user.username }} </td>
+                <td> {{ user.email }} </td>
+                <td> {{ user.phone }} </td>
+                <td> {{ user.bussinessname }} </td>
+                <td> {{ user.addresses |json }} </td>
+                <td>
+                  <input type="checkbox" (change)="eventCheck($event.target, user.id)" />
+                </td>
+              </tr>
+            </table>
+          </div>
+          <div class="col-md-12">
+            <h4>{{ message}}</h4>
+          </div>
+
+          <div class="col-md-12" [hidden]="detailSelected == true || showPostForm==true">
+            <table class="col-md-12" *ngIf="selectedUserId">
+              <tr>
+                <th>Year<br>Make<br>Model<br>Name</th>
+                <th>description</th>
+                <th style="text-align: center">Part<br>Grad</th>
+                <th style="text-align: center">Stock #</th>
+                <th style="text-align: center">US Price</th>
+                <th>Dealer Info</th>
+                <th style="text-align: center">Distance<br>Miles</th>
+              </tr>
+              <tr id="{{autopart.id}}" (click)="getDetail(autopart, i)"
+                [style.background-color]="i == cindex? 'lightyellow' : (even ? 'white' : 'white')"
+                *ngFor="let autopart of autopartsSearch; let i = index;  let even=even">
+                <td> {{ autopart.id }} {{ autopart.year }}<br>
+                  {{ autopart.make }}<br>
+                  {{ autopart.model }}<br>
+
+                  {{autopart.partName }}
+                </td>
+                <td>
+                  <div class="card">
+                    <div class="card-content">
+                      <div class="card-body">
+                        <div class="media d-flex">
+                          <div class="align-self-center">
+                            <i class="icon-speech warning font-large-2 float-left">
+                              <img height="100" width="100" *ngIf="autopart.imageModels"
+                                src="{{baseUrlResizeImage + '/' + autopart.showInSearchImageId}}" alt="">
+                            </i>
+                          </div>
+                          <div class="media-body text-right">
+                            <h3>{{ autopart.grade}}</h3>
+                            <span> {{ autopart.engine }}.L {{ autopart.transmission}} {{ autopart.description }}
+                              {{ autopart.partNumber }}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- <img height="100" width="100" *ngIf="autopart.imageModels"
+                    src="{{baseUrlResizeImage + '/' + autopart.showInSearchImageId}}" alt="">
+                  {{ autopart.engine }}.L {{ autopart.transmission}} {{ autopart.description }}
+                  {{ autopart.partNumber }} -->
+                </td>
+                <td style="text-align: center">{{ autopart.grade}}</td>
+                <td style="text-align: center">#{{ autopart.id}}</td>
+                <td style="text-align: center">${{autopart.price}}</td>
+                <td>
+                  <div *ngIf="currentUser"><a target="_blank" href={{autopart.bussinessUrl}}>{{autopart.bussinessName |
+                      titlecase}}</a> {{
+                    autopart.phone}} <br>
+                  </div>
+                  {{autopart.city |
+                  titlecase}}, {{ autopart.state}}
+                </td>
+                <td style="text-align: center">
+                  <div *ngIf="autopart.distance !='0'"> {{autopart.distance}}</div>
+                  <input type="checkbox" (change)="deleteAutopart($event.target, autopart.id)" />
+                </td>
+
+              </tr>
+            </table>
+          </div>
+
+
+        </div>
+      </main>
+      <footer class="row bg-light py-4 mt-auto">
+        <div class="col"> Footer content </div>
+      </footer>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,103 @@
+/* Nested Modal Styles */
+.nested-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  outline: 0;
+}
+
+/* Nested modal levels with slight offset for visual distinction */
+.nested-modal-level-2 {
+  transform: translate(10px, 10px);
+}
+
+.nested-modal-level-3 {
+  transform: translate(20px, 20px);
+}
+
+.nested-modal-level-4 {
+  transform: translate(30px, 30px);
+}
+
+.nested-modal-level-5 {
+  transform: translate(40px, 40px);
+}
+
+/* Nested backdrop styling */
+.nested-backdrop {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+/* Ensure nested modals are properly centered */
+.nested-modal .modal-dialog {
+  position: relative;
+  width: auto;
+  margin: 0.5rem;
+  pointer-events: none;
+}
+
+@media (min-width: 576px) {
+  .nested-modal .modal-dialog {
+    max-width: 500px;
+    margin: 1.75rem auto;
+  }
+}
+
+/* Add subtle shadow to distinguish nested levels */
+.nested-modal .modal-content {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.nested-modal-level-2 .modal-content {
+  box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+.nested-modal-level-3 .modal-content {
+  box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+/* Ensure proper stacking context */
+.nested-modal .modal-header,
+.nested-modal .modal-body,
+.nested-modal .modal-footer {
+  position: relative;
+  z-index: 1;
+}
+
+/* Animation for nested modals */
+.nested-modal.show {
+  animation: nestedModalFadeIn 0.15s ease-out;
+}
+
+@keyframes nestedModalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Responsive adjustments for nested modals */
+@media (max-width: 767.98px) {
+  .nested-modal-level-2,
+  .nested-modal-level-3,
+  .nested-modal-level-4,
+  .nested-modal-level-5 {
+    transform: none; /* Remove offset on small screens */
+  }
+  
+  .nested-modal .modal-dialog {
+    margin: 0.5rem;
+  }
+}

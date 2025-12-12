@@ -1,0 +1,885 @@
+<div>
+  <div class="row nogot">
+    <div class="my-fluid-col main-content col mt-4 pt-2">
+      <div class="row px-2 position-sticky common-bar-top">
+        <nav class="navbar navbar-expand navbar-white border-radius-8 d-flex justify-content-between"
+          style="background-color:#253052">
+          <button class="btn btn-primary-abs" (click)="toggleClass()"><i class="fa fa-bars"></i></button>
+          <ul class="navbar-nav d-flex align-items-center gap-5">
+            <!-- <li class="search-bar">
+              <div class="position-relative">
+                <input type="text" class="form-control bg-light height-40 border-0" [(ngModel)]="searchInput"
+                  (input)="onSearchChangeCustomer($event)" placeholder="Search here..." />
+                <a (click)="searchCustomerByLastName(searchInput)" href="javascript;;"
+                  class="position-absolute end-0 top-0 mt-3 me-3 text-muted"><i class="fa fa-search"></i></a>
+              </div>
+            </li>
+            <li class="nav-item dropdown">
+              <div class="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"> <a href="javascript:;"
+                  class="notification position-relative"><i class="fa fa-bell text-dark opacity-50 fs-20"></i> <span
+                    class="position-absolute top-0 start-100 translate-middle bg-danger rounded-circle text-white text-white text-center line-height-200">10</span></a>
+              </div>
+              <div class="dropdown-menu p-0 border-0 shadow border-radius-8 overflow-hidden w-100 notification-box">
+                <div class="d-flex align-items-center justify-content-between p-4 border-bottom"> <strong
+                    class="fs-14">Notifications <span class="text-muted">(10)</span></strong> <a href="javascript:;"
+                    class="fs-12">Mark All Read</a> </div>
+                <div class="notice-scroller"> <a href="javascript:;" class="w-100 d-block">
+                    <div class="d-flex gap-3 align-items-center p-4 border-bottom"> <i
+                        class="fa fa-car fs-18 text-primary-abs text-center"></i> <span class="text-muted pe-4">
+                        <p class="fs-13">Vehicle <b class="text-dark">Chevrolet</b> is due 28 days.</p>
+                        <small class="fs-12">2 Hours ago</small>
+                      </span> </div>
+                  </a> <a href="javascript:;" class="w-100 d-block">
+                    <div class="d-flex gap-3 align-items-center p-4 border-bottom"> <i
+                        class="fa fa-user-tie fs-18 text-primary-abs text-center"></i> <span class="text-muted pe-4">
+                        <p class="fs-13">New <b class="text-dark">Customer</b> has been added.</p>
+                        <small class="fs-12">1 Day ago</small>
+                      </span> </div>
+                  </a> <a href="javascript:;" class="w-100 d-block">
+                    <div class="d-flex gap-3 align-items-center p-4 border-bottom"> <i
+                        class="fa fa-car fs-18 text-primary-abs text-center"></i> <span class="text-muted pe-4">
+                        <p class="fs-13">Vehicle <b class="text-dark">Chevrolet</b> is due 28 days.</p>
+                        <small class="fs-12">2 Hours ago</small>
+                      </span> </div>
+                  </a> <a href="javascript:;" class="w-100 d-block">
+                    <div class="d-flex gap-3 align-items-center p-4 border-bottom"> <i
+                        class="fa fa-user-tie fs-18 text-primary-abs text-center"></i> <span class="text-muted pe-4">
+                        <p class="fs-13">New <b class="text-dark">Customer</b> has been added.</p>
+                        <small class="fs-12">1 Day ago</small>
+                      </span> </div>
+                  </a> <a href="javascript:;" class="w-100 d-block">
+                    <div class="d-flex gap-3 align-items-center p-4"> <i
+                        class="fa fa-car fs-18 text-primary-abs text-center"></i> <span class="text-muted pe-4">
+                        <p class="fs-13">Vehicle <b class="text-dark">Chevrolet</b> is due 28 days.</p>
+                        <small class="fs-12">2 Hours ago</small>
+                      </span> </div>
+                  </a> </div>
+                <a href="javascript:;" class="text-center mx-auto pt-3 fs-12 d-block border-top">See all
+                  notifications</a>
+              </div>
+            </li> -->
+            <li class="nav-item dropdown">
+              <div class="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                <div class="d-flex align-items-center gap-3"> <img width="40" height="40" class="border-radius-4"
+                    *ngIf="company.icon != null && company.icon.length > 0"
+                    [src]="'data:image/jpeg;base64,'+ company.icon" />
+                  <div class="user-details text-white"> <strong class="fs-14 mb-1 d-block">{{user.firstName}}
+                      {{user.lastName}}</strong> <small
+                      class="fs-13 text-dark- opacity-50">{{this.company.name}}</small> </div>
+                  <i class="fa fa-angle-down opacity-50"></i>
+                </div>
+              </div>
+              <div class="dropdown-menu p-0 border-0 shadow border-radius-8 overflow-hidden w-100 mt-3">
+                <ul class="d-flex flex-column">
+                  <li class="d-block p-0"><a routerLink="/users" class="dropdown-item p-3 fs-12"><i
+                        class="fa fa-users text-primary-abs fs-15 me-2 ms-1"></i> Manage Users</a></li>
+                  <li class="d-block p-0"><button data-bs-toggle="modal" data-bs-target="#myAccount"
+                      class="dropdown-item p-3 fs-12"><i class="fa fa-user text-primary-abs fs-15 me-2 ms-1"></i> My
+                      Account</button></li>
+                  <li class="d-block p-0"><button data-bs-toggle="modal" data-bs-target="#resetPassword"
+                      class="dropdown-item p-3 fs-12"><i class="fa fa-key text-primary-abs fs-15 me-2 ms-1"></i> Reset
+                      Password</button></li>
+                  <li class="d-block p-0"><a routerLink="/login" class="dropdown-item p-3 fs-12" (click)="logout()"><i
+                        class="fa fa-power-off text-primary-abs fs-15 me-2 ms-1"></i> Logout</a></li>
+                </ul>
+              </div>
+            </li>
+          </ul>
+        </nav>
+      </div>
+      <div class="row mt-4">
+        <div class="mt-4 pt-1">
+          <div class="d-md-flex align-items-center justify-content-between px-2 py-2 " style="background-color:#253052">
+
+            <h2 class="text-white fw-700 text-uppercase fs-18" id="shopExpensesTop">Shop Expenses<span
+                class="fs-14 fw-400" title="Total Expenses" *ngIf="this.expenses!.length > 0">
+                ({{this.expenses!.length}})
+              </span></h2>
+
+            <div class="position-relative">
+              <input type="text" class="form-control bg-light height-40 border-0" id="searchInput"
+                [(ngModel)]="searchInput" placeholder="Search expense by item name ..." />
+              <div class="position-absolute end-0 top-0 mt-3"> <a class="text-muted me-3" data-toggle="tooltip"
+                  data-bs-title="Search expense by name"><i class="fa fa-search"
+                    (click)="searchExpenses(1, searchInput, 0)"></i></a>
+
+              </div>
+            </div>
+
+            <div class="d-lg-flex align-items-center px-2 mt-2">
+              <button class="btn btn-primary-abs fs-13 px-3 py-2 mt-15-mob" data-bs-toggle="modal"
+                *ngIf="user.allowAddExpense == true" (click)="createExpense()"><i class="fa fa-plus me-2"></i> Add
+                Expense
+              </button>
+              <button title="Show all info" (click)="this.getCompanyExpense(2, this.currentUserUser.companyId, 0);"
+                *ngIf="expenses.length > 0" class="fs-13 btn btn-secondary-abs px-3 border-radius-4 ms-md-3"><i
+                  class="fa fa-filter"></i> Get Unpaid</button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="row mt-4">
+        <div class="mt-4 pt-1">
+          <div class="col-12 p-3 bg-white shadow border border-radius-8">
+
+            <div class="table-responsive jobs-table bg-white border-radius-8 shadow">
+              <table class="table table-bordered border-radius-8 w-100">
+                <thead>
+                  <tr>
+
+                    <th class="bg-secondary p-4 fs-13 text-center text-white v-align-middle mw-50" style="width: 50px;">
+                      #
+                    </th>
+                    <th class="bg-secondary p-4 fs-13 text-center text-white v-align-middle">Item</th>
+                    <th class="bg-secondary p-4 fs-13 text-center text-white v-align-middle"
+                      title="Click to go to Configuration" [routerLink]="'/expense-types'"
+                      style="cursor:pointer; width:150px">Expense Type</th>
+                    <th class="bg-secondary p-4 fs-13 text-center text-white v-align-middle"
+                      title="Click to go to Configuration" [routerLink]="'/vendors'"
+                      style="cursor:pointer; width:150px">Vendor</th>
+                    <th class="bg-secondary p-4 fs-13 text-center text-white v-align-middle w-10" style="width: 50px;">
+                      Quantity</th>
+                    <th class="bg-secondary p-4 fs-13 text-center text-white v-align-middle mw-100" style="width:100px">
+                      <i class="fa-solid fa-dollar-sign"></i>
+                    </th>
+
+                    <th class="bg-secondary p-4 fs-13 text-center text-white v-align-middle mw-100"
+                      style="width: 100px;">Subtotal</th>
+                    <th class="bg-secondary p-4 fs-13 text-center text-white v-align-middle"
+                      title="Click to go to Configuration" [routerLink]="'/payment-method'"
+                      style="cursor:pointer; width:150px">Payment</th>
+                    <th class="bg-secondary p-4 fs-13 text-center text-white v-align-middle mw-50"><i
+                        class="fa-solid fa-clock"></i>
+                    </th>
+                    <th class="bg-secondary p-4 fs-13 text-center text-white v-align-middle mw-50"><i
+                        class="fa-solid fa-user"></i>
+                    </th>
+                    <th class="bg-secondary p-4 fs-13 text-center text-white v-align-middle mw-50"><i
+                        class="fa-solid fa-circle-check"></i>
+                    </th>
+                    <th class="bg-secondary p-4 fs-13 text-center text-white v-align-middle" style="width:100px;">
+                      Action
+                    </th>
+                  </tr>
+
+
+                </thead>
+                <tbody>
+                  <ng-container
+                    *ngFor="let expense of expenses | paginate: { itemsPerPage: this.pageSize,currentPage: currantPageNumber , totalItems: searchCount }; let i=index">
+                    <tr class="alert-info" (click)="setExpenseId(expense.id); getDetailsExpense(expense, i)"
+                      [style.background-color]="expense.id == currentExpenseId? '#FFF3CD' : (true ? '#CFF4FC' : '#CFF4FC')">
+
+                      <td class="fs-13 p-2 text-center v-align-middle">
+                        {{i+1}}
+                      </td>
+                      <td class="fs-13 p-2"
+                        [attr.title]="{'Please specify item information':expense.comments == ''|| expense.comments == null }">
+                        <textarea [(ngModel)]="expense.comments" class="form-control"
+                          [ngClass]="{'blink border-danger': expense.comments == ''|| expense.comments == null }"
+                          placeholder="Please Specify" (keyup.enter)="onEnterExpense('notes',expense)" rows="1"
+                          oninput='this.style.height = "";this.style.height = this.scrollHeight + "px"' maxlength="200"
+                          [disabled]="user.allowAddExpense == false"></textarea>
+                      </td>
+                      <td class="p-2 text-center">
+                        <select class="form-select h-48 px-3 border-radius-8" [disabled]="user.allowAddExpense == false"
+                          [(ngModel)]="expense.expenseTypeId" (change)="onEnterExpense('expense type',expense)">
+                          <option value="0" disabled selected>Select Type</option>
+                          <option value="0" *ngIf="expense.expenseTypeId > 0">Un-select Type</option>
+                          <option [value]="itemType.id" *ngFor="let itemType of expenseTypes;let i=index;">
+                            {{itemType.name}}
+                          </option>
+                        </select>
+                      </td>
+                      <td class="p-2 text-center">
+                        <select class="form-select h-48 px-3 border-radius-8" [disabled]="user.allowAddExpense == false"
+                          [(ngModel)]="expense.vendorId" (change)="onEnterExpense('vendor',expense)">
+                          <option value="0" disabled selected>Select Vendor</option>
+                          <option value="0" *ngIf="expense.vendorId > 0">Un-select Vendor</option>
+                          <option [value]="itemType.id" *ngFor="let itemType of vendors;let i=index;">
+                            {{itemType.name}}
+                          </option>
+                        </select>
+                      </td>
+                      <td class="fs-13 p-2"><input (keyup.enter)="onEnterExpense('quantity',expense)"
+                          [disabled]="user.allowAddExpense == false" [(ngModel)]="expense.quantity"
+                          onKeyPress="if(this.value.length==10) return false" pattern="[0-9]" type="number"
+                          class="form-control form-control-sm h-40 border-radius-4" />
+                      </td>
+                      <td class="fs-13 p-2"><input (keyup.enter)="onEnterExpense('amount',expense)"
+                          [disabled]="user.allowAddExpense == false"
+                          [ngClass]="{'blink border-danger': expense.amount == 0 }" [(ngModel)]="expense.amount"
+                          onKeyPress="if(this.value.length==10) return false" pattern="[0-9]" type="number"
+                          class="form-control form-control-sm h-40 border-radius-4" />
+                      </td>
+
+                      <td class="fs-13 p-2 text-center v-align-middle">${{getExpenseSubTotal(expense)}}</td>
+                      <td class="p-2 text-center">
+                        <select class="form-select h-48 px-3 border-radius-8" [disabled]="user.allowAddExpense == false"
+                          [(ngModel)]="expense.paymentMethodId" (change)="onEnterExpense('vendor',expense)">
+                          <option value="0" disabled selected>Select Payment</option>
+                          <option value="0" *ngIf="expense.paymentMethodId > 0">Un-select Payment</option>
+                          <option [value]="itemType.id" *ngFor="let itemType of paymentMethods;let i=index;">
+                            {{itemType.name}}
+                          </option>
+                        </select>
+                      </td>
+                      <td class="fs-13 p-2 text-center v-align-middle">
+                        {{expense.createdAt | date: 'MM/dd/yyyy HH:mm'}}
+                      </td>
+                      <td class="fs-13 p-2 text-center  v-align-middle">
+                        <ng-container *ngFor="let user of users;let i=index;">
+                          <span *ngIf="user.id == expense.userId">
+                            {{(user.firstName + " " + user.lastName) | shortName:2}}
+                          </span>
+                        </ng-container>
+
+
+                      </td>
+                      <td class="p-2 text-center v-align-middle">
+
+                        <strong class="badge badge-success" *ngIf="expense.paid==true"
+                          (click)="onEnterExpensePaid('paid', expense, false)">Paid</strong>
+                        <strong class="badge badge-danger" *ngIf="expense.paid==false"
+                          (click)="onEnterExpensePaid('paid', expense, true)">Not
+                          Paid</strong>
+
+                      </td>
+                      <td class="p-2 text-center  v-align-middle">
+                        <div class="d-flex align-items-center justifyc-cntent-center gap-2">
+                          <button class="btn btn-outline-danger btn-sm" [disabled]="user.allowAddExpense == false"
+                            title="Delete" (click)="deleteVehicleExpense(null, expense)"><i
+                              class="fa fa-trash"></i></button>
+                          <button class="btn btn-outline-success btn-sm" [disabled]="user.allowAddExpense == false"
+                            title="Save" (click)="onEnterExpense('update', expense)"><i class="fa fa-save"></i></button>
+
+                          <button class="btn btn-outline-warning btn-sm" title="add images"
+                            [disabled]="user.allowAddPayment == false" (click)="fileInputExpense.click()"><i
+                              class="fa fa-camera"></i></button>
+
+                          <input type='file' id="uploadButton" class="form-control opacity-0 top-0 position-absolute"
+                            accept="image/jpg, image/jpeg" #fileInputExpense
+                            (change)="onSelectFileEditorExpenses($event)" multiple
+                            (click)="fileInputExpense.value = ''" />
+
+                        </div>
+                      </td>
+                    </tr>
+                    <tr class="v-align-middle fs-11"
+                      *ngIf="showAllExpenseInfo== true || expense.imageModels.length  > 0 || expense.paid == true"
+                      (click)="getDetailsExpense(expense, i)">
+                      <td></td>
+                      <!-- <td></td> -->
+                      <td colspan="10">
+                        <div class="row overflow-x-auto overflow-y-hidden">
+                          <div
+                            class="gap-2 images-lists d-flex justify-content-between flex-wrap w-auto transition mt-1">
+
+                            <div *ngFor='let imageModel of expense.imageModels; let i=index'
+                              class="containerImage v-imgs float-start my-2 transition" style="cursor: pointer;">
+                              <div class="containerImage">
+
+                                <label class="top-left" for="title">
+                                  {{imageModel?.createdAt | date: 'MM/dd/yyyy
+                                  HH:mm:ss'}}</label>
+
+                                <img class="preview img-fluid img-thumbnail" width="100%"
+                                  title="{{imageModel.createdAt| date:  'MM/dd/yyyy, HH:mm'}}"
+                                  *ngIf="expense.showInSearchImageId != imageModel.id"
+                                  src="{{baseUrlResizeImageExpenses + '/' + imageModel.id}}"
+                                  (click)="getDetailsExpense(expense, i);setImage4(imageModel)"
+                                  style="border: 3px solid #555;">
+                                <img class="preview img-fluid img-thumbnail" width="100%"
+                                  title="{{imageModel.createdAt| date: 'MM/dd/yyyy, HH:mm'}} "
+                                  *ngIf="expense.showInSearchImageId == imageModel.id"
+                                  src="{{baseUrlResizeImageExpenses + '/' + imageModel.id}}"
+                                  (click)="getDetailsExpense(expense, i);setImage4(imageModel)" title="Show in search"
+                                  style="border: 3px solid lightcoral;">
+                                <div class="bottom-right py-2" *ngIf="user.allowAddPayment == true">
+                                  <!-- <button *ngIf="imageModel.id != job.showInSearchImageId"
+                                title="As index image during search"
+                                (click)="setImageForSearchJobs(job.id, imageModel.id)"
+                                class="btn btn-outline-primary-abs me-3 mt-3 btn-sm" for="title"><i
+                                  class="bi-search"></i></button> -->
+                                  <button (click)="deleteImageExpense(expense.id, imageModel.id)" data-toggle="tooltip"
+                                    data-placement="top" title="Remove this image"
+                                    class="btn btn-outline-danger mt-3 btn-sm" for="title"> <i class="bi-trash"></i>
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 px-0 py-3"
+                          *ngIf="selectedImage4 != null && selectedImage4 > 0 && expense.id ==  imageModelSelected.expenseId &&  expense.showInSearchImageId != selectedImage4">
+                          <div class="bg-white rounded-3 border p-3 h-100">
+                            <div class="containerImage" *ngIf="expense?.imageModels!.length > 0"> <img
+                                class="image w-100 img-fluid img-thumbnail"
+                                src="{{baseUrlResizeImageExpenseGetImages + '/' + selectedImage4}}" alt="Image" />
+                              <img
+                                *ngIf="selectedImage4 != null && selectedImage4 > 0 &&  expense.showInSearchImageId == selectedImage4"
+                                style="max-height:500px;"
+                                class="img-fluid rounded-2 img-thumbnail my-2 object-fit-cover w-100"
+                                src="{{baseUrlResizeImageExpenseGetImages + '/' + selectedImage4}}" alt="Image" />
+                              <!-- <label *ngIf="selectedImage4 == payment.showInSearchImageId" class="top-left"
+                              for="title">
+                              Will Show this in listing</label> -->
+                              <div class="top-right py-3">
+                                <button title="Close" (click)="selectedImage4 =0"
+                                  class="btn btn-primary-abs me-3 mt-3 btn-sm" for="title">Close</button>
+                                <!-- <button *ngIf="selectedImage != selectedVehicle.showInSearchImageId"
+                                title="As index image during search"
+                                (click)="setImageForSearch(selectedVehicle.id, selectedImage)"
+                                class="btn btn-primary-abs me-3 mt-3 btn-sm" for="title">Set for Index</button> -->
+                                <!-- <button (click)="deleteImage2(selectedVehicle.id, selectedImage4)"
+                                data-toggle="tooltip" data-placement="top" title="Remove this image"
+                                class="btn btn-danger mt-3 btn-sm" for="title">
+                                <i class="bi-trash"></i>
+                              </button> -->
+                              </div>
+                            </div>
+
+                          </div>
+                        </div>
+                      </td>
+                      <td class="fs-13 p-2 text-center">
+                        <span *ngIf="expense.paid == true">Paid at: {{expense.paidAt | date: 'MM/dd/yyyy HH:mm'}}</span>
+                      </td>
+
+                    </tr>
+                  </ng-container>
+
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex align-items-center justify-content-between my-0 my-sm-4 table-bottom"
+        *ngIf="expenses.length> 0">
+        <div class="d-sm-flex align-items-center gap-3 my-2 justify-content-end"> <span>Showing</span>
+          <select class="form-select px-3 my-3 my-sm-0" (change)="rememberMePageSize()" [(ngModel)]="pageSize"
+            title="Page Size">
+            <option>5</option>
+            <option>10</option>
+            <option>20</option>
+            <option>30</option>
+            <option>40</option>
+            <option>50</option>
+            <option>60</option>
+            <option>70</option>
+            <option>80</option>
+            <option>90</option>
+            <option>100</option>
+            <option>200</option>
+            <option>300</option>
+          </select>
+          <span>of {{this.searchCount}} entries</span>
+
+
+          <div class="ps-2">
+            <div class="form-check form-switch d-flex ms-3 mw-150 mt-1">
+              <input type="checkbox" role="switch" id="default2" class="form-check-input mt-0"
+                [checked]="this.pageSize !=20 " (change)="rememberMePageSize()" />
+              <label for="default2" class="form-check-label fs-12 fw-600 mt-0 ms-4">Remember My Page Size</label>
+            </div>
+          </div>
+
+        </div>
+
+        <nav class="paginations my-2" *ngIf="expenses.length > 0 ">
+
+          <ul class="pagination d-flex align-items-center gap-3" *ngIf="this.searchMode ==0 ">
+            <pagination-controls previousLabel="Prev" nextLabel="Next" [maxSize]=10
+              (pageChange)="getCompanyExpense(0, this.currentUserUser.companyId,$event)">
+            </pagination-controls>
+          </ul>
+          <ul class="pagination d-flex align-items-center gap-3" *ngIf="this.searchMode ==2 ">
+            <pagination-controls previousLabel="Prev" nextLabel="Next" [maxSize]=10
+              (pageChange)="getCompanyExpense(2, this.currentUserUser.companyId,$event)">
+            </pagination-controls>
+          </ul>
+          <ul class="pagination d-flex align-items-center gap-3" *ngIf="this.searchMode ==1 ">
+            <pagination-controls previousLabel="Prev" nextLabel="Next" [maxSize]=10
+              (pageChange)="searchExpenses(1, searchInput,$event)">
+            </pagination-controls>
+          </ul>
+        </nav>
+      </div>
+
+      <div class="row nogot">
+        <div class="mt-2 pt-1">
+          <div class="d-md-flex align-items-center justify-content-between px-2 my-4 py-2"
+            style="background-color:#253052">
+            <h2 class="fw-700 text-uppercase fs-18 text-white">Expense Overview</h2>
+            <div class="d-flex align-items-center gap-3">
+              <select class="form-select h-28 w-150 fs-13" [(ngModel)]="rangeExpense" title="Report number of weeks">
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5</option>
+                <option>6</option>
+                <option>7</option>
+                <option>8</option>
+                <option>9</option>
+                <option>10</option>
+                <option>11</option>
+                <option>12</option>
+                <option>13</option>
+                <option>14</option>
+                <option>15</option>
+                <option>16</option>
+              </select>
+              <div class="input-group-append">
+                <button type="button" class="btn-outline-secondary" title="Clear" id="refresh"
+                  (click)="resetEmployeeJobs()"><i class="bi bi-x-circle"></i></button>
+              </div>
+              <input trimText class="form-control h-28 w-150" type="week" [value]="todayWeek"
+                (change)="setWeekExpense($event)" />
+            </div>
+          </div>
+
+          <!-- <div class="row mt-1">
+            <div class="col-12 px-1">
+              <div class="d-md-flex align-items-center justify-content-between px-2 my-4">
+                <a class="text-center text-decoration-none fs-11 rounded-2 py-1 px-2"
+                  *ngFor="let letter of optionsLetter; let i=index" title="Customer Last Name Starting With "
+                  [style.background-color]="letter == currantLetter? '#1580da' : (false ? 'white' : 'white')"
+                  [style.color]="letter == currantLetter? '#FFF' : (false ? '#333' : '#333')"
+                  style="TEXT-DECORATION: underline; padding: 5px;">{{letter}}</a>
+              </div>
+            </div>
+          </div> -->
+
+          <div class="row mt-1 ">
+            <div class="col-12 mt-1 px-1">
+              <div class="bg-white border-radius-8 shadow h-100 ">
+                <div class="d-flex">
+                  <strong class="fs-18 p-4 d-block">Weekly Expenses
+
+                  </strong>
+                  <div class="align-items-center justify-content-between px-2 my-4">
+                    <a class="text-center fs-13 rounded-2 py-1 px-2" *ngFor="let letter of optionsLetter; let i=index"
+                      title="Click to view weekly report details" (click)="getReports(letter)"
+                      [style.background-color]="letter == currantLetter? '#1580da' : (false ? 'white' : 'white')"
+                      [style.color]="letter == currantLetter? '#FFF' : (false ? '#333' : '#333')"
+                      style="TEXT-DECORATION: underline; padding: 5px;">{{letter}}</a>
+                  </div>
+                </div>
+                <canvas baseChart [type]="'bar'" [data]="lineExpenseChartData" width="1000" height="500"
+                  class="p-4 w-100 border-top" [options]="lineChartOptionsExpenses" [legend]="lineChartLegend"></canvas>
+                <div class="input-group mb-4" *ngIf="expenseTypeGroupBy.length > 0 ">
+                  <div class="table-container shadow-sm border-radius-8 border w-100 mx-4 mt-4">
+                    <table class="table-bordered table-striped overflow-hidden border-radius-8 line-height-130 w-100">
+                      <tr>
+                        <th class="text-center fs-13 w-25 bg-light"># (week {{this.weekNumber}})</th>
+                        <th class="text-center fs-13 w-25">Expense Type</th>
+                        <th class="text-center fs-13 w-25 bg-light">Items</th>
+                        <th class="text-center fs-13 w-25 ">Subtotal</th>
+                      </tr>
+                      <tr *ngFor="let expenseTypeItem of expenseTypeGroupBy; let i=index" title="Click to view details"
+                        (click)="setExpenseFromGroupBy(expenseTypeItem.expenses)">
+                        <td class="text-center fs-13 w-25 bg-light">{{i+1}}</td>
+
+                        <td class="text-center fs-13 w-25">
+                          <ng-container *ngFor="let expenseType of this.expenseTypes">
+                            <ng-container *ngIf="expenseType.id ==expenseTypeItem.status ">
+                              {{expenseType.name}}
+                            </ng-container>
+                          </ng-container>
+                        </td>
+                        <td class="text-center fs-13 w-25 bg-light">{{expenseTypeItem.expenses.length}}</td>
+                        <td class="text-center fs-13 w-25">${{expenseTypeItem.count}}</td>
+                      </tr>
+                    </table>
+                  </div>
+                </div>
+
+                <div class="input-group mb-4" *ngIf="vendorGroupBy.length > 0 ">
+                  <div class="table-container shadow-sm border-radius-8 border w-100 mx-4 mt-4">
+                    <table class="table-bordered table-striped overflow-hidden border-radius-8 line-height-130 w-100">
+                      <tr>
+                        <th class="text-center fs-13 w-25 bg-light"># (week {{this.weekNumber}})</th>
+                        <th class="text-center fs-13 w-25">Vendor</th>
+                        <th class="text-center fs-13 w-25 bg-light">Items</th>
+                        <th class="text-center fs-13 w-25 ">Subtotal</th>
+                      </tr>
+                      <tr *ngFor="let vendorG of vendorGroupBy; let i=index" title="Click to view details"
+                        (click)="setExpenseFromGroupBy(vendorG.expenses)">
+                        <td class="text-center fs-13 w-25 bg-light">{{i+1}}</td>
+                        <td class="text-center fs-13 w-25">
+                          <ng-container *ngFor="let vendor of this.vendors">
+                            <ng-container *ngIf="vendor.id ==vendorG.status ">
+                              {{vendor.name}}
+                            </ng-container>
+                          </ng-container>
+                        </td>
+                        <td class="text-center fs-13 w-25 bg-light">{{vendorG.expenses.length}}</td>
+                        <td class="text-center fs-13 w-25">${{vendorG.count}}</td>
+                      </tr>
+                    </table>
+                  </div>
+                </div>
+
+                <div class="input-group mb-4" *ngIf="paymentMethodGroupBy.length > 0 ">
+                  <div class="table-container shadow-sm border-radius-8 border w-100 mx-4 mt-4">
+                    <table class="table-bordered table-striped overflow-hidden border-radius-8 line-height-130 w-100">
+                      <tr>
+                        <th class="text-center fs-13 w-25 bg-light"># (week {{this.weekNumber}})</th>
+                        <th class="text-center fs-13 w-25">Payment Method</th>
+                        <th class="text-center fs-13 w-25 bg-light">Items</th>
+                        <th class="text-center fs-13 w-25 ">Subtotal</th>
+                      </tr>
+                      <tr *ngFor="let paymentMethodG of paymentMethodGroupBy; let i=index" title="Click to view details"
+                        (click)="setExpenseFromGroupBy(paymentMethodG.expenses)">
+                        <td class="text-center fs-13 w-25 bg-light">{{i+1}}</td>
+                        <td class="text-center fs-13 w-25">
+                          <ng-container *ngFor="let paymentMethod of this.paymentMethods">
+                            <ng-container *ngIf="paymentMethod.id ==paymentMethodG.status ">
+                              {{paymentMethod.name}}
+                            </ng-container>
+                          </ng-container>
+                        </td>
+                        <td class="text-center fs-13 w-25 bg-light">{{paymentMethodG.expenses.length}}</td>
+                        <td class="text-center fs-13 w-25">${{paymentMethodG.count}}</td>
+                      </tr>
+                    </table>
+                  </div>
+                </div>
+
+                <div class="input-group mb-4"></div>
+              </div>
+            </div>
+
+
+
+          </div>
+        </div>
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+
+
+</div>
+
+
+
+
+
+
+<div class="modal fade" id="myAccount" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+  aria-labelledby="myAccountLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content border-radius-8">
+      <div class="modal-header p-4">
+        <h1 class="modal-title fs-20 fw-600 text-capitalize" id="myAccountLabel">My Account</h1>
+        <button type="button" class="btn-close mt-1" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body px-2" *ngIf="currentUser">
+        <form *ngIf="!isSuccessful" name="form" (ngSubmit)="f.form.valid && onSubmit()" #f="ngForm" novalidate>
+          <div class="row">
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="title" class="form-label fs-14 fw-400 mb-3">Account Type</label>
+                <select class="form-select h-48 px-3 border-radius-8" name="role" #type="ngModel" size="1" style=" appearance: none;
+                background-image: url('');" [(ngModel)]="form.role" required disabled
+                  [ngClass]="{ 'is-invalid': f.submitted && type.errors }">
+                  <option value="ROLE_USER" selected>Employee</option>
+                  <option value="ROLE_SHOP">Auto Shop</option>
+                  <option value="ROLE_ADMIN">Admin</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-4" *ngIf="form.role == 'ROLE_SHOP' || form.role == 'ROLE_RECYCLER' ">
+              <div class="mt-4 pt-1">
+                <label for="bussnessName" class="form-label fs-14 fw-400 mb-3">Business/Company Name</label>
+                <input trimText class="form-control h-48 px-3 border-radius-8" name="bussinessname"
+                  [(ngModel)]="form.bussinessname" required minlength="5" maxlength="200" #bussinessname="ngModel"
+                  placeHolder="Enter Business/Company Name"
+                  [ngClass]="{ 'is-invalid': f.submitted && bussinessname.errors }" />
+                <div class="invalid-feedback" *ngIf="bussinessname.errors && f.submitted">
+                  <span *ngIf="bussinessname.errors['required']">Business Name is required</span>
+                  <span *ngIf="bussinessname.errors['minlength']">Business Name must be at least 5 characters</span>
+                  <span *ngIf="bussinessname.errors['maxlength']">Business Name must be at most 200 characters</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="firstName" class="form-label fs-14 fw-400 mb-3">First Name</label>
+                <input trimText class="form-control h-48 px-3 border-radius-8" type="text" name="firstName"
+                  [(ngModel)]="form.firstName" required minlength="2" maxlength="20" #firstName="ngModel"
+                  [ngClass]="{ 'is-invalid': f.submitted && firstName.errors }" placeholder="Enter Your First Name" />
+                <div class="invalid-feedback" *ngIf="firstName.errors && f.submitted">
+                  <span *ngIf="firstName.errors['required']">First Name is required</span>
+                  <span *ngIf="firstName.errors['minlength']">First Name must be at least 2 characters</span>
+                  <span *ngIf="firstName.errors['maxlength']">First Name must be at most 20 characters</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="lastName" class="form-label fs-14 fw-400 mb-3">Last Name</label>
+                <input trimText class="form-control h-48 px-3 border-radius-8" type="text" name="lastName"
+                  [(ngModel)]="form.lastName" required minlength="2" maxlength="20" #lastName="ngModel"
+                  [ngClass]="{ 'is-invalid': f.submitted && lastName.errors }" placeholder="Enter Your Last Name" />
+                <div class="invalid-feedback" *ngIf="lastName.errors && f.submitted">
+                  <span *ngIf="lastName.errors['required']">Last Name is required</span>
+                  <span *ngIf="lastName.errors['minlength']">Last Name must be at least 2 characters</span>
+                  <span *ngIf="lastName.errors['maxlength']">Last Name must be at most 20 characters</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="email" class="form-label fs-14 fw-400 mb-3">Email Address</label>
+                <input trimText class="form-control h-48 px-3 border-radius-8" name="email" [(ngModel)]="form.email"
+                  required email #email="ngModel" [ngClass]="{ 'is-invalid': f.submitted && email.errors }"
+                  maxlength="100" pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                  placeholder="Enter Your Email Address" />
+                <div class="invalid-feedback" *ngIf="email.errors && f.submitted">
+                  <span *ngIf="email.errors['required']">Email is required</span>
+                  <span *ngIf="email.errors['email']">Email must be a valid email address</span>
+                  <span *ngIf="email.errors['pattern']">Email must be a valid email address</span>
+                  <span *ngIf="email.errors['maxlength']">Email must be at most 100 characters</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="phone" class="form-label fs-14 fw-400 mb-3">Phone</label>
+                <input trimText class="form-control h-48 px-3 border-radius-8" name="phone" [(ngModel)]="form.phone"
+                  required maxlength="20" #phone="ngModel" [ngClass]="{ 'is-invalid': f.submitted && phone.errors }"
+                  pattern="^[-+()0-9]{10,12}(?:-\d+)?$" placeholder="Enter Your Phone Number" />
+                <div class="invalid-feedback" *ngIf="phone.errors && f.submitted">
+                  <span *ngIf="phone.errors['required']">Phone is required</span>
+                  <span *ngIf="phone.errors['pattern']">Phone must be a valid phone number</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="street" class="form-label fs-14 fw-400 mb-3">Street</label>
+                <input trimText class="form-control h-48 px-3 border-radius-8" name="street" [(ngModel)]="form.street"
+                  required minlength="2" maxlength="200" #street="ngModel"
+                  [ngClass]="{ 'is-invalid': f.submitted && street.errors }" placeholder="Enter Your Street" />
+                <div class="invalid-feedback" *ngIf="street.errors && f.submitted">
+                  <span *ngIf="street.errors['required']">Street is required</span>
+                  <span *ngIf="street.errors['minlength']">Street must be at least 2 characters</span>
+                  <span *ngIf="street.errors['maxlength']">Street must be at most 200 characters</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="city" class="form-label fs-14 fw-400 mb-3">City</label>
+                <input trimText class="form-control h-48 px-3 border-radius-8" name="city" [(ngModel)]="form.city"
+                  required minlength="2" maxlength="200" #city="ngModel"
+                  [ngClass]="{ 'is-invalid': f.submitted && city.errors }" placeholder="Enter Your City" />
+                <div class="invalid-feedback" *ngIf="city.errors && f.submitted">
+                  <span *ngIf="city.errors['required']">City is required</span>
+                  <span *ngIf="city.errors['minlength']">City must be at least 2 characters</span>
+                  <span *ngIf="city.errors['maxlength']">City must be at most 200 characters</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="state" class="form-label fs-14 fw-400 mb-3">State</label>
+                <select class="form-select h-48 px-3 border-radius-8" name="state" #state="ngModel" size="1" required
+                  [(ngModel)]="form.state" [ngClass]="{ 'is-invalid': f.submitted && state.errors }">
+                  <option value="AL">Alabama</option>
+                  <option value="AK">Alaska</option>
+                  <option value="AZ">Arizona</option>
+                  <option value="AR">Arkansas</option>
+                  <option value="CA">California</option>
+                  <option value="CO">Colorado</option>
+                  <option value="CT">Connecticut</option>
+                  <option value="DE">Delaware</option>
+                  <option value="DC">District Of Columbia</option>
+                  <option value="FL">Florida</option>
+                  <option value="GA">Georgia</option>
+                  <option value="HI">Hawaii</option>
+                  <option value="ID">Idaho</option>
+                  <option value="IL">Illinois</option>
+                  <option value="IN">Indiana</option>
+                  <option value="IA">Iowa</option>
+                  <option value="KS">Kansas</option>
+                  <option value="KY">Kentucky</option>
+                  <option value="LA">Louisiana</option>
+                  <option value="ME">Maine</option>
+                  <option value="MD">Maryland</option>
+                  <option value="MA">Massachusetts</option>
+                  <option value="MI">Michigan</option>
+                  <option value="MN">Minnesota</option>
+                  <option value="MS">Mississippi</option>
+                  <option value="MO">Missouri</option>
+                  <option value="MT">Montana</option>
+                  <option value="NE">Nebraska</option>
+                  <option value="NV">Nevada</option>
+                  <option value="NH">New Hampshire</option>
+                  <option value="NJ">New Jersey</option>
+                  <option value="NM">New Mexico</option>
+                  <option value="NY">New York</option>
+                  <option value="NC">North Carolina</option>
+                  <option value="ND">North Dakota</option>
+                  <option value="OH">Ohio</option>
+                  <option value="OK">Oklahoma</option>
+                  <option value="OR">Oregon</option>
+                  <option value="PA">Pennsylvania</option>
+                  <option value="RI">Rhode Island</option>
+                  <option value="SC">South Carolina</option>
+                  <option value="SD">South Dakota</option>
+                  <option value="TN">Tennessee</option>
+                  <option value="TX">Texas</option>
+                  <option value="UT">Utah</option>
+                  <option value="VT">Vermont</option>
+                  <option value="VA">Virginia</option>
+                  <option value="WA">Washington</option>
+                  <option value="WV">West Virginia</option>
+                  <option value="WI">Wisconsin</option>
+                  <option value="WY">Wyoming</option>
+                </select>
+                <div class="invalid-feedback d-block" *ngIf="state.errors && f.submitted">
+                  <span *ngIf="state.errors['required']">State is required</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="zip" class="form-label fs-14 fw-400 mb-3">Zip Code</label>
+                <input trimText class="form-control h-48 px-3 border-radius-8" pattern="[0-9]*" name="zip"
+                  [(ngModel)]="form.zip" maxlength="20" required minlength="5" maxlength="20" #zip="ngModel"
+                  [ngClass]="{ 'is-invalid': f.submitted && zip.errors }" placeholder="Enter Your Zip Code" />
+                <div class="invalid-feedback" *ngIf="zip.errors && f.submitted">
+                  <span *ngIf="zip.errors['required']">Zip Code is required</span>
+                  <span *ngIf="zip.errors['pattern']">Must be a valid Zip Code</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-12 mt-4">
+              <div *ngIf="f.submitted && isUpdateFailed">
+                <span *ngIf="errorMessageProfile" class="alert alert-danger" role="alert">Update failed: {{
+                  errorMessageProfile
+                  }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="d-flex align-items-center gap-3 mt-5 px-3" *ngIf="currentUser">
+            <button class="btn btn-primary-abs h-45 px-4 rounded-4 fs-14 fw-600">Update Account</button>
+          </div>
+        </form>
+        <div *ngIf="isSuccessful" class="p-4">
+          <span class="alert alert-success" role="alert">Your update is successful! <button
+              class="btn btn-sm btn-primary-abs ms-3" (click)="reload()">Ok</button></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="resetPassword" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+  aria-labelledby="resetPasswordLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content border-radius-8">
+      <div class="modal-header p-4">
+        <h1 class="modal-title fs-20 fw-600 text-capitalize" id="resetPasswordLabel">Reset Password</h1>
+        <button type="button" class="btn-close mt-1" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body px-2" *ngIf="currentUser">
+        <form name="form" (ngSubmit)="f.form.valid && changePasswordRequest()" #f="ngForm" novalidate>
+          <div class="row">
+            <div class="col-md-4" *ngIf="form.role == 'ROLE_SHOP' || form.role == 'ROLE_RECYCLER' ">
+              <div class="mt-4 pt-1">
+                <label for="password" class="form-label fs-14 fw-400 mb-3">Old Password</label>
+                <div class="input-group">
+                  <input trimText class="form-control h-48 px-3" [type]="showPassword ? 'text' : 'password'"
+                    name="password" [(ngModel)]="form.password" required minlength="6" #password="ngModel"
+                    maxlength="30" [ngClass]="{ 'is-invalid': f.submitted && password.errors }"
+                    placeholder="Enter Your Old Password" />
+                  <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button"> <i alt="show" class="far fa-eye eye-show"
+                        (click)="showPassword = !showPassword" [class.hide]="showPassword"></i>
+                      <i alt="hide" class="far fa-eye-slash eye-hide" (click)="showPassword = !showPassword"
+                        [class.hide]="!showPassword"></i></button>
+                  </div>
+                </div>
+                <div class="invalid-feedback" *ngIf="password.errors && f.submitted">
+                  <span *ngIf="password.errors['required']">Password is required</span>
+                  <span *ngIf="password.errors['minlength']">Password must be at least 6 characters</span>
+                  <span *ngIf="password.errors['maxlength']">Password must be at most 30 characters</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="newPassword" class="form-label fs-14 fw-400 mb-3">New Password</label>
+                <div class="input-group">
+                  <input trimText class="form-control h-48 px-3" [type]="showPasswordNew ? 'text' : 'password'"
+                    name="newPassword" [(ngModel)]="form.newPassword" required minlength="6" #newPassword="ngModel"
+                    maxlength="30" [ngClass]="{ 'is-invalid': f.submitted && newPassword.errors }"
+                    placeholder="Enter Your New Password" />
+                  <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button"> <i alt="show" class="far fa-eye eye-show"
+                        (click)="showPasswordNew = !showPasswordNew" [class.hide]="showPasswordNew"></i>
+                      <i alt="hide" class="far fa-eye-slash eye-hide" (click)="showPasswordNew = !showPasswordNew"
+                        [class.hide]="!showPasswordNew"></i></button>
+                  </div>
+                </div>
+                <div class="invalid-feedback" *ngIf="newPassword.errors && f.submitted">
+                  <span *ngIf="newPassword.errors['required']">New Password is required</span>
+                  <span *ngIf="newPassword.errors['minlength']">New Password must be at least 6 characters</span>
+                  <span *ngIf="newPassword.errors['maxlength']">New Password must be at most 30 characters</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="newPasswordComfirmed" class="form-label fs-14 fw-400 mb-3">Confirm New Password</label>
+                <div class="input-group">
+                  <input trimText class="form-control h-48 px-3" [type]="showPaswordNewConfirmed ? 'text' : 'password'"
+                    name="passwordNew" [(ngModel)]="form.newPasswordComfirmed" required minlength="6"
+                    #newPasswordComfirmed="ngModel" maxlength="30"
+                    [ngClass]="{ 'is-invalid': f.submitted && newPasswordComfirmed.errors }"
+                    placeholder="Please Re-Type Your New Password" />
+                  <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button"> <i alt="show" class="far fa-eye eye-show"
+                        (click)="showPaswordNewConfirmed = !showPaswordNewConfirmed"
+                        [class.hide]="showPaswordNewConfirmed"></i>
+                      <i alt="hide" class="far fa-eye-slash eye-hide"
+                        (click)="showPaswordNewConfirmed = !showPaswordNewConfirmed"
+                        [class.hide]="!showPaswordNewConfirmed"></i></button>
+                  </div>
+                </div>
+                <div class="invalid-feedback" *ngIf="newPasswordComfirmed.errors && f.submitted">
+                  <span *ngIf="newPasswordComfirmed.errors['required']">Confirm New Password is required</span>
+                  <span *ngIf="newPasswordComfirmed.errors['minlength']">Confirm New Password must be at least 6
+                    characters</span>
+                  <span *ngIf="newPasswordComfirmed.errors['maxlength']">Confirm New Password must be at most 30
+                    characters</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-12 py-4 mt-4" *ngIf="errorMessageResetPassword != ''">
+              <span class="alert alert-success line-height-150" role="alert">{{errorMessageResetPassword}}</span>
+            </div>
+          </div>
+          <div class="d-flex align-items-center gap-3 mt-4 px-3" *ngIf="currentUser">
+            <button class="btn btn-primary-abs h-45 px-4 rounded-4 fs-14 fw-600">Reset Password</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

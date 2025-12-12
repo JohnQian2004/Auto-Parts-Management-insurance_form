@@ -1,0 +1,1280 @@
+<div>
+  <div class="row nogot">
+    <div class="my-fluid-col main-content col mt-4 pt-2">
+      <div class="row px-2 position-sticky common-bar-top">
+        <nav class="navbar navbar-expand navbar-white bg-white border-radius-8 d-flex justify-content-between">
+          <button class="btn btn-primary-abs" (click)="toggleClass()"><i class="fa fa-bars"></i></button>
+          <ul class="navbar-nav d-flex align-items-center gap-5">
+            <!-- <li class="search-bar">
+              <div class="position-relative">
+                <input type="text" class="form-control bg-light height-40 border-0" [(ngModel)]="searchInput"
+                  (input)="onSearchChangeCustomer($event)" placeholder="Search here..." />
+                <a (click)="searchCustomerByLastName(searchInput)" href="javascript;;"
+                  class="position-absolute end-0 top-0 mt-3 me-3 text-muted"><i class="fa fa-search"></i></a>
+              </div>
+            </li> -->
+            <!-- <li class="nav-item dropdown">
+                <div class="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"> <a href="javascript:;" class="notification position-relative"><i class="fa fa-bell text-dark opacity-50 fs-20"></i> <span class="position-absolute top-0 start-100 translate-middle bg-danger rounded-circle text-white text-white text-center line-height-200">10</span></a> </div>
+                <div class="dropdown-menu p-0 border-0 shadow border-radius-8 overflow-hidden w-100 notification-box">
+                  <div class="d-flex align-items-center justify-content-between p-4 border-bottom"> <strong class="fs-14">Notifications <span class="text-muted">(10)</span></strong> <a href="javascript:;" class="fs-12">Mark All Read</a> </div>
+                  <div class="notice-scroller"> <a href="javascript:;" class="w-100 d-block">
+                    <div class="d-flex gap-3 align-items-center p-4 border-bottom"> <i class="fa fa-car fs-18 text-primary-abs text-center"></i> <span class="text-muted pe-4">
+                      <p class="fs-13">Vehicle <b class="text-dark">Chevrolet</b> is due 28 days.</p>
+                      <small class="fs-12">2 Hours ago</small> </span> </div>
+                    </a> <a href="javascript:;" class="w-100 d-block">
+                    <div class="d-flex gap-3 align-items-center p-4 border-bottom"> <i class="fa fa-user-tie fs-18 text-primary-abs text-center"></i> <span class="text-muted pe-4">
+                      <p class="fs-13">New <b class="text-dark">Customer</b> has been added.</p>
+                      <small class="fs-12">1 Day ago</small> </span> </div>
+                    </a> <a href="javascript:;" class="w-100 d-block">
+                    <div class="d-flex gap-3 align-items-center p-4 border-bottom"> <i class="fa fa-car fs-18 text-primary-abs text-center"></i> <span class="text-muted pe-4">
+                      <p class="fs-13">Vehicle <b class="text-dark">Chevrolet</b> is due 28 days.</p>
+                      <small class="fs-12">2 Hours ago</small> </span> </div>
+                    </a> <a href="javascript:;" class="w-100 d-block">
+                    <div class="d-flex gap-3 align-items-center p-4 border-bottom"> <i class="fa fa-user-tie fs-18 text-primary-abs text-center"></i> <span class="text-muted pe-4">
+                      <p class="fs-13">New <b class="text-dark">Customer</b> has been added.</p>
+                      <small class="fs-12">1 Day ago</small> </span> </div>
+                    </a> <a href="javascript:;" class="w-100 d-block">
+                    <div class="d-flex gap-3 align-items-center p-4"> <i class="fa fa-car fs-18 text-primary-abs text-center"></i> <span class="text-muted pe-4">
+                      <p class="fs-13">Vehicle <b class="text-dark">Chevrolet</b> is due 28 days.</p>
+                      <small class="fs-12">2 Hours ago</small> </span> </div>
+                    </a> </div>
+                  <a href="javascript:;" class="text-center mx-auto pt-3 fs-12 d-block border-top">See all notifications</a> </div>
+              </li> -->
+            <li class="nav-item dropdown">
+              <div class="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                <div class="d-flex align-items-center gap-3">
+                  <!-- <img width="40" height="40" class="border-radius-4" [src]="'data:image/jpeg;base64,'+ company.icon" /> -->
+                  <div class="user-details"> <strong class="fs-14 mb-1 d-block">{{user.firstName}}
+                      {{user.lastName}}</strong> <small class="fs-13 text-dark- opacity-50">Super Admin</small> </div>
+                  <i class="fa fa-angle-down opacity-50"></i>
+                </div>
+              </div>
+              <div class="dropdown-menu p-0 border-0 shadow border-radius-8 overflow-hidden w-100 mt-3">
+                <ul class="d-flex flex-column">
+                  <li class="d-block p-0"><a routerLink="/users-parts-market2" class="dropdown-item p-3 fs-12"><i
+                        class="fa fa-users text-primary-abs fs-15 me-2 ms-1"></i> Manage Users</a></li>
+                  <li class="d-block p-0">
+                    <button data-bs-toggle="modal" data-bs-target="#myAccount" class="dropdown-item p-3 fs-12"><i
+                        class="fa fa-user text-primary-abs fs-15 me-2 ms-1"></i> My Account</button>
+                  </li>
+                  <li class="d-block p-0">
+                    <button data-bs-toggle="modal" data-bs-target="#resetPassword" class="dropdown-item p-3 fs-12"><i
+                        class="fa fa-key text-primary-abs fs-15 me-2 ms-1"></i> Reset Password</button>
+                  </li>
+                  <li class="d-block p-0"><a routerLink="/login" class="dropdown-item p-3 fs-12" (click)="logout()"><i
+                        class="fa fa-power-off text-primary-abs fs-15 me-2 ms-1"></i> Logout</a></li>
+                </ul>
+              </div>
+            </li>
+          </ul>
+        </nav>
+      </div>
+
+      <!-- <div class="d-md-flex align-items-center justify-content-between px-2 my-4 pt-4">
+        <h2 class="heading-color fw-700 text-uppercase fs-18">System Overview</h2>
+        <div class="d-flex align-items-center gap-3">
+          <select class="form-select h-28 w-150 fs-13" [(ngModel)]="rangePartMarket">
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+            <option>4</option>
+            <option>5</option>
+            <option>6</option>
+            <option>7</option>
+            <option>8</option>
+            <option>9</option>
+            <option>10</option>
+            <option>11</option>
+            <option>12</option>
+          </select>
+          <input trimText class="form-control h-28 w-150" type="week" (change)="setWeekVehicle($event)" />
+        </div>
+      </div> -->
+
+      <!-- <div class="row py-3 mt-4 vehicles-overview">
+        <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 px-2 my-2">
+          <div class="bg-white border-radius-4 p-4 shadow-sm">
+            <div class="d-flex gap-3">
+              <i class="fa fa-building-shield fa-2x text-primary-abs"></i>
+              <span>
+                <strong class="fs-6 d-block pb-2">Companies</strong>
+                <p>{{systemSatisticsResponse.totalCompanies}}</p>
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 px-2 my-2">
+          <div class="bg-white border-radius-4 p-4 shadow-sm">
+            <div class="d-flex gap-3">
+              <i class="fa fa-store fa-2x text-primary-abs"></i>
+              <span>
+                <strong class="fs-6 d-block pb-2">Shop Subscribers</strong>
+                <p>{{systemSatisticsResponse.totalShopUsers}}</p>
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 px-2 my-2">
+          <div class="bg-white border-radius-4 p-4 shadow-sm">
+            <div class="d-flex gap-3">
+              <i class="fa fa-user-shield fa-2x text-primary-abs"></i>
+              <span>
+                <strong class="fs-6 d-block pb-2">Market Only Subscribers</strong>
+                <p>{{systemSatisticsResponse.totalMarketOnlyUsers}}</p>
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 px-2 my-2">
+          <div class="bg-white border-radius-4 p-4 shadow-sm">
+            <div class="d-flex gap-3">
+              <i class="fa fa-truck-ramp-box fa-2x text-primary-abs"></i>
+              <span>
+                <strong class="fs-6 d-block pb-2">Listed Auto Parts</strong>
+                <p>{{systemSatisticsResponse.totalListedAutoparts}}</p>
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 px-2 my-2">
+          <div class="bg-white border-radius-4 p-4 shadow-sm">
+            <div class="d-flex gap-3">
+              <i class="fa fa-caravan fa-2x text-primary-abs"></i>
+              <span>
+                <strong class="fs-6 d-block pb-2">Archived Auto Parts</strong>
+                <p>{{systemSatisticsResponse.totalArchivededAutoparts}}</p>
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 px-2 my-2">
+          <div class="bg-white border-radius-4 p-4 shadow-sm">
+            <div class="d-flex gap-3">
+              <i class="fa fa-images fa-2x text-primary-abs"></i>
+              <span>
+                <strong class="fs-6 d-block pb-2">Images</strong>
+                <p>{{systemSatisticsResponse.totalImages}}</p>
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 px-2 my-2">
+          <div class="bg-white border-radius-4 p-4 shadow-sm">
+            <div class="d-flex gap-3">
+              <i class="fa fa-eye fa-2x text-primary-abs"></i>
+              <span>
+                <strong class="fs-6 d-block pb-2">Total View Counts</strong>
+                <p>{{systemSatisticsResponse.totalViewCounts}}</p>
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 mt-4 px-2">
+          <div class="bg-white border-radius-8 shadow h-100">
+            <strong class="fs-18 p-4 d-block">Users trend at the time entering into the system</strong>
+            <canvas baseChart [type]="'bar'" [data]="lineUserChartData" width="1000" height="500"
+              class="p-4 w-100 border-top" [options]="lineChartOptionsUsers" [legend]="lineChartLegend"></canvas>
+          </div>
+        </div>
+        <div class="col-lg-6 mt-4 ps-2">
+          <div class="bg-white border-radius-8 shadow h-100">
+            <strong class="fs-18 p-4 d-block">Auto Parts trend at the time entering into the system</strong>
+            <canvas baseChart [type]="'bar'" [data]="lineAutopartChartData" width="500" height="500"
+              class="p-4 w-100 border-top" [options]="lineChartOptionsAutopart" [legend]="lineChartLegend"></canvas>
+          </div>
+        </div>
+        <div class="col-lg-6 mt-4 pe-2">
+          <div class="bg-white border-radius-8 shadow h-100">
+            <strong class="fs-18 p-4 d-block">Images trend at the time entering into the system</strong>
+            <canvas baseChart [type]="'bar'" [data]="lineImageChartData" width="500" height="500"
+              class="p-4 w-100 border-top" [options]="lineChartOptionsImage" [legend]="lineChartLegend"></canvas>
+          </div>
+        </div>
+        <div class="col-lg-12 mt-4 px-2 pe-2">
+          <div class="bg-white border-radius-8 shadow h-100">
+            <strong class="fs-18 p-4 d-block">Auto part overviews</strong>
+          </div>
+        </div>
+        <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 px-2 my-2"
+          *ngFor="let groupBy of this.reportsTitle; let i=index">
+          <div class="bg-white border-radius-4 p-4 shadow-sm">
+            <div class="d-flex gap-3">
+              <i class="fa fa-eye fa-2x text-primary-abs"></i>
+              <span>
+                <strong class="fs-6 d-block pb-2" style="word-break:break-all">{{groupBy.name}}</strong>
+                <p>{{groupBy.count}}</p>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div> -->
+
+      <div class="d-md-flex align-items-center justify-content-between px-2 my-4 pt-4">
+        <h2 class="heading-color fw-700 text-uppercase fs-18">Total {{systemSatisticsResponse.totalMarketOnlyUsers}}
+          Users (Part Market Only) with {{systemSatisticsResponse.totalListedAutoparts}} Parts
+        </h2>
+        <div class="d-flex align-items-center gap-3">
+          <!-- <button class="btn btn-primary-abs btn-sm" data-bs-toggle="modal" data-bs-target="#userInfo">See User
+            Info</button> -->
+          <input type="text" class="form-control bg-light height-40 border-0" [(ngModel)]="searchInput"
+            (input)="onSearchChangeUser($event)" placeholder="Search by last name ..." />
+          <!-- <a (click)="searchCustomerByLastName(searchInput)" href="javascript;;"
+            class="position-absolute end-0 top-0 mt-3 me-3 text-muted"><i class="fa fa-search"></i></a>
+
+          <input trimText class="form-control rounded-2 fs-12 h-28 ps-2 w-150" type="text" placeholder="Search By Last Name"
+            (input)="onSearchChangeUser($event)" /> -->
+        </div>
+      </div>
+
+      <div class="d-md-flex align-items-center justify-content-between px-2 my-4 pt-4 pagd">
+        <a class="text-center text-decoration-none fs-11 rounded-2 py-1 px-2"
+          (click)=" getAllUserStartingPage(0,letter, pageSize)" *ngFor="let letter of optionsLetter; let i=index"
+          title="User Last Name Starting With "
+          [style.background-color]="letter == currantLetter? '#1580da' : (false ? 'white' : 'white')"
+          [style.color]="letter == currantLetter? '#FFF' : (false ? '#333' : '#333')"
+          style="TEXT-DECORATION: underline; padding: 5px;">
+
+          <strong>{{letter}}</strong>
+          <ng-container *ngFor="let report of this.reportsLastName">
+            <span *ngIf="report.name == letter && report.count > 0">({{report.count}})</span>
+          </ng-container>
+
+        </a>
+      </div>
+
+      <div class="row mx-negative">
+        <div class="col-lg-3 col-md-6" (click)="getUserDetailPartMarket(customer2, i)"
+          *ngFor="let customer2 of usersAdmin; let i=index; let even=even">
+          <div class="bg-white shadow-sm border-radius-8 p-4 cursor-pointer"
+            [style.border]="i == cindex? '1px solid #1580da' : (even ? 'white' : 'white')">
+            <div class="text-center">
+              <i class="fa-solid fa-circle-user fa-4x heading-color"></i>
+              <strong class="text-black fs-14 d-block pt-4 pb-2">{{ customer2.firstName }} {{customer2.lastName
+                }}</strong>
+            </div>
+            <ul class="customers-details">
+              <li class="d-flex gap-3 align-items-center mt-4"><i
+                  class="fa fa-mobile-alt text-primary-abs border-radius-4 text-center "></i>
+                <p class="fs-12 text-black opacity-75 line-height-150">{{ formatPhoneNumber(customer2.phone) }}</p>
+              </li>
+              <li class="d-flex gap-3 align-items-center mt-4"><i
+                  class="fa fa-envelope text-primary-abs border-radius-4 text-center "></i>
+                <p class="fs-12 text-black opacity-75 line-height-150">{{ customer2.email }}</p>
+              </li>
+              <li class="d-flex gap-3 align-items-center mt-4"><i
+                  class="fa fa-map-marker-alt text-primary-abs border-radius-4 text-center "></i>
+                <p class="fs-12 text-black opacity-75 line-height-150">{{customer2.addresses[0].street}},
+                  {{customer2.addresses[0].city}}, {{customer2.addresses[0].state}} {{customer2.addresses[0].zip}}</p>
+              </li>
+              <li class="d-flex gap-3 align-items-center mt-4"><i
+                  class="fa fa-list text-primary-abs border-radius-4 text-center "></i>
+                <p class="fs-12 text-black opacity-75 line-height-150">Listed Parts: {{customer2.totalCountListed}}</p>
+              </li>
+              <li class="d-flex gap-3 align-items-center mt-4"><i
+                  class="fa fa-list text-primary-abs border-radius-4 text-center "></i>
+                <p class="fs-12 text-black opacity-75 line-height-150">Archived Parts: {{customer2.totalCountArchived}}
+                </p>
+              </li>
+
+              <li class="d-flex gap-3 align-items-center mt-4"><i
+                  class="fa fa-flag text-primary-abs border-radius-4 text-center "></i>
+                <div class="form-check form-switch d-flex text-start ms-3">
+                  <input class="form-check-input mt-0" type="checkbox" disabled [(ngModel)]="customer2.activated"
+                    role="switch" id="activated" />
+                  <label class="form-check-label fs-12 fw-600 mt-1 ms-4" for="activated">Activated</label>
+                </div>
+              </li>
+
+              <li class="d-flex gap-3 align-items-center mt-4"><i
+                  class="fa fa-calendar text-primary-abs border-radius-4 text-center "></i>
+                <p class="fs-12 text-black opacity-75 line-height-150">Since {{customer2.createdAt| date}}</p>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex align-items-center justify-content-between my-4 table-bottom">
+        <div class="d-flex align-items-center gap-3 my-2"> <span>Showing</span>
+          <select class="form-select px-3" [(ngModel)]="pageSize"
+            (change)="getAllUserStartingPage(0, this.currantLetter, pageSize)">
+            <option>10</option>
+            <option>20</option>
+            <option>30</option>
+            <option>40</option>
+            <option>50</option>
+            <option>60</option>
+            <option>70</option>
+            <option>80</option>
+            <option>90</option>
+            <option>100</option>
+            <option>200</option>
+            <option>300</option>
+          </select>
+          <span>of {{this.searchCount}} entries</span>
+        </div>
+
+        <nav class="paginations my-2">
+          <ul class="pagination d-flex align-items-center gap-3">
+            <li class="page-item"> <a class="page-link bg-light border-radius-4 px-3 py-2 fw-bold"
+                (click)="getAllUserStartingPage(this.currantPageNumber-1,this.currantLetter, pageSize)"> Previous
+              </a> </li>
+            <li (click)="getAllUserStartingPage(i,this.currantLetter, pageSize)"
+              *ngFor="let page of pagesArray; let i=index" class="page-item"><a
+                class="page-link border-radius-4 px-3 py-2"
+                [style.background-color]="i == currantPageNumber? '#1580DA' : (false ? '#EEE' : '#EEE')"
+                [style.color]="i == currantPageNumber? '#FFF' : (false ? '#666' : '#666')"
+                href="javascript:;">{{page}}</a></li>
+            <li class="page-item"> <a class="page-link bg-light border-radius-4 px-3 py-2 fw-bold"
+                (click)="getAllUserStartingPage(this.currantPageNumber+1,this.currantLetter, pageSize)">
+                Next </a> </li>
+          </ul>
+        </nav>
+      </div>
+
+      <div class="d-md-flex align-items-center justify-content-between px-2 my-4 pt-4">
+        <h2 class="heading-color fw-700 text-uppercase fs-18">Auto Parts<span class="fs-14 fw-400"
+            title="Current Customer"
+            *ngIf="this.user && this.user.roles != null && this.user.roles[0].name !='ROLE_ADMIN'">
+            ({{this.user.firstName}}
+            {{this.user.lastName}} {{this.user.email}} ) </span><button class="btn btn-primary-abs btn-sm"
+            *ngIf="this.user && this.user.roles != null && this.user.roles[0].name !='ROLE_ADMIN'"
+            data-bs-toggle="modal" data-bs-target="#userInfo">Details</button></h2>
+        <div class="d-flex align-items-center gap-3">
+          <select class="form-select h-28 w-150 fs-13" [(ngModel)]="pageSize">
+            <option>10</option>
+            <option>20</option>
+            <option>30</option>
+            <option>40</option>
+            <option>50</option>
+            <option>60</option>
+            <option>70</option>
+            <option>80</option>
+            <option>90</option>
+            <option>100</option>
+            <option>200</option>
+            <option>300</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row mx-negative">
+        <div class="col-12" [hidden]="detailSelected == true">
+          <div *ngIf="autopartsSearch.length >0">
+            <div class="parts-box bg-white border-radius-8 py-4 px-3 mt-4 shadow-sm" id="{{autopart.id}}"
+              [style.background-color]="i == cindex? '#1580da' : (even ? '#EEE' : '#EEE')"
+              *ngFor="let autopart of autopartsSearch; let i = index;  let even=even">
+              <div class="row mx-n2">
+                <div class="col-lg-2 col-md-4">
+                  <img class="img-fluid w-100 border-radius-8" *ngIf="autopart.showInSearchImageId"
+                    src="{{baseUrlResizeImage + '/' + autopart.showInSearchImageId}}" alt="Image" />
+                </div>
+                <div class="col-lg-10 col-md-8 ps-md-1">
+                  <div class="d-md-flex align-items-start justify-content-between">
+                    <div>
+                      <h2 class="fs-22 fw-700 py-2 line-height-150" *ngIf="currentUser"><a class="text-dark"
+                          target="_blank" href={{autopart.bussinessUrl}}>{{autopart.bussinessName | titlecase}}</a></h2>
+                      <h3 class="fs-17 text-dark opacity-50 fw-500 line-height-130 mb-0">{{ autopart.id}} - {{
+                        autopart.year }} - {{ autopart.make }} - {{ autopart.model }} - {{ autopart.grade}}</h3>
+                    </div>
+                    <div class="d-flex align-items-center gap-2 pt-2">
+                      <button class="btn btn-primary-abs btn-sm" (click)="getDetailAutopart(autopart)"
+                        data-bs-toggle="modal" data-bs-target="#partDetails">Details</button>
+                      <button class="btn btn-warning btn-sm" *ngIf="this.currentUser != null && this.user != null && this.user.partMarketOnly ==false && this.user.allowAddUpdateAutopart==true &&
+                            this.autopart.companyId == this.user.companyId" (click)="getDetailAutopart(autopart)"
+                        data-bs-toggle="modal" data-bs-target="#editPart"><i class="fa fa-edit"></i>
+                      </button>
+                      <button class="btn btn-warning btn-sm" *ngIf="this.currentUser != null && this.user != null && this.user.partMarketOnly ==true &&
+                            this.autopart.userId == this.user.id" (click)="getDetailAutopart(autopart)"
+                        data-bs-toggle="modal" data-bs-target="#editPart"><i class="fa fa-edit"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="d-flex align-itmes-start justify-content-between">
+                    <ul class="customers-details mt-1 d-lg-flex gap-2 w-100">
+                      <li class="mt-2 pe-lg-2">
+                        <p class="fs-12 text-black opacity-75 line-height-150"><b>Parts Name:</b> {{autopart.title }}
+                        </p>
+                      </li>
+                      <li class="mt-2 px-lg-2">
+                        <p class="fs-12 text-black opacity-75 line-height-150"><b>Part No.:</b> {{ autopart.partNumber
+                          }}
+                        </p>
+                      </li>
+                      <li class="mt-2 px-lg-2" *ngIf="currentUser != null">
+                        <p class="fs-12 text-black opacity-75 line-height-150"><b>Mobile No.:</b> {{formatPhoneNumber(
+                          autopart.phone)}}</p>
+                      </li>
+                      <li class="mt-2 px-lg-2">
+                        <p class="fs-12 text-black opacity-75 line-height-150"><b>Address.:</b> {{ autopart.street}},
+                          {{autopart.city |
+                          titlecase}}, {{ autopart.state}} {{ autopart.zip}}</p>
+                      </li>
+                      <li class="mt-2 px-lg-2" *ngIf="autopart.distance !='0'">
+                        <p class="fs-12 text-black opacity-75 line-height-150"><b>Distance.:</b> {{autopart.distance}}
+                          Mil.</p>
+                      </li>
+                    </ul>
+                    <h3 class="fs-30 fw-700 text-primary-abs mt-2 ps-md-2">${{autopart.salePrice}}</h3>
+                  </div>
+                  <p class="fs-12 opacity-75 text-dark d-block pt-3 line-height-130">{{ autopart.description }}</p>
+                  <p class="fs-12 opacity-75 text-dark d-block pt-3 line-height-130" title="View Count">{{
+                    autopart.viewCount }} views ( posted at {{ autopart.createdAt | date }} ) </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex align-items-center justify-content-between my-4 table-bottom">
+        <div class="d-flex align-items-center gap-3 my-2"> <span>Showing</span>
+          <select class="form-select px-3" [(ngModel)]="pageSize"
+            (change)=" this.applyFilter2(this.user.id, '2', false, 0, this.pageSize)">
+            <option>10</option>
+            <option>20</option>
+            <option>30</option>
+            <option>40</option>
+            <option>50</option>
+            <option>60</option>
+            <option>70</option>
+            <option>80</option>
+            <option>90</option>
+            <option>100</option>
+            <option>200</option>
+            <option>300</option>
+
+          </select>
+          <span>of {{this.searchCountAutopart}} entries</span>
+        </div>
+        <nav class="paginations my-2">
+          <ul class="pagination d-flex align-items-center gap-3">
+            <li class="page-item"> <a class="page-link bg-light border-radius-4 px-3 py-2 fw-bold"
+                (click)=" this.applyFilter2(this.user.id, '2', false, this.currantPageNumberAutopart-1, this.pageSize)">
+                Previous
+              </a> </li>
+            <li (click)=" this.applyFilter2(this.user.id, '2', false, i, this.pageSize)"
+              *ngFor="let page of pagesArrayAutopart; let i=index" class="page-item"><a
+                class="page-link border-radius-4 px-3 py-2"
+                [style.background-color]="i == currantPageNumberAutopart? '#1580DA' : (false ? '#EEE' : '#EEE')"
+                [style.color]="i == currantPageNumberAutopart? '#FFF' : (false ? '#666' : '#666')"
+                href="javascript:;">{{page}}</a></li>
+            <li class="page-item"> <a class="page-link bg-light border-radius-4 px-3 py-2 fw-bold"
+                (click)=" this.applyFilter2(this.user.id, '2', false, this.currantPageNumberAutopart+1, this.pageSize)">
+                Next </a> </li>
+          </ul>
+        </nav>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="partDetails" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+  aria-labelledby="partDetailsLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl" *ngIf="selectedAutopart">
+    <div class="modal-content border-radius-8">
+      <div class="modal-header p-4">
+        <h1 class="modal-title fs-20 fw-600 text-capitalize" id="partDetailsLabel">{{ selectedAutopart.id }} {{
+          selectedAutopart.year }} {{ selectedAutopart.make }} {{selectedAutopart.model }} {{selectedAutopart.partName
+          }}</h1>
+        <button type="button" class="btn-close mt-1" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body px-2 submit-form">
+        <div class="row">
+          <div class="col-md-4">
+            <div class="mt-4 pt-1 position-relative">
+              <div *ngFor='let imageModel of selectedAutopart.imageModels; let i=index' class="d-inline-block me-2">
+                <img class="mt-3 preview img-fluid img-thumbnail me-3" width="100"
+                  *ngIf="selectedAutopart.showInSearchImageId != imageModel.id"
+                  src="{{baseUrlResizeImage + '/' + imageModel.id}}" (click)="setImage(i)"
+                  style="border: 3px solid #555;">
+                <img class="mt-3 preview img-fluid img-thumbnail me-3" width="100"
+                  *ngIf="selectedAutopart.showInSearchImageId == imageModel.id"
+                  src="{{baseUrlResizeImage + '/' + imageModel.id}}" (click)="setImage(i)" title="Show in search"
+                  style="border: 3px solid lightcoral;">
+              </div>
+            </div>
+          </div>
+          <div class="col-md-8">
+            <div class="mt-4 pt-1 position-relative">
+              <div class="containerImage">
+                <img
+                  *ngIf="selectedImage != null && selectedImage != 0  && selectedAutopart.showInSearchImageId != selectedImage"
+                  class="image w-100 img-fluid img-thumbnail" src="{{baseUrlImage + '/' + selectedImage}}"
+                  alt="Image" />
+                <img
+                  *ngIf="selectedImage != null && selectedImage != 0  &&  selectedAutopart.showInSearchImageId == selectedImage"
+                  class="image w-100 img-fluid img-thumbnail" src="{{baseUrlImage + '/' + selectedImage}}"
+                  alt="Image" />
+              </div>
+            </div>
+          </div>
+          <div class="col-md-12">
+            <div class="mt-4 pt-1">
+              <p class="py-2 fs-13 line-height-130">{{ selectedAutopart.description }}</p>
+              <div class="clearfix"></div>
+              <p class="py-2 fs-13 line-height-130 w-50 d-inline-block"><b>Grade: </b> {{ selectedAutopart.grade }}</p>
+              <p class="py-2 fs-13 line-height-130 w-50 d-inline-block"><b>Sales Price: </b> $ {{
+                selectedAutopart.salePrice }}</p>
+              <p *ngIf="currentUser != null && selectedAutopart.bussinessUrl && selectedAutopart.bussinessName "
+                class="py-2 fs-13 line-height-130 w-50 d-inline-block"><b>Dealer Info: </b>
+                <a target="_blank" href={{selectedAutopart.bussinessUrl}}>{{selectedAutopart.bussinessName |
+                  titlecase}}</a>
+              </p>
+              <p *ngIf="currentUser != null" class="py-2 fs-13 line-height-130 w-50 d-inline-block"><b>Phone: </b> {{
+                formatPhoneNumber(
+                selectedAutopart.phone) }}</p>
+              <p class="py-2 fs-13 line-height-13 w-50 d-inline-block"><b>Address: </b> {{selectedAutopart.city |
+                titlecase}}, {{ selectedAutopart.state}}</p>
+              <p class="py-2 fs-13 line-height-130 w-50 d-inline-block" *ngIf="selectedAutopart.distance !='0' ">
+                <b>Distance: </b> {{ selectedAutopart.distance }} Mil.
+              </p>
+            </div>
+          </div>
+          <div class="col-md-12 p-0">
+            <div class="row"
+              *ngIf="selectedAutopart.fitmented == true && selectedAutopart.fitments != null && selectedAutopart.fitments.length > 0">
+              <div class="col-12 table-responsive">
+                <label for="fitment" class="form-label fs-14 fw-400 mb-3"> Fitments/Compatibilities:</label>
+                <table class="table">
+                  <tr>
+                    <th>#</th>
+                    <th>year</th>
+                    <th>make</th>
+                    <th>model</th>
+                    <th>trim</th>
+                    <th>engine</th>
+                    <!-- <th>action</th> -->
+                  </tr>
+                  <tr *ngFor="let fitment of selectedAutopart.fitments; let i=index">
+                    <td>{{i+1}}</td>
+                    <td>{{ fitment.year }}</td>
+                    <td>{{ fitment.make }}</td>
+                    <td>{{ fitment.model }}</td>
+                    <td>{{ fitment.trim }}</td>
+                    <td>{{ fitment.engine }}</td>
+                    <!-- <td>Place Holder</td> -->
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
+          <!-- <div class="col-md-12">
+            <h5 class="text-success fw-700 my-3">{{ message1}}</h5>
+            <div class="d-flex gap-3" *ngIf="currentUser != null">
+              <button class="btn btn-secondary-abs h-45 px-4 rounded-4 fs-14 fw-600 mt-4 "
+                (click)="addSavedItem(selectedAutopart.id)"
+                *ngIf="selectedAutopart.showSavedButton==true && selectedAutopart.archived == false ">Save to
+                List</button>
+              <button class="btn btn-secondary h-45 px-4 rounded-4 fs-14 fw-600 mt-4 "
+                (click)="deleteSavedItem(null, selectedAutopart.id)"
+                *ngIf="selectedAutopart.showSavedButton==false">Remove From List</button>
+            </div>
+          </div> -->
+
+        </div>
+        <br /><br />
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="editPart" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+  aria-labelledby="editPartLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl" *ngIf="selectedAutopart">
+    <div class="modal-content border-radius-8">
+      <div class="modal-header p-4">
+        <h1 class="modal-title fs-20 fw-600 text-capitalize" id="editPartLabel">{{ selectedAutopart.id }} {{
+          selectedAutopart.year }} {{ selectedAutopart.make }} {{selectedAutopart.model }} {{selectedAutopart.partName
+          }}</h1>
+        <button type="button" class="btn-close mt-1" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body px-2 submit-form" *ngIf="currentUser">
+        <div class="row">
+          <div class="col-md-4">
+            <div class="mt-4 pt-1 position-relative">
+              <button name="btn" class="btn btn-secondary-abs py-3 px-3 w-100" disabled><i
+                  class="fa fa-cloud-upload me-2"></i> Upload Images [Disabled]</button>
+              <!-- <input type='file' class="form-control h-48 ps-5 border-radius-8 mt-5 opacity-0 top-0 position-absolute"
+                #fileInput (change)="onSelectFileEditor($event)" multiple /> -->
+            </div>
+            <!-- <div class="mt-4 pt-1 position-relative">
+              <button (click)="deleteImage(selectedAutopart.id, selectedImage)" class="btn btn-danger mt-3 btn-sm"
+                title="Remove Current Image"><i class="fa fa-trash"></i></button>
+            </div> -->
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1 position-relative">
+              <div *ngFor='let imageModel of selectedAutopart.imageModels; let i=index' class="d-inline-block me-2">
+                <img class="mt-3 preview img-fluid img-thumbnail me-3" width="100"
+                  *ngIf="selectedAutopart.showInSearchImageId != imageModel.id"
+                  src="{{baseUrlResizeImage + '/' + imageModel.id}}" (click)="setImage(i)"
+                  style="border: 3px solid #555;">
+                <img class="mt-3 preview img-fluid img-thumbnail me-3" width="100"
+                  *ngIf="selectedAutopart.showInSearchImageId == imageModel.id"
+                  src="{{baseUrlResizeImage + '/' + imageModel.id}}" (click)="setImage(i)" title="Show in search"
+                  style="border: 3px solid lightcoral;">
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1 position-relative">
+              <div class="containerImage">
+                <img
+                  *ngIf="selectedImage != null && selectedImage != 0 &&  selectedAutopart.showInSearchImageId != selectedImage"
+                  class="image w-100 img-fluid img-thumbnail" src="{{baseUrlImage + '/' + selectedImage}}"
+                  alt="Image" />
+                <img
+                  *ngIf="selectedImage != null && selectedImage != 0 &&  selectedAutopart.showInSearchImageId == selectedImage"
+                  class="image w-100 img-fluid img-thumbnail" src="{{baseUrlImage + '/' + selectedImage}}"
+                  alt="Image" />
+                <label *ngIf="selectedImage == selectedAutopart.showInSearchImageId" class="top-left" for="title">Will
+                  Show This During Search</label>
+                <div class="bottom-right py-2">
+                  <button *ngIf="selectedImage != selectedAutopart.showInSearchImageId" disabled
+                    title="As index image during search" (click)="setImageForSearch(selectedAutopart.id, selectedImage)"
+                    class="btn btn-primary mt-3 btn-sm" for="title">Set for Search [Disabled]</button>
+                  <button (click)="deleteImage(selectedAutopart.id, selectedImage)" data-toggle="tooltip"
+                    data-placement="top" title="Remove this image" class="btn btn-danger mt-3 btn-sm" for="title">
+                    <i class="bi-trash"></i>
+                  </button>
+
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="year" class="form-label fs-14 fw-400 mb-3">Year</label>
+              <select class="form-select h-48 px-3 border-radius-8" [(ngModel)]="selectedAutopart.year">
+                <option [value]="option" *ngFor="let option of optionsYear;let i=index;">{{option}}</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="make" class="form-label fs-14 fw-400 mb-3">Make</label>
+              <select class="form-select h-48 px-3 border-radius-8" #device [(ngModel)]="selectedAutopart.make"
+                (change)="onChange($event, device.value)">
+                <option *ngFor="let obj of optionsMake;let i=index;">{{obj}}</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="model" class="form-label fs-14 fw-400 mb-3">Model</label>
+              <select class="form-select h-48 px-3 border-radius-8" [(ngModel)]="selectedAutopart.model">
+                <option *ngFor="let obj2 of optionsModel;let i=index;">{{obj2}}</option>
+              </select>
+            </div>
+          </div>
+          <!-- <div class="col-md-4" *ngIf="showPostForm == false">
+            <div class="mt-4 pt-1">
+              <label for="amount" class="form-label fs-14 fw-400 mb-3">Search</label>
+              <div class="input-group">
+                <input type="text" class="form-control h-48 px-3 border-radius-8" id="title" required
+                  [(ngModel)]="selectedAutopart.title" pleaseholder="part name" name="title" />
+                <div class="input-group-append">
+                  <button *ngIf="!showPostForm" class="btn btn-success" type="button"
+                    (click)="searchPartWithPage(0, pageSize, 2, false)">Search</button>
+                </div>
+              </div>
+            </div>
+          </div> -->
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="title" class="form-label fs-14 fw-400 mb-3">Name/Title</label>
+              <input trimText class="form-control h-48 px-3 border-radius-8" type="text" placeholder="Enter Parts Name"
+                id="title" required [(ngModel)]="selectedAutopart.title" name="title" />
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label class="form-label fs-14 fw-400 mb-3">Parts Number</label>
+              <input trimText class="form-control h-48 px-3 border-radius-8" type="text"
+                placeholder="Enter Parts Number" required [(ngModel)]="selectedAutopart.partNumber" name="partInfo" />
+            </div>
+          </div>
+          <div class="col-md-12">
+            <div class="mt-4 pt-1">
+              <label for="description" class="form-label fs-14 fw-400 mb-3">Description</label>
+              <input trimText class="form-control h-48 px-3 border-radius-8" type="text" placeholder="Enter Description"
+                required [(ngModel)]="selectedAutopart.description" name="description" />
+            </div>
+          </div>
+          <div class="col-md-12 p-0" *ngIf="selectedAutopart.fitmented == true">
+            <div class="mt-4 pt-1">
+
+              <div class="row"
+                *ngIf="selectedAutopart.fitmented == true && selectedAutopart.fitments != null && selectedAutopart.fitments.length > 0">
+                <div class="col-12 table-responsive">
+                  <label for="fitment" class="form-label fs-14 fw-400 mb-3"> Fitments/Compatibilities:</label>
+                  <table class="table">
+                    <tr>
+                      <th>#</th>
+                      <th>year</th>
+                      <th>make</th>
+                      <th>model</th>
+                      <th>trim</th>
+                      <th>engine</th>
+                      <!-- <th>action</th> -->
+                    </tr>
+                    <tr *ngFor="let fitment of selectedAutopart.fitments; let i=index">
+                      <td>{{i+1}}</td>
+                      <td>{{ fitment.year }}</td>
+                      <td>{{ fitment.make }}</td>
+                      <td>{{ fitment.model }}</td>
+                      <td>{{ fitment.trim }}</td>
+                      <td>{{ fitment.engine }}</td>
+                      <!-- <td>Place Holder</td> -->
+                    </tr>
+                  </table>
+                </div>
+
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="shipping" class="form-label fs-14 fw-400 mb-3">Shipping</label>
+              <select name="shipping" class="form-select h-48 px-3 border-radius-8" size="1"
+                [(ngModel)]="selectedAutopart.shipping">
+                <option selected="selected">-- Select Shipping --</option>
+                <option value="FLP">Free Local Pickup</option>
+                <option value="LD">Local Delivery</option>
+                <option value="SGS">Standard Ground Shipping</option>
+                <option value="FS">Fast Shipping</option>
+                <option value="CFDI">Call for Delivery Instructions</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="warranty" class="form-label fs-14 fw-400 mb-3">Warranty</label>
+              <select name="warranty" class="form-select h-48 px-3 border-radius-8" size="1"
+                [(ngModel)]="selectedAutopart.warranty">
+                <option selected="selected">-- Select Warranty --</option>
+                <option value="7D">7 days</option>
+                <option value="30D">15 days</option>
+                <option value="30D">30 days</option>
+                <option value="SAI">sold as is</option>
+                <option value="BWFP">Buy Warranty from PARTHUT</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="grade" class="form-label fs-14 fw-400 mb-3">Grade</label>
+              <select name="grade" class="form-select h-48 px-3 border-radius-8" size="1"
+                [(ngModel)]="selectedAutopart.grade">
+                <option selected="selected">Select Grade</option>
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+                <option value="Used">Used</option>
+                <option value="New">New</option>
+                <option value="Insurance">Insurance</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="price" class="form-label fs-14 fw-400 mb-3">Price</label>
+              <input trimText class="form-control h-48 px-3 border-radius-8" type="text" placeholder="Enter Price"
+                required [(ngModel)]="selectedAutopart.salePrice" name="price" />
+            </div>
+          </div>
+          <!-- <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="stocknumber" class="form-label fs-14 fw-400 mb-3">Stock No.</label>
+              <input trimText class="form-control h-48 px-3 border-radius-8" type="text" placeholder="Enter Stock Number"
+                id="stocknumber" [(ngModel)]="selectedAutopart.stocknumber" name="stocknumber" />
+            </div>
+          </div> -->
+          <div class="col-md-12">
+            <h5 class="text-success fw-700 my-3">{{ message1}}</h5>
+            <div class="pt-1 d-flex gap-3">
+              <button class="btn btn-primary-abs h-45 px-4 rounded-4 fs-14 fw-600 mt-4 " (click)="saveAutopartEditor()"
+                *ngIf="selectedAutopart.status ==2">Save Info</button>
+              <!-- <button class="btn btn-secondary-abs h-45 px-4 rounded-4 fs-14 fw-600 mt-4 "
+                (click)="addSavedItem(selectedAutopart.id)" *ngIf="selectedAutopart.showSavedButton==true">Save to
+                List</button>
+              <button class="btn btn-secondary h-45 px-4 rounded-4 fs-14 fw-600 mt-4 "
+                (click)=" archiveAutopart( selectedAutopart, true); "
+                *ngIf="selectedAutopart.archived ==false">Archive</button>
+              <button class="btn btn-secondary h-45 px-4 rounded-4 fs-14 fw-600 mt-4 "
+                (click)=" archiveAutopart( selectedAutopart, false); "
+                *ngIf="selectedAutopart.archived ==true">Repost</button> -->
+              <!-- <button class="btn btn-success h-45 px-4 rounded-4 fs-14 fw-600 mt-4 " (click)="backToListing()"
+                data-bs-dismiss="modal">Back</button> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="userInfo" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+  aria-labelledby="userInfoLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content border-radius-8">
+      <div class="modal-header p-4">
+        <h1 class="modal-title fs-20 fw-600 text-capitalize" id="userInfoLabel">Edit User Info ( Since {{
+          user.createdAt | date}})</h1>
+        <button type="button" class="btn-close mt-1" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body px-2" *ngIf="currentUser">
+        <div class="row">
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="firstName" class="form-label fs-14 fw-400 mb-3">First Name</label>
+              <input trimText class="form-control h-48 px-3 border-radius-8" type="text" name="firstName"
+                [(ngModel)]="user.firstName" placeholder="Enter Your First Name" />
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="lastName" class="form-label fs-14 fw-400 mb-3">Last Name</label>
+              <input trimText class="form-control h-48 px-3 border-radius-8" type="text" name="lastName"
+                [(ngModel)]="user.lastName" placeholder="Enter Your Last Name" />
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="email" class="form-label fs-14 fw-400 mb-3">Username / Address</label>
+              <input trimText class="form-control h-48 px-3 border-radius-8" name="email" [(ngModel)]="user.email"
+                placeholder="Enter Your Username /Email Address" />
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="phone" class="form-label fs-14 fw-400 mb-3">Phone</label>
+              <input trimText class="form-control h-48 px-3 border-radius-8" name="phone" [(ngModel)]="user.phone"
+                placeholder="Enter Your Phone Number" />
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="street" class="form-label fs-14 fw-400 mb-3">Street</label>
+              <input trimText class="form-control h-48 px-3 border-radius-8" name="street"
+                [(ngModel)]="user.addresses[0].street" placeholder="Enter Your Street" />
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="city" class="form-label fs-14 fw-400 mb-3">City</label>
+              <input trimText class="form-control h-48 px-3 border-radius-8" name="city"
+                [(ngModel)]="user.addresses[0].city" placeholder="Enter Your City" />
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="state" class="form-label fs-14 fw-400 mb-3">State</label>
+              <select class="form-select h-48 px-3 border-radius-8" name="state" #state="ngModel" size="1" required
+                [(ngModel)]="user.addresses[0].state">
+                <option value="AL">Alabama</option>
+                <option value="AK">Alaska</option>
+                <option value="AZ">Arizona</option>
+                <option value="AR">Arkansas</option>
+                <option value="CA">California</option>
+                <option value="CO">Colorado</option>
+                <option value="CT">Connecticut</option>
+                <option value="DE">Delaware</option>
+                <option value="DC">District Of Columbia</option>
+                <option value="FL">Florida</option>
+                <option value="GA">Georgia</option>
+                <option value="HI">Hawaii</option>
+                <option value="ID">Idaho</option>
+                <option value="IL">Illinois</option>
+                <option value="IN">Indiana</option>
+                <option value="IA">Iowa</option>
+                <option value="KS">Kansas</option>
+                <option value="KY">Kentucky</option>
+                <option value="LA">Louisiana</option>
+                <option value="ME">Maine</option>
+                <option value="MD">Maryland</option>
+                <option value="MA">Massachusetts</option>
+                <option value="MI">Michigan</option>
+                <option value="MN">Minnesota</option>
+                <option value="MS">Mississippi</option>
+                <option value="MO">Missouri</option>
+                <option value="MT">Montana</option>
+                <option value="NE">Nebraska</option>
+                <option value="NV">Nevada</option>
+                <option value="NH">New Hampshire</option>
+                <option value="NJ">New Jersey</option>
+                <option value="NM">New Mexico</option>
+                <option value="NY">New York</option>
+                <option value="NC">North Carolina</option>
+                <option value="ND">North Dakota</option>
+                <option value="OH">Ohio</option>
+                <option value="OK">Oklahoma</option>
+                <option value="OR">Oregon</option>
+                <option value="PA">Pennsylvania</option>
+                <option value="RI">Rhode Island</option>
+                <option value="SC">South Carolina</option>
+                <option value="SD">South Dakota</option>
+                <option value="TN">Tennessee</option>
+                <option value="TX">Texas</option>
+                <option value="UT">Utah</option>
+                <option value="VT">Vermont</option>
+                <option value="VA">Virginia</option>
+                <option value="WA">Washington</option>
+                <option value="WV">West Virginia</option>
+                <option value="WI">Wisconsin</option>
+                <option value="WY">Wyoming</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="zip" class="form-label fs-14 fw-400 mb-3">Zip Code</label>
+              <input trimText class="form-control h-48 px-3 border-radius-8" pattern="[0-9]*" name="zip"
+                [(ngModel)]="user.addresses[0].zip" placeholder="Enter Your Zip Code" />
+            </div>
+          </div>
+          <div class="clearix"></div>
+          <div class="col-md-4 mt-4" *ngIf="user && (  user.roles[0].name == 'ROLE_ADMIN')">
+            <div class="form-check form-switch d-flex text-start ms-3">
+              <input class="form-check-input mt-0" type="checkbox" [(ngModel)]="user.allowAddCompany" role="switch"
+                id="allowAddCompany" />
+              <label class="form-check-label fs-12 fw-600 mt-1 ms-4" for="allowAddCompany">Allow Add Company</label>
+            </div>
+          </div>
+          <div class="col-md-4 mt-4">
+            <div class="form-check form-switch d-flex text-start ms-3">
+              <input class="form-check-input mt-0" type="checkbox" [(ngModel)]="user.activated" role="switch"
+                id="activated" />
+              <label class="form-check-label fs-12 fw-600 mt-1 ms-4" for="activated">Activated (update here is not
+                recommented)</label>
+            </div>
+          </div>
+          <!-- <div class="col-md-4 mt-4">
+            <div class="form-check form-switch d-flex text-start ms-3">
+              <input class="form-check-input mt-0" type="checkbox" [(ngModel)]="user.part_market_only" role="switch"
+                id="partMarket" />
+              <label class="form-check-label fs-12 fw-600 mt-1 ms-4" for="partMarket">Part Market Only</label>
+            </div>
+          </div> -->
+          <div class="col-md-12 mt-4">
+            <div class="alert alert-success" *ngIf="messageUser !=''">{{ messageUser}}</div>
+          </div>
+        </div>
+        <div class="d-flex align-items-center gap-3 mt-5 px-3">
+          <button class="btn btn-primary-abs h-45 px-4 rounded-4 fs-14 fw-600"
+            *ngIf="currentUserUser.allowUpdateUser==true" (click)="saveUser(user)">Activate or De-Activate User</button>
+          <button class="btn btn-danger h-45 px-4 rounded-4 fs-14 fw-600"
+            *ngIf="user.id > 0 && currentUserUser.allowUpdateUser==true" (click)="deleteUserPartMarketOnly(user)">Delete
+            User</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="myAccount" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+  aria-labelledby="myAccountLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content border-radius-8">
+      <div class="modal-header p-4">
+        <h1 class="modal-title fs-20 fw-600 text-capitalize" id="myAccountLabel">My Account</h1>
+        <button type="button" class="btn-close mt-1" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body px-2" *ngIf="currentUser">
+        <form *ngIf="!isSuccessful" name="form" (ngSubmit)="f.form.valid && onSubmit()" #f="ngForm" novalidate>
+          <div class="row">
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="title" class="form-label fs-14 fw-400 mb-3">Account Type</label>
+                <select class="form-select h-48 px-3 border-radius-8" name="role" #type="ngModel" size="1" style=" appearance: none;
+                background-image: url('');" [(ngModel)]="form.role" required disabled
+                  [ngClass]="{ 'is-invalid': f.submitted && type.errors }">
+                  <option value="ROLE_USER" selected>Employee</option>
+                  <option value="ROLE_SHOP">Auto Shop</option>
+                  <option value="ROLE_ADMIN">Admin</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-4" *ngIf="form.role == 'ROLE_SHOP' || form.role == 'ROLE_RECYCLER' ">
+              <div class="mt-4 pt-1">
+                <label for="bussnessName" class="form-label fs-14 fw-400 mb-3">Business/Company Name</label>
+                <input trimText class="form-control h-48 px-3 border-radius-8" name="bussinessname"
+                  [(ngModel)]="form.bussinessname" required minlength="5" maxlength="200" #bussinessname="ngModel"
+                  placeHolder="Enter Business/Company Name"
+                  [ngClass]="{ 'is-invalid': f.submitted && bussinessname.errors }" />
+                <div class="invalid-feedback" *ngIf="bussinessname.errors && f.submitted">
+                  <span *ngIf="bussinessname.errors['required']">Business Name is required</span>
+                  <span *ngIf="bussinessname.errors['minlength']">Business Name must be at least 5 characters</span>
+                  <span *ngIf="bussinessname.errors['maxlength']">Business Name must be at most 200 characters</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="firstName" class="form-label fs-14 fw-400 mb-3">First Name</label>
+                <input trimText class="form-control h-48 px-3 border-radius-8" type="text" name="firstName"
+                  [(ngModel)]="form.firstName" required minlength="2" maxlength="20" #firstName="ngModel"
+                  [ngClass]="{ 'is-invalid': f.submitted && firstName.errors }" placeholder="Enter Your First Name" />
+                <div class="invalid-feedback" *ngIf="firstName.errors && f.submitted">
+                  <span *ngIf="firstName.errors['required']">First Name is required</span>
+                  <span *ngIf="firstName.errors['minlength']">First Name must be at least 2 characters</span>
+                  <span *ngIf="firstName.errors['maxlength']">First Name must be at most 20 characters</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="lastName" class="form-label fs-14 fw-400 mb-3">Last Name</label>
+                <input trimText class="form-control h-48 px-3 border-radius-8" type="text" name="lastName"
+                  [(ngModel)]="form.lastName" required minlength="2" maxlength="20" #lastName="ngModel"
+                  [ngClass]="{ 'is-invalid': f.submitted && lastName.errors }" placeholder="Enter Your Last Name" />
+                <div class="invalid-feedback" *ngIf="lastName.errors && f.submitted">
+                  <span *ngIf="lastName.errors['required']">Last Name is required</span>
+                  <span *ngIf="lastName.errors['minlength']">Last Name must be at least 2 characters</span>
+                  <span *ngIf="lastName.errors['maxlength']">Last Name must be at most 20 characters</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="email" class="form-label fs-14 fw-400 mb-3">Email Address</label>
+                <input trimText class="form-control h-48 px-3 border-radius-8" name="email" [(ngModel)]="form.email"
+                  required email #email="ngModel" [ngClass]="{ 'is-invalid': f.submitted && email.errors }"
+                  maxlength="100" placeholder="Enter Your Email Address" />
+                <div class="invalid-feedback" *ngIf="email.errors && f.submitted">
+                  <span *ngIf="email.errors['required']">Email is required</span>
+                  <span *ngIf="email.errors['email']">Email must be a valid email address</span>
+                  <span *ngIf="email.errors['maxlength']">Email must be at most 100 characters</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="phone" class="form-label fs-14 fw-400 mb-3">Phone</label>
+                <input trimText class="form-control h-48 px-3 border-radius-8" name="phone" [(ngModel)]="form.phone"
+                  required maxlength="20" #phone="ngModel" [ngClass]="{ 'is-invalid': f.submitted && phone.errors }"
+                  pattern="^[-+()0-9]{10,12}(?:-\d+)?$" placeholder="Enter Your Phone Number" />
+                <div class="invalid-feedback" *ngIf="phone.errors && f.submitted">
+                  <span *ngIf="phone.errors['required']">Phone is required</span>
+                  <span *ngIf="phone.errors['pattern']">Phone must be a valid phone number</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="street" class="form-label fs-14 fw-400 mb-3">Street</label>
+                <input trimText class="form-control h-48 px-3 border-radius-8" name="street" [(ngModel)]="form.street"
+                  required minlength="2" maxlength="200" #street="ngModel"
+                  [ngClass]="{ 'is-invalid': f.submitted && street.errors }" placeholder="Enter Your Street" />
+                <div class="invalid-feedback" *ngIf="street.errors && f.submitted">
+                  <span *ngIf="street.errors['required']">Street is required</span>
+                  <span *ngIf="street.errors['minlength']">Street must be at least 2 characters</span>
+                  <span *ngIf="street.errors['maxlength']">Street must be at most 200 characters</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="city" class="form-label fs-14 fw-400 mb-3">City</label>
+                <input trimText class="form-control h-48 px-3 border-radius-8" name="city" [(ngModel)]="form.city"
+                  required minlength="2" maxlength="200" #city="ngModel"
+                  [ngClass]="{ 'is-invalid': f.submitted && city.errors }" placeholder="Enter Your City" />
+                <div class="invalid-feedback" *ngIf="city.errors && f.submitted">
+                  <span *ngIf="city.errors['required']">City is required</span>
+                  <span *ngIf="city.errors['minlength']">City must be at least 2 characters</span>
+                  <span *ngIf="city.errors['maxlength']">City must be at most 200 characters</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="state" class="form-label fs-14 fw-400 mb-3">State</label>
+                <select class="form-select h-48 px-3 border-radius-8" name="state" #state="ngModel" size="1" required
+                  [(ngModel)]="form.state" [ngClass]="{ 'is-invalid': f.submitted && state.errors }">
+                  <option value="AL">Alabama</option>
+                  <option value="AK">Alaska</option>
+                  <option value="AZ">Arizona</option>
+                  <option value="AR">Arkansas</option>
+                  <option value="CA">California</option>
+                  <option value="CO">Colorado</option>
+                  <option value="CT">Connecticut</option>
+                  <option value="DE">Delaware</option>
+                  <option value="DC">District Of Columbia</option>
+                  <option value="FL">Florida</option>
+                  <option value="GA">Georgia</option>
+                  <option value="HI">Hawaii</option>
+                  <option value="ID">Idaho</option>
+                  <option value="IL">Illinois</option>
+                  <option value="IN">Indiana</option>
+                  <option value="IA">Iowa</option>
+                  <option value="KS">Kansas</option>
+                  <option value="KY">Kentucky</option>
+                  <option value="LA">Louisiana</option>
+                  <option value="ME">Maine</option>
+                  <option value="MD">Maryland</option>
+                  <option value="MA">Massachusetts</option>
+                  <option value="MI">Michigan</option>
+                  <option value="MN">Minnesota</option>
+                  <option value="MS">Mississippi</option>
+                  <option value="MO">Missouri</option>
+                  <option value="MT">Montana</option>
+                  <option value="NE">Nebraska</option>
+                  <option value="NV">Nevada</option>
+                  <option value="NH">New Hampshire</option>
+                  <option value="NJ">New Jersey</option>
+                  <option value="NM">New Mexico</option>
+                  <option value="NY">New York</option>
+                  <option value="NC">North Carolina</option>
+                  <option value="ND">North Dakota</option>
+                  <option value="OH">Ohio</option>
+                  <option value="OK">Oklahoma</option>
+                  <option value="OR">Oregon</option>
+                  <option value="PA">Pennsylvania</option>
+                  <option value="RI">Rhode Island</option>
+                  <option value="SC">South Carolina</option>
+                  <option value="SD">South Dakota</option>
+                  <option value="TN">Tennessee</option>
+                  <option value="TX">Texas</option>
+                  <option value="UT">Utah</option>
+                  <option value="VT">Vermont</option>
+                  <option value="VA">Virginia</option>
+                  <option value="WA">Washington</option>
+                  <option value="WV">West Virginia</option>
+                  <option value="WI">Wisconsin</option>
+                  <option value="WY">Wyoming</option>
+                </select>
+                <div class="invalid-feedback d-block" *ngIf="state.errors && f.submitted">
+                  <span *ngIf="state.errors['required']">State is required</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="zip" class="form-label fs-14 fw-400 mb-3">Zip Code</label>
+                <input trimText class="form-control h-48 px-3 border-radius-8" pattern="[0-9]*" name="zip"
+                  [(ngModel)]="form.zip" maxlength="20" required minlength="5" maxlength="20" #zip="ngModel"
+                  [ngClass]="{ 'is-invalid': f.submitted && zip.errors }" placeholder="Enter Your Zip Code" />
+                <div class="invalid-feedback" *ngIf="zip.errors && f.submitted">
+                  <span *ngIf="zip.errors['required']">Zip Code is required</span>
+                  <span *ngIf="zip.errors['pattern']">Must be a valid Zip Code</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-12 mt-4">
+              <div *ngIf="f.submitted && isUpdateFailed">
+                <span *ngIf="errorMessageProfile" class="alert alert-danger" role="alert">Update failed: {{
+                  errorMessageProfile
+                  }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="d-flex align-items-center gap-3 mt-5 px-3" *ngIf="currentUser">
+            <button class="btn btn-primary-abs h-45 px-4 rounded-4 fs-14 fw-600">Update Account</button>
+          </div>
+        </form>
+        <div *ngIf="isSuccessful" class="p-4">
+          <span class="alert alert-success" role="alert">Your update is successful! <button
+              class="btn btn-sm btn-primary-abs ms-3" (click)="reload()">Ok</button></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="resetPassword" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+  aria-labelledby="resetPasswordLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content border-radius-8">
+      <div class="modal-header p-4">
+        <h1 class="modal-title fs-20 fw-600 text-capitalize" id="resetPasswordLabel">Reset Password</h1>
+        <button type="button" class="btn-close mt-1" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body px-2" *ngIf="currentUser">
+        <form name="form" (ngSubmit)="f.form.valid && changePasswordRequest()" #f="ngForm" novalidate>
+          <div class="row">
+            <div class="col-md-4" *ngIf="form.role == 'ROLE_SHOP' || form.role == 'ROLE_RECYCLER' ">
+              <div class="mt-4 pt-1">
+                <label for="password" class="form-label fs-14 fw-400 mb-3">Old Password</label>
+                <div class="input-group">
+                  <input trimText class="form-control h-48 px-3" [type]="showPassword ? 'text' : 'password'"
+                    name="password" [(ngModel)]="form.password" required minlength="6" #password="ngModel"
+                    maxlength="30" [ngClass]="{ 'is-invalid': f.submitted && password.errors }"
+                    placeholder="Enter Your Old Password" />
+                  <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button"> <i alt="show" class="far fa-eye eye-show"
+                        (click)="showPassword = !showPassword" [class.hide]="showPassword"></i>
+                      <i alt="hide" class="far fa-eye-slash eye-hide" (click)="showPassword = !showPassword"
+                        [class.hide]="!showPassword"></i></button>
+                  </div>
+                </div>
+                <div class="invalid-feedback" *ngIf="password.errors && f.submitted">
+                  <span *ngIf="password.errors['required']">Password is required</span>
+                  <span *ngIf="password.errors['minlength']">Password must be at least 6 characters</span>
+                  <span *ngIf="password.errors['maxlength']">Password must be at most 30 characters</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="newPassword" class="form-label fs-14 fw-400 mb-3">New Password</label>
+                <div class="input-group">
+                  <input trimText class="form-control h-48 px-3" [type]="showPasswordNew ? 'text' : 'password'"
+                    name="newPassword" [(ngModel)]="form.newPassword" required minlength="6" #newPassword="ngModel"
+                    maxlength="30" [ngClass]="{ 'is-invalid': f.submitted && newPassword.errors }"
+                    placeholder="Enter Your New Password" />
+                  <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button"> <i alt="show" class="far fa-eye eye-show"
+                        (click)="showPasswordNew = !showPasswordNew" [class.hide]="showPasswordNew"></i>
+                      <i alt="hide" class="far fa-eye-slash eye-hide" (click)="showPasswordNew = !showPasswordNew"
+                        [class.hide]="!showPasswordNew"></i></button>
+                  </div>
+                </div>
+                <div class="invalid-feedback" *ngIf="newPassword.errors && f.submitted">
+                  <span *ngIf="newPassword.errors['required']">New Password is required</span>
+                  <span *ngIf="newPassword.errors['minlength']">New Password must be at least 6 characters</span>
+                  <span *ngIf="newPassword.errors['maxlength']">New Password must be at most 30 characters</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="newPasswordComfirmed" class="form-label fs-14 fw-400 mb-3">Confirm New Password</label>
+                <div class="input-group">
+                  <input trimText class="form-control h-48 px-3" [type]="showPaswordNewConfirmed ? 'text' : 'password'"
+                    name="passwordNew" [(ngModel)]="form.newPasswordComfirmed" required minlength="6"
+                    #newPasswordComfirmed="ngModel" maxlength="30"
+                    [ngClass]="{ 'is-invalid': f.submitted && newPasswordComfirmed.errors }"
+                    placeholder="Please Re-Type Your New Password" />
+                  <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button"> <i alt="show" class="far fa-eye eye-show"
+                        (click)="showPaswordNewConfirmed = !showPaswordNewConfirmed"
+                        [class.hide]="showPaswordNewConfirmed"></i>
+                      <i alt="hide" class="far fa-eye-slash eye-hide"
+                        (click)="showPaswordNewConfirmed = !showPaswordNewConfirmed"
+                        [class.hide]="!showPaswordNewConfirmed"></i></button>
+                  </div>
+                </div>
+                <div class="invalid-feedback" *ngIf="newPasswordComfirmed.errors && f.submitted">
+                  <span *ngIf="newPasswordComfirmed.errors['required']">Confirm New Password is required</span>
+                  <span *ngIf="newPasswordComfirmed.errors['minlength']">Confirm New Password must be at least 6
+                    characters</span>
+                  <span *ngIf="newPasswordComfirmed.errors['maxlength']">Confirm New Password must be at most 30
+                    characters</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-12 py-4 mt-4" *ngIf="errorMessageResetPassword != ''">
+              <span class="alert alert-success line-height-150" role="alert">{{errorMessageResetPassword}}</span>
+            </div>
+          </div>
+          <div class="d-flex align-items-center gap-3 mt-4 px-3" *ngIf="currentUser">
+            <button class="btn btn-primary-abs h-45 px-4 rounded-4 fs-14 fw-600">Reset Password</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

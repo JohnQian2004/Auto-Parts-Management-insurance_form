@@ -1,0 +1,2127 @@
+<div class="min-vh-100 bg-gradient">
+  <!-- Header -->
+  <!-- <div class="bg-dark bg-opacity-75 text-white py-4">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-md-8 text-center text-md-start">
+          <h1 class="display-4 fw-bold mb-2">🛫 Travel Admin Dashboard</h1>
+          <p class="lead mb-0">Manage trips, bookings, andtuintravel operations</p>
+        </div>
+        <div class="col-md-4 text-center text-md-end">
+          <div *ngIf="currentUser" class="d-flex flex-column align-items-end">
+            <div class="mb-2">
+              <span class="text-light">Welcome, </span>
+              <span class="fw-bold text-primary">{{ currentUser.firstName }} {{ currentUser.lastName }}</span>
+            </div>
+            <div class="mb-2">
+              <small class="text-light">{{ currentUser.role | titlecase }}</small>
+            </div>
+            <button class="btn btn-outline-light btn-sm" (click)="logout()">
+              <span class="me-1">🚪</span>Logout
+            </button>
+          </div>
+          <div *ngIf="!currentUser" class="text-center">
+            <p class="text-light mb-2">Not logged in</p>
+            <button class="btn btn-primary btn-sm" routerLink="/login">
+              <span class="me-1">🔑</span>Login
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="d-flex flex-column align-items-center justify-content-center text-white py-5">
+    <div class="spinner-border mb-3" role="status">
+      <span class="visually-hidden">Loading ..</span>
+    </div>
+    <p class="mb-0">Loading admin data...</p>
+  </div>
+
+  <!-- Main Content -->
+  <div *ngIf="!isLoading" class="py-4">
+    <div class="container-fluid">
+      <div class="row g-0 bg-white rounded shadow">
+        <!-- Sidebar Navigation -->
+        <div class="col-md-3 col-lg-2 bg-dark text-white">
+          <nav class="nav flex-column p-3">
+            <button class="nav-link text-white-50 border-0 bg-transparent text-start w-100 mb-2 rounded"
+              [class.active]="activeTab === 'dashboard'" [class.bg-primary]="activeTab === 'dashboard'"
+              (click)="setActiveTab('dashboard')">
+              <span class="me-2">📊</span>
+              <span>Dashboard</span>
+            </button>
+            <button class="nav-link text-white-50 border-0 bg-transparent text-start w-100 mb-2 rounded"
+              [class.active]="activeTab === 'categories'" [class.bg-primary]="activeTab === 'categories'"
+              (click)="setActiveTab('categories')">
+              <span class="me-2">🏷️</span>
+              <span>Category Management</span>
+            </button>
+            <button class="nav-link text-white-50 border-0 bg-transparent text-start w-100 mb-2 rounded"
+              [class.active]="activeTab === 'trips'" [class.bg-primary]="activeTab === 'trips'"
+              (click)="setActiveTab('trips')">
+              <span class="me-2">🗺️</span>
+              <span>Trip Management</span>
+            </button>
+            <button class="nav-link text-white-50 border-0 bg-transparent text-start w-100 mb-2 rounded"
+              [class.active]="activeTab === 'tripsDb'" [class.bg-primary]="activeTab === 'tripsDb'"
+              (click)="setActiveTab('tripsDb')">
+              <span class="me-2">🗄️</span>
+              <span>Trip Management db2</span>
+            </button>
+            <button class="nav-link text-white-50 border-0 bg-transparent text-start w-100 mb-2 rounded"
+              [class.active]="activeTab === 'bookings'" [class.bg-primary]="activeTab === 'bookings'"
+              (click)="setActiveTab('bookings')">
+              <span class="me-2">📋</span>
+              <span>Booking Management</span>
+            </button>
+            <button class="nav-link text-white-50 border-0 bg-transparent text-start w-100 mb-2 rounded"
+              [class.active]="activeTab === 'customers'" [class.bg-primary]="activeTab === 'customers'"
+              (click)="setActiveTab('customers')">
+              <span class="me-2">👥</span>
+              <span>Customer Management</span>
+            </button>
+            <button class="nav-link text-white-50 border-0 bg-transparent text-start w-100 mb-2 rounded"
+              [class.active]="activeTab === 'subscriptions'" [class.bg-primary]="activeTab === 'subscriptions'"
+              (click)="setActiveTab('subscriptions')">
+              <span class="me-2">💳</span>
+              <span>Subscription Plans</span>
+            </button>
+            <button class="nav-link text-white-50 border-0 bg-transparent text-start w-100 mb-2 rounded"
+              [class.active]="activeTab === 'analytics'" [class.bg-primary]="activeTab === 'analytics'"
+              (click)="setActiveTab('analytics')">
+              <span class="me-2">📈</span>
+              <span>Analytics & Reports</span>
+            </button>
+
+            <button class="nav-link text-white-50 border-0 bg-transparent text-start w-100 mb-2 rounded"
+              [class.active]="activeTab === 'settings'" [class.bg-primary]="activeTab === 'settings'"
+              (click)="setActiveTab('settings')">
+              <span class="me-2">⚙️</span>
+              <span>Settings</span>
+            </button>
+          </nav>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="col-md-9 col-lg-10 p-4">
+          <!-- Dashboard Tab -->
+          <div *ngIf="activeTab === 'dashboard'">
+            <div class="row g-4">
+              <!-- Stats Cards -->
+              <div class="col-12 col-lg-8">
+                <div class="card border-0 shadow-sm">
+                  <div class="card-header bg-transparent border-0">
+                    <h5 class="card-title mb-0">📈 Key Metrics</h5>
+                  </div>
+                  <div class="card-body">
+                    <div class="row g-3">
+                      <div class="col-6 col-md-3">
+                        <div class="d-flex align-items-center p-3 bg-light rounded">
+                          <div class="fs-1 me-3">🗺️</div>
+                          <div>
+                            <h4 class="mb-1 fw-bold text-primary">{{ stats.totalTrips }}</h4>
+                            <p class="mb-0 text-muted small">Total Trips</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="col-6 col-md-3">
+                        <div class="d-flex align-items-center p-3 bg-light rounded">
+                          <div class="fs-1 me-3">📋</div>
+                          <div>
+                            <h4 class="mb-1 fw-bold text-success">{{ stats.totalBookings }}</h4>
+                            <p class="mb-0 text-muted small">Total Bookings</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="col-6 col-md-3">
+                        <div class="d-flex align-items-center p-3 bg-light rounded">
+                          <div class="fs-1 me-3">💰</div>
+                          <div>
+                            <h4 class="mb-1 fw-bold text-warning">{{ formatCurrency(stats.totalRevenue) }}</h4>
+                            <p class="mb-0 text-muted small">Total Revenue</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="col-6 col-md-3">
+                        <div class="d-flex align-items-center p-3 bg-light rounded">
+                          <div class="fs-1 me-3">📊</div>
+                          <div>
+                            <h4 class="mb-1 fw-bold text-info">{{ formatCurrency(stats.averageBookingValue) }}</h4>
+                            <p class="mb-0 text-muted small">Avg Booking Value</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Popular Destinations -->
+              <div class="col-12 col-lg-4">
+                <div class="card border-0 shadow-sm h-100">
+                  <div class="card-header bg-transparent border-0">
+                    <h5 class="card-title mb-0">🏆 Popular Destinations</h5>
+                  </div>
+                  <div class="card-body">
+                    <div class="d-flex flex-column gap-2">
+                      <div *ngFor="let destination of stats.popularDestinations; let i = index"
+                        class="d-flex align-items-center p-2 bg-light rounded">
+                        <span class="badge bg-primary me-2">#{{ i + 1 }}</span>
+                        <span class="fw-medium">{{ destination }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Recent Bookings -->
+              <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                  <div class="card-header bg-transparent border-0">
+                    <h5 class="card-title mb-0">🕒 Recent Bookings</h5>
+                  </div>
+                  <div class="card-body">
+                    <div class="d-flex flex-column gap-3">
+                      <div *ngFor="let booking of stats.recentBookings"
+                        class="d-flex justify-content-between align-items-center p-3 bg-light rounded">
+                        <div>
+                          <h6 class="mb-1 fw-bold">{{ booking.tripName }}</h6>
+                          <p class="mb-1 text-muted small">{{ booking.customerName }}</p>
+                          <p class="mb-0 text-muted small">{{ formatDate(booking.travelDate) }}</p>
+                        </div>
+                        <div class="text-end">
+                          <span class="badge" [class]="getStatusColor(booking.status)">
+                            {{ booking.status }}
+                          </span>
+                          <div class="fw-bold text-success mt-1">{{ formatCurrency(booking.totalPrice) }}</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Trips Tab -->
+          <div *ngIf="activeTab === 'trips'">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h4 class="mb-0">🗺️ Trip Management</h4>
+              <button class="btn btn-primary" (click)="addNewTrip()">
+                ➕ Add New Trip
+              </button>
+            </div>
+
+            <div class="row g-4">
+              <div *ngFor="let trip of trips" class="col-12 col-md-6 col-lg-4">
+                <div class="card border-0 shadow-sm h-100">
+                  <div class="position-relative">
+                    <img
+                      [src]="trip.images[0] || 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop'"
+                      [alt]="trip.name || 'Trip'" class="card-img-top" style="height: 200px; object-fit: cover;">
+                  </div>
+
+                  <div class="card-body">
+                    <h5 class="card-title fw-bold mb-2">{{ trip.name || 'Unnamed Trip' }}</h5>
+                    <p class="card-text text-muted mb-1">📍 {{ trip.destination || 'Unknown Destination' }}</p>
+                    <p class="card-text text-muted mb-1">⏱️ {{ trip.duration || 'Unknown Duration' }}</p>
+                    <p class="card-text text-success fw-bold mb-1">💰 {{ formatCurrency(trip.basePrice || 0) }}</p>
+                    <p class="card-text text-muted mb-1">👥 {{ getTotalAvailableSpots(trip) }}/{{ trip.maxCapacity || 0
+                      }}
+                      spots</p>
+                    <p class="card-text text-muted mb-3">👥 Group: {{ trip.groupSize.min || 1 }}-{{ trip.groupSize.max
+                      || 1 }}
+                      people</p>
+                  </div>
+
+                  <div class="card-footer bg-transparent border-0">
+                    <div class="d-flex gap-2">
+                      <button class="btn btn-outline-info btn-sm flex-fill" (click)="previewTrip(trip)">
+                        👁️ Preview
+                      </button>
+                      <button class="btn btn-outline-warning btn-sm flex-fill" (click)="editTrip(trip)">
+                        ✏️ Edit
+                      </button>
+                      <button class="btn btn-outline-danger btn-sm flex-fill" (click)="deleteTrip(trip.id!)"
+                        [disabled]="!trip.id">
+                        🗑️ Delete
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Trips DB Tab -->
+          <div *ngIf="activeTab === 'tripsDb'">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h4 class="mb-0">🗄️ Trip Management db2</h4>
+              <div class="d-flex gap-2">
+                <!-- <button class="btn btn-primary" (click)="addNewTripDb()">
+                  ➕ Add New Trip (Mock)
+                </button> -->
+                <button class="btn btn-success" (click)="openNewTripEditor()">
+                  + Add New Trip
+                </button>
+              </div>
+            </div>
+
+            <div class="row g-4">
+              <div *ngFor="let trip of tripsDb" class="col-12 col-md-6 col-lg-4">
+                <div class="card border-0 shadow-sm h-100">
+                  <div class="position-relative">
+                    <img
+                      [src]="getTripImageUrl(trip) || 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop'"
+                      [alt]="trip.name || 'Trip'" class="card-img-top" style="height: 200px; object-fit: cover;">
+                  </div>
+
+                  <div class="card-body">
+                    <h5 class="card-title fw-bold mb-2">{{ trip.name || 'Unnamed Trip' }}</h5>
+                    <p class="card-text text-muted mb-1">📍 {{ trip.destination || 'Unknown Destination' }}</p>
+                    <p class="card-text text-muted mb-1">⏱️ {{ trip.duration || 'Unknown Duration' }}</p>
+                    <p class="card-text text-success fw-bold mb-1">💰 {{ formatCurrency(trip.basePrice || 0) }}</p>
+                    <p class="card-text text-muted mb-1">👥 {{ trip.maxCapacity || 0 }} spots</p>
+                    <p class="card-text text-muted mb-3">👥 Group: {{ trip.groupSizeMin || 1 }}-{{ trip.groupSizeMax ||
+                      1 }}
+                      people</p>
+                  </div>
+
+                  <div class="card-footer bg-transparent border-0">
+                    <div class="d-flex gap-2">
+                      <button class="btn btn-outline-info btn-sm flex-fill" (click)="previewTripDb(trip)">
+                        👁️ Preview
+                      </button>
+                      <!-- <button class="btn btn-outline-warning btn-sm flex-fill" (click)="editTripDb(trip)">
+                        ✏️ Edit (Mock)
+                      </button> -->
+                      <button class="btn btn-outline-success btn-sm flex-fill" (click)="editTripWithNewEditor(trip)">
+                        🚀 Edit
+                      </button>
+                      <button class="btn btn-outline-danger btn-sm flex-fill" (click)="deleteTripDb(trip.id!)"
+                        [disabled]="!trip.id">
+                        🗑️ Delete
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bookings Tab -->
+          <div *ngIf="activeTab === 'bookings'">
+            <div class="mb-4">
+              <h4 class="mb-3">📋 Booking Management</h4>
+
+              <!-- Search and Filters -->
+              <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                  <div class="row g-3 align-items-end">
+                    <div class="col-12 col-md-4">
+                      <label class="form-label">Search</label>
+                      <input type="text" placeholder="Search bookings..." [(ngModel)]="searchTerm" class="form-control">
+                    </div>
+
+                    <div class="col-12 col-md-3">
+                      <label class="form-label">Status</label>
+                      <select [(ngModel)]="statusFilter" class="form-select">
+                        <option value="">All Status</option>
+                        <option value="Confirmed">Confirmed</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Cancelled">Cancelled</option>
+                      </select>
+                    </div>
+
+                    <div class="col-12 col-md-3">
+                      <label class="form-label">Date</label>
+                      <input type="date" [(ngModel)]="dateFilter" class="form-control">
+                    </div>
+
+                    <div class="col-12 col-md-2">
+                      <button (click)="clearFilters()" class="btn btn-outline-secondary w-100">
+                        Clear
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+              <div class="card-body p-0">
+                <div class="table-responsive">
+                  <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                      <tr>
+                        <th class="px-3">Booking ID</th>
+                        <th class="px-3">Trip</th>
+                        <th class="px-3">Customer</th>
+                        <th class="px-3">Travel Date</th>
+                        <th class="px-3">People</th>
+                        <th class="px-3">Total Price</th>
+                        <th class="px-3">Status</th>
+                        <th class="px-3">Payment</th>
+                        <th class="px-3">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let booking of getFilteredBookings()">
+                        <td class="px-3">{{ booking.id }}</td>
+                        <td class="px-3">{{ booking.tripName }}</td>
+                        <td class="px-3">
+                          <div>
+                            <div class="fw-medium">{{ booking.customerName }}</div>
+                            <small class="text-muted">{{ booking.customerEmail }}</small>
+                          </div>
+                        </td>
+                        <td class="px-3">{{ formatDate(booking.travelDate) }}</td>
+                        <td class="px-3">{{ booking.numberOfPeople }}</td>
+                        <td class="px-3 fw-bold text-success">{{ formatCurrency(booking.totalPrice) }}</td>
+                        <td class="px-3">
+                          <span class="badge" [class]="getStatusColor(booking.status)">
+                            {{ booking.status }}
+                          </span>
+                        </td>
+                        <td class="px-3">
+                          <span class="badge" [class]="getPaymentStatusColor(booking.paymentStatus)">
+                            {{ booking.paymentStatus }}
+                          </span>
+                        </td>
+                        <td class="px-3">
+                          <div class="d-flex gap-2 align-items-center">
+                            <button class="btn btn-outline-primary btn-sm" (click)="viewBooking(booking)">
+                              👁️
+                            </button>
+                            <div class="btn-group btn-group-sm">
+                              <button class="btn btn-outline-success"
+                                (click)="updateBookingStatus(booking, 'Confirmed')"
+                                [disabled]="booking.status === 'Confirmed'" title="Confirm">
+                                ✅
+                              </button>
+                              <button class="btn btn-outline-danger" (click)="updateBookingStatus(booking, 'Cancelled')"
+                                [disabled]="booking.status === 'Cancelled'" title="Cancel">
+                                ❌
+                              </button>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Customers Tab -->
+          <div *ngIf="activeTab === 'customers'">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h4 class="mb-0">👥 Customer Management</h4>
+              <button class="btn btn-success" (click)="addNewCustomer()">
+                ➕ Add New Customer
+              </button>
+            </div>
+
+            <div class="card border-0 shadow-sm mb-4">
+              <div class="card-body">
+                <div class="row g-3 align-items-end">
+                  <div class="col-12 col-md-6">
+                    <label class="form-label">Search</label>
+                    <input type="text" placeholder="Search customers..." [(ngModel)]="customerSearchTerm"
+                      class="form-control">
+                  </div>
+
+                  <div class="col-12 col-md-4">
+                    <label class="form-label">Status</label>
+                    <select [(ngModel)]="customerStatusFilter" class="form-select">
+                      <option value="">All Customers</option>
+                      <option value="active">Active</option>
+                      <option value="inactive">Inactive</option>
+                      <option value="vip">VIP</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+              <div class="card-body p-0">
+                <div class="table-responsive">
+                  <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                      <tr>
+                        <th class="px-3">Customer ID</th>
+                        <th class="px-3">Name</th>
+                        <th class="px-3">Email</th>
+                        <th class="px-3">Phone</th>
+                        <th class="px-3">Total Bookings</th>
+                        <th class="px-3">Total Spent</th>
+                        <th class="px-3">Status</th>
+                        <th class="px-3">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let customer of getFilteredCustomers()">
+                        <td class="px-3">{{ customer.id }}</td>
+                        <td class="px-3 fw-medium">{{ customer.name }}</td>
+                        <td class="px-3">{{ customer.email }}</td>
+                        <td class="px-3">{{ customer.phone }}</td>
+                        <td class="px-3">{{ customer.totalBookings }}</td>
+                        <td class="px-3 fw-bold text-success">{{ formatCurrency(customer.totalSpent) }}</td>
+                        <td class="px-3">
+                          <span class="badge" [class]="getCustomerStatusColor(customer.status)">
+                            {{ customer.status }}
+                          </span>
+                        </td>
+                        <td class="px-3">
+                          <div class="d-flex gap-2">
+                            <button class="btn btn-outline-primary btn-sm" (click)="viewCustomer(customer)">
+                              👁️
+                            </button>
+                            <button class="btn btn-outline-warning btn-sm" (click)="editCustomer(customer)">
+                              ✏️
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Analytics Tab -->
+          <div *ngIf="activeTab === 'analytics'">
+            <app-travel-admin-subscription-plan-report [subscriptionPlans]="subscriptionPlans"
+              (planAnalyticsRequested)="viewPlanAnalytics($event)">
+            </app-travel-admin-subscription-plan-report>
+
+
+            <app-analytics-dashboard></app-analytics-dashboard>
+          </div>
+
+          <!-- Categories Tab -->
+          <div *ngIf="activeTab === 'categories'">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h4 class="mb-0">🏷️ Category Management</h4>
+              <button class="btn btn-primary" (click)="addNewCategory()">
+                ➕ Add New Category
+              </button>
+            </div>
+
+            <div class="row g-4">
+              <div *ngFor="let category of allCategories" class="col-12 col-md-6 col-lg-4">
+                <div class="card border-0 shadow-sm h-100">
+                  <app-travel-category [category]="category" [selectedCategory]="''"
+                    [tripsCount]="getTripsInCategory(category.id)"></app-travel-category>
+
+                  <!-- Metadata Section -->
+                  <div class="metadata-section mt-1 mb-1">
+                    <div class="d-flex flex-wrap align-items-center gap-3 text-muted small">
+                      <div class="d-flex align-items-center gap-1">
+                        <span class="text-muted">👤</span>
+                        <span class="fw-medium">{{ category.createdByUsername || 'Unknown' }}</span>
+                      </div>
+                      <div class="d-flex align-items-center gap-1">
+                        <span class="text-muted">📅</span>
+                        <span>{{ category.createdAt | date:'MMM dd, yyyy' }}</span>
+                      </div>
+                      <div class="d-flex align-items-center gap-1">
+                        <span class="text-muted">✏️</span>
+                        <span>{{ category.lastModifiedByUsername || 'Unknown' }}</span>
+                      </div>
+                      <div class="d-flex align-items-center gap-1">
+                        <span class="text-muted">🔄</span>
+                        <span [class]="category.isActive ? 'text-success' : 'text-danger'">
+                          {{ category.isActive ? 'Active' : 'Inactive' }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="card-body pt-2">
+                    <div class="d-flex justify-content-center gap-2">
+                      <button class="btn btn-outline-warning btn-sm" (click)="editCategory(category)">
+                        ✏️ Edit
+                      </button>
+                      <button class="btn btn-outline-danger btn-sm" (click)="deleteCategory(category.id)"
+                        [disabled]="getTripsInCategory(category.id) > 0">
+                        🗑️ Delete
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Settings Tab -->
+          <div *ngIf="activeTab === 'settings'">
+            <div class="mb-4">
+              <h4 class="mb-0">⚙️ System Settings</h4>
+            </div>
+
+            <div class="row g-4">
+              <!-- General Settings -->
+              <div class="col-12 col-lg-6">
+                <div class="card border-0 shadow-sm h-100">
+                  <div class="card-header bg-transparent border-0">
+                    <h5 class="card-title mb-0">🔧 General Settings</h5>
+                  </div>
+                  <div class="card-body">
+                    <div class="d-flex flex-column gap-3">
+                      <div class="form-group">
+                        <label for="companyName" class="form-label fw-medium">Company Name</label>
+                        <input type="text" id="companyName" [(ngModel)]="settings.companyName"
+                          placeholder="Your Company Name" class="form-control">
+                      </div>
+
+                      <div class="form-group">
+                        <label for="contactEmail" class="form-label fw-medium">Contact Email</label>
+                        <input type="email" id="contactEmail" [(ngModel)]="settings.contactEmail"
+                          placeholder="contact@company.com" class="form-control">
+                      </div>
+
+                      <div class="form-group">
+                        <label for="phoneNumber" class="form-label fw-medium">Phone Number</label>
+                        <input type="tel" id="phoneNumber" [(ngModel)]="settings.phoneNumber"
+                          placeholder="+1 (555) 123-4567" class="form-control">
+                      </div>
+
+                      <div class="form-group">
+                        <label for="timezone" class="form-label fw-medium">Timezone</label>
+                        <select id="timezone" [(ngModel)]="settings.timezone" class="form-select">
+                          <option value="UTC">UTC</option>
+                          <option value="EST">Eastern Standard Time</option>
+                          <option value="PST">Pacific Standard Time</option>
+                          <option value="GMT">Greenwich Mean Time</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Booking Settings -->
+              <div class="col-12 col-lg-6">
+                <div class="card border-0 shadow-sm h-100">
+                  <div class="card-header bg-transparent border-0">
+                    <h5 class="card-title mb-0">📋 Booking Settings</h5>
+                  </div>
+                  <div class="card-body">
+                    <div class="d-flex flex-column gap-3">
+                      <div class="form-group">
+                        <label for="maxBookingDays" class="form-label fw-medium">Maximum Booking Days in Advance</label>
+                        <input type="number" id="maxBookingDays" [(ngModel)]="settings.maxBookingDays" min="1" max="365"
+                          class="form-control">
+                      </div>
+
+                      <div class="form-group">
+                        <label for="cancellationHours" class="form-label fw-medium">Cancellation Notice (Hours)</label>
+                        <input type="number" id="cancellationHours" [(ngModel)]="settings.cancellationHours" min="0"
+                          max="168" class="form-control">
+                      </div>
+
+                      <div class="form-group">
+                        <label for="autoConfirm" class="form-label fw-medium">Auto-confirm Bookings</label>
+                        <select id="autoConfirm" [(ngModel)]="settings.autoConfirm" class="form-select">
+                          <option value="true">Yes</option>
+                          <option value="false">No</option>
+                        </select>
+                      </div>
+
+                      <div class="form-group">
+                        <label for="paymentRequired" class="form-label fw-medium">Payment Required</label>
+                        <select id="paymentRequired" [(ngModel)]="settings.paymentRequired" class="form-select">
+                          <option value="immediate">Immediate</option>
+                          <option value="24hours">Within 24 Hours</option>
+                          <option value="7days">Within 7 Days</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Notification Settings -->
+              <div class="col-12 col-lg-6">
+                <div class="card border-0 shadow-sm h-100">
+                  <div class="card-header bg-transparent border-0">
+                    <h5 class="card-title mb-0">🔔 Notification Settings</h5>
+                  </div>
+                  <div class="card-body">
+                    <div class="d-flex flex-column gap-3">
+                      <div class="form-check">
+                        <input type="checkbox" id="emailNotifications" [(ngModel)]="settings.emailNotifications"
+                          class="form-check-input">
+                        <label for="emailNotifications" class="form-check-label fw-medium">
+                          Email Notifications
+                        </label>
+                      </div>
+
+                      <div class="form-check">
+                        <input type="checkbox" id="smsNotifications" [(ngModel)]="settings.smsNotifications"
+                          class="form-check-input">
+                        <label for="smsNotifications" class="form-check-label fw-medium">
+                          SMS Notifications
+                        </label>
+                      </div>
+
+                      <div class="form-check">
+                        <input type="checkbox" id="bookingAlerts" [(ngModel)]="settings.bookingAlerts"
+                          class="form-check-input">
+                        <label for="bookingAlerts" class="form-check-label fw-medium">
+                          New Booking Alerts
+                        </label>
+                      </div>
+
+                      <div class="form-check">
+                        <input type="checkbox" id="cancellationAlerts" [(ngModel)]="settings.cancellationAlerts"
+                          class="form-check-input">
+                        <label for="cancellationAlerts" class="form-check-label fw-medium">
+                          Cancellation Alerts
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Security Settings -->
+              <div class="col-12 col-lg-6">
+                <div class="card border-0 shadow-sm h-100">
+                  <div class="card-header bg-transparent border-0">
+                    <h5 class="card-title mb-0">🔒 Security Settings</h5>
+                  </div>
+                  <div class="card-body">
+                    <div class="d-flex flex-column gap-3">
+                      <div class="form-group">
+                        <label for="sessionTimeout" class="form-label fw-medium">Session Timeout (Minutes)</label>
+                        <input type="number" id="sessionTimeout" [(ngModel)]="settings.sessionTimeout" min="5" max="480"
+                          class="form-control">
+                      </div>
+
+                      <div class="form-check">
+                        <input type="checkbox" id="twoFactorAuth" [(ngModel)]="settings.twoFactorAuth"
+                          class="form-check-input">
+                        <label for="twoFactorAuth" class="form-check-label fw-medium">
+                          Enable Two-Factor Authentication
+                        </label>
+                      </div>
+
+                      <div class="form-check">
+                        <input type="checkbox" id="auditLogging" [(ngModel)]="settings.auditLogging"
+                          class="form-check-input">
+                        <label for="auditLogging" class="form-check-label fw-medium">
+                          Enable Audit Logging
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="d-flex gap-3 justify-content-end mt-4 pt-4 border-top">
+              <button class="btn btn-outline-secondary" (click)="resetSettings()">Reset to Defaults</button>
+              <button class="btn btn-primary" (click)="saveSettings()">Save Settings</button>
+            </div>
+          </div>
+
+          <!-- Subscription Plans Tab -->
+          <div *ngIf="activeTab === 'subscriptions'">
+            <app-travel-admin-subscription-plan [subscriptionPlans]="subscriptionPlans" [displayMode]="'vendor'"
+              [activeSubscription]="activeSubscription" [vendorSubscriptions]="vendorSubscriptions"
+              (planUpdated)="loadSubscriptionPlans()" (planCreated)="onPlanCreated($event)"
+              (planDeleted)="onPlanDeleted($event)" (planSubscriptionRequested)="onVendorSubscriptionRequested($event)"
+              (planSubscriptionCancelled)="onVendorSubscriptionCancelled($event)">
+            </app-travel-admin-subscription-plan>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Trip Modal -->
+  <div *ngIf="showTripModal" class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title fw-bold">{{ isEditingTrip ? 'Edit Trip' : 'Add New Trip' }}</h5>
+          <button type="button" class="btn-close btn-close-white" (click)="closeTripModal()"></button>
+        </div>
+
+        <div class="modal-body">
+          <!-- Trip Modal Tabs -->
+          <ul class="nav nav-tabs nav-fill mb-4 border-bottom">
+            <li class="nav-item">
+              <button class="nav-link fw-medium" [class.active]="activeTripTab === 'basic'"
+                (click)="setActiveTripTab('basic')">
+                📝 Basic Info
+              </button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link fw-medium" [class.active]="activeTripTab === 'details'"
+                (click)="setActiveTripTab('details')">
+                🎯 Trip Details
+              </button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link fw-medium" [class.active]="activeTripTab === 'availability'"
+                (click)="setActiveTripTab('availability')">
+                📅 Availability
+              </button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link fw-medium" [class.active]="activeTripTab === 'itinerary'"
+                (click)="setActiveTripTab('itinerary')">
+                🗓️ Itinerary
+              </button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link fw-medium" [class.active]="activeTripTab === 'images'"
+                (click)="setActiveTripTab('images')">
+                🖼️ Images
+              </button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link fw-medium" [class.active]="activeTripTab === 'inclusions'"
+                (click)="setActiveTripTab('inclusions')">
+                ✅ Inclusions & Exclusions
+              </button>
+            </li>
+          </ul>
+
+          <!-- Progress Indicator -->
+          <div class="progress mb-4" style="height: 8px;">
+            <div class="progress-bar bg-success" role="progressbar" [style.width.%]="getFormProgress()"
+              aria-valuenow="getFormProgress()" aria-valuemin="0" aria-valuemax="100"></div>
+          </div>
+
+          <form>
+            <!-- Basic Info Tab -->
+            <div *ngIf="activeTripTab === 'basic'" class="p-4">
+              <div class="alert alert-info mb-4">
+                <h6 class="alert-heading fw-bold">🚀 Basic Information</h6>
+                <p class="mb-0">Start by providing the essential details about your trip. This information will be
+                  displayed to potential travelers.</p>
+              </div>
+
+              <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                  <label for="name" class="form-label fw-medium">Trip Name</label>
+                  <input type="text" id="name" [(ngModel)]="tripForm.name" name="name" placeholder="Enter trip name"
+                    class="form-control" [class.is-valid]="tripForm.name.trim() !== ''"
+                    [class.is-invalid]="tripForm.name.trim() === ''" required>
+                  <div *ngIf="tripForm.name.trim() === ''" class="invalid-feedback">
+                    Trip name is required
+                  </div>
+                  <div *ngIf="tripForm.name.trim() !== ''" class="valid-feedback">
+                    ✓ Trip name looks good
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <label for="destination" class="form-label fw-medium">Destination</label>
+                  <input type="text" id="destination" [(ngModel)]="tripForm.destination" name="destination"
+                    placeholder="Enter destination" class="form-control"
+                    [class.is-valid]="tripForm.destination.trim() !== ''"
+                    [class.is-invalid]="tripForm.destination.trim() === ''" required>
+                  <div *ngIf="tripForm.destination.trim() === ''" class="invalid-feedback">
+                    Destination is required
+                  </div>
+                  <div *ngIf="tripForm.destination.trim() !== ''" class="valid-feedback">
+                    ✓ Destination looks good
+                  </div>
+                </div>
+              </div>
+
+              <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                  <label for="duration" class="form-label fw-medium">Duration</label>
+                  <input type="text" id="duration" [(ngModel)]="tripForm.duration" name="duration"
+                    placeholder="e.g., 3 days" class="form-control" [class.is-valid]="tripForm.duration.trim() !== ''"
+                    [class.is-invalid]="tripForm.duration.trim() === ''" required>
+                  <div *ngIf="tripForm.duration.trim() === ''" class="invalid-feedback">
+                    Duration is required
+                  </div>
+                  <div *ngIf="tripForm.duration.trim() !== ''" class="valid-feedback">
+                    ✓ Duration looks good
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <label for="basePrice" class="form-label fw-medium">Base Price ($)</label>
+                  <input type="number" id="basePrice" [(ngModel)]="tripForm.basePrice" name="basePrice"
+                    placeholder="0.00" min="0" step="0.01" class="form-control"
+                    [class.is-valid]="tripForm.basePrice > 0" [class.is-invalid]="tripForm.basePrice <= 0"
+                    (ngModelChange)="onBasePriceChange()" required>
+                  <div *ngIf="tripForm.basePrice <= 0" class="invalid-feedback">
+                    Base price must be greater than 0
+                  </div>
+                  <div *ngIf="tripForm.basePrice > 0" class="valid-feedback">
+                    ✓ Base price looks good
+                  </div>
+                </div>
+              </div>
+
+              <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                  <label for="totalCapacity" class="form-label fw-medium">Total Capacity</label>
+                  <input type="number" id="totalCapacity" [(ngModel)]="tripForm.totalCapacity" name="totalCapacity"
+                    placeholder="0" min="1" class="form-control" [class.is-valid]="this.tripForm.totalCapacity > 0"
+                    [class.is-invalid]="this.tripForm.totalCapacity <= 0" (ngModelChange)="onTotalCapacityChange()"
+                    required>
+                  <div *ngIf="tripForm.totalCapacity <= 0" class="invalid-feedback">
+                    Total capacity must be greater than 0
+                  </div>
+                  <div *ngIf="tripForm.totalCapacity > 0" class="valid-feedback">
+                    ✓ Total capacity looks good
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <label for="category" class="form-label fw-medium">Category</label>
+                  <select id="category" [(ngModel)]="tripForm.categoryId" name="categoryId" class="form-select"
+                    [class.is-valid]="tripForm.categoryId > 0" [class.is-invalid]="tripForm.categoryId <= 0" required>
+                    <option value="0">Select category</option>
+                    <option *ngFor="let category of allCategories" [value]="category.id">{{ category.name }}</option>
+                  </select>
+                  <div *ngIf="tripForm.categoryId <= 0" class="invalid-feedback">
+                    Category is required
+                  </div>
+                  <div *ngIf="tripForm.categoryId > 0" class="valid-feedback">
+                    ✓ Category looks good
+                  </div>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="description" class="form-label fw-medium">Description</label>
+                <textarea id="description" [(ngModel)]="tripForm.description" name="description"
+                  placeholder="Enter trip description" rows="6" class="form-control"
+                  [class.is-valid]="tripForm.description.trim() !== ''"
+                  [class.is-invalid]="tripForm.description.trim() === ''" required></textarea>
+                <div *ngIf="tripForm.description.trim() === ''" class="invalid-feedback">
+                  Description is required
+                </div>
+                <div *ngIf="tripForm.description.trim() !== ''" class="valid-feedback">
+                  ✓ Description looks good
+                </div>
+              </div>
+            </div>
+
+            <!-- Images Tab -->
+            <div *ngIf="activeTripTab === 'images'" class="p-4">
+              <div class="alert alert-info mb-4">
+                <h6 class="alert-heading fw-bold">🖼️ Trip Images</h6>
+                <p class="mb-0">Add and manage images for your trip. The first image will be used as the main display
+                  image.</p>
+              </div>
+
+              <!-- Main Image Section -->
+              <div class="mb-4">
+                <label for="mainImage" class="form-label fw-medium">Main Image URL</label>
+                <div class="input-group">
+                  <input type="url" id="mainImage" [(ngModel)]="tripForm.image" name="mainImage"
+                    placeholder="https://example.com/main-image.jpg" class="form-control"
+                    [class.is-valid]="tripForm.image.trim() !== '' && isValidUrl(tripForm.image)"
+                    [class.is-invalid]="tripForm.image.trim() === '' || !isValidUrl(tripForm.image)" required>
+                  <button class="btn btn-outline-secondary" type="button" (click)="generateRandomImage()">
+                    🎲 Random
+                  </button>
+                </div>
+                <div *ngIf="tripForm.image.trim() === ''" class="invalid-feedback">
+                  Main image URL is required
+                </div>
+                <div *ngIf="tripForm.image.trim() !== '' && !isValidUrl(tripForm.image)" class="invalid-feedback">
+                  Please enter a valid image URL
+                </div>
+                <div *ngIf="tripForm.image.trim() !== '' && isValidUrl(tripForm.image)" class="valid-feedback">
+                  ✓ Main image URL looks good
+                </div>
+
+                <!-- Main Image Preview -->
+                <div *ngIf="tripForm.image.trim() !== '' && isValidUrl(tripForm.image)" class="mt-3">
+                  <label class="form-label fw-medium">Main Image Preview</label>
+                  <div class="border rounded p-3 bg-light">
+                    <img [src]="tripForm.image" [alt]="tripForm.name || 'Trip main image'" class="img-fluid rounded"
+                      style="max-height: 300px; object-fit: cover;">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Additional Images Section -->
+              <div class="mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <label class="form-label fw-medium mb-0">Additional Images</label>
+                  <button type="button" class="btn btn-success btn-sm" (click)="addImage()">
+                    ➕ Add Image
+                  </button>
+                </div>
+
+                <div *ngIf="tripForm.images.length === 0" class="text-center py-4 text-muted">
+                  <p class="mb-2">No additional images added yet</p>
+                  <p class="small">Click "Add Image" to add more images to your trip gallery</p>
+                </div>
+
+                <div *ngIf="tripForm.images.length > 0" class="row g-3">
+                  <div *ngFor="let image of tripForm.images; let i = index" class="col-md-6 col-lg-4">
+                    <div class="card border-0 shadow-sm h-100">
+                      <div class="position-relative">
+                        <img [src]="image" [alt]="'Trip image ' + (i + 1)" class="card-img-top"
+                          style="height: 200px; object-fit: cover;">
+                        <div class="position-absolute top-0 end-0 p-2">
+                          <button type="button" class="btn btn-danger btn-sm" (click)="removeImage(i)">
+                            🗑️
+                          </button>
+                        </div>
+                      </div>
+                      <div class="card-body p-3">
+                        <div class="input-group input-group-sm">
+                          <input type="url" [(ngModel)]="tripForm.images[i]" [name]="'image' + i"
+                            placeholder="Image URL" class="form-control"
+                            [class.is-valid]="tripForm.images[i].trim() !== '' && isValidUrl(tripForm.images[i])"
+                            [class.is-invalid]="tripForm.images[i].trim() === '' || !isValidUrl(tripForm.images[i])">
+                          <button class="btn btn-outline-secondary btn-sm" type="button"
+                            (click)="generateRandomImageForIndex(i)">
+                            🎲
+                          </button>
+                        </div>
+                        <div *ngIf="tripForm.images[i].trim() === '' || !isValidUrl(tripForm.images[i])"
+                          class="invalid-feedback d-block">
+                          Please enter a valid image URL
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Image Management Tips -->
+              <div class="alert alert-warning">
+                <h6 class="alert-heading fw-bold">💡 Tips for Great Trip Images</h6>
+                <ul class="mb-0">
+                  <li>Use high-quality images (minimum 800x600 pixels)</li>
+                  <li>Include a mix of landscape and detail shots</li>
+                  <li>Show the destination, activities, and accommodations</li>
+                  <li>Ensure images are properly licensed for commercial use</li>
+                  <li>Optimize images for web (compress without losing quality)</li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- Trip Details Tab -->
+            <div *ngIf="activeTripTab === 'details'" class="p-4">
+              <div class="alert alert-info mb-4">
+                <h6 class="alert-heading fw-bold">📋 Trip Details</h6>
+                <p class="mb-0">Configure the technical specifications and requirements for your trip. This information
+                  helps travelers understand what to expect and prepare accordingly.</p>
+              </div>
+
+              <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                  <label for="difficulty" class="form-label fw-medium">Difficulty Level</label>
+                  <select id="difficulty" [(ngModel)]="tripForm.difficulty" name="difficulty" class="form-select"
+                    [class.is-valid]="tripForm.difficulty.trim() !== ''"
+                    [class.is-invalid]="tripForm.difficulty.trim() === ''" required>
+                    <option value="">Select difficulty level</option>
+                    <option value="Easy">Easy - Suitable for all fitness levels</option>
+                    <option value="Moderate">Moderate - Some physical activity required</option>
+                    <option value="Challenging">Challenging - High fitness level recommended</option>
+                  </select>
+                  <small class="form-text text-muted">Choose the appropriate difficulty level for your trip</small>
+                  <div *ngIf="tripForm.difficulty.trim() === ''" class="invalid-feedback">
+                    Difficulty level is required
+                  </div>
+                  <div *ngIf="tripForm.difficulty.trim() !== ''" class="valid-feedback">
+                    ✓ Difficulty level looks good
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <label for="groupSizeMin" class="form-label fw-medium">Group Size (Min)</label>
+                  <input type="number" id="groupSizeMin" [(ngModel)]="tripForm.groupSize.min" name="groupSizeMin"
+                    placeholder="1" min="1" class="form-control" [class.is-valid]="tripForm.groupSize.min > 0"
+                    [class.is-invalid]="tripForm.groupSize.min <= 0" required>
+                  <small class="form-text text-muted">Minimum number of people required for the trip</small>
+                  <div *ngIf="tripForm.groupSize.min <= 0" class="invalid-feedback">
+                    Minimum group size must be greater than 0
+                  </div>
+                  <div *ngIf="tripForm.groupSize.min > 0" class="valid-feedback">
+                    ✓ Minimum group size looks good
+                  </div>
+                </div>
+              </div>
+
+              <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                  <label for="groupSizeMax" class="form-label fw-medium">Group Size (Max)</label>
+                  <input type="number" id="groupSizeMax" [(ngModel)]="tripForm.groupSize.max" name="groupSizeMax"
+                    placeholder="20" min="1" class="form-control"
+                    [class.is-valid]="tripForm.groupSize.max >= tripForm.groupSize.min"
+                    [class.is-invalid]="tripForm.groupSize.max < tripForm.groupSize.min" required>
+                  <small class="form-text text-muted">Maximum number of people allowed on the trip</small>
+                  <div *ngIf="tripForm.groupSize.max < tripForm.groupSize.min" class="invalid-feedback">
+                    Maximum group size must be greater than or equal to minimum
+                  </div>
+                  <div *ngIf="tripForm.groupSize.max >= tripForm.groupSize.min" class="valid-feedback">
+                    ✓ Maximum group size looks good
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <label for="bestTime" class="form-label fw-medium">Best Time to Visit</label>
+                  <input type="text" id="bestTime" [(ngModel)]="tripForm.bestTime" name="bestTime"
+                    placeholder="e.g., March to October" class="form-control"
+                    [class.is-valid]="tripForm.bestTime.trim() !== ''"
+                    [class.is-invalid]="tripForm.bestTime.trim() === ''" required>
+                  <small class="form-text text-muted">Specify the optimal time period for this trip</small>
+                  <div *ngIf="tripForm.bestTime.trim() === ''" class="invalid-feedback">
+                    Best time to visit is required
+                  </div>
+                  <div *ngIf="tripForm.bestTime.trim() !== ''" class="valid-feedback">
+                    ✓ Best time to visit looks good
+                  </div>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="cancellationPolicy" class="form-label fw-medium">Cancellation Policy</label>
+                <input type="text" id="cancellationPolicy" [(ngModel)]="tripForm.cancellationPolicy"
+                  name="cancellationPolicy" placeholder="e.g., Free cancellation up to 7 days before"
+                  class="form-control" [class.is-valid]="tripForm.cancellationPolicy.trim() !== ''"
+                  [class.is-invalid]="tripForm.cancellationPolicy.trim() === ''" required>
+                <small class="form-text text-muted">Explain your cancellation and refund policy</small>
+                <div *ngIf="tripForm.cancellationPolicy.trim() === ''" class="invalid-feedback">
+                  Cancellation policy is required
+                </div>
+                <div *ngIf="tripForm.cancellationPolicy.trim() !== ''" class="valid-feedback">
+                  ✓ Cancellation policy looks good
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label fw-medium">Highlights</label>
+                <small class="form-text text-muted d-block mb-2">Add key attractions and memorable experiences that make
+                  this trip special</small>
+                <div class="border border-2 border-dashed border-secondary rounded p-3 bg-light">
+                  <div *ngFor="let highlight of tripForm.highlights; let i = index"
+                    class="d-flex align-items-center gap-2 mb-2 p-2 bg-white rounded border">
+                    <input type="text" [(ngModel)]="tripForm.highlights[i]" [name]="'highlight' + i"
+                      placeholder="Enter highlight" class="form-control flex-grow-1">
+                    <button type="button" class="btn btn-outline-danger btn-sm rounded-circle"
+                      (click)="removeHighlight(i)" title="Remove Highlight">×</button>
+                  </div>
+                  <button type="button" class="btn btn-success" (click)="addHighlight()">+ Add Highlight</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Availability Tab -->
+            <div *ngIf="activeTripTab === 'availability'" class="p-4">
+              <div class="alert alert-info mb-4">
+                <h6 class="alert-heading fw-bold">📅 Availability Management</h6>
+                <p class="mb-0">Manage trip dates, capacity, and pricing. Add specific dates when your trip is available
+                  and configure pricing for each date.</p>
+              </div>
+
+              <!-- Add New Date Section -->
+              <div class="card availability-card mb-4">
+                <div class="card-header bg-primary text-white">
+                  <h6 class="mb-0 fw-bold">➕ Add New Date</h6>
+                </div>
+                <div class="card-body">
+                  <div class="row g-3">
+                    <div class="col-md-4">
+                      <label for="newDate" class="form-label fw-medium">Date</label>
+                      <input type="date" id="newDate" [(ngModel)]="newAvailabilityDate" name="newDate"
+                        class="form-control" [min]="getTodayDate()">
+                    </div>
+                    <div class="col-md-3">
+                      <label for="newCapacity" class="form-label fw-medium">Capacity</label>
+                      <input type="number" id="newCapacity" [(ngModel)]="newAvailabilityCapacity" name="newCapacity"
+                        placeholder="30" min="1" [max]="tripForm.totalCapacity" class="form-control">
+                    </div>
+                    <div class="col-md-3">
+                      <label for="newPrice" class="form-label fw-medium">Price ($)</label>
+                      <input type="number" id="newPrice" [(ngModel)]="newAvailabilityPrice" name="newPrice"
+                        placeholder="899.99" min="0" step="0.01" class="form-control">
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                      <button type="button" class="btn btn-primary w-100" (click)="addAvailabilityDate()"
+                        [disabled]="!newAvailabilityDate || !newAvailabilityCapacity || !newAvailabilityPrice">
+                        Add Date
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Existing Availability Management -->
+              <div class="card availability-card">
+                <div class="card-header bg-success text-white">
+                  <h6 class="mb-0 fw-bold">📊 Manage Existing Dates</h6>
+                </div>
+                <div class="card-body">
+                  <div *ngIf="tripForm.availability.length === 0" class="text-center py-4">
+                    <div class="text-muted mb-3">
+                      <i class="fs-1">📅</i>
+                    </div>
+                    <h6 class="text-muted">No availability dates set yet</h6>
+                    <p class="text-muted small">Add dates above to start managing trip availability</p>
+                  </div>
+
+                  <div *ngIf="tripForm.availability.length > 0" class="table-responsive">
+                    <table class="table table-hover availability-table">
+                      <thead class="table-light">
+                        <tr>
+                          <th>Date</th>
+                          <th>Available Spots</th>
+                          <th>Max Capacity</th>
+                          <th>Price ($)</th>
+                          <th>Status</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let avail of tripForm.availability; let i = index" class="align-middle">
+                          <td>
+                            <strong>{{ formatDate(avail.date) }}</strong>
+                          </td>
+                          <td>
+                            <input type="number" [(ngModel)]="avail.available" [name]="'available' + i" min="0"
+                              [max]="avail.maxCapacity" class="form-control form-control-sm availability-input">
+                          </td>
+                          <td>
+                            <input type="number" [(ngModel)]="avail.maxCapacity" [name]="'maxCapacity' + i" min="1"
+                              [max]="tripForm.totalCapacity" class="form-control form-control-sm availability-input">
+                          </td>
+                          <td>
+                            <input type="number" [(ngModel)]="avail.price" [name]="'price' + i" min="0" step="0.01"
+                              class="form-control form-control-sm availability-price-input">
+                          </td>
+                          <td>
+                            <span class="badge availability-status-badge" [class]="getAvailabilityStatusClass(avail)">
+                              {{ getAvailabilityStatus(avail) }}
+                            </span>
+                          </td>
+                          <td>
+                            <button type="button" class="btn btn-outline-danger btn-sm"
+                              (click)="removeAvailabilityDate(i)" title="Remove Date">
+                              🗑️
+                            </button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Itinerary Tab -->
+            <div *ngIf="activeTripTab === 'itinerary'" class="p-4">
+              <div class="alert alert-info mb-4">
+                <h6 class="alert-heading fw-bold">🗓️ Itinerary Planning</h6>
+                <p class="mb-0">Create a detailed day-by-day itinerary for your trip. Include activities, meals, and
+                  timing to give travelers a clear understanding of their journey.</p>
+              </div>
+
+              <div class="bg-light rounded p-3">
+                <div *ngFor="let day of tripForm.itinerary; let dayIndex = index"
+                  class="bg-white border rounded mb-3 overflow-hidden">
+                  <div class="bg-primary text-white p-3 d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0 fw-bold">🗓️ Day {{ day.day }}</h6>
+                    <button type="button" class="btn btn-outline-light btn-sm rounded-circle"
+                      (click)="removeItineraryDay(dayIndex)" title="Remove Day">×</button>
+                  </div>
+
+                  <div class="p-3">
+                    <div class="mb-3">
+                      <label class="form-label fw-medium">Title</label>
+                      <input type="text" [(ngModel)]="day.title" [name]="'itineraryTitle' + dayIndex"
+                        placeholder="Day title" class="form-control">
+                      <small class="form-text text-muted">Brief title for this day (e.g., "Arrival & City Tour")</small>
+                    </div>
+
+                    <div class="mb-3">
+                      <label class="form-label fw-medium">Description</label>
+                      <textarea [(ngModel)]="day.description" [name]="'itineraryDescription' + dayIndex"
+                        placeholder="Day description" rows="3" class="form-control"></textarea>
+                      <small class="form-text text-muted">Detailed overview of what happens on this day</small>
+                    </div>
+
+                    <!-- Activities -->
+                    <div class="mb-3">
+                      <label class="form-label fw-medium">Activities</label>
+                      <small class="form-text text-muted d-block mb-2">Schedule activities with specific times and
+                        descriptions</small>
+                      <div class="border border-2 border-dashed border-secondary rounded p-3 bg-light">
+                        <div *ngFor="let activity of day.activities; let activityIndex = index"
+                          class="d-flex align-items-center gap-2 mb-2 p-2 bg-white rounded border">
+                          <div class="row g-2 flex-grow-1">
+                            <div class="col-md-4">
+                              <input type="text" [(ngModel)]="day.activities[activityIndex].time"
+                                [name]="'activityTime' + dayIndex + '_' + activityIndex"
+                                placeholder="Time (e.g., 09:00 AM)" class="form-control">
+                            </div>
+                            <div class="col-md-8">
+                              <input type="text" [(ngModel)]="day.activities[activityIndex].description"
+                                [name]="'activityDescription' + dayIndex + '_' + activityIndex"
+                                placeholder="Activity description" class="form-control">
+                            </div>
+                          </div>
+                          <button type="button" class="btn btn-outline-danger btn-sm rounded-circle"
+                            (click)="removeActivity(dayIndex, activityIndex)">×</button>
+                        </div>
+                        <button type="button" class="btn btn-success" (click)="addActivity(dayIndex)">+ Add
+                          Activity</button>
+                      </div>
+                    </div>
+
+                    <!-- Meals -->
+                    <div class="mb-3">
+                      <label class="form-label fw-medium">Meals</label>
+                      <small class="form-text text-muted d-block mb-2">Include meal arrangements and
+                        descriptions</small>
+                      <div class="border border-2 border-dashed border-secondary rounded p-3 bg-light">
+                        <div *ngFor="let meal of day.meals; let mealIndex = index"
+                          class="d-flex align-items-center gap-2 mb-2 p-2 bg-white rounded border">
+                          <div class="row g-2 flex-grow-1">
+                            <div class="col-md-4">
+                              <input type="text" [(ngModel)]="day.meals[mealIndex].type"
+                                [name]="'mealType' + dayIndex + '_' + mealIndex"
+                                placeholder="Meal type (e.g., Breakfast, Lunch, Dinner)" class="form-control">
+                            </div>
+                            <div class="col-md-8">
+                              <input type="text" [(ngModel)]="day.meals[mealIndex].description"
+                                [name]="'mealDescription' + dayIndex + '_' + mealIndex" placeholder="Meal description"
+                                class="form-control">
+                            </div>
+                          </div>
+                          <button type="button" class="btn btn-outline-danger btn-sm rounded-circle"
+                            (click)="removeMeal(dayIndex, mealIndex)">×</button>
+                        </div>
+                        <button type="button" class="btn btn-success" (click)="addMeal(dayIndex)">+ Add Meal</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <button type="button" class="btn btn-success" (click)="addItineraryDay()">+ Add Itinerary Day</button>
+              </div>
+            </div>
+
+            <!-- Inclusions & Exclusions Tab -->
+            <div *ngIf="activeTripTab === 'inclusions'" class="p-4">
+              <div class="alert alert-info mb-4">
+                <h6 class="alert-heading fw-bold">✅ Inclusions & Exclusions</h6>
+                <p class="mb-0">Clearly define what's included and what's not included in your trip package. This helps
+                  set proper expectations and avoid misunderstandings.</p>
+              </div>
+
+              <div class="bg-white border border-success border-start border-start-4 rounded p-3 mb-3">
+                <h5 class="text-success fw-bold mb-3">✅ Inclusions</h5>
+                <small class="form-text text-muted d-block mb-3">List all services, accommodations, and items included
+                  in the trip price</small>
+                <div class="border border-2 border-dashed border-secondary rounded p-3 bg-light">
+                  <div *ngFor="let inclusion of tripForm.inclusions; let i = index"
+                    class="d-flex align-items-center gap-2 mb-2 p-2 bg-white rounded border">
+                    <input type="text" [(ngModel)]="tripForm.inclusions[i]" [name]="'inclusion' + i"
+                      placeholder="Enter inclusion item" class="form-control flex-grow-1">
+                    <button type="button" class="btn btn-outline-danger btn-sm rounded-circle"
+                      (click)="removeInclusion(i)" title="Remove Inclusion">×</button>
+                  </div>
+                  <button type="button" class="btn btn-success" (click)="addInclusion()">+ Add Inclusion</button>
+                </div>
+              </div>
+
+              <div class="bg-white border border-danger border-start border-start-4 rounded p-3">
+                <h5 class="text-danger fw-bold mb-3">❌ Exclusions</h5>
+                <small class="form-text text-muted d-block mb-3">List items and services that are NOT included in the
+                  trip price</small>
+                <div class="border border-2 border-dashed border-secondary rounded p-3 bg-light">
+                  <div *ngFor="let exclusion of tripForm.exclusions; let i = index"
+                    class="d-flex align-items-center gap-2 mb-2 p-2 bg-white rounded border">
+                    <input type="text" [(ngModel)]="tripForm.exclusions[i]" [name]="'exclusion' + i"
+                      placeholder="Enter exclusion item" class="form-control flex-grow-1">
+                    <button type="button" class="btn btn-outline-danger btn-sm rounded-circle"
+                      (click)="removeExclusion(i)" title="Remove Exclusion">×</button>
+                  </div>
+                  <button type="button" class="btn btn-success" (click)="addExclusion()">+ Add Exclusion</button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <div class="modal-footer">
+          <div class="d-flex justify-content-between align-items-center w-100">
+            <div>
+              <button *ngIf="activeTripTab !== 'basic'" class="btn btn-outline-secondary me-2"
+                (click)="previousTripTab()">
+                ← Previous
+              </button>
+            </div>
+            <div class="text-center">
+              <span class="badge bg-secondary px-3 py-2">{{ getTripTabTitle() }}</span>
+            </div>
+            <div>
+              <button *ngIf="activeTripTab !== 'inclusions'" class="btn btn-outline-secondary me-2"
+                (click)="nextTripTab()" [disabled]="!isCurrentTabValid()">
+                Next →
+              </button>
+              <button class="btn btn-primary" (click)="saveTrip()" [disabled]="!isFormComplete()">
+                {{ isEditingTrip ? 'Update Trip' : 'Add Trip' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- Booking Modal -->
+  <div *ngIf="showBookingModal && selectedBooking" class="modal fade show d-block" tabindex="-1"
+    style="background-color: rgba(0,0,0,0.5);">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Booking Details</h5>
+          <button type="button" class="btn-close" (click)="closeBookingModal()"></button>
+        </div>
+
+        <div class="modal-body">
+          <div class="d-flex flex-column gap-3 mb-4">
+            <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+              <span class="fw-medium">Booking ID:</span>
+              <span class="text-muted">{{ selectedBooking.id }}</span>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+              <span class="fw-medium">Trip:</span>
+              <span class="text-muted">{{ selectedBooking.tripName }}</span>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+              <span class="fw-medium">Customer:</span>
+              <span class="text-muted">{{ selectedBooking.customerName }}</span>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+              <span class="fw-medium">Email:</span>
+              <span class="text-muted">{{ selectedBooking.customerEmail }}</span>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+              <span class="fw-medium">Travel Date:</span>
+              <span class="text-muted">{{ formatDate(selectedBooking.travelDate) }}</span>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+              <span class="fw-medium">Number of People:</span>
+              <span class="text-muted">{{ selectedBooking.numberOfPeople }}</span>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+              <span class="fw-medium">Total Price:</span>
+              <span class="fw-bold text-success fs-5">{{ formatCurrency(selectedBooking.totalPrice) }}</span>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+              <span class="fw-medium">Booking Date:</span>
+              <span class="text-muted">{{ formatDate(selectedBooking.bookingDate) }}</span>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+              <span class="fw-medium">Status:</span>
+              <span class="badge" [class]="getStatusColor(selectedBooking.status)">
+                {{ selectedBooking.status }}
+              </span>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+              <span class="fw-medium">Payment Status:</span>
+              <span class="badge" [class]="getPaymentStatusColor(selectedBooking.paymentStatus)">
+                {{ selectedBooking.paymentStatus }}
+              </span>
+            </div>
+          </div>
+
+          <div class="border-top pt-4">
+            <h6 class="mb-3">Update Status</h6>
+            <div class="d-flex gap-2 mb-4">
+              <button class="btn btn-success" (click)="updateBookingStatus(selectedBooking, 'Confirmed')"
+                [disabled]="selectedBooking.status === 'Confirmed'">
+                ✅ Confirm Booking
+              </button>
+              <button class="btn btn-danger" (click)="updateBookingStatus(selectedBooking, 'Cancelled')"
+                [disabled]="selectedBooking.status === 'Cancelled'">
+                ❌ Cancel Booking
+              </button>
+            </div>
+
+            <h6 class="mb-3">Update Payment Status</h6>
+            <div class="d-flex gap-2">
+              <button class="btn btn-success" (click)="updatePaymentStatus(selectedBooking, 'Paid')"
+                [disabled]="selectedBooking.paymentStatus === 'Paid'">
+                💰 Mark as Paid
+              </button>
+              <button class="btn btn-danger" (click)="updatePaymentStatus(selectedBooking, 'Failed')"
+                [disabled]="selectedBooking.paymentStatus === 'Failed'">
+                ❌ Mark as Failed
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-secondary" (click)="closeBookingModal()">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Customer Modal -->
+  <div *ngIf="showCustomerModal" class="modal fade show d-block" tabindex="-1"
+    style="background-color: rgba(0,0,0,0.5);">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ isEditingCustomer ? 'Edit Customer' : (selectedCustomer ? 'Customer Details' : 'Add
+            New Customer') }}</h5>
+          <button type="button" class="btn-close" (click)="closeCustomerModal()"></button>
+        </div>
+
+        <div class="modal-body">
+          <!-- Customer Details View -->
+          <div *ngIf="selectedCustomer && !isEditingCustomer" class="d-flex flex-column gap-3 mb-4">
+            <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+              <span class="fw-medium">Customer ID:</span>
+              <span class="text-muted">{{ selectedCustomer.id }}</span>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+              <span class="fw-medium">Name:</span>
+              <span class="text-muted">{{ selectedCustomer.name }}</span>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+              <span class="fw-medium">Email:</span>
+              <span class="text-muted">{{ selectedCustomer.email }}</span>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+              <span class="fw-medium">Phone:</span>
+              <span class="text-muted">{{ selectedCustomer.phone }}</span>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+              <span class="fw-medium">Total Bookings:</span>
+              <span class="text-muted">{{ selectedCustomer.totalBookings }}</span>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+              <span class="fw-medium">Total Spent:</span>
+              <span class="fw-bold text-success fs-5">{{ formatCurrency(selectedCustomer.totalSpent) }}</span>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+              <span class="fw-medium">Status:</span>
+              <span class="badge" [class]="getCustomerStatusColor(selectedCustomer.status)">
+                {{ selectedCustomer.status }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Customer Form -->
+          <form *ngIf="!selectedCustomer || isEditingCustomer" class="d-flex flex-column gap-3">
+            <div class="form-group">
+              <label for="customerName" class="form-label fw-medium">Name</label>
+              <input type="text" id="customerName" [(ngModel)]="customerForm.name" name="customerName"
+                placeholder="Enter customer name" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+              <label for="customerEmail" class="form-label fw-medium">Email</label>
+              <input type="email" id="customerEmail" [(ngModel)]="customerForm.email" name="customerEmail"
+                placeholder="Enter customer email" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+              <label for="customerPhone" class="form-label fw-medium">Phone</label>
+              <input type="tel" id="customerPhone" [(ngModel)]="customerForm.phone" name="customerPhone"
+                placeholder="Enter customer phone" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+              <label for="customerStatus" class="form-label fw-medium">Status</label>
+              <select id="customerStatus" [(ngModel)]="customerForm.status" name="customerStatus" class="form-select"
+                required>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+                <option value="vip">VIP</option>
+              </select>
+            </div>
+          </form>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-secondary" (click)="closeCustomerModal()">
+            {{ selectedCustomer && !isEditingCustomer ? 'Close' : 'Cancel' }}
+          </button>
+          <button *ngIf="!selectedCustomer || isEditingCustomer" class="btn btn-primary" (click)="saveCustomer()">
+            {{ isEditingCustomer ? 'Update Customer' : 'Add Customer' }}
+          </button>
+          <button *ngIf="selectedCustomer && !isEditingCustomer" class="btn btn-warning"
+            (click)="editCustomer(selectedCustomer)">
+            ✏️ Edit Customer
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Category Modal -->
+  <div *ngIf="showCategoryModal" class="modal fade show d-block" tabindex="-1"
+    style="background-color: rgba(0,0,0,0.5);">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title fw-bold">{{ isEditingCategory ? 'Edit Category' : 'Add New Category' }}</h5>
+          <button type="button" class="btn-close btn-close-white" (click)="closeCategoryModal()"></button>
+        </div>
+
+        <div class="modal-body">
+          <form class="d-flex flex-column gap-3">
+            <div class="form-group">
+              <label for="categoryName" class="form-label fw-medium">Category Name</label>
+              <input type="text" id="categoryName" [(ngModel)]="categoryForm.name" name="categoryName"
+                placeholder="Enter category name" class="form-control"
+                [class.is-valid]="categoryForm.name.trim() !== ''" [class.is-invalid]="categoryForm.name.trim() === ''"
+                required>
+              <div *ngIf="categoryForm.name.trim() === ''" class="invalid-feedback">
+                Category name is required
+              </div>
+              <div *ngIf="categoryForm.name.trim() !== ''" class="valid-feedback">
+                ✓ Category name looks good
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="categoryDescription" class="form-label fw-medium">Description</label>
+              <textarea id="categoryDescription" [(ngModel)]="categoryForm.description" name="categoryDescription"
+                placeholder="Enter category description" rows="4" class="form-control"
+                [class.is-valid]="categoryForm.description.trim() !== ''"
+                [class.is-invalid]="categoryForm.description.trim() === ''" required></textarea>
+              <div *ngIf="categoryForm.description.trim() === ''" class="invalid-feedback">
+                Description is required
+              </div>
+              <div *ngIf="categoryForm.description.trim() !== ''" class="valid-feedback">
+                ✓ Description looks good
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="categoryImage" class="form-label fw-medium">Image URL</label>
+              <input type="url" id="categoryImage" [(ngModel)]="categoryForm.imageUrl" name="categoryImage"
+                placeholder="https://example.com/image.jpg" class="form-control"
+                [class.is-valid]="categoryForm.imageUrl.trim() !== '' && isValidUrl(categoryForm.imageUrl)"
+                [class.is-invalid]="categoryForm.imageUrl.trim() === '' || !isValidUrl(categoryForm.imageUrl)" required>
+              <div *ngIf="categoryForm.imageUrl.trim() === ''" class="invalid-feedback">
+                Image URL is required
+              </div>
+              <div *ngIf="categoryForm.imageUrl.trim() !== '' && !isValidUrl(categoryForm.imageUrl)"
+                class="invalid-feedback">
+                Please enter a valid URL
+              </div>
+              <div *ngIf="categoryForm.imageUrl.trim() !== '' && isValidUrl(categoryForm.imageUrl)"
+                class="valid-feedback">
+                ✓ Image URL looks good
+              </div>
+
+              <!-- Image Preview -->
+              <div *ngIf="categoryForm.imageUrl.trim() !== '' && isValidUrl(categoryForm.imageUrl)" class="mt-3">
+                <label class="form-label fw-medium">Image Preview</label>
+                <div class="border rounded p-2 bg-light">
+                  <img [src]="categoryForm.imageUrl" [alt]="categoryForm.name" class="img-fluid rounded"
+                    style="max-height: 200px; width: 100%;">
+                </div>
+              </div>
+            </div>
+
+            <!-- Active Status Toggle -->
+            <div class="form-group">
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="categoryActive" [(ngModel)]="categoryForm.isActive"
+                  name="categoryActive">
+                <label class="form-check-label fw-medium" for="categoryActive">
+                  <span [class]="categoryForm.isActive ? 'text-success' : 'text-muted'">
+                    {{ categoryForm.isActive ? '🟢 Active' : '🔴 Inactive' }}
+                  </span>
+                </label>
+              </div>
+              <small class="text-muted">
+                {{ categoryForm.isActive ? 'This category will be visible to users' : 'This category will be hidden from
+                users' }}
+              </small>
+            </div>
+          </form>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-secondary" (click)="closeCategoryModal()">Cancel</button>
+          <button class="btn btn-primary" (click)="saveCategory()" [disabled]="!isCategoryFormValid()">
+            {{ isEditingCategory ? 'Update Category' : 'Add Category' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Subscription Plan Modal -->
+  <div *ngIf="showPlanModal || showPlanWizard" class="modal fade show d-block" tabindex="-1"
+    style="background-color: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            {{ isEditingPlan ? 'Edit Subscription Plan' : 'Create New Subscription Plan' }}
+          </h5>
+          <button type="button" class="btn-close"
+            (click)="showPlanWizard ? closePlanWizard() : closePlanModal()"></button>
+        </div>
+
+        <div class="modal-body">
+          <!-- NEW CLEAN PLAN WIZARD -->
+          <div class="plan-wizard">
+            <!-- Step Indicators -->
+            <div class="wizard-steps mb-4">
+              <div class="d-flex justify-content-between align-items-center">
+                <div *ngFor="let step of [1,2,3,4]; let i = index" class="d-flex align-items-center flex-fill">
+                  <div class="step-circle me-2" [class.active]="currentStep >= step"
+                    [class.completed]="currentStep > step">
+                    {{ step }}
+                  </div>
+                  <div class="step-info me-3">
+                    <div class="step-title" [class.active]="currentStep >= step">
+                      {{ getStepTitle(step) }}
+                    </div>
+                    <small class="step-desc">{{ getStepDescription(step) }}</small>
+                  </div>
+                  <div *ngIf="i < 3" class="step-line flex-fill" [class.active]="currentStep > step"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Step Content -->
+            <div class="step-content">
+              <!-- Step 1: Basic Information -->
+              <div *ngIf="currentStep === 1" class="step-panel">
+                <h5 class="mb-3">📝 Basic Information</h5>
+                <div class="row g-3">
+                  <div class="col-12">
+                    <label class="form-label fw-medium">Plan Name *</label>
+                    <input type="text" [(ngModel)]="planForm.name" placeholder="e.g., Premium Travel Plan"
+                      class="form-control">
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label fw-medium">Description *</label>
+                    <textarea [(ngModel)]="planForm.description" placeholder="Describe what this plan offers..."
+                      rows="4" class="form-control"></textarea>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Step 2: Pricing & Billing -->
+              <div *ngIf="currentStep === 2" class="step-panel">
+                <h5 class="mb-3">💰 Pricing & Billing</h5>
+                <div class="row g-3">
+                  <div class="col-12">
+                    <div class="form-check form-switch">
+                      <input class="form-check-input" type="checkbox" [(ngModel)]="planForm.isTrialOnly"
+                        (ngModelChange)="onTrialOnlyChange()">
+                      <label class="form-check-label fw-medium">
+                        🎁 Trial-Only Plan (No recurring billing)
+                      </label>
+                    </div>
+                  </div>
+
+                  <div class="col-md-6" *ngIf="!planForm.isTrialOnly">
+                    <label class="form-label fw-medium">Price (USD) *</label>
+                    <div class="input-group">
+                      <span class="input-group-text">$</span>
+                      <input type="number" [(ngModel)]="planForm.price" (ngModelChange)="onPriceChange()"
+                        placeholder="29.99" min="0" step="0.01" class="form-control">
+                    </div>
+
+                    <!-- Discount Information Display -->
+                    <div *ngIf="getDiscountInfo().hasDiscount" class="mt-2">
+                      <div class="alert alert-success d-flex align-items-center" role="alert">
+                        <i class="fas fa-percentage me-2"></i>
+                        <div>
+                          <strong>🎉 Discount Applied!</strong><br>
+                          <small>
+                            Monthly equivalent: ${{ getDiscountInfo().monthlyEquivalent }}/month<br>
+                            You save: ${{ getDiscountInfo().savings }} ({{ planForm.discountPercent }}% off)
+                          </small>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Manual Discount Display -->
+                    <div
+                      *ngIf="planForm.discountPercent && planForm.discountPercent > 0 && !getDiscountInfo().hasDiscount"
+                      class="mt-2">
+                      <div class="alert alert-info d-flex align-items-center" role="alert">
+                        <i class="fas fa-tag me-2"></i>
+                        <div>
+                          <strong>💰 Manual Discount Set!</strong><br>
+                          <small>
+                            Discount: {{ planForm.discountPercent }}%<br>
+                            Final price: ${{ planForm.price }} ({{ planForm.durationMonths }} months)
+                          </small>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Suggested Pricing Helper -->
+                    <div *ngIf="planForm.durationMonths === 12 && !getDiscountInfo().hasDiscount && planForm.price"
+                      class="mt-2">
+                      <div class="alert alert-info d-flex align-items-center" role="alert">
+                        <i class="fas fa-lightbulb me-2"></i>
+                        <div>
+                          <strong>💡 Pro Tip:</strong><br>
+                          <small>
+                            For yearly plans, consider offering a discount!<br>
+                            Suggested: ${{ (planForm.price! / 12 * 12 * 0.8).toFixed(2) }} (20% off) or ${{
+                            (planForm.price! / 12 * 12 * 0.75).toFixed(2) }} (25% off)
+                          </small>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6" *ngIf="!planForm.isTrialOnly">
+                    <label class="form-label fw-medium">Billing Cycle *</label>
+                    <select [(ngModel)]="planForm.durationMonths" (ngModelChange)="onDurationMonthsChange($event)"
+                      class="form-select">
+                      <option value="1">Monthly</option>
+                      <option value="3">Quarterly</option>
+                      <option value="6">Semi-Annual</option>
+                      <option value="12">Annual</option>
+                    </select>
+                  </div>
+
+                  <!-- Discount Field -->
+                  <div class="col-md-6" *ngIf="!planForm.isTrialOnly">
+                    <label class="form-label fw-medium">Discount Percentage</label>
+                    <div class="input-group">
+                      <input type="number" [(ngModel)]="planForm.discountPercent" (ngModelChange)="onDiscountChange()"
+                        placeholder="0" min="0" max="100" step="0.01" class="form-control">
+                      <span class="input-group-text">%</span>
+                    </div>
+                    <small class="form-text text-muted">
+                      <i class="fas fa-info-circle me-1"></i>
+                      Enter discount percentage (0-100%). Auto-calculated for yearly plans.
+                    </small>
+                  </div>
+
+                  <div class="col-md-6">
+                    <label class="form-label fw-medium">Trial Period (Days)</label>
+                    <select [(ngModel)]="planForm.trialDays" class="form-select">
+                      <option value="0">No Trial</option>
+                      <option value="7">7 Days Free</option>
+                      <option value="14">14 Days Free</option>
+                      <option value="30">30 Days Free</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6" *ngIf="planForm.trialDays && planForm.trialDays > 0">
+                    <label class="form-label fw-medium">Trial Price (USD)</label>
+                    <div class="input-group">
+                      <span class="input-group-text">$</span>
+                      <input type="number" [(ngModel)]="planForm.trialPrice" placeholder="0.00" min="0" step="0.01"
+                        class="form-control">
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Step 3: Features & Limits -->
+              <div *ngIf="currentStep === 3" class="step-panel">
+                <h5 class="mb-3">✨ Features & Limits</h5>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label class="form-label fw-medium">Maximum Trips</label>
+                    <input type="number" [(ngModel)]="planForm.maxTrips" placeholder="0 for unlimited" min="0"
+                      class="form-control">
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label fw-medium">Plan Status</label>
+                    <div class="form-check form-switch">
+                      <input class="form-check-input" type="checkbox" [(ngModel)]="planForm.isActive">
+                      <label class="form-check-label">
+                        {{ planForm.isActive ? '🟢 Active' : '🔴 Inactive' }}
+                      </label>
+                    </div>
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label fw-medium">Features List</label>
+                    <textarea [(ngModel)]="planForm.features" placeholder="Feature 1, Feature 2, Feature 3" rows="3"
+                      class="form-control"></textarea>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Step 4: Review & Confirm -->
+              <div *ngIf="currentStep === 4" class="step-panel">
+                <h5 class="mb-3">👀 Review & Confirm</h5>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <h6 class="text-muted mb-2">Plan Details</h6>
+                    <div class="mb-2"><strong>Name:</strong> {{ planForm.name || 'Not specified' }}</div>
+                    <div class="mb-2"><strong>Description:</strong> {{ planForm.description || 'Not specified' }}</div>
+                    <div class="mb-2"><strong>Status:</strong> {{ planForm.isActive ? 'Active' : 'Inactive' }}</div>
+                  </div>
+                  <div class="col-md-6">
+                    <h6 class="text-muted mb-2">Pricing & Features</h6>
+                    <div class="mb-2"><strong>Price:</strong> ${{ planForm.price || 0 }} / {{ planForm.durationMonths ||
+                      1 }} month(s)</div>
+                    <div class="mb-2" *ngIf="planForm.trialDays && planForm.trialDays > 0">
+                      <strong>Trial:</strong> {{ planForm.trialDays }} days {{ planForm.trialPrice === 0 ? 'FREE' : 'for
+                      $' + planForm.trialPrice }}
+                    </div>
+                    <div class="mb-2"><strong>Max Trips:</strong> {{ planForm.maxTrips || 0 }} {{ planForm.maxTrips ===
+                      0 ? '(Unlimited)' : 'trips' }}</div>
+                    <div class="mb-2"><strong>Features:</strong> {{ planForm.features || 'None specified' }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Navigation -->
+            <div class="wizard-navigation mt-4">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <button *ngIf="currentStep > 1" class="btn btn-outline-secondary" (click)="previousStep()">
+                    ← Previous
+                  </button>
+                </div>
+                <div class="text-center">
+                  <span class="badge bg-secondary px-3 py-2">Step {{ currentStep }} of 4</span>
+                </div>
+                <div>
+                  <button class="btn btn-secondary me-2" (click)="closePlanModal()">Cancel</button>
+                  <button *ngIf="currentStep < 4" class="btn btn-primary" (click)="nextStep()">
+                    Next →
+                  </button>
+                  <button *ngIf="currentStep === 4" class="btn btn-success" (click)="savePlan()">
+                    {{ isEditingPlan ? 'Update Plan' : 'Create Plan' }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- New Trip Editor Component -->
+  <app-travel-trip-editor2 [showModal]="showNewTripEditor" [trip]="selectedTripDb" [allCategories]="allCategories"
+    [isEditingTrip]="selectedTripDb !== null" [isLoading]="isLoading" (closeModal)="closeNewTripEditor()"
+    (saveTrip)="onSaveNewTrip($event)">
+  </app-travel-trip-editor2>
+  <!-- Analytics Modal -->
+  <div *ngIf="showAnalyticsModal" class="modal fade show d-block" tabindex="-1"
+    style="background-color: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            📈 Analytics for {{ selectedAnalyticsPlan?.name }}
+          </h5>
+          <button type="button" class="btn-close" (click)="closeAnalyticsModal()"></button>
+        </div>
+        <div class="modal-body">
+          <div *ngIf="analyticsLoading" class="text-center py-5">
+            <div class="spinner-border text-primary mb-3"></div>
+            <p class="text-muted">Loading detailed analytics...</p>
+          </div>
+
+          <div *ngIf="!analyticsLoading && selectedAnalyticsPlan">
+            <!-- Plan Overview -->
+            <div class="row g-4 mb-4">
+              <div class="col-md-3">
+                <div class="card border-0 bg-light">
+                  <div class="card-body text-center">
+                    <div class="text-muted small mb-2">Plan Price</div>
+                    <div class="h4 fw-bold text-primary">${{ selectedAnalyticsPlan.price }}</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="card border-0 bg-light">
+                  <div class="card-body text-center">
+                    <div class="text-muted small mb-2">Billing Cycle</div>
+                    <div class="h6 fw-bold">{{ selectedAnalyticsPlan.billingCycle | titlecase }}</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="card border-0 bg-light">
+                  <div class="card-body text-center">
+                    <div class="text-muted small mb-2">Status</div>
+                    <div class="h6 fw-bold" [class]="selectedAnalyticsPlan.isActive ? 'text-success' : 'text-danger'">
+                      {{ selectedAnalyticsPlan.isActive ? 'Active' : 'Inactive' }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="card border-0 bg-light">
+                  <div class="card-body text-center">
+                    <div class="text-muted small mb-2">Stripe Status</div>
+                    <div class="h6 fw-bold"
+                      [class]="selectedAnalyticsPlan.stripeSync ? 'text-success' : 'text-warning'">
+                      {{ selectedAnalyticsPlan.stripeSync ? 'Synced' : 'Not Synced' }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Detailed Analytics -->
+            <div *ngIf="planAnalytics.length > 0" class="row g-4">
+              <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                  <div class="card-header">
+                    <h6 class="mb-0">📊 Performance Metrics</h6>
+                  </div>
+                  <div class="card-body">
+                    <div *ngFor="let analytics of planAnalytics" class="mb-3">
+                      <div *ngIf="analytics.planId === selectedAnalyticsPlan.id">
+                        <div class="row g-3">
+                          <div class="col-md-2">
+                            <div class="text-center p-2 bg-light rounded">
+                              <div class="small text-muted">Total Subs</div>
+                              <div class="fw-bold">{{ analytics.totalSubscriptions }}</div>
+                            </div>
+                          </div>
+                          <div class="col-md-2">
+                            <div class="text-center p-2 bg-light rounded">
+                              <div class="small text-muted">Active Subs</div>
+                              <div class="fw-bold text-success">{{ analytics.activeSubscriptions }}</div>
+                            </div>
+                          </div>
+                          <div class="col-md-2">
+                            <div class="text-center p-2 bg-light rounded">
+                              <div class="small text-muted">Monthly Revenue</div>
+                              <div class="fw-bold text-warning">${{ analytics.revenue | number:'1.2-2' }}</div>
+                            </div>
+                          </div>
+                          <div class="col-md-2">
+                            <div class="text-center p-2 bg-light rounded">
+                              <div class="small text-muted">Conversion Rate</div>
+                              <div class="fw-bold text-info">{{ analytics.conversionRate | number:'1.1-1' }}%</div>
+                            </div>
+                          </div>
+                          <div class="col-md-2">
+                            <div class="text-center p-2 bg-light rounded">
+                              <div class="small text-muted">Churn Rate</div>
+                              <div class="fw-bold" [class]="analytics.churnRate > 10 ? 'text-danger' : 'text-warning'">
+                                {{ analytics.churnRate | number:'1.1-1' }}%
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-md-2">
+                            <div class="text-center p-2 bg-light rounded">
+                              <div class="small text-muted">Avg LTV</div>
+                              <div class="fw-bold text-primary">${{ analytics.averageLifetime | number:'1.2-2' }}</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div *ngIf="planAnalytics.length === 0" class="text-center py-4">
+              <div class="text-muted">
+                <p class="mb-2">No detailed analytics available for this plan</p>
+                <small>Analytics will appear once subscription data is available</small>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeAnalyticsModal()">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Trip Preview Modal -->
+  <app-travel-trip-detail2 [trip]="selectedTripDb" [showModal]="showPreviewModal"
+    (closeModal)="closePreviewModal()"></app-travel-trip-detail2>
+  <app-travel-trip [trip]="selectedTrip" [showModal]="showPreviewModal"
+    (closeModal)="closePreviewModal()"></app-travel-trip>
+
+  <!-- Payment Modal -->
+  <div class="modal fade" [class.show]="showPaymentModalFlag" [style.display]="showPaymentModalFlag ? 'block' : 'none'"
+    tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i class="bi bi-credit-card me-2"></i>
+            Complete Subscription Payment
+          </h5>
+          <button type="button" class="btn-close" (click)="hidePaymentModal()"></button>
+        </div>
+        <div class="modal-body">
+          <div *ngIf="selectedPlanForPayment" class="mb-4">
+            <h6>Subscription Plan Details</h6>
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">{{ selectedPlanForPayment.name }}</h5>
+                <p class="card-text">{{ selectedPlanForPayment.description }}</p>
+                <div class="row">
+                  <div class="col-6">
+                    <strong>Price:</strong> ${{ selectedPlanForPayment.price | number:'1.2-2' }}/{{
+                    selectedPlanForPayment.durationMonths }} month(s)
+                  </div>
+                  <div class="col-6">
+                    <strong>Features:</strong> {{ selectedPlanForPayment.features }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="paymentError" class="alert alert-danger">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            {{ paymentError }}
+          </div>
+
+          <app-stripe-payment-form [amount]="selectedPlanForPayment?.price || 0" [currency]="'usd'"
+            [description]="'Subscription: ' + (selectedPlanForPayment?.name || '')" [isVisible]="showPaymentModalFlag"
+            (paymentSuccess)="onPaymentSuccess($event)" (paymentError)="onPaymentError($event)"
+            (paymentCancel)="onPaymentCancel()">
+          </app-stripe-payment-form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

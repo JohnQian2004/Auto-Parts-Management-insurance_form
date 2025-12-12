@@ -1,0 +1,998 @@
+<div class="container-fluid">
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+
+                </div>
+
+            </div>
+        </div><!-- /.container-fluid -->
+    </section>
+</div>
+<section class="content">
+    <div class="row">
+        <div class="col-md-3 ">
+            <div class="card" id="{{vehicle?.id}}" #target_{{vehicle?.id}}>
+                <div class="progress">
+                    <div class="progress-bar" role="progressbar" style="width: {{vehicle.daysInShopPrecentage}}%"
+                        aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <img class="card-img-top" *ngIf="vehicle.imageModels"
+                    src="{{baseUrlImage + '/' + vehicle.imageModels[0]?.id}}" alt="">
+                <div class="card-body">
+
+                    <h5 class="card-title">
+                        #{{ vehicle.id }} {{ vehicle.year }} {{ vehicle.make }} {{
+                        vehicle.model }}
+                        <span style="color: {{ vehicle.color}}"> {{ vehicle.color }}</span>
+
+                        <!-- <div class="square" style="background-color: {{ vehicle.color}}">
+                        </div> -->
+                    </h5>
+
+                    <p class="card-text nopadding">{{ vehicle.description }} </p>
+                    <p *ngIf="vehicle.vin" class="card-text nopadding">{{ vehicle.vin }} </p>
+                    <p *ngIf="vehicle.workRequest" class="card-text nopadding">{{ vehicle.workRequest }} </p>
+
+                    <div class="input-group">
+                        <div class="input-group-append">
+                            <label> Special Request</label>
+                        </div>
+                        <div class="input-group-append">
+                            <input type="checkbox" (change)="setSpecialFlag($event)" [(ngModel)]="vehicle.special">
+                        </div>
+                    </div>
+                    <span *ngIf="vehicle.paid==true">
+                        <button class="btn btn-success badge-sm"
+                            (click)="changePaidStatus(vehicle, false)">Paid</button></span>
+                    <span *ngIf="vehicle.paid==false">
+                        <button class="btn btn-outline-secondary btn-sm"
+                            (click)="changePaidStatus(vehicle, true)">N.Paid</button></span>
+                    <a href="#" class="btn btn-success  badge-sm"> Test <i class="bi-file-excel"></i></a>
+
+                    <div class="callout callout-primary p-3">
+                        <p class="card-text nopadding"> <i class="bi-person"></i>
+                            {{ vehicle.customer?.firstName }} {{
+                            vehicle.customer?.lastName
+                            }}
+                        </p>
+                        <p class="card-text nopadding"><i class="bi-phone"></i> {{ vehicle.customer?.phone }}
+                        </p>
+                        <p class="card-text nopadding"><i class="bi-house"></i> {{
+                            vehicle.customer?.street }} {{vehicle.customer?.city }} {{vehicle.customer?.state }}
+                            {{vehicle.customer?.zip }}
+                        </p>
+                    </div>
+                    <span *ngIf="vehicle.loanerCarName"><i class="bi-truck"></i> {{
+                        vehicle.loanerCarName }} </span>
+                    <span *ngIf="vehicle.insuranceCompany"><i class="bi-ui-checks"></i> {{
+                        vehicle.insuranceCompany }} </span>
+                    <input type="date" [disabled]="user.allowChangeJobTargetDate == false"
+                        (change)="onChangeVehicleCalendar2($event, vehicle)"
+                        [ngModel]="vehicle.targetDate |  date:'yyyy-MM-dd'">
+
+
+
+                    <div class="card-footer text-muted" (click)="getVehicleHistory(vehicle.id)">{{ vehicle.createdAt
+                        |
+                        date}} Been
+
+                        {{vehicle.daysInShop}} days
+
+                    </div>
+                </div>
+                <label *ngIf="showVehicleHistory== true && vehicleHistories.length> 0" for="plate">Vehicle
+                    Change
+                    History</label>
+                <table *ngIf="showVehicleHistory== true && vehicleHistories.length> 0">
+                    <tr class="col-md-3">
+                        <th style="text-align: center">#</th>
+                        <th style="text-align: center">Id</th>
+                        <th style="text-align: center">Name</th>
+                        <th style="text-align: center">Type</th>
+                        <th style="text-align: center">Value</th>
+                        <th style="text-align: center">Time</th>
+                    </tr>
+                    <tr *ngFor="let vehicleHistory of vehicleHistories; let i=index">
+                        <td style="text-align: center">{{i}}</td>
+                        <td style="text-align: center">{{vehicleHistory.id}}</td>
+                        <td style="text-align: center">{{vehicleHistory.name}}</td>
+                        <td style="text-align: center">
+                            <select [(ngModel)]="vehicleHistory.type">
+                                <option value="0">add</option>
+                                <option value="1">update</option>
+                                <option value="2">remove</option>
+                            </select>
+                        </td>
+                        <td style="text-align: center">{{vehicleHistory.value}}</td>
+                        <td style="text-align: center">{{vehicleHistory.createdAt | date: 'short'}}</td>
+
+                    </tr>
+                </table>
+
+                <label for="plate" (click)="getProductionOverview()">Production Overview</label>
+                <table *ngIf="statusOverview.length> 0">
+                    <tr class="col-md-3" (click)="applyStatusfilter('All')">
+                        <th style="text-align: center">Id</th>
+                        <th style="text-align: center">Status</th>
+                        <th style="text-align: center"><i class="bi-calendar-check"></i></th>
+                    </tr>
+                    <tr *ngFor="let groupBy of statusOverview" (click)="applyStatusfilter(groupBy.status)">
+                        <td style="text-align: center">{{groupBy.status}}</td>
+                        <ng-container *ngFor="let status of statuss; let i=index">
+                            <td *ngIf="status.id==groupBy.status">{{status.name}}</td>
+                        </ng-container>
+                        <td style="text-align: center">{{groupBy.count}}</td>
+                    </tr>
+                </table>
+                <label for="plate" (click)="getLocationOverviews()">Location Overview</label>
+                <table *ngIf="locationOverview.length> 0">
+                    <tr class="col-md-3" (click)="applyLocationfilter('All')">
+                        <th style="text-align: center">Id</th>
+                        <th style="text-align: center">Location</th>
+                        <th style="text-align: center"><i class="bi-calendar-check"></i></th>
+                    </tr>
+                    <tr *ngFor="let groupBy of locationOverview" (click)="applyLocationfilter(groupBy.status)">
+                        <td style="text-align: center">{{groupBy.status}}</td>
+                        <ng-container *ngFor="let status of locations; let i=index">
+                            <td *ngIf="status.id==groupBy.status">{{status.name}}</td>
+                        </ng-container>
+                        <td style="text-align: center">{{groupBy.count}}</td>
+                    </tr>
+                </table>
+            </div>
+
+
+        </div>
+        <div class="col-md-9">
+            <div class="card card-primary card-outline">
+                <div class="card-header">
+
+                    <div class="card-title"
+                        [style.background-color]="archived == true? 'red' : (false ? 'white' : 'white')"
+                        (click)="archived =!archived "><i class="bi-truck"></i> Vehicle </div>
+
+                    <span *ngIf="vehicle.id> 0 && vehicle.paid==true">
+                        <button class="btn btn-success badge-sm"
+                            (click)="changePaidStatus(vehicle, false)">Paid</button></span>
+                    <span *ngIf="vehicle.id> 0 &&  vehicle.paid==false">
+                        <button class="btn btn-outline-secondary btn-sm"
+                            (click)="changePaidStatus(vehicle, true)">N.Paid</button></span>
+                    <div class="card-tools">
+                        <div class="input-group input-group-sm">
+                            <!-- <input type="text" class="form-control" placeholder="Search Vehicle"> -->
+
+                            <div class="input-group-append">
+                                <div class="btn btn-primary" *ngIf="user.allowAddAndUpdateVehicle == true"
+                                    (click)="reset()">
+                                    <i class="bi-plus-lg" ngbTooltip="Add New"></i>
+                                </div>
+                            </div>
+                            <div class="input-group-append">
+                                <div class="btn btn-primary" *ngIf="user.allowAddAndUpdateVehicle == true"
+                                    (click)="createVehicle(vehicle)">
+                                    <i class="bi-save" ngbTooltip="Save"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.card-tools -->
+                </div>
+                <div class="card-body">
+
+                    <div class="input-group mb-12">
+                        <label for="placeholder"> </label>
+                        <div class="nopadding" *ngIf="user.allowAddService == true">
+                            <li class="dropdown">
+                                <a class="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Add
+                                    Jobs
+                                    <i class="bi-card-list"></i>
+                                </a>
+                                <div class="dropdown-menu">
+                                    <ng-container *ngFor="let service of services; let i=index">
+                                        <a (click)="addVehicleJob(service)" class="dropdown-item">
+                                            {{service.name}} </a>
+                                    </ng-container>
+                                </div>
+                            </li>
+                        </div>
+                    </div>
+                    <div class="input-group mb-12" cdkDropList (cdkDropListDropped)="dropped($event)">
+                        <div class="input-group mb-12" *ngFor="let job of jobs; let i=index" (click)="setJobId(job.id)"
+                            [style.background-color]="job.id == currentJobId? 'lightblue' : (true ? 'white' : 'white')">
+                            <div class="form-group col-3 nopadding">
+                                <label *ngIf="i==0" for="header"># Job Name</label>
+                                <div class="input-group">
+                                    <button *ngIf="job.status ==0" class="btn btn-outline-secondary"
+                                        cdkDrag>{{i+1}}</button>
+                                    <button *ngIf="job.status ==1" class="btn btn-outline-danger"
+                                        cdkDrag>{{i+1}}</button>
+                                    <input for="job name" type="text" class="form-control" [(ngModel)]="job.name"
+                                        (keyup.enter)="onEnter('job name',job)">
+
+                                    <div class="input-group-append">
+                                        <!-- <i  (click)="deleteVehicleJob($event.target, job)" class="bi-trash"></i> -->
+                                        <input type="checkbox" (change)="deleteVehicleJob($event.target, job)">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group col-3 nopadding">
+                                <label *ngIf="i==0" for="header">Type/Payment</label>
+                                <div class="input-group">
+                                    <select class="form-control" [(ngModel)]="job.jobRequestType"
+                                        placeholder="Job Requst Type" #jobRequestType
+                                        (change)="onChangeJobJobRequestType($event, jobRequestType.value, job)">
+                                        <option *ngFor="let jobRequestType of jobRequestTypes let i=index"
+                                            value="{{jobRequestType.id}}">
+                                            {{jobRequestType.name}}
+                                        </option>
+                                    </select>
+                                    <select class="form-control" [(ngModel)]="job.paymentMethod"
+                                        placeholder="Payment Method" #paymentMethod
+                                        (change)="onChangeJobPaymentMethod($event, paymentMethod.value, job)">
+                                        <option *ngFor="let paymentMethod of paymentMethods let i=index"
+                                            value="{{paymentMethod.id}}">
+                                            {{paymentMethod.name}}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group col-3 nopadding">
+                                <label *ngIf="i==0" for="header">Assigned
+                                    To/Deadline/Status</label>
+                                <div class="input-group">
+                                    <select class="form-control" [(ngModel)]="job.employeeId" #device
+                                        [disabled]="user.allowAssignUser == false"
+                                        (change)="onChangeEmployee2($event, device.value, job)" placeholder="Model">
+                                        <option [value]="employee.id" *ngFor="let employee of employees;let i=index;">
+                                            {{employee.firstName}} {{employee.lastName}}
+                                        </option>
+                                    </select>
+                                    <div class="input-group-append">
+                                        <input type="date" *ngIf="job.employeeId > 0" style="width:110px"
+                                            [disabled]="user.allowChangeJobTargetDate == false"
+                                            (change)="onChangeCalendar($event, job)"
+                                            max="{{vehicle.targetDate | date:'yyyy-MM-dd'}}"
+                                            [ngModel]="job.targetDate |  date:'yyyy-MM-dd'">
+                                    </div>
+                                    <div class="input-group-append">
+                                        <input type="checkbox" [checked]="isJobChecked(job)"
+                                            [disabled]="user.allowUpdateJobStatus == false"
+                                            *ngIf="job.employeeId > 0 && job.targetDate != null"
+                                            (change)="updateJobStatus(job)">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group col-3 nopadding">
+                                <label *ngIf="i==0" for="header">Job Instructions</label>
+                                <div class="input-group">
+
+                                    <textarea type="text" [(ngModel)]="job.notes" class="form-control"
+                                        (keyup.enter)="onEnter('job notes',job)" rows="1"
+                                        oninput='this.style.height = "";this.style.height = this.scrollHeight + "px"'
+                                        [disabled]="user.allowUpdateJobStatus == false"></textarea>
+                                    <div class="input-group-append">
+                                        <button style="background-color: white;" class="btn-outline-secondary"
+                                            (click)="saveJobNotes(job)"><i class="bi-save"></i></button>
+                                    </div>
+
+
+                                </div>
+                            </div>
+                            <div class="form-group col-3 nopadding">
+
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="input-group mb-12">
+                        ====
+                    </div>
+
+
+                    <div *ngIf="errorMessageVehicle" class="form-group col-12 nopadding">
+                        <div class="form-group">
+                            <label *ngIf="errorMessageVehicle" for="plate">Error</label>
+                            <div *ngIf="errorMessageVehicle" class="alert alert-danger" role="alert">
+                                {{ errorMessageVehicle }}
+                            </div>
+                        </div>
+                    </div>
+                    <div *ngIf="successMessageVehicle" class="form-group col-12 nopadding">
+                        <div class="form-group">
+                            <label *ngIf="successMessageVehicle" for="plate">Success</label>
+                            <div *ngIf="successMessageVehicle" class="alert alert-success" role="alert">
+                                {{ successMessageVehicle }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div *ngIf="currentUser" (click)="getAllUsers()">
+    <select [(ngModel)]="user" (change)="resetUser(user)">
+        <option *ngFor="let user of users" [ngValue]="user">{{user.username}} {{user.companyId}}</option>
+    </select>
+</div>
+
+<nav *ngIf="currentUser">
+    <div class="nav nav-tabs" id="nav-tab" role="tablist">
+        <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button"
+            role="tab" aria-controls="nav-home" aria-selected="true" ng-click="refresh()"
+            (click)="refresh()">Home</button>
+        <!-- <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button"
+            role="tab" aria-controls="nav-profile" aria-selected="false">In Shop Admin</button> -->
+        <button class="nav-link" id="nav-contact-tab" data-bs-toggle="tab" data-bs-target="#nav-contact" type="button"
+            role="tab" aria-controls="nav-contact" aria-selected="false">In Shop
+            [{{vehicles.length}}]</button>
+    </div>
+</nav>
+<div class="tab-content" id="nav-tabContent">
+    <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+
+
+
+
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-12 nopadding">
+                </div>
+
+
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <h4>{{ message}}</h4>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="col-12">
+                            <div class="input-group">
+                                <div class="input-group-append">
+                                    <input type="text" class="form-control" (input)="onSearchChange($event)"
+                                        placeholder="search anything">
+                                </div>
+                                <div class="input-group-append">
+                                    <button class="btn btn-outline-secondary" type="button"
+                                        *ngIf="currentUser && archived == false" (click)="searchVehicle(5)">
+                                        <i class="bi-arrow-repeat"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <table class="col-12" *ngIf="vehicles.length >0">
+                            <tr>
+                                <th style="text-align: center">#</th>
+                                <th style="text-align: center" (click)="sortList('year')">Year</th>
+                                <th style="text-align: center" (click)="sortList('make')">Make</th>
+                                <th style="text-align: center" (click)="sortList('model')">Model</th>
+                                <th style="text-align: center" (click)="sortList('color')">Color</th>
+                                <th style="text-align: center" (click)="sortList('jobRequestType')">Job Type</th>
+                                <th style="text-align: center" (click)="sortList('approvalStatus')">Aproval Status
+                                </th>
+
+                                <th style="text-align: center" (click)="sortList('insuranceCompany')">Ins Co.</th>
+                                <th style="text-align: center">Work Requests</th>
+                                <th style="text-align: center">Name/Phone</th>
+                                <th style="text-align: center" (click)="sortList('status')">Job Status</th>
+                                <th style="text-align: center" (click)="sortList('price')">$</th>
+                                <th style="text-align: center" (click)="sortList('paid')">Paid</th>
+                                <th style="text-align: center" (click)="sortList('paymentMethod')">Payment Method
+                                </th>
+                                <th style="text-align: center" (click)="sortList('paymentStatus')">Payment Status
+                                </th>
+                                <th style="text-align: center" (click)="sortList('createdAt')">Check In Time</th>
+                                <th style="text-align: center" (click)="sortList('daysInShop')">Days In Shop</th>
+                                <th style="text-align: center" (click)="sortList('targetDate')">Target Date</th>
+                                <th style="text-align: center">Rentals</th>
+                                <th style="text-align: center">Location</th>
+                                <th style="text-align: center">Archive</th>
+                            </tr>
+                            <tr id="{{vehicle.id}}"
+                                [style.background-color]="i == cindex? 'lightyellow' : (even ? 'white' : 'white')"
+                                *ngFor="let vehicle of vehicles; let i = index;  let even=even"
+                                (click)="getDetail(vehicle, i)">
+                                <td>{{vehicle.id}} </td>
+                                <td>{{vehicle.year}} </td>
+                                <td>{{vehicle.make}} </td>
+                                <td>{{vehicle.model}} </td>
+                                <td style="color: {{vehicle.color}}">{{vehicle.color}} </td>
+                                <td>
+                                    <select [(ngModel)]="vehicle.jobRequestType" placeholder="Job Requst Type"
+                                        #jobRequestType (change)="onChangeJobRequestType($event, jobRequestType.value)">
+                                        <option *ngFor="let jobRequestType of jobRequestTypes let i=index"
+                                            value="{{jobRequestType.id}}">
+                                            {{jobRequestType.name}}
+                                        </option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select [(ngModel)]="vehicle.approvalStatus" placeholder="Vehicle Approval Status"
+                                        #approvalStatus (change)="onChangeApprovalStatus($event, approvalStatus.value)">
+                                        <option *ngFor="let approvalStatus of approvalStatuss; let i=index"
+                                            value="{{approvalStatus.id}}">
+                                            {{approvalStatus.name}}
+                                        </option>
+                                    </select>
+                                </td>
+
+
+                                <td>{{vehicle.insuranceCompany}}</td>
+                                <td>
+                                    <img class="preview" *ngIf="vehicle.imageModels"
+                                        src="{{baseUrlImage + '/' + vehicle.imageModels[0].id}}" alt="">
+                                    <small>
+                                        {{vehicle.workRequest}}
+                                    </small>
+                                </td>
+                                <td>{{ vehicle.customer.firstName}} {{ vehicle.customer.lastName}} {{
+                                    vehicle.customer.phone}}</td>
+                                <td>
+
+                                    <select [(ngModel)]="vehicle.status" placeholder="status" #device
+                                        [disabled]="user.allowUpdateVehicleStatus == false"
+                                        (change)="onChangeStatus($event, device.value)">
+                                        <option *ngFor="let option of statuss; let i=index" value="{{option.id}}">
+                                            {{option.name}}
+                                        </option>
+                                    </select>
+
+
+                                </td>
+                                <td><span *ngIf="vehicle.price> 0">{{vehicle.price}}</span> </td>
+                                <td>
+
+                                    <button class="btn btn-success badge-sm" *ngIf="vehicle.paid==true"
+                                        (click)="changePaidStatus(vehicle, false)">Paid</button>
+
+                                    <button class="btn btn-outline-secondary badge-sm" *ngIf="vehicle.paid==false"
+                                        (click)="changePaidStatus(vehicle, true)">N.Paid</button>
+                                </td>
+                                <td> <select [(ngModel)]="vehicle.paymentMethod" placeholder="Payment Method"
+                                        #paymentMethod (change)="onChangePaymentMethod($event, paymentMethod.value)">
+                                        <option *ngFor="let paymentMethod of paymentMethods let i=index"
+                                            value="{{paymentMethod.id}}">
+                                            {{paymentMethod.name}}
+                                        </option>
+                                    </select>
+                                </td>
+                                <td>
+
+                                    <select [(ngModel)]="vehicle.paymentStatus" placeholder="Payment Status"
+                                        #paymentStatus (change)="onChangePaymentStatus($event, paymentStatus.value)">
+                                        <option *ngFor="let paymentStatus of paymentStatuss let i=index"
+                                            value="{{paymentStatus.id}}">
+                                            {{paymentStatus.name}}
+                                        </option>
+                                    </select>
+                                </td>
+                                <td>{{vehicle.createdAt | date}} </td>
+                                <td *ngIf="vehicle.daysInShop>6" style="background-color: yellow;text-align: center">
+                                    {{vehicle.daysInShop}}</td>
+
+                                <td style="text-align: center" *ngIf="vehicle.daysInShop<7">{{vehicle.daysInShop}}
+                                </td>
+                                <td>{{vehicle.targetDate | date}}</td>
+                                <td>{{vehicle.loanerCarName}}</td>
+                                <td>
+                                    <select [(ngModel)]="vehicle.location" placeholder="location" #deviceLocation
+                                        (change)="onChangeLocation($event, deviceLocation.value)">
+                                        <option *ngFor="let option of locations; let i=index" value="{{option.id}}">
+                                            {{option.name}}
+                                        </option>
+                                    </select>
+                                </td>
+                                <td style="text-align: center"><input type="checkbox"
+                                        (change)="archiveVehicle(vehicle)"></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <!-- <div class="row">
+
+                    <div class="col-3 nopadding" *ngFor='let vehicle of vehicles; let i=index'>
+
+                        <div class="card" (click)="getDetail(vehicle, i)" id="{{vehicle?.id}}" #target_{{vehicle?.id}}>
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar"
+                                    style="width: {{vehicle.daysInShopPrecentage}}%" aria-valuenow="25"
+                                    aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <img class="card-img-top" *ngIf="vehicle.imageModels"
+                                src="{{baseUrlImage + '/' + vehicle.imageModels[0].id}}" alt="">
+                            <div class="card-body">
+
+                                <h5 class="card-title">
+                                    {{ vehicle.id }} {{ vehicle.year }} {{ vehicle.make }} {{
+                                    vehicle.model }} <div class="square" style="background-color: {{ vehicle.color}}">
+                                    </div>
+                                    <span style="color: {{ vehicle.color}}"> {{ vehicle.color }}</span>
+                                </h5>
+                                <p class="card-text nopadding">{{ vehicle.customer.firstName }} {{
+                                    vehicle.customer.lastName
+                                    }}
+                                </p>
+                                <p class="card-text nopadding"><i class="bi-house"></i>{{ vehicle.customer.phone }} {{
+                                    vehicle.customer.street }}
+                                </p>
+                                <p *ngIf="vehicle.loanerCarName" class="card-text nopadding"><i class="bi-truck"></i>{{
+                                    vehicle.loanerCarName }}
+                                </p>
+                                <p *ngIf="vehicle.insuranceCompany" class="card-text nopadding"><i
+                                        class="bi-ui-checks"></i>{{
+                                    vehicle.insuranceCompany }}
+                                </p>
+                            </div>
+                            <div class="card-footer text-muted">{{ vehicle.createdAt | date}} Been
+                                {{vehicle.daysInShop}} days
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div> -->
+            </div>
+        </div>
+    </div>
+    <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
+        <div class="d-flex align-items-start">
+            <div class="nav flex-column nav-pills me-3" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                <button class="nav-link active" id="v-pills-home-tab" data-bs-toggle="pill"
+                    data-bs-target="#v-pills-home" type="button" role="tab" aria-controls="v-pills-home"
+                    aria-selected="true">Company</button>
+                <button class="nav-link" id="v-pills-profile-tab" data-bs-toggle="pill"
+                    data-bs-target="#v-pills-profile" type="button" role="tab" aria-controls="v-pills-profile"
+                    aria-selected="false">Services</button>
+                <button class="nav-link" id="v-pills-messages-tab" data-bs-toggle="pill"
+                    data-bs-target="#v-pills-messages" type="button" role="tab" aria-controls="v-pills-messages"
+                    aria-selected="false">Technicians</button>
+                <button class="nav-link" id="v-pills-settings-tab" data-bs-toggle="pill"
+                    data-bs-target="#v-pills-settings" type="button" role="tab" aria-controls="v-pills-settings"
+                    aria-selected="false">Insurance Co.</button>
+            </div>
+            <div class="tab-content" id="v-pills-tabContent">
+                <div class="tab-pane fade show active" id="v-pills-home" role="tabpanel"
+                    aria-labelledby="v-pills-home-tab">...</div>
+                <div class="tab-pane fade" id="v-pills-profile" role="tabpanel" aria-labelledby="v-pills-profile-tab">
+                    ...</div>
+                <div class="tab-pane fade" id="v-pills-messages" role="tabpanel" aria-labelledby="v-pills-messages-tab">
+                    ...</div>
+                <div class="tab-pane fade" id="v-pills-settings" role="tabpanel" aria-labelledby="v-pills-settings-tab">
+                    ...</div>
+            </div>
+        </div>
+    </div>
+    <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">
+        <div class="row">
+
+            <div class="col-md-4">
+                <div class="input-group">
+                    <div class="input-group-append">
+                        <!-- <button class="btn btn-outline-secondary" type="button" (click)="createVehicle(vehicle)">
+                            Save
+                        </button> -->
+                    </div>
+                    <div class="input-group-append">
+                        <!-- <button class="btn btn-outline-secondary" type="button" *ngIf="currentUser && archived == false"
+                            (click)="searchVehicle(5)">
+                            Refresh
+                        </button> -->
+                    </div>
+                </div>
+                <div class="card" id="{{vehicle?.id}}" #target_{{vehicle?.id}}>
+                    <div class="progress">
+                        <div class="progress-bar" role="progressbar" style="width: {{vehicle.daysInShopPrecentage}}%"
+                            aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <img class="card-img-top" *ngIf="vehicle.imageModels"
+                        src="{{baseUrlImage + '/' + vehicle.imageModels[0]?.id}}" alt="">
+                    <div class="card-body">
+
+                        <h5 class="card-title">
+                            #{{ vehicle.id }} {{ vehicle.year }} {{ vehicle.make }} {{
+                            vehicle.model }}
+                            <span style="color: {{ vehicle.color}}"> {{ vehicle.color }}</span>
+
+                            <!-- <div class="square" style="background-color: {{ vehicle.color}}">
+                            </div> -->
+                        </h5>
+
+                        <p class="card-text nopadding">{{ vehicle.description }} </p>
+                        <p *ngIf="vehicle.vin" class="card-text nopadding">{{ vehicle.vin }} </p>
+                        <p *ngIf="vehicle.workRequest" class="card-text nopadding">{{ vehicle.workRequest }} </p>
+
+                        <div class="input-group">
+                            <div class="input-group-append">
+                                <label> Special Request</label>
+                            </div>
+                            <div class="input-group-append">
+                                <input type="checkbox" (change)="setSpecialFlag($event)" [(ngModel)]="vehicle.special">
+                            </div>
+                        </div>
+                        <span *ngIf="vehicle.paid==true">
+                            <button class="btn btn-success badge-sm"
+                                (click)="changePaidStatus(vehicle, false)">Paid</button></span>
+                        <span *ngIf="vehicle.paid==false">
+                            <button class="btn btn-outline-secondary btn-sm"
+                                (click)="changePaidStatus(vehicle, true)">N.Paid</button></span>
+                        <a href="#" class="btn btn-success  badge-sm"> Test <i class="bi-file-excel"></i></a>
+
+                        <div class="callout callout-primary p-3">
+                            <p class="card-text nopadding"> <i class="bi-person"></i>
+                                {{ vehicle.customer?.firstName }} {{
+                                vehicle.customer?.lastName
+                                }}
+                            </p>
+                            <p class="card-text nopadding"><i class="bi-phone"></i> {{ vehicle.customer?.phone }}
+                            </p>
+                            <p class="card-text nopadding"><i class="bi-house"></i> {{
+                                vehicle.customer?.street }} {{vehicle.customer?.city }} {{vehicle.customer?.state }}
+                                {{vehicle.customer?.zip }}
+                            </p>
+                        </div>
+                        <span *ngIf="vehicle.loanerCarName"><i class="bi-truck"></i> {{
+                            vehicle.loanerCarName }} </span>
+                        <span *ngIf="vehicle.insuranceCompany"><i class="bi-ui-checks"></i> {{
+                            vehicle.insuranceCompany }} </span>
+                        <input type="date" [disabled]="user.allowChangeJobTargetDate == false"
+                            (change)="onChangeVehicleCalendar2($event, vehicle)"
+                            [ngModel]="vehicle.targetDate |  date:'yyyy-MM-dd'">
+
+                        <!-- <div class="square" style="background-color: {{ vehicle.color}}"></div> -->
+                        <!-- <p class="card-text"> {{vehicle.engine}}.L {{ vehicle.transmission}}. {{ vehicle.description }}</p>
+                  <p class="card-text"> {{autopart.city | titlecase}}, {{ autopart.state}}</p> -->
+
+
+
+                        <label *ngIf="services" for="service">Pre-defined jobs [{{services.length}}]</label>
+
+
+                        <div class="card-text nopadding" *ngIf="user.allowAddService == true">
+                            <li class="dropdown">
+                                <a class="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Add
+                                    Jobs
+                                    <i class="bi-card-list"></i>
+                                </a>
+                                <div class="dropdown-menu">
+                                    <ng-container *ngFor="let service of services; let i=index">
+                                        <a (click)="addVehicleJob(service)" class="dropdown-item">
+                                            {{service.name}} </a>
+                                    </ng-container>
+                                </div>
+                            </li>
+                        </div>
+                        <div><br></div>
+                        <p class="card-text nopadding">
+                        </p>
+                        <div>
+                            <table *ngIf="jobs.length>0" class="col-12" cdkDropList
+                                (cdkDropListDropped)="dropped($event)">
+                                <tr>
+                                    <th>Jobs[{{jobs.length}}]</th>
+                                    <!-- <th style="text-align: center; width: 5%"><i class="bi-trash"></i></th>
+                                    <th style="text-align: center; width: 30%"><i class="bi-people"></i></th>
+                                    <th style="text-align: center; width: 25%"><i class="bi-calendar"></i></th>
+                                    <th style="text-align: center; width: 5%"><i class="bi-calendar-check"></i></th> -->
+
+                                </tr>
+                                <tr *ngFor="let job of jobs; let i=index" (click)="setJobId(job.id)"
+                                    style="padding: 50px;"
+                                    [style.background-color]="job.id == currentJobId? 'lightblue' : (true ? 'white' : 'white')">
+                                    <td colspan="5" width="100%"
+                                        [style.border-color]="job.status == 1? 'coral' : (true ? 'white' : 'white')">
+                                        <table width="100%">
+                                            <tr>
+                                                <td colspan="5">
+                                                    <div class="input-group">
+                                                        <button class="btn btn-outline-secondary"
+                                                            cdkDrag>{{i+1}}</button>
+                                                        <input for="job name" type="text" class="form-control"
+                                                            [(ngModel)]="job.name"
+                                                            (keyup.enter)="onEnter('job name',job)">
+
+                                                        <div class="input-group-append">
+                                                            <button class="btn btn-outline-secondary"><i
+                                                                    class="bi-trash"
+                                                                    (click)="deleteVehicleJob($event.target, job)"></i></button>
+                                                            <!-- <input type="checkbox"
+                                                                (change)="deleteVehicleJob($event.target, job)"> -->
+                                                        </div>
+                                                    </div>
+                                                </td>
+
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <select class="form-control" [(ngModel)]="job.jobRequestType"
+                                                        placeholder="Job Requst Type" #jobRequestType
+                                                        (change)="onChangeJobJobRequestType($event, jobRequestType.value, job)">
+                                                        <option
+                                                            *ngFor="let jobRequestType of jobRequestTypes let i=index"
+                                                            value="{{jobRequestType.id}}">
+                                                            {{jobRequestType.name}}
+                                                        </option>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <select class="form-control" [(ngModel)]="job.paymentMethod"
+                                                        placeholder="Payment Method" #paymentMethod
+                                                        (change)="onChangeJobPaymentMethod($event, paymentMethod.value, job)">
+                                                        <option *ngFor="let paymentMethod of paymentMethods let i=index"
+                                                            value="{{paymentMethod.id}}">
+                                                            {{paymentMethod.name}}
+                                                        </option>
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr>
+
+                                                <td>
+                                                    <select #device [disabled]="user.allowAssignUser == false"
+                                                        [(ngModel)]="job.employeeId" class="form-control"
+                                                        (change)="onChangeEmployee2($event, device.value,job)">
+                                                        <option [value]="employee.id"
+                                                            *ngFor="let employee of employees;let i=index;">
+                                                            {{employee.firstName}} {{employee.lastName}}
+                                                        </option>
+                                                    </select>
+
+                                                </td>
+                                                <td>
+                                                    <div class="input-group">
+                                                        <input type="date" *ngIf="job.employeeId > 0"
+                                                            class="form-control"
+                                                            [disabled]="user.allowChangeJobTargetDate == false"
+                                                            (change)="onChangeCalendar($event, job)"
+                                                            max="{{vehicle.targetDate | date:'yyyy-MM-dd'}}"
+                                                            [ngModel]="job.targetDate |  date:'yyyy-MM-dd'">
+                                                        <div class="input-group-append">
+                                                            <input type="checkbox" [checked]="isJobChecked(job)"
+                                                                [disabled]="user.allowUpdateJobStatus == false"
+                                                                *ngIf="job.employeeId > 0 && job.targetDate != null"
+                                                                (change)="updateJobStatus(job)">
+                                                        </div>
+                                                    </div>
+                                                </td>
+
+                                            </tr>
+                                            <tr>
+                                                <td colspan="5">
+
+                                                    <textarea class="form-control" style="min-width: 100%"
+                                                        (keyup.enter)="onEnter('job notes',job)" [(ngModel)]="job.notes"
+                                                        placeholder="job notes">
+                                                                        </textarea>
+
+
+                                                    <!-- <div class="input-group-append">
+                                                                    <button style="background-color: white;"
+                                                                        (click)="saveJobNotes(job)"><i
+                                                                            class="bi-save"></i></button>
+                                                                </div> -->
+
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+
+                            </table>
+                        </div>
+
+
+                    </div>
+
+                    <div class="card-footer text-muted" (click)="getVehicleHistory(vehicle.id)">{{ vehicle.createdAt
+                        |
+                        date}} Been
+
+                        {{vehicle.daysInShop}} days
+
+                    </div>
+                    <label *ngIf="showVehicleHistory== true && vehicleHistories.length> 0" for="plate">Vehicle
+                        Change
+                        History</label>
+                    <table *ngIf="showVehicleHistory== true && vehicleHistories.length> 0">
+                        <tr class="col-md-3">
+                            <th style="text-align: center">#</th>
+                            <th style="text-align: center">Id</th>
+                            <th style="text-align: center">Name</th>
+                            <th style="text-align: center">Type</th>
+                            <th style="text-align: center">Value</th>
+                            <th style="text-align: center">Time</th>
+                        </tr>
+                        <tr *ngFor="let vehicleHistory of vehicleHistories; let i=index">
+                            <td style="text-align: center">{{i}}</td>
+                            <td style="text-align: center">{{vehicleHistory.id}}</td>
+                            <td style="text-align: center">{{vehicleHistory.name}}</td>
+                            <td style="text-align: center">
+                                <select [(ngModel)]="vehicleHistory.type">
+                                    <option value="0">add</option>
+                                    <option value="1">update</option>
+                                    <option value="2">remove</option>
+                                </select>
+                            </td>
+                            <td style="text-align: center">{{vehicleHistory.value}}</td>
+                            <td style="text-align: center">{{vehicleHistory.createdAt | date: 'short'}}</td>
+
+                        </tr>
+                    </table>
+
+                    <label for="plate" (click)="getProductionOverview()">Production Overview</label>
+                    <table *ngIf="statusOverview.length> 0">
+                        <tr class="col-md-3" (click)="applyStatusfilter('All')">
+                            <th style="text-align: center">Id</th>
+                            <th style="text-align: center">Status</th>
+                            <th style="text-align: center"><i class="bi-calendar-check"></i></th>
+                        </tr>
+                        <tr *ngFor="let groupBy of statusOverview" (click)="applyStatusfilter(groupBy.status)">
+                            <td style="text-align: center">{{groupBy.status}}</td>
+                            <ng-container *ngFor="let status of statuss; let i=index">
+                                <td *ngIf="status.id==groupBy.status">{{status.name}}</td>
+                            </ng-container>
+                            <td style="text-align: center">{{groupBy.count}}</td>
+                        </tr>
+                    </table>
+                    <label for="plate" (click)="getLocationOverviews()">Location Overview</label>
+                    <table *ngIf="locationOverview.length> 0">
+                        <tr class="col-md-3" (click)="applyLocationfilter('All')">
+                            <th style="text-align: center">Id</th>
+                            <th style="text-align: center">Location</th>
+                            <th style="text-align: center"><i class="bi-calendar-check"></i></th>
+                        </tr>
+                        <tr *ngFor="let groupBy of locationOverview" (click)="applyLocationfilter(groupBy.status)">
+                            <td style="text-align: center">{{groupBy.status}}</td>
+                            <ng-container *ngFor="let status of locations; let i=index">
+                                <td *ngIf="status.id==groupBy.status">{{status.name}}</td>
+                            </ng-container>
+                            <td style="text-align: center">{{groupBy.count}}</td>
+                        </tr>
+                    </table>
+                </div>
+
+            </div>
+            <div class="col-md-8 nopadding">
+
+                <div class="col-12">
+                    <div class="input-group">
+                        <div class="input-group-append">
+                            <input type="text" class="form-control" (input)="onSearchChange($event)"
+                                placeholder="search anything">
+                        </div>
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="button"
+                                *ngIf="currentUser && archived == false" (click)="searchVehicle(5)">
+                                <i class="bi-arrow-repeat"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <table class="col-12" *ngIf="vehicles.length >0">
+                    <tr>
+                        <th style="text-align: center">#</th>
+                        <th style="text-align: center" (click)="sortList('year')">Year</th>
+                        <th style="text-align: center" (click)="sortList('make')">Make</th>
+                        <th style="text-align: center" (click)="sortList('model')">Model</th>
+                        <th style="text-align: center" (click)="sortList('color')">Color</th>
+                        <th style="text-align: center" (click)="sortList('jobRequestType')">Job Type</th>
+                        <th style="text-align: center" (click)="sortList('approvalStatus')">Approval Status</th>
+                        <th style="text-align: center" (click)="sortList('insuranceCompany')">Ins Co.</th>
+                        <th style="text-align: center">Work Requests</th>
+                        <th style="text-align: center">Name/Phone</th>
+                        <th style="text-align: center" (click)="sortList('status')">Job Status</th>
+                        <th style="text-align: center" (click)="sortList('price')">$</th>
+                        <th style="text-align: center" (click)="sortList('paid')">Paid</th>
+                        <th style="text-align: center" (click)="sortList('paymentMethod')">Payment Method</th>
+                        <th style="text-align: center" (click)="sortList('paymentStatus')">Payment Status</th>
+                        <th style="text-align: center" (click)="sortList('createdAt')">Check In Time</th>
+                        <th style="text-align: center" (click)="sortList('daysInShop')">Days In Shop</th>
+                        <th style="text-align: center" (click)="sortList('targetDate')">Target Date</th>
+                        <th style="text-align: center">Rentals</th>
+                        <th style="text-align: center">Location</th>
+                        <th style="text-align: center">Archive</th>
+                    </tr>
+                    <tr id="{{vehicle.id}}"
+                        [style.background-color]="i == cindex? 'lightyellow' : (even ? 'white' : 'white')"
+                        *ngFor="let vehicle of vehicles; let i = index;  let even=even" (click)="getDetail(vehicle, i)">
+                        <td>{{vehicle.id}} </td>
+                        <td>{{vehicle.year}} </td>
+                        <td>{{vehicle.make}} </td>
+                        <td>{{vehicle.model}} </td>
+                        <td style="color: {{vehicle.color}}">{{vehicle.color}} </td>
+                        <td>
+                            <select [(ngModel)]="vehicle.jobRequestType" placeholder="Job Requst Type" #jobRequestType
+                                (change)="onChangeJobRequestType($event, jobRequestType.value)">
+                                <option *ngFor="let jobRequestType of jobRequestTypes let i=index"
+                                    value="{{jobRequestType.id}}">
+                                    {{jobRequestType.name}}
+                                </option>
+                            </select>
+                        </td>
+                        <td>
+                            <select [(ngModel)]="vehicle.approvalStatus" placeholder="Vehicle Approval Status"
+                                #approvalStatus (change)="onChangeApprovalStatus($event, approvalStatus.value)">
+                                <option *ngFor="let approvalStatus of approvalStatuss; let i=index"
+                                    value="{{approvalStatus.id}}">
+                                    {{approvalStatus.name}}
+                                </option>
+                            </select>
+                        </td>
+                        <td>{{vehicle.insuranceCompany}}</td>
+                        <td>
+                            <!-- <img *ngIf="vehicle.imageModels" width="250px" height="100px"
+                        src="{{baseUrlImage + '/' + vehicle.imageModels[0]?.id}}" alt=""> -->
+                            <small>
+                                {{vehicle.workRequest}}
+                            </small>
+                        </td>
+                        <td>{{ vehicle.customer.firstName}} {{ vehicle.customer.lastName}} {{
+                            vehicle.customer.phone}}</td>
+                        <td>
+                            <select [(ngModel)]="vehicle.status" placeholder="status" #device
+                                [disabled]="user.allowUpdateVehicleStatus == false"
+                                (change)="onChangeStatus($event, device.value)">
+                                <option *ngFor="let option of statuss; let i=index" value="{{option.id}}">
+                                    {{option.name}}
+                                </option>
+                            </select>
+
+
+                        </td>
+                        <td><span *ngIf="vehicle.price> 0">{{vehicle.price}}</span> </td>
+                        <td>
+                            <span *ngIf="vehicle.paid==true">
+                                <button class="btn btn-success badge-sm"
+                                    (click)="changePaidStatus(vehicle, false)">Paid</button></span>
+                            <span *ngIf="vehicle.paid==false">
+                                <button class="btn btn-outline-secondary btn-sm"
+                                    (click)="changePaidStatus(vehicle, true)">N.Paid</button></span>
+                        </td>
+                        <td>
+                            <select [(ngModel)]="vehicle.paymentMethod" placeholder="Payment Method" #paymentMethod
+                                (change)="onChangePaymentMethod($event, paymentMethod.value)">
+                                <option *ngFor="let paymentMethod of paymentMethods let i=index"
+                                    value="{{paymentMethod.id}}">
+                                    {{paymentMethod.name}}
+                                </option>
+                            </select>
+                        </td>
+                        <td>
+
+                            <select [(ngModel)]="vehicle.paymentStatus" placeholder="Payment Status" #paymentStatus
+                                (change)="onChangePaymentStatus($event, paymentStatus.value)">
+                                <option *ngFor="let paymentStatus of paymentStatuss let i=index"
+                                    value="{{paymentStatus.id}}">
+                                    {{paymentStatus.name}}
+                                </option>
+                            </select>
+                        </td>
+                        <td>{{vehicle.createdAt | date}} </td>
+                        <td *ngIf="vehicle.daysInShop>6" style="background-color: yellow;text-align: center">
+                            {{vehicle.daysInShop}}</td>
+
+                        <td style="text-align: center" *ngIf="vehicle.daysInShop<7">{{vehicle.daysInShop}}</td>
+                        <td>{{vehicle.targetDate | date}}</td>
+                        <td>{{vehicle.loanerCarName}}</td>
+                        <td>
+                            <select [(ngModel)]="vehicle.location" placeholder="location" #deviceLocation
+                                (change)="onChangeLocation($event, deviceLocation.value)">
+                                <option *ngFor="let option of locations; let i=index" value="{{option.id}}">
+                                    {{option.name}}
+                                </option>
+                            </select>
+                        </td>
+                        <td style="text-align: center"><input type="checkbox" (change)="archiveVehicle(vehicle)">
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

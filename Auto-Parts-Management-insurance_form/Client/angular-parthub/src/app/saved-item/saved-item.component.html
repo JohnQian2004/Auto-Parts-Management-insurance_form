@@ -1,0 +1,66 @@
+<div class="col-md-12 px-1">
+  <div class="card">
+    <div class="card-header">
+      <h5>Saved Items [{{ savedItems.length }}]</h5>
+    </div>
+    <table class="col-md-12">
+      <tr>
+        <th>#</th>
+        <th>Year<br>Make<br>Model</th>
+        <th>Name</th>
+        <th>Part #</th>
+        <th>Description</th>
+        <th style="text-align: center">Grade</th>
+        <th style="text-align: center">Stock #</th>
+        <th style="text-align: center">Sale Price</th>
+        <th>Dealer Info</th>
+        <th style="text-align: center">Posted At</th>
+        <th style="text-align: center">Action</th>
+      </tr>
+      <tr id="{{autopart.id}}" [style.background-color]="i == cindex? 'lightyellow' : (even ? 'white' : 'white')"
+        *ngFor="let autopart of savedItems; let i = index;  let even=even">
+        <td> {{i+1 }}</td>
+        <td> {{ autopart.id }} {{ autopart.year }}<br>
+          {{ autopart.make }}<br>
+          {{ autopart.model }}<br>
+          <!-- {{autopart.engine}}.L {{ autopart.transmission}} <br> -->
+
+        </td>
+        <td> {{autopart.title }}</td>
+        <td> {{autopart.partNumber }}</td>
+        <td>
+          <!-- <div *ngFor="let imageUrl of autopart.imageModels; let i = index">
+                {{ imageUrl.id }}
+                <img width="100" height="60" *ngIf="imageUrl" src="{{baseUrlImage + '/' + imageUrl.id}}" class="image">
+              </div> -->
+
+
+
+          <img height="100" width="100" *ngIf="autopart.imageModels"
+            src="{{baseUrlResizeImage + '/' + autopart.showInSearchImageId}}" alt="">
+          {{ autopart.description }}
+          {{ autopart.partNumber }}
+        </td>
+        <td style="text-align: center">{{ autopart.grade}}</td>
+        <td style="text-align: center">#{{ autopart.id}}</td>
+        <td style="text-align: center">${{autopart.salePrice}}</td>
+        <td>
+          <div *ngIf="currentUser"><a target="_blank" href={{autopart.bussinessUrl}}>{{autopart.bussinessName |
+              titlecase}}</a> {{
+            autopart.phone}} <br>
+          </div>
+          {{autopart.city |
+          titlecase}}, {{ autopart.state}}
+        </td>
+        <td style="text-align: center">{{ autopart.postingAt| date}}</td>
+        <td style="text-align: center">
+          <a style="TEXT-DECORATION: underline; color: blue" (click)="getDetail(autopart, i)">Detail</a>
+          <br><a style="TEXT-DECORATION: underline; color: blue" (click)="deleteSavedItem(null, autopart.id)"
+            title="Remove from saved items">Remove</a>
+
+        </td>
+
+      </tr>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,1354 @@
+[
+    {
+        "area": "FRONT BUMPER & GRILLE",
+        "index": 1,
+        "data": [
+            {
+                "index": 2,
+                "line": "R&I R&I bumper cover 1.2",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 2,
+                    "wildCard": " ",
+                    "oper": "R&I",
+                    "line": "R&I R&I bumper cover 1.2",
+                    "description": "R&I bumper cover",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 0,
+                    "labor": 1.2,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": [
+                    {
+                        "index": 2,
+                        "line": "Note: front bumper cover damage is unrelated prior damage"
+                    }
+                ]
+            },
+            {
+                "index": 3,
+                "line": "** Repl Non OEM CAPA RT Molding extn 521120R030 1 31.93 0.2",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 3,
+                    "wildCard": "**",
+                    "oper": "Repl",
+                    "line": "** Repl Non OEM CAPA RT Molding extn 521120R030 1 31.93 0.2",
+                    "description": "Non OEM CAPA RT Molding extn",
+                    "isParts": true,
+                    "partNumber": "521120R030",
+                    "qty": 1,
+                    "labor": 0.2,
+                    "extendedPrice": 31.93,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            }
+        ]
+    },
+    {
+        "area": "FRONT LAMPS",
+        "index": 4,
+        "data": [
+            {
+                "index": 5,
+                "line": "R&I RT R&I headlamp assy 0.2",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 5,
+                    "wildCard": " ",
+                    "oper": "R&I",
+                    "line": "R&I RT R&I headlamp assy 0.2",
+                    "description": "RT R&I headlamp assy",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 0,
+                    "labor": 0.2,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            },
+            {
+                "index": 1,
+                "line": "7 * Rpr RT Fender Canada built 3.0",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 7,
+                    "wildCard": "*",
+                    "oper": "Rpr",
+                    "line": "7 * Rpr RT Fender Canada built 3.0",
+                    "description": "RT Fender Canada built",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 0,
+                    "labor": 3,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            },
+            {
+                "index": 8,
+                "line": "Add for Clear Coat 0.7",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 8,
+                    "wildCard": " ",
+                    "oper": "Add",
+                    "line": "Add for Clear Coat 0.7",
+                    "description": "for Clear Coat",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 0,
+                    "labor": 0.7,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            },
+            {
+                "index": 9,
+                "line": "# Rpr Feather Prime and Block 0.5 3",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 9,
+                    "wildCard": "#",
+                    "oper": "Rpr",
+                    "line": "# Rpr Feather Prime and Block 0.5 3",
+                    "description": "Feather Prime and Block",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 0.5,
+                    "labor": 3,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            },
+            {
+                "index": 10,
+                "line": "R&I RT Fender liner Canada built 0.4",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 10,
+                    "wildCard": " ",
+                    "oper": "R&I",
+                    "line": "R&I RT Fender liner Canada built 0.4",
+                    "description": "RT Fender liner Canada built",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 0,
+                    "labor": 0.4,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            },
+            {
+                "index": 11,
+                "line": "R&I RT Corner molding Canada built 0.1",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 11,
+                    "wildCard": " ",
+                    "oper": "R&I",
+                    "line": "R&I RT Corner molding Canada built 0.1",
+                    "description": "RT Corner molding Canada built",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 0,
+                    "labor": 0.1,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            },
+            {
+                "index": 12,
+                "line": "** Repl Opt OEM RT Wheel opng mldg 756010R030 1 69.79 0.3",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 12,
+                    "wildCard": "**",
+                    "oper": "Repl",
+                    "line": "** Repl Opt OEM RT Wheel opng mldg 756010R030 1 69.79 0.3",
+                    "description": "Opt OEM RT Wheel opng mldg",
+                    "isParts": true,
+                    "partNumber": "756010R030",
+                    "qty": 1,
+                    "labor": 0.3,
+                    "extendedPrice": 69.79,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            },
+            {
+                "index": 14,
+                "line": "R&I RT Drip molding front 0.3",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 14,
+                    "wildCard": " ",
+                    "oper": "R&I",
+                    "line": "R&I RT Drip molding front 0.3",
+                    "description": "RT Drip molding front",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 0,
+                    "labor": 0.3,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            },
+            {
+                "index": 15,
+                "line": "R&I RT Drip molding center Canada 0.3",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 15,
+                    "wildCard": " ",
+                    "oper": "R&I",
+                    "line": "R&I RT Drip molding center Canada 0.3",
+                    "description": "RT Drip molding center Canada",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 0,
+                    "labor": 0.3,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            },
+            {
+                "index": 16,
+                "line": "R&I RT Drip molding rear 0.1",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 16,
+                    "wildCard": " ",
+                    "oper": "R&I",
+                    "line": "R&I RT Drip molding rear 0.1",
+                    "description": "RT Drip molding rear",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 0,
+                    "labor": 0.1,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            },
+            {
+                "index": 17,
+                "line": "# Refn Clear Coat Undamaged Panel-Rt 0.7",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 17,
+                    "wildCard": "#",
+                    "oper": " ",
+                    "line": "# Refn Clear Coat Undamaged Panel-Rt 0.7",
+                    "description": "Refn Clear Coat Undamaged Panel-Rt",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 0,
+                    "labor": 0.7,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            }
+        ]
+    },
+    {
+        "area": "FRONT DOOR",
+        "index": 18,
+        "data": [
+            {
+                "index": 2,
+                "line": "19 * Rpr RT Outer panel (HSS) 1.5",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 19,
+                    "wildCard": "*",
+                    "oper": "Rpr",
+                    "line": "19 * Rpr RT Outer panel (HSS) 1.5",
+                    "description": "RT Outer panel (HSS)",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 0,
+                    "labor": 1.5,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            },
+            {
+                "index": 20,
+                "line": "Overlap Major Adj. Panel -0.4",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 20,
+                    "wildCard": " ",
+                    "oper": " ",
+                    "line": "Overlap Major Adj. Panel -0.4",
+                    "description": "Overlap Major Adj. Panel",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 0,
+                    "labor": -0.4,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            },
+            {
+                "index": 21,
+                "line": "Add for Clear Coat 0.3",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 21,
+                    "wildCard": " ",
+                    "oper": "Add",
+                    "line": "Add for Clear Coat 0.3",
+                    "description": "for Clear Coat",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 0,
+                    "labor": 0.3,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            },
+            {
+                "index": 22,
+                "line": "# Rpr Feather Prime and Block 0.5 3",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 22,
+                    "wildCard": "#",
+                    "oper": "Rpr",
+                    "line": "# Rpr Feather Prime and Block 0.5 3",
+                    "description": "Feather Prime and Block",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 0.5,
+                    "labor": 3,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            },
+            {
+                "index": 23,
+                "line": "# Refn Basecoat Reduction -0.2",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 23,
+                    "wildCard": "#",
+                    "oper": " ",
+                    "line": "# Refn Basecoat Reduction -0.2",
+                    "description": "Refn Basecoat Reduction",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 0,
+                    "labor": -0.2,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            },
+            {
+                "index": 24,
+                "line": "R&I RT Belt molding 0.2",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 24,
+                    "wildCard": " ",
+                    "oper": "R&I",
+                    "line": "R&I RT Belt molding 0.2",
+                    "description": "RT Belt molding",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 0,
+                    "labor": 0.2,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            },
+            {
+                "index": 25,
+                "line": "R&I RT Lower molding Canada built 0.3",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 25,
+                    "wildCard": " ",
+                    "oper": "R&I",
+                    "line": "R&I RT Lower molding Canada built 0.3",
+                    "description": "RT Lower molding Canada built",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 0,
+                    "labor": 0.3,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            },
+            {
+                "index": 26,
+                "line": "R&I RT R&I mirror as an assy 0.3",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 26,
+                    "wildCard": " ",
+                    "oper": "R&I",
+                    "line": "R&I RT R&I mirror as an assy 0.3",
+                    "description": "RT R&I mirror as an assy",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 0,
+                    "labor": 0.3,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            },
+            {
+                "index": 27,
+                "line": "* R&I RT Handle, outside 0.3",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 27,
+                    "wildCard": "*",
+                    "oper": "R&I",
+                    "line": "* R&I RT Handle, outside 0.3",
+                    "description": "RT Handle, outside",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 0,
+                    "labor": 0.3,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            },
+            {
+                "index": 28,
+                "line": "R&I RT R&I trim panel 0.4",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 28,
+                    "wildCard": " ",
+                    "oper": "R&I",
+                    "line": "R&I RT R&I trim panel 0.4",
+                    "description": "RT R&I trim panel",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 0,
+                    "labor": 0.4,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            }
+        ]
+    },
+    {
+        "area": "REAR DOOR",
+        "index": 29,
+        "data": [
+            {
+                "index": 30,
+                "line": "* Rpr RT Outer panel (HSS) 3.0 2.0",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 30,
+                    "wildCard": "*",
+                    "oper": "Rpr",
+                    "line": "* Rpr RT Outer panel (HSS) 3.0 2.0",
+                    "description": "RT Outer panel (HSS)",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 3,
+                    "labor": 2,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            },
+            {
+                "index": 31,
+                "line": "Overlap Major Adj. Panel -0.4",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 31,
+                    "wildCard": " ",
+                    "oper": " ",
+                    "line": "Overlap Major Adj. Panel -0.4",
+                    "description": "Overlap Major Adj. Panel",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 0,
+                    "labor": -0.4,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            },
+            {
+                "index": 32,
+                "line": "Add for Clear Coat 0.3",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 32,
+                    "wildCard": " ",
+                    "oper": "Add",
+                    "line": "Add for Clear Coat 0.3",
+                    "description": "for Clear Coat",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 0,
+                    "labor": 0.3,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            },
+            {
+                "index": 33,
+                "line": "# Rpr Feather Prime and Block 0.5 3",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 33,
+                    "wildCard": "#",
+                    "oper": "Rpr",
+                    "line": "# Rpr Feather Prime and Block 0.5 3",
+                    "description": "Feather Prime and Block",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 0.5,
+                    "labor": 3,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            },
+            {
+                "index": 34,
+                "line": "R&I RT Belt molding 0.2",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 34,
+                    "wildCard": " ",
+                    "oper": "R&I",
+                    "line": "R&I RT Belt molding 0.2",
+                    "description": "RT Belt molding",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 0,
+                    "labor": 0.2,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            },
+            {
+                "index": 35,
+                "line": "R&I RT Lower molding Canada built 0.3",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 35,
+                    "wildCard": " ",
+                    "oper": "R&I",
+                    "line": "R&I RT Lower molding Canada built 0.3",
+                    "description": "RT Lower molding Canada built",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 0,
+                    "labor": 0.3,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            },
+            {
+                "index": 36,
+                "line": "R&I RT R&I trim panel 0.4",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 36,
+                    "wildCard": " ",
+                    "oper": "R&I",
+                    "line": "R&I RT R&I trim panel 0.4",
+                    "description": "RT R&I trim panel",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 0,
+                    "labor": 0.4,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            },
+            {
+                "index": 0,
+                "line": "37 * R&I RT Handle, outside",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 37,
+                    "wildCard": "*",
+                    "oper": "R&I",
+                    "line": "37 * R&I RT Handle, outside",
+                    "description": "RT Handle, outside",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 0,
+                    "labor": 0,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            }
+        ]
+    },
+    {
+        "area": "QUARTER PANEL",
+        "index": 38,
+        "data": [
+            {
+                "index": 2,
+                "line": "39 * Rpr RT Quarter panel 1.5",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 39,
+                    "wildCard": "*",
+                    "oper": "Rpr",
+                    "line": "39 * Rpr RT Quarter panel 1.5",
+                    "description": "RT Quarter panel",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 0,
+                    "labor": 1.5,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            },
+            {
+                "index": 8,
+                "line": "11/29/2024 10:05:24 AM 419915 Page 3",
+                "isSkipped": false,
+                "notes": []
+            },
+            {
+                "index": 2015,
+                "line": "TOYO RAV4 XLE FWD 4D UTV 4-2.5L Gasoline Sequential MPI Magnetic Gray Metall",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 2015,
+                    "wildCard": " ",
+                    "oper": " ",
+                    "line": "TOYO RAV4 XLE FWD 4D UTV 4-2.5L Gasoline Sequential MPI Magnetic Gray Metall",
+                    "description": "TOYO RAV4 XLE FWD 4D UTV 4-2.5L Gasoline Sequential MPI Magnetic Gray Metall",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 0,
+                    "labor": 0,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": [
+                    {
+                        "index": 2015,
+                        "line": "Note: for scrapes near rear door only -- other quarter damage is prior damage"
+                    }
+                ]
+            },
+            {
+                "index": 40,
+                "line": "Overlap Major Adj. Panel -0.4",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 40,
+                    "wildCard": " ",
+                    "oper": " ",
+                    "line": "Overlap Major Adj. Panel -0.4",
+                    "description": "Overlap Major Adj. Panel",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 0,
+                    "labor": -0.4,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            },
+            {
+                "index": 41,
+                "line": "Add for Clear Coat 0.4",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 41,
+                    "wildCard": " ",
+                    "oper": "Add",
+                    "line": "Add for Clear Coat 0.4",
+                    "description": "for Clear Coat",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 0,
+                    "labor": 0.4,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            },
+            {
+                "index": 42,
+                "line": "# Rpr Feather Prime and Block 0.5 3",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 42,
+                    "wildCard": "#",
+                    "oper": "Rpr",
+                    "line": "# Rpr Feather Prime and Block 0.5 3",
+                    "description": "Feather Prime and Block",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 0.5,
+                    "labor": 3,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            },
+            {
+                "index": 43,
+                "line": "# Refn Basecoat Reduction -0.2",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 43,
+                    "wildCard": "#",
+                    "oper": " ",
+                    "line": "# Refn Basecoat Reduction -0.2",
+                    "description": "Refn Basecoat Reduction",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 0,
+                    "labor": -0.2,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            },
+            {
+                "index": 44,
+                "line": "* R&I RT Wheel opng mldg Canada 0.4",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 44,
+                    "wildCard": "*",
+                    "oper": "R&I",
+                    "line": "* R&I RT Wheel opng mldg Canada 0.4",
+                    "description": "RT Wheel opng mldg Canada",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 0,
+                    "labor": 0.4,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            },
+            {
+                "index": 45,
+                "line": "# Rope Rt Quarter Glass Molding 1 3.00 0.3",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 45,
+                    "wildCard": "#",
+                    "oper": " ",
+                    "line": "# Rope Rt Quarter Glass Molding 1 3.00 0.3",
+                    "description": "Rope Rt Quarter Glass Molding",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 1,
+                    "labor": 0.3,
+                    "extendedPrice": 3,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            }
+        ]
+    },
+    {
+        "area": "REAR LAMPS",
+        "index": 46,
+        "data": [
+            {
+                "index": 47,
+                "line": "R&I RT Tail lamp assy 0.3",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 47,
+                    "wildCard": " ",
+                    "oper": "R&I",
+                    "line": "R&I RT Tail lamp assy 0.3",
+                    "description": "RT Tail lamp assy",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 0,
+                    "labor": 0.3,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            }
+        ]
+    },
+    {
+        "area": "REAR BUMPER",
+        "index": 48,
+        "data": [
+            {
+                "index": 49,
+                "line": "R&I R&I bumper cover 1.0",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 49,
+                    "wildCard": " ",
+                    "oper": "R&I",
+                    "line": "R&I R&I bumper cover 1.0",
+                    "description": "R&I bumper cover",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 0,
+                    "labor": 1,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            }
+        ]
+    },
+    {
+        "area": "MISCELLANEOUS OPERATIONS",
+        "index": 50,
+        "data": [
+            {
+                "index": 51,
+                "line": "# Refn Corrosion Protection 0.3",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 51,
+                    "wildCard": "#",
+                    "oper": " ",
+                    "line": "# Refn Corrosion Protection 0.3",
+                    "description": "Refn Corrosion Protection",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 0,
+                    "labor": 0.3,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            },
+            {
+                "index": 14,
+                "line": "Incl. 52 * Repl Cover car/bag 1 7.00",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 14,
+                    "wildCard": "*",
+                    "oper": "Repl",
+                    "line": "Incl. 52 * Repl Cover car/bag 1 7.00",
+                    "description": "Incl. 52 Cover car/bag",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 1,
+                    "labor": 7,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            }
+        ]
+    },
+    {
+        "area": "OTHER CHARGES",
+        "index": 53,
+        "data": [
+            {
+                "index": 54,
+                "line": "# E.P.C. 1 3.00",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 54,
+                    "wildCard": "#",
+                    "oper": " ",
+                    "line": "# E.P.C. 1 3.00",
+                    "description": "E.P.C.",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 1,
+                    "labor": 3,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            },
+            {
+                "index": 15,
+                "line": "SUBTOTALS 114.72 18.8 9.5",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 15,
+                    "wildCard": " ",
+                    "oper": " ",
+                    "line": "SUBTOTALS 114.72 18.8 9.5",
+                    "description": "SUBTOTALS",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 114.72,
+                    "labor": 9.5,
+                    "extendedPrice": 18.8,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            },
+            {
+                "index": 17,
+                "line": "Estimate Notes:",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 17,
+                    "wildCard": " ",
+                    "oper": " ",
+                    "line": "Estimate Notes:",
+                    "description": "Estimate Notes:",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 0,
+                    "labor": 0,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            },
+            {
+                "index": 18,
+                "line": "Prior Damage:  Front bumper, Rear Bumper, Rear cargo door, Rt quarter at rear",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 18,
+                    "wildCard": "",
+                    "oper": " ",
+                    "line": "Prior Damage:  Front bumper, Rear Bumper, Rear cargo door, Rt quarter at rear",
+                    "description": "Prior Damage: Front bumper, Rear Bumper, Rear cargo door, Rt quarter at rear",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 0,
+                    "labor": 0,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            },
+            {
+                "index": 20,
+                "line": "Category Basis Rate Cost $",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 20,
+                    "wildCard": " ",
+                    "oper": " ",
+                    "line": "Category Basis Rate Cost $",
+                    "description": "Category Basis Rate Cost $",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 0,
+                    "labor": 0,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            },
+            {
+                "index": 22,
+                "line": "Body Labor 16.8 hrs @ $ 60.00 /hr 1,008.00",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 22,
+                    "wildCard": " ",
+                    "oper": " ",
+                    "line": "Body Labor 16.8 hrs @ $ 60.00 /hr 1,008.00",
+                    "description": "Body Labor 16.8 hrs @ $ 60.00 /hr",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 0,
+                    "labor": 1,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            },
+            {
+                "index": 23,
+                "line": "Paint Labor 9.5 hrs @ $ 60.00 /hr 570.00",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 23,
+                    "wildCard": " ",
+                    "oper": " ",
+                    "line": "Paint Labor 9.5 hrs @ $ 60.00 /hr 570.00",
+                    "description": "Paint Labor 9.5 hrs @ $ 60.00 /hr",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 0,
+                    "labor": 570,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            },
+            {
+                "index": 24,
+                "line": "Feather Prime and Block 2.0 hrs @ $ 60.00 /hr 120.00",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 24,
+                    "wildCard": " ",
+                    "oper": " ",
+                    "line": "Feather Prime and Block 2.0 hrs @ $ 60.00 /hr 120.00",
+                    "description": "Feather Prime and Block 2.0 hrs @ $ 60.00 /hr",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 0,
+                    "labor": 120,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            },
+            {
+                "index": 25,
+                "line": "Paint Supplies 9.5 hrs @ $ 42.00 /hr 399.00",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 25,
+                    "wildCard": " ",
+                    "oper": " ",
+                    "line": "Paint Supplies 9.5 hrs @ $ 42.00 /hr 399.00",
+                    "description": "Paint Supplies 9.5 hrs @ $ 42.00 /hr",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 0,
+                    "labor": 399,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            },
+            {
+                "index": 26,
+                "line": "Body Supplies 11.0 hrs @ $ 3.00 /hr 33.00",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 26,
+                    "wildCard": " ",
+                    "oper": " ",
+                    "line": "Body Supplies 11.0 hrs @ $ 3.00 /hr 33.00",
+                    "description": "Body Supplies 11.0 hrs @ $ 3.00 /hr",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 0,
+                    "labor": 33,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            },
+            {
+                "index": 27,
+                "line": "Other Charges 3.00",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 27,
+                    "wildCard": " ",
+                    "oper": " ",
+                    "line": "Other Charges 3.00",
+                    "description": "Other Charges",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 0,
+                    "labor": 3,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            },
+            {
+                "index": 29,
+                "line": "Sales Tax $ 543.72 @ 6.0000 % 32.62",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 29,
+                    "wildCard": " ",
+                    "oper": " ",
+                    "line": "Sales Tax $ 543.72 @ 6.0000 % 32.62",
+                    "description": "Sales Tax $ 543.72 @ 6.0000 %",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 0,
+                    "labor": 32.62,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            },
+            {
+                "index": 30,
+                "line": "Grand Total 2,277.34",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 30,
+                    "wildCard": " ",
+                    "oper": " ",
+                    "line": "Grand Total 2,277.34",
+                    "description": "Grand Total",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 0,
+                    "labor": 2,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            },
+            {
+                "index": 32,
+                "line": "CUSTOMER PAY 250.00",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 32,
+                    "wildCard": " ",
+                    "oper": " ",
+                    "line": "CUSTOMER PAY 250.00",
+                    "description": "CUSTOMER PAY",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 0,
+                    "labor": 250,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            },
+            {
+                "index": 33,
+                "line": "INSURANCE PAY 2,027.34",
+                "isSkipped": false,
+                "parsedLine": {
+                    "index": 33,
+                    "wildCard": " ",
+                    "oper": " ",
+                    "line": "INSURANCE PAY 2,027.34",
+                    "description": "INSURANCE PAY",
+                    "isParts": false,
+                    "partNumber": "",
+                    "qty": 0,
+                    "labor": 2,
+                    "extendedPrice": 0,
+                    "paint": 0,
+                    "isSkipped": false,
+                    "isValid": true,
+                    "notes": []
+                },
+                "notes": []
+            },
+            {
+                "index": 33,
+                "line": "11/29/2024 10:05:24 AM 419915 Page 4",
+                "isSkipped": false,
+                "notes": []
+            }
+        ]
+    }
+]

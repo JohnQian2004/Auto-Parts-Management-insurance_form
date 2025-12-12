@@ -1,0 +1,33 @@
+<div class="timeline">
+  <div *ngFor="let payrollHistory of payrollHistories; let i=index">
+    <div class="container" [ngClass]="{ left: i%2!==0, right:i%2==0}">
+      <div class="content">
+        <div class="btn btn-light d-flex gap-2 align-items-center white-space my-1 border p-1 shadow "
+          data-toggle="tooltip" data-placement="bottom">
+          <span [ngClass]="{'text-danger': payrollHistory.vehicle.special ==true}"
+            title="{{payrollHistory.vehicle.make}}"
+            class="car-{{ payrollHistory.vehicle.make| lowercase }} fs-32"></span>
+
+          <span class="d-block text-start">
+            <strong class="fs-12 fw-500 d-flex gap-2 align-items-center" title="Click to view vehicle details"
+              data-bs-toggle="modal" data-bs-target="#editVehicle">
+              <i class="fa-solid fa-square border border-radius-1" style="color: {{payrollHistory.vehicle.color}}"></i>
+              <small>{{
+                payrollHistory.vehicle.year }} {{payrollHistory.vehicle.make}} {{ payrollHistory.vehicle.model
+                }}</small></strong>
+            <strong class="fw-700 fs-11 py-1 line-height-150 text-secondary">
+              <span class="fs-12 fw-700 ">{{payrollHistory.job.id}} - {{payrollHistory.job.name}}</span> - <span
+                class="text-danger fw-700">${{payrollHistory.job.price}}</span> -
+              <span class="opacity-75">{{payrollHistory.createdAt | date: 'MMM/dd/yyyy HH:mm'}}</span>
+            </strong>
+            <!-- <strong class="badge badge-success ms-1" title="Paid" *ngIf="vehicle.paid==true"><i
+                    class="fa-solid fa-dollar-sign"></i></strong> -->
+          </span>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+ 

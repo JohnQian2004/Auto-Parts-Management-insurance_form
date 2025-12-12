@@ -1,0 +1,771 @@
+<div class="col-md-12 px-0 ng-grey py-1">
+    <nav class="navbar navbar-expand  navbar-white bg-white shadow" style="border-radius:8px !important">
+
+        <button class="btn btn-primary btn-sm" data-bs-toggle="collapse" data-bs-target="#navbarCollapse1"
+            title="Show/hide remainder">
+            <i class="fa fa-bars fa-2x"></i>
+        </button>
+        <h4>Part Market User Control Panel</h4>
+        <div class="card-tools ml-auto">
+            <div class="input-group">
+                <input type="text" class="form-control" [(ngModel)]="partNumber"
+                    style="background-color: #f1f1f1; width:400px;" title="Search name or part # or description"
+                    placeholder="Search name or part # or description">
+
+                <div class="input-group-append">
+                    <div class="btn btn-primary" (click)="searchAllWithPage(0, pageSize, this.forArchived)"
+                        class="position-absolute end-0 top-0 mt-3 me-3 text-muted"><i class="fa fa-search"></i>
+                    </div>
+                </div>
+                <!-- <div class="input-group-append">
+                <div class="btn btn-primary" *ngIf="vehicle.customer.id > 0"
+                    (click)="deleteCustomer(vehicle.customer.id)">
+                    <i class="bi-trash"></i>
+                </div>
+            </div> -->
+                <!-- <div class="input-group-append">
+                    <div class="btn btn-primary" *ngIf="user.allowUpdateCustomerInfo == true"
+                        (click)="reset()">
+                        <i class="bi-plus-lg" ngbTooltip="Add New"></i>
+                    </div>
+                </div> -->
+                <!-- <div class="input-group-append">
+                    <div class="btn btn-primary" *ngIf="currentUser && archived == false"
+                        (click)="searchVehicle(5)">
+                        <i class="bi-arrow-repeat" title="Refresh"></i>
+                    </div>
+                </div> -->
+            </div>
+        </div>
+
+        <ul class="navbar-nav">
+            <li class="nav-item dropdown">
+                <div class="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    <small style="font-weight:500">{{user.firstName}} {{user.lastName}}</small>
+                    <br>
+                    <small
+                        *ngIf="this.user.bussnessName != null && this.user.bussnessName != ''">{{this.user.bussnessName}}</small>
+                </div>
+                <div class="dropdown-menu">
+                    <a routerLink="/profile" class="dropdown-item"> <i class="fa fa-user"></i> Edit Profile</a>
+                    <a routerLink="/password" class="dropdown-item"> <i class="fa fa-key"></i> Reset Password</a>
+                    <!-- <a routerLink="/home" class="dropdown-item" (click)="logout()"><i class="fa fa-power-off"></i>
+                        Logout</a> -->
+                </div>
+            </li>
+
+        </ul>
+    </nav>
+</div>
+<div class="col-md-12 px-0">
+    <fieldset class="border rounded-3 p-3">
+        <!-- <legend class="float-none w-auto px-3">{{ content }}</legend> -->
+
+        <button class="btn btn-outline-secondary mr-1" type="button" title="Listed"
+            (click)="applyFilter2('2', false, 0, this.pageSize)">
+            Listed [{{userSatisticsResponse?.totalAutopartsPublished}}]
+        </button>
+        <!-- <button class="btn btn-outline-secondary mr-1" type="button" (click)="applyFilter('0')">
+            Not Published {{userSatisticsResponse?.totalAutopartsUnpublished}}
+        </button> -->
+
+        <button class="btn btn-outline-secondary mr-1" type="button" title="Archived"
+            (click)="applyFilter2('2', true, 0, this.pageSize)">
+            Archived [{{userSatisticsResponse?.totalAutopartsArchieved}}]
+        </button>
+
+        <button class="btn btn-outline-primary mr-1" type="button" (click)="AddNewAutopart()" title="Add a new part">
+            <i class="bi-plus-lg"></i>
+
+        </button>
+
+    </fieldset>
+</div>
+
+<div></div>
+<!-- <div class="col-md-12 px-0 py-2">
+    <div class="row">
+        <div class="input-group mb-12 px-3">
+            <input type="text" class="form-control" placeholder="Search name or part # or description"
+                [(ngModel)]="partNumber" />
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="button"
+                    (click)="searchAllWithPage(0, pageSize, this.forArchived)"
+                    title="Search name or part # or description">
+                    <i class="bi-search"></i>
+                </button>
+            </div>
+        </div>
+        <label></label>
+    </div>
+</div> -->
+<div class="col-md-12 px-0 py-2">
+    <div class="card col-12 px-1 shadow" style="border-radius: 8px;">
+        <div class="card-header bg-white" style="padding: 0.1rem rem 0.25rem">
+
+            <div class="card-title">
+                <h4>{{ message}}</h4>
+
+            </div>
+            <div class="row">
+
+                <div class="col-md-12" *ngIf="detailSelected==false">
+                    <div class="input-group">
+                        <div class="input-group-append px-1">
+                            <select [(ngModel)]="pageSize">
+                                <option>10</option>
+                                <option>20</option>
+                                <option>30</option>
+                                <option>40</option>
+                                <option>50</option>
+                                <option>60</option>
+                                <option>70</option>
+                                <option>80</option>
+                                <option>90</option>
+                                <option>100</option>
+                                <option>200</option>
+                            </select>
+                        </div>
+                        <!-- <div class="input-group-append  px-1">
+                            <b>{{ message}}</b>
+                        </div> -->
+
+                        <div class="input-group-append px-1">
+                            <div>
+                                <ng-container *ngIf="partNumber ==''">
+                                    <a class="text-center" (click)="applyFilter2('2',this.forArchived, i, pageSize)"
+                                        *ngFor="let page of pagesArray; let i=index"
+                                        [style.background-color]="i == currantPageNumber? 'lightgrey' : (false ? 'white' : 'white')"
+                                        style="TEXT-DECORATION: underline; padding: 6px;">{{page}}</a>
+                                </ng-container>
+                                <ng-container *ngIf="partNumber !=''">
+                                    <a class="text-center" (click)="searchAllWithPage(i, pageSize, this.forArchived)"
+                                        *ngFor="let page of pagesArray; let i=index"
+                                        [style.background-color]="i == currantPageNumber? 'lightgrey' : (false ? 'white' : 'white')"
+                                        style="TEXT-DECORATION: underline; padding: 6px;">{{page}}</a>
+                                </ng-container>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row" [hidden]="detailSelected == true">
+            <div class="col-md-12" style="min-height:500px">
+                <table class="col-md-12">
+                    <tr>
+                        <th>#</th>
+                        <th>Year Make Model</th>
+                        <th>Name</th>
+                        <th>Part #</th>
+                        <th>Description</th>
+                        <th style="text-align: center">Grade</th>
+                        <th style="text-align: center">Stock #</th>
+                        <th style="text-align: center">Sale Price</th>
+                        <th>Dealer Info</th>
+                        <th style="text-align: center">views</th>
+                        <th style="text-align: center">Posted At</th>
+                        <th style="text-align: center">By</th>
+                        <th style="text-align: center">Actions<br></th>
+                    </tr>
+                    <tr id="{{autopart.id}}"
+                        [style.background-color]="i == cindex? 'lightyellow' : (even ? 'white' : 'white')"
+                        *ngFor="let autopart of autopartsSearch; let i = index;  let even=even">
+                        <td>{{ i+1 }}</td>
+                        <td>{{ autopart.year }}<br>
+                            {{ autopart.make }}<br>
+                            {{ autopart.model }}<br>
+                        </td>
+                        <td>
+                            {{autopart.title }}
+                        </td>
+                        <td>
+                            {{autopart.partNumber }}
+                        </td>
+                        <td>
+                            <img height="100" width="100" *ngIf="autopart.imageModels"
+                                src="{{baseUrlResizeImage + '/' + autopart.showInSearchImageId}}" alt="">
+                            {{ autopart.description }}
+                            {{ autopart.partNumber }}
+                        </td>
+                        <td style="text-align: center">{{ autopart.grade}}</td>
+                        <td style="text-align: center">#{{ autopart.id}}</td>
+                        <td style="text-align: center">${{autopart.salePrice}}</td>
+                        <td>
+                            <div *ngIf="currentUser"><a target="_blank"
+                                    href={{autopart.bussinessUrl}}>{{autopart.bussinessName
+                                    |
+                                    titlecase}}</a> {{
+                                formatPhoneNumber (autopart.phone)}} <br>
+                            </div>
+                            {{autopart.city |
+                            titlecase}}, {{ autopart.state}}
+                        </td>
+                        <td style="text-align: center">{{autopart.viewCount}}</td>
+                        <td style="text-align: center">{{autopart.postingAt | date}}</td>
+                        <td style="text-align: center">
+
+                            <ng-container *ngFor="let user of this.users; let i=index">
+                                <ng-container *ngIf="user.id == autopart.userId">
+                                    {{user.firstName}} {{user.lastName}}
+                                </ng-container>
+                            </ng-container>
+
+                        </td>
+                        <td style="text-align: center">
+
+                            <a (click)="getDetail(autopart, i)" *ngIf="autopart.status==2"
+                                style="TEXT-DECORATION: underline; color: blue">Detail</a><br>
+
+                            <a *ngIf="autopart.status==2" (click)="deleteAutopart(autopart, i)"
+                                style="TEXT-DECORATION: underline; color: blue">Delete</a><br>
+
+                            <a (click)="editAutopart(autopart, i)" *ngIf="autopart.status==2"
+                                style="TEXT-DECORATION: underline; color: blue">Edit</a><br>
+
+                            <a (click)="publishAutopart(autopart)" *ngIf="autopart.status==0"
+                                style="TEXT-DECORATION: underline; color: blue">Publish</a>
+
+                            <a (click)="archiveAutopart(autopart, true)"
+                                *ngIf="autopart.status==2 && autopart.archived == false"
+                                style="TEXT-DECORATION: underline; color: blue">Archive</a>
+
+                            <a (click)="archiveAutopart(autopart, false)"
+                                *ngIf="autopart.status==2 && autopart.archived == true"
+                                style="TEXT-DECORATION: underline; color: blue">Repost</a>
+
+                        </td>
+
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="row" [hidden]="detailSelected == false">
+            <div class="col-12" *ngIf="selectedAutopart != null && selectedAutopart.id> 0">
+                <div class="card">
+                    <div class="card-header" (click)="backToListing()">
+                        <h4 class="card-title">{{ selectedAutopart.id }} {{ selectedAutopart.year }} {{
+                            selectedAutopart.make }}
+                            {{
+                            selectedAutopart.model }} {{
+                            selectedAutopart.partName }}</h4>
+                    </div>
+
+                    <div class="card-body">
+
+                        <div class="row">
+
+                            <div class="col-md-2" style="padding-left: 1px; padding-right: 1px; overflow-y: scroll;">
+                                <div *ngFor='let imageModel of selectedAutopart.imageModels; let i=index'>
+                                    <img class="img-fluid" *ngIf="selectedAutopart.showInSearchImageId != imageModel.id"
+                                        src="{{baseUrlResizeImage + '/' + imageModel.id}}" (click)="setImage(i)"
+                                        style="border: 3px solid #555;">
+                                    <img class="img-fluid" *ngIf="selectedAutopart.showInSearchImageId == imageModel.id"
+                                        src="{{baseUrlResizeImage + '/' + imageModel.id}}" (click)="setImage(i)"
+                                        style="border: 3px solid lightcoral;">
+                                </div>
+                            </div>
+                            <div class="col-md-10">
+                                <div class="containerImage">
+
+                                    <img *ngIf="selectedAutopart.showInSearchImageId != selectedImage"
+                                        class="card-img-top" src="{{baseUrlImage + '/' + selectedImage}}" alt=""
+                                        style="border: 3px solid #555;">
+
+                                    <img *ngIf="selectedAutopart.showInSearchImageId == selectedImage"
+                                        class="card-img-top" src="{{baseUrlImage + '/' + selectedImage}}" alt=""
+                                        style="border: 3px solid lightcoral;">
+
+                                    <label *ngIf="selectedImage == selectedAutopart.showInSearchImageId"
+                                        class="top-left" for="title">Will Show This During Search</label>
+                                    <div class="bottom-right">
+                                        <button *ngIf="selectedImage != selectedAutopart.showInSearchImageId"
+                                            (click)="setImageForSearch(selectedAutopart.id, selectedImage)"
+                                            class="btn btn-primary  mr-1" for="title">Set for Search</button>
+                                        <button (click)="deleteImage(selectedAutopart.id, selectedImage)"
+                                            data-toggle="tooltip" data-placement="top" title="Remove this image"
+                                            class="btn btn-primary  mr-1" for="title">
+                                            <i class="bi-trash"></i>
+                                        </button>
+                                        <button class="btn btn-primary mr-1" (click)="fileInput.click()"
+                                            data-toggle="tooltip" data-placement="top" title="Add More Images">
+                                            <i class="bi-plus-circle"></i>
+                                            <input #fileInput class="btn btn-primary" type='file'
+                                                (change)="onSelectFile($event)" multiple style="display:none;">
+                                        </button>
+                                    </div>
+                                </div>
+                                <!-- <img class="card-img-top" *ngIf="selectedAutopart.imageModels"
+                            src="{{baseUrlImage + '/' + selectedImage}}" alt=""> -->
+
+                                <p></p>
+                                <div class="form-group">
+                                    <fieldset class="border rounded-3 p-3">
+                                        <legend class="float-none w-auto px-3">Vehicle Info</legend>
+                                        <div class="input-group mb-12">
+                                            <select class="form-control" [(ngModel)]="selectedAutopart.year"
+                                                placeholder="Year">
+                                                <option [value]="option"
+                                                    *ngFor="let option of optionsYear;let i=index;">
+                                                    {{option}}
+                                                </option>
+                                            </select>
+                                            <select class="form-control" #device [(ngModel)]="selectedAutopart.make"
+                                                (change)="onChange($event, device.value)">
+                                                <option *ngFor="let obj of optionsMake;let i=index;">{{obj}}</option>
+                                            </select>
+                                            <select class="form-control" [(ngModel)]="selectedAutopart.model"
+                                                placeholder="model">
+                                                <option *ngFor="let obj2 of optionsModel;let i=index;">{{obj2}}</option>
+                                            </select>
+                                        </div>
+                                    </fieldset>
+
+                                    <fieldset class="border rounded-3 p-3">
+                                        <legend class="float-none w-auto px-3">Part Info</legend>
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <label for="title">Parts Name</label>
+                                                <input type="text" class="form-control" id="title" required
+                                                    pleaseholder="part name" [(ngModel)]="selectedAutopart.title"
+                                                    name="title" title="part name" />
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-4">
+                                                <label for="title">Parts Number</label>
+                                                <input type="text" class="form-control" id="title" required
+                                                    [(ngModel)]="selectedAutopart.partNumber" name="title" />
+                                            </div>
+
+                                            <!-- <div class="col-4">
+                                        <label for="title">Description 2</label>
+                                        <input type="text" class="form-control" id="title" required
+                                            [(ngModel)]="selectedAutopart.title" name="title" />
+                                    </div> -->
+
+                                            <div class="col-8">
+                                                <label for="description">Description</label>
+                                                <input trimText class="form-control" id="description" required
+                                                    [(ngModel)]="selectedAutopart.description" name="description" />
+                                            </div>
+
+
+
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-4">
+                                                <label for="shipping">Shipping</label>
+                                                <select class="form-control" name="shipping" size="1"
+                                                    [(ngModel)]="selectedAutopart.shipping">
+                                                    <option selected="selected">Select Shipping</option>
+                                                    <option value="FLP">Free local pickup</option>
+                                                    <option value="LD">local delivery</option>
+                                                    <option value="SGS">standard ground shipping</option>
+                                                    <option value="FS">fast shipping</option>
+                                                    <option value="CFDI">Call for delivery instructions</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="col-4">
+                                                <label for="warranty">Warranty</label>
+                                                <select class="form-control" name="warranty" size="1"
+                                                    [(ngModel)]="selectedAutopart.warranty">
+                                                    <option selected="selected">Select Warranty</option>
+                                                    <option value="7D">7 days</option>
+                                                    <option value="30D">15 days</option>
+                                                    <option value="30D">30 days</option>
+                                                    <option value="SAI">sold as is</option>
+                                                    <option value="BWFP">buy warranty from PARTHUT</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="col-4">
+                                                <label for="grade">Grade</label>
+                                                <select class="form-control" name="grade" size="1"
+                                                    [(ngModel)]="selectedAutopart.grade">
+                                                    <option selected="selected">Select Grade</option>
+                                                    <option value="A">A</option>
+                                                    <option value="B">B</option>
+                                                    <option value="C">C</option>
+                                                    <option value="Used">Used</option>
+                                                    <option value="New">New</option>
+                                                    <option value="Insurance">Insurance</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-4">
+                                                <label for="price">Price</label>
+                                                <input trimText class="form-control" id="price" required type="number"
+                                                    [(ngModel)]="selectedAutopart.salePrice" name="price" />
+                                            </div>
+                                            <div class="col-4">
+                                                <label for="stocknumber">Stock #</label>
+                                                <input trimText class="form-control" id="stocknumber"
+                                                    [(ngModel)]="selectedAutopart.stocknumber" name="stocknumber" />
+                                            </div>
+                                            <!-- <div class="col-4">
+                                        <label>|</label>
+                                        <button (click)="saveAutopart()"
+                                            class="form-control btn btn-success">Post</button>
+                                    </div> -->
+                                        </div>
+                                        <div class="row"
+                                            *ngIf="selectedAutopart.fitmented == true && selectedAutopart.fitments != null && selectedAutopart.fitments.length > 0">
+                                            <div class="col-12 table-responsive">
+                                                <label for="fitment"> Fitments/Compatibilities:</label>
+                                                <table class="table">
+                                                    <tr>
+                                                        <th>#</th>
+                                                        <th>year</th>
+                                                        <th>make</th>
+                                                        <th>model</th>
+                                                        <th>trim</th>
+                                                        <th>engine</th>
+                                                        <th>action</th>
+                                                    </tr>
+                                                    <tr *ngFor="let fitment of selectedAutopart.fitments; let i=index">
+                                                        <td>{{i+1}}</td>
+                                                        <td>{{ fitment.year }}</td>
+                                                        <td>{{ fitment.make }}</td>
+                                                        <td>{{ fitment.model }}</td>
+                                                        <td>{{ fitment.trim }}</td>
+                                                        <td>{{ fitment.engine }}</td>
+                                                        <td>Place Holder</td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                </div>
+                                <div class="col-md-12" *ngIf="message1">
+                                    <h4>{{ message1}}</h4>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-12">
+                                        <fieldset class="border rounded-3 p-3">
+                                            <a class="col-md-3" *ngIf="selectedAutopart.status ==2"
+                                                class="btn btn-outline-secondary  mr-1"
+                                                (click)="saveAutopart()">Save</a>
+
+                                            <!-- <a class="col-md-3" *ngIf="selectedAutopart.status !=2" class="btn btn-outline-secondary"
+                    (click)="deleteSavedItem(null, selectedAutopart.id)">Edit</a>
+
+                  <a class="col-md-3" *ngIf="selectedAutopart.showSavedButton==true" class="btn btn-outline-secondary"
+                    (click)="addSavedItem(selectedAutopart.id)">Save To My List</a>
+
+                  <a class="col-md-3" *ngIf="selectedAutopart.showSavedButton==false" class="btn btn-outline-secondary"
+                    (click)="deleteSavedItem(null, selectedAutopart.id)">Remove From List</a> -->
+
+
+                                            <a class="col-md-3"
+                                                *ngIf="selectedAutopart.status==2 && selectedAutopart.archived == true"
+                                                class="btn btn-outline-primary mr-1"
+                                                (click)="archiveAutopart( selectedAutopart, false)">Repost</a>
+
+                                            <a class="col-md-3"
+                                                *ngIf="selectedAutopart.status ==2 && selectedAutopart.archived ==false"
+                                                class="btn btn-outline-secondary mr-1"
+                                                (click)="archiveAutopart( selectedAutopart, true)">Archiev</a>
+
+                                            <a class="col-md-3" class="btn btn-outline-primary mr-1"
+                                                (click)="backToListing()">Back
+                                                to Listing</a>
+                                        </fieldset>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="card-footer text-muted">Posted on {{ selectedAutopart.postingAt | date}}</div>
+                </div>
+            </div>
+            <div class="col-12" *ngIf="selectedAutopart != null && selectedAutopart.id == 0">
+                <div class="card">
+                    <div class="card-header" (click)="backToListing()">
+                        <h4 class="card-title" *ngIf="selectedAutopart.year > 0 ">{{ selectedAutopart.year }} {{
+                            selectedAutopart.make }}
+                            {{
+                            selectedAutopart.model }} {{
+                            selectedAutopart.partName }}</h4>
+                        <h4 class="card-title" *ngIf="selectedAutopart.year == 0 ">
+                            Please fill the form
+                        </h4>
+                    </div>
+
+                    <div class="card-body">
+
+                        <div class="row">
+
+                            <div class="col-md-2" style="padding-left: 1px; padding-right: 1px; overflow-y: scroll;">
+                                <div *ngFor='let imageModel of imageModels; let i=index'>
+                                    <img class="img-fluid" *ngIf="imageModel.showInSearch ==false"
+                                        [src]="imageModel.picByte" (click)="setShowInSearch(i)"
+                                        style="border: 3px solid #555;">
+                                    <img class="img-fluid" *ngIf="imageModel.showInSearch ==true"
+                                        [src]="imageModel.picByte" (click)="setShowInSearch(i)"
+                                        style="border: 3px solid lightcoral;">
+                                </div>
+                            </div>
+                            <div class="col-md-10">
+                                <div class="containerImage" *ngIf="imageModels.length > 0 ">
+
+                                    <img class="card-img-top" *ngIf="imageUrl && selectedImage.showInSearch==false"
+                                        [src]="imageUrl" alt="" style="border: 3px solid #555;">
+
+                                    <img class="card-img-top" *ngIf="imageUrl && selectedImage.showInSearch==true"
+                                        [src]="imageUrl" alt="" style="border: 3px solid lightcoral;">
+
+                                    <label *ngIf="selectedImage.showInSearch==true" class="top-left" for="title">Will
+                                        Show This
+                                        During Search</label>
+                                    <div class="bottom-right">
+                                        <button *ngIf="selectedImage.showInSearch==false"
+                                            (click)="setImageForSearch(selectedAutopart.id, selectedImage)"
+                                            class="btn btn-primary  mr-1" for="title">Set for Search</button>
+                                        <button (click)="deleteImage(selectedAutopart.id, selectedImage)"
+                                            data-toggle="tooltip" data-placement="top" title="Remove this image"
+                                            class="btn btn-primary  mr-1" for="title">
+                                            <i class="bi-trash"></i>
+                                        </button>
+                                        <button class="btn btn-primary mr-1" (click)="fileInput.click()"
+                                            data-toggle="tooltip" data-placement="top" title="Add More Images">
+                                            <i class="bi-plus-circle"></i>
+                                            <input #fileInput class="btn btn-primary" type='file'
+                                                (change)="onSelectFileNew($event)" multiple style="display:none;">
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="containerImage" *ngIf="imageModels.length == 0 ">
+                                    <button class="btn btn-primary mr-1" (click)="fileInput.click()"
+                                        data-toggle="tooltip" data-placement="top" title="Add More Images">
+                                        <i class="bi-plus-circle"></i>
+                                        <input #fileInput class="btn btn-primary" type='file'
+                                            (change)="onSelectFileNew($event)" multiple style="display:none;">
+                                    </button>
+                                </div>
+                                <!-- <img class="card-img-top" *ngIf="selectedAutopart.imageModels"
+                            src="{{baseUrlImage + '/' + selectedImage}}" alt=""> -->
+
+                                <p></p>
+                                <div class="form-group">
+                                    <fieldset class="border rounded-3 p-3">
+                                        <legend class="float-none w-auto px-3">Vehicle Info</legend>
+                                        <div class="input-group mb-12">
+                                            <select class="form-control" [(ngModel)]="selectedAutopart.year"
+                                                placeholder="Year">
+                                                <option [value]="option"
+                                                    *ngFor="let option of optionsYear;let i=index;">
+                                                    {{option}}
+                                                </option>
+                                            </select>
+                                            <select class="form-control" #device [(ngModel)]="selectedAutopart.make"
+                                                (change)="onChange($event, device.value)">
+                                                <option *ngFor="let obj of optionsMake;let i=index;">{{obj}}</option>
+                                            </select>
+                                            <select class="form-control" [(ngModel)]="selectedAutopart.model"
+                                                placeholder="model">
+                                                <option *ngFor="let obj2 of optionsModel;let i=index;">{{obj2}}</option>
+                                            </select>
+                                        </div>
+                                    </fieldset>
+
+                                    <fieldset class="border rounded-3 p-3">
+                                        <legend class="float-none w-auto px-3">Part Info</legend>
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <label for="title">Parts Name</label>
+                                                <input type="text" class="form-control" id="title" required
+                                                    pleaseholder="part name" [(ngModel)]="selectedAutopart.title"
+                                                    name="title" title="part name" />
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-4">
+                                                <label for="title">Parts Number</label>
+                                                <input type="text" class="form-control" id="title" required
+                                                    [(ngModel)]="selectedAutopart.partNumber" name="title" />
+                                            </div>
+
+                                            <!-- <div class="col-4">
+                                        <label for="title">Description 2</label>
+                                        <input type="text" class="form-control" id="title" required
+                                            [(ngModel)]="selectedAutopart.title" name="title" />
+                                    </div> -->
+
+                                            <div class="col-8">
+                                                <label for="description">Description</label>
+                                                <input trimText class="form-control" id="description" required
+                                                    [(ngModel)]="selectedAutopart.description" name="description" />
+                                            </div>
+
+
+
+                                        </div>
+
+                                        <div class="row"
+                                            *ngIf="selectedAutopart.partNumber != null && selectedAutopart.partNumber != '' && selectedAutopart.year > 0 && selectedAutopart.make !='' && selectedAutopart.model != '' ">
+                                            <div class="col-12">
+                                                <label for="title">Fitment/Compatibility Check</label>
+                                                <input type="checkbox" id="title" style="width:20px; height:20px"
+                                                    (change)="onChangeFitment(selectedAutopart)" disabled
+                                                    title="Check fitment/Compatibility"
+                                                    [(ngModel)]="selectedAutopart.fitmented" name="fitment" />
+                                            </div>
+
+                                            <div class="col-12" *ngIf="selectedAutopart.fitmented == true">
+                                                <label for="description">Fitments/Compatibilities</label>
+                                                <input trimText class="form-control" id="description"
+                                                    placeholder="Shall pull from AI server and display in table if available"
+                                                    name="description" />
+                                                <div class="row"
+                                                    *ngIf="selectedAutopart.fitmented == true && selectedAutopart.fitments != null && selectedAutopart.fitments.length > 0">
+                                                    <div class="col-12 table-responsive">
+                                                        <label for="fitment"> Fitments/Compatibilities:</label>
+                                                        <table class="table">
+                                                            <tr>
+                                                                <th>#</th>
+                                                                <th>year</th>
+                                                                <th>make</th>
+                                                                <th>model</th>
+                                                                <th>trim</th>
+                                                                <th>engine</th>
+                                                                <!-- <th>action</th> -->
+                                                            </tr>
+                                                            <tr
+                                                                *ngFor="let fitment of selectedAutopart.fitments; let i=index">
+                                                                <td>{{i+1}}</td>
+                                                                <td>{{ fitment.year }}</td>
+                                                                <td>{{ fitment.make }}</td>
+                                                                <td>{{ fitment.model }}</td>
+                                                                <td>{{ fitment.trim }}</td>
+                                                                <td>{{ fitment.engine }}</td>
+                                                                <!-- <td>Place Holder</td> -->
+                                                            </tr>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-4">
+                                                <label for="shipping">Shipping</label>
+                                                <select class="form-control" name="shipping" size="1"
+                                                    [(ngModel)]="selectedAutopart.shipping">
+                                                    <option selected="selected">Select Shipping</option>
+                                                    <option value="FLP">Free local pickup</option>
+                                                    <option value="LD">local delivery</option>
+                                                    <option value="SGS">standard ground shipping</option>
+                                                    <option value="FS">fast shipping</option>
+                                                    <option value="CFDI">Call for delivery instructions</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="col-4">
+                                                <label for="warranty">Warranty</label>
+                                                <select class="form-control" name="warranty" size="1"
+                                                    [(ngModel)]="selectedAutopart.warranty">
+                                                    <option selected="selected">Select Warranty</option>
+                                                    <option value="7D">7 days</option>
+                                                    <option value="30D">15 days</option>
+                                                    <option value="30D">30 days</option>
+                                                    <option value="SAI">sold as is</option>
+                                                    <option value="BWFP">buy warranty from PARTHUT</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="col-4">
+                                                <label for="grade">Grade</label>
+                                                <select class="form-control" name="grade" size="1"
+                                                    [(ngModel)]="selectedAutopart.grade">
+                                                    <option selected="selected">Select Grade</option>
+                                                    <option value="A">A</option>
+                                                    <option value="B">B</option>
+                                                    <option value="C">C</option>
+                                                    <option value="Used">Used</option>
+                                                    <option value="New">New</option>
+                                                    <option value="Insurance">Insurance</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-4">
+                                                <label for="price">Price</label>
+                                                <input trimText class="form-control" id="price" required type="number"
+                                                    [(ngModel)]="selectedAutopart.salePrice" name="price" />
+                                            </div>
+                                            <div class="col-4">
+                                                <label for="stocknumber">Stock #</label>
+                                                <input trimText class="form-control" id="stocknumber"
+                                                    [(ngModel)]="selectedAutopart.stocknumber" name="stocknumber" />
+                                            </div>
+                                            <!-- <div class="col-4">
+                                        <label>|</label>
+                                        <button (click)="saveAutopart()"
+                                            class="form-control btn btn-success">Post</button>
+                                    </div> -->
+                                        </div>
+                                    </fieldset>
+                                </div>
+                                <div class="col-md-12" *ngIf="message1">
+                                    <h4>{{ message1}}</h4>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-12">
+                                        <fieldset class="border rounded-3 p-3">
+                                            <a class="col-md-3" *ngIf="selectedAutopart.id ==0"
+                                                class="btn btn-outline-secondary  mr-1"
+                                                (click)="createNewAutopart()">Post</a>
+
+                                            <!-- <a class="col-md-3" *ngIf="selectedAutopart.status !=2" class="btn btn-outline-secondary"
+                    (click)="deleteSavedItem(null, selectedAutopart.id)">Edit</a>
+
+                  <a class="col-md-3" *ngIf="selectedAutopart.showSavedButton==true" class="btn btn-outline-secondary"
+                    (click)="addSavedItem(selectedAutopart.id)">Save To My List</a>
+
+                  <a class="col-md-3" *ngIf="selectedAutopart.showSavedButton==false" class="btn btn-outline-secondary"
+                    (click)="deleteSavedItem(null, selectedAutopart.id)">Remove From List</a> -->
+
+
+                                            <a class="col-md-3"
+                                                *ngIf="selectedAutopart.status==2 && selectedAutopart.archived == true"
+                                                class="btn btn-outline-primary mr-1"
+                                                (click)="archiveAutopart( selectedAutopart, false)">Repost</a>
+
+                                            <a class="col-md-3"
+                                                *ngIf="selectedAutopart.status ==2 && selectedAutopart.archived ==false"
+                                                class="btn btn-outline-secondary mr-1"
+                                                (click)="archiveAutopart( selectedAutopart, true)">Archiev</a>
+
+                                            <a class="col-md-3" class="btn btn-outline-primary mr-1"
+                                                (click)="backToListing()">Back
+                                                to Listing</a>
+                                        </fieldset>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="card-footer text-muted">Posted on {{ selectedAutopart.postingAt | date}}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- <code>
+    <pre>{{selectedAutopart |json}}</pre>
+</code> -->

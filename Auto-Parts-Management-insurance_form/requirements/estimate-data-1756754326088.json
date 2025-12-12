@@ -1,0 +1,551 @@
+{
+  "shopInfo": {
+    "name": "AUTO POINT COLLISION REPAIRS & CAR PAINT",
+    "address": "5801  Belair  Road,  Baltimore,  MD  21206",
+    "phone": "(410) 488-4040",
+    "workfileId": "",
+    "partsShare": "",
+    "invoiceType": "Preliminary Estimate",
+    "description": "We provide High quality work and service at low price."
+  },
+  "customerInfo": {
+    "name": "Buck,  Carroll",
+    "phone": "(202) 276-0123",
+    "phoneType": "Cell"
+  },
+  "jobInfo": {
+    "jobNumber": "",
+    "writtenBy": "",
+    "adjuster": "WILLIG,  JONATHON",
+    "claimNumber": "",
+    "policyNumber": "",
+    "typeOfLoss": "",
+    "dateOfLoss": "",
+    "daysToRepair": 0,
+    "pointOfImpact": "",
+    "inspectionLocation": ""
+  },
+  "vehicleInfo": {
+    "year": "2021",
+    "make": "GMC",
+    "model": "Terrain SLE FWD 4D UTV 4-1.5L Turbocharged Gasoline Direct Injection",
+    "bodyStyle": "SLE FWD 4D UTV",
+    "engine": "4-1.5L Turbocharged Gasoline Direct Injection",
+    "color": "white",
+    "vin": "",
+    "interiorColor": "",
+    "exteriorColor": "white",
+    "mileageIn": "",
+    "mileageOut": "",
+    "license": "",
+    "state": "MD",
+    "productionDate": "",
+    "condition": "",
+    "jobNumber": ""
+  },
+  "insuranceInfo": {
+    "company": ""
+  },
+  "repairFacility": {
+    "name": "AUTO POINT COLLISION REPAIRS & CAR PAINT",
+    "address": "5801 Belair Road, Baltimore, MD 21206",
+    "phone": "(410) 488-4040"
+  },
+  "estimateData": [
+    {
+      "areaName": "FRONT  BUMPER  &  GRILLE",
+      "claimItems": [
+        {
+          "lineNumber": 2,
+          "operation": "O/H",
+          "description": "bumper assy 0",
+          "partNumber": "",
+          "quantity": 1,
+          "extendedPrice": 0,
+          "laborHours": 3.8,
+          "paintHours": 0
+        },
+        {
+          "lineNumber": 3,
+          "operation": "**  Repl",
+          "description": "RECOND Bumper cover w/o park",
+          "partNumber": "",
+          "quantity": 1,
+          "extendedPrice": 0,
+          "laborHours": 0,
+          "paintHours": 0
+        },
+        {
+          "lineNumber": 4,
+          "operation": "Add",
+          "description": "for Clear Coat 0",
+          "partNumber": "",
+          "quantity": 1,
+          "extendedPrice": 0,
+          "laborHours": 0,
+          "paintHours": 1.2
+        },
+        {
+          "lineNumber": 5,
+          "operation": "**  Repl",
+          "description": "A/M CAPA Lower cover black, w/o",
+          "partNumber": "",
+          "quantity": 1,
+          "extendedPrice": 0,
+          "laborHours": 0,
+          "paintHours": 0
+        },
+        {
+          "lineNumber": 6,
+          "operation": "Repl",
+          "description": "Energy absorber",
+          "partNumber": "23196301",
+          "quantity": 1,
+          "extendedPrice": 197.05,
+          "laborHours": 0,
+          "paintHours": 0
+        },
+        {
+          "lineNumber": 7,
+          "operation": "**  Repl",
+          "description": "A/M Guard 1",
+          "partNumber": "84766445",
+          "quantity": 1,
+          "extendedPrice": 21.54,
+          "laborHours": 0.1,
+          "paintHours": 0
+        },
+        {
+          "lineNumber": 8,
+          "operation": "*  Rpr",
+          "description": "Upper support 0",
+          "partNumber": "",
+          "quantity": 1,
+          "extendedPrice": 0,
+          "laborHours": 1,
+          "paintHours": 0.5
+        },
+        {
+          "lineNumber": 9,
+          "operation": "Repl",
+          "description": "Front brace 1",
+          "partNumber": "84167659",
+          "quantity": 1,
+          "extendedPrice": 28.92,
+          "laborHours": 0.2,
+          "paintHours": 0
+        },
+        {
+          "lineNumber": 10,
+          "operation": "*  Repl",
+          "description": "Grille assy SL, SLE +30%",
+          "partNumber": "84236083",
+          "quantity": 1,
+          "extendedPrice": 615.71,
+          "laborHours": 0,
+          "paintHours": 0
+        },
+        {
+          "lineNumber": 11,
+          "operation": "*  Repl",
+          "description": "LKQ Grille assy SL, SLE",
+          "partNumber": "84236083",
+          "quantity": 1,
+          "extendedPrice": 0,
+          "laborHours": 0,
+          "paintHours": 0
+        },
+        {
+          "lineNumber": 12,
+          "operation": "#  Rpr",
+          "description": "lower grill texture repair 0",
+          "partNumber": "",
+          "quantity": 1,
+          "extendedPrice": 0,
+          "laborHours": 0.5,
+          "paintHours": 0
+        },
+        {
+          "lineNumber": 13,
+          "operation": "R&I",
+          "description": "Underbody shield 1.5 liter",
+          "partNumber": "",
+          "quantity": 0,
+          "extendedPrice": 0,
+          "laborHours": 0,
+          "paintHours": 0
+        },
+        {
+          "lineNumber": 14,
+          "operation": "**  Repl",
+          "description": "A/M License bracket 1",
+          "partNumber": "23462463",
+          "quantity": 1,
+          "extendedPrice": 23,
+          "laborHours": 0.2,
+          "paintHours": 0
+        }
+      ],
+      "images": []
+    },
+    {
+      "areaName": "FRONT  LAMPS",
+      "claimItems": [
+        {
+          "lineNumber": 16,
+          "operation": "Repl",
+          "description": "Aim fog lamps 1",
+          "partNumber": "",
+          "quantity": 1,
+          "extendedPrice": 0,
+          "laborHours": 0.3,
+          "paintHours": 0
+        }
+      ],
+      "images": []
+    },
+    {
+      "areaName": "COOLING",
+      "claimItems": [
+        {
+          "lineNumber": 18,
+          "operation": "**  Repl",
+          "description": "A/M KEYSIQ Radiator m 4.6 M 0.0",
+          "partNumber": "87830396",
+          "quantity": 1,
+          "extendedPrice": 176.47,
+          "laborHours": 0,
+          "paintHours": 0
+        },
+        {
+          "lineNumber": 19,
+          "operation": "**  Repl",
+          "description": "A/M CAPA Shutter upper",
+          "partNumber": "84766744",
+          "quantity": 1,
+          "extendedPrice": 208.2,
+          "laborHours": 0,
+          "paintHours": 0
+        },
+        {
+          "lineNumber": 20,
+          "operation": "**  Repl",
+          "description": "A/M CAPA Shutter lower",
+          "partNumber": "84614525",
+          "quantity": 1,
+          "extendedPrice": 106,
+          "laborHours": 0,
+          "paintHours": 0
+        },
+        {
+          "lineNumber": 21,
+          "operation": "Repl",
+          "description": "Upper baffle",
+          "partNumber": "84618991",
+          "quantity": 1,
+          "extendedPrice": 83.9,
+          "laborHours": 0,
+          "paintHours": 0
+        },
+        {
+          "lineNumber": 22,
+          "operation": "R&I",
+          "description": "Lower baffle",
+          "partNumber": "",
+          "quantity": 0,
+          "extendedPrice": 0,
+          "laborHours": 0,
+          "paintHours": 0
+        },
+        {
+          "lineNumber": 23,
+          "operation": "#  Repl",
+          "description": "antifreeze 2",
+          "partNumber": "",
+          "quantity": 1,
+          "extendedPrice": 50,
+          "laborHours": 0,
+          "paintHours": 0
+        },
+        {
+          "lineNumber": 24,
+          "operation": "*  Repl",
+          "description": "LKQ Fan assy +30% m 0.5 M 0.0",
+          "partNumber": "84847896",
+          "quantity": 1,
+          "extendedPrice": 375.7,
+          "laborHours": 0,
+          "paintHours": 0
+        },
+        {
+          "lineNumber": 25,
+          "operation": "**  Repl",
+          "description": "A/M KEYSIQ Intercooler m Incl. M 0.0",
+          "partNumber": "85163204",
+          "quantity": 1,
+          "extendedPrice": 195.45,
+          "laborHours": 0,
+          "paintHours": 0
+        }
+      ],
+      "images": []
+    },
+    {
+      "areaName": "HOOD",
+      "claimItems": [
+        {
+          "lineNumber": 27,
+          "operation": "*  Rpr",
+          "description": "Hood 0",
+          "partNumber": "",
+          "quantity": 1,
+          "extendedPrice": 0,
+          "laborHours": 1,
+          "paintHours": 3
+        },
+        {
+          "lineNumber": 28,
+          "operation": "Add",
+          "description": "for Clear Coat 0",
+          "partNumber": "",
+          "quantity": 1,
+          "extendedPrice": 0,
+          "laborHours": 0,
+          "paintHours": 1.2
+        },
+        {
+          "lineNumber": 29,
+          "operation": "R&I",
+          "description": "Insulator 1.5, 2.0 liter 0",
+          "partNumber": "",
+          "quantity": 1,
+          "extendedPrice": 0,
+          "laborHours": 0.3,
+          "paintHours": 0
+        },
+        {
+          "lineNumber": 30,
+          "operation": "*  Rpr",
+          "description": "Latch 0",
+          "partNumber": "",
+          "quantity": 1,
+          "extendedPrice": 0,
+          "laborHours": 0.5,
+          "paintHours": 0
+        },
+        {
+          "lineNumber": 31,
+          "operation": "R&I",
+          "description": "Latch 0",
+          "partNumber": "",
+          "quantity": 1,
+          "extendedPrice": 0,
+          "laborHours": 0.3,
+          "paintHours": 0
+        },
+        {
+          "lineNumber": 32,
+          "operation": "R&I",
+          "description": "Front w'strip 0",
+          "partNumber": "",
+          "quantity": 1,
+          "extendedPrice": 0,
+          "laborHours": 0.2,
+          "paintHours": 0
+        }
+      ],
+      "images": []
+    },
+    {
+      "areaName": "FENDER",
+      "claimItems": [
+        {
+          "lineNumber": 34,
+          "operation": "*  Rpr",
+          "description": "LT Fender 0",
+          "partNumber": "",
+          "quantity": 1,
+          "extendedPrice": 0,
+          "laborHours": 1,
+          "paintHours": 1.8
+        },
+        {
+          "lineNumber": 35,
+          "operation": "",
+          "description": "Overlap Major Adj. Panel 0 0.0 -0.4",
+          "partNumber": "",
+          "quantity": 1,
+          "extendedPrice": 0,
+          "laborHours": 0,
+          "paintHours": 0
+        },
+        {
+          "lineNumber": 36,
+          "operation": "Add",
+          "description": "for Clear Coat 0",
+          "partNumber": "",
+          "quantity": 1,
+          "extendedPrice": 0,
+          "laborHours": 0,
+          "paintHours": 0.3
+        },
+        {
+          "lineNumber": 37,
+          "operation": "R&I",
+          "description": "LT Fender liner 0",
+          "partNumber": "",
+          "quantity": 1,
+          "extendedPrice": 0,
+          "laborHours": 0.4,
+          "paintHours": 0
+        },
+        {
+          "lineNumber": 38,
+          "operation": "R&I",
+          "description": "LT Fender liner 0",
+          "partNumber": "",
+          "quantity": 1,
+          "extendedPrice": 0,
+          "laborHours": 0.4,
+          "paintHours": 0
+        },
+        {
+          "lineNumber": 39,
+          "operation": "#  Blnd",
+          "description": "L/S W/S PILLAR 0",
+          "partNumber": "",
+          "quantity": 1,
+          "extendedPrice": 0,
+          "laborHours": 0,
+          "paintHours": 0.5
+        }
+      ],
+      "images": []
+    },
+    {
+      "areaName": "WINDSHIELD",
+      "claimItems": [
+        {
+          "lineNumber": 41,
+          "operation": "*  Rpr",
+          "description": "Windshield GM w/o Pre-crash 0",
+          "partNumber": "",
+          "quantity": 1,
+          "extendedPrice": 0,
+          "laborHours": 0.5,
+          "paintHours": 0
+        },
+        {
+          "lineNumber": 42,
+          "operation": "#  Refn",
+          "description": "FEATHER PRIME AND BLOCK 0",
+          "partNumber": "",
+          "quantity": 1,
+          "extendedPrice": 0,
+          "laborHours": 0,
+          "paintHours": 0.5
+        },
+        {
+          "lineNumber": 43,
+          "operation": "#  Subl",
+          "description": "Hazardous waste removal",
+          "partNumber": "",
+          "quantity": 1,
+          "extendedPrice": 10,
+          "laborHours": 0,
+          "paintHours": 0
+        },
+        {
+          "lineNumber": 44,
+          "operation": "#  Repl",
+          "description": "Cover Car",
+          "partNumber": "",
+          "quantity": 1,
+          "extendedPrice": 10,
+          "laborHours": 0,
+          "paintHours": 0
+        },
+        {
+          "lineNumber": 45,
+          "operation": "#  Repl",
+          "description": "Flex additive",
+          "partNumber": "",
+          "quantity": 1,
+          "extendedPrice": 15,
+          "laborHours": 0,
+          "paintHours": 0
+        },
+        {
+          "lineNumber": 46,
+          "operation": "#  Repl",
+          "description": "Corrosion protection primer",
+          "partNumber": "",
+          "quantity": 1,
+          "extendedPrice": 8,
+          "laborHours": 0,
+          "paintHours": 0
+        },
+        {
+          "lineNumber": 47,
+          "operation": "#  Cover",
+          "description": "interior",
+          "partNumber": "",
+          "quantity": 1,
+          "extendedPrice": 5,
+          "laborHours": 0.2,
+          "paintHours": 0
+        },
+        {
+          "lineNumber": 48,
+          "operation": "#  Mask",
+          "description": "jams/openings",
+          "partNumber": "",
+          "quantity": 1,
+          "extendedPrice": 5,
+          "laborHours": 0.2,
+          "paintHours": 0
+        },
+        {
+          "lineNumber": 49,
+          "operation": "#  PRE",
+          "description": "SCAN 1 0.5 M 0.0",
+          "partNumber": "",
+          "quantity": 1,
+          "extendedPrice": 0,
+          "laborHours": 0,
+          "paintHours": 0
+        },
+        {
+          "lineNumber": 50,
+          "operation": "#  POST",
+          "description": "SCAN 1 0.5 M 0.0",
+          "partNumber": "",
+          "quantity": 1,
+          "extendedPrice": 0,
+          "laborHours": 0,
+          "paintHours": 0
+        },
+        {
+          "lineNumber": 51,
+          "operation": "#  Rpr",
+          "description": "D AND R BATTERY 0 0.3 M 0.0",
+          "partNumber": "",
+          "quantity": 1,
+          "extendedPrice": 0,
+          "laborHours": 0,
+          "paintHours": 0
+        }
+      ],
+      "images": []
+    }
+  ],
+  "summary": {
+    "subtotal": 5488.71,
+    "laborHours": 0,
+    "paintHours": 0,
+    "grandTotal": 0,
+    "deductible": 0,
+    "customerPay": 0,
+    "insurancePay": 0
+  }
+}

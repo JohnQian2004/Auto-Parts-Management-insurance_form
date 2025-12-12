@@ -1,0 +1,366 @@
+<div class="col-md-12 px-1">
+    <nav>
+        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+            <a class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" href="#nav-home" role="tab"
+                aria-controls="nav-home" aria-selected="true">Vehicles</a>
+            <a class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" href="#nav-profile" role="tab"
+                aria-controls="nav-profile" aria-selected="false">Customers</a>
+            <a class="nav-link" id="nav-contact-tab" data-bs-toggle="tab" href="#nav-contact" role="tab"
+                aria-controls="nav-contact" aria-selected="false">Revernues</a>
+            <a class="nav-link" id="nav-employee-tab" data-bs-toggle="tab" href="#nav-employee" role="tab"
+                aria-controls="nav-employee" aria-selected="false">Employee Performance</a>
+        </div>
+    </nav>
+</div>
+<div class="tab-content col-12" id="myTabContent">
+    <div class="tab-pane fade show active col-12" id="nav-home" role="tabpanel" aria-labelledby="home-tab">
+        <div class="input-group col-mb-12">
+            <div class="form-group col-12 nopadding">
+                <label></label>
+            </div>
+            <div class="form-group col-12 nopadding">
+                <div style="display: block; border-color: lightgray;">
+                    <canvas baseChart [type]="'bar'" [data]="lineVehicleChartDataStatus" width="700" class="card"
+                        [options]="lineChartOptionsVehicleStatus" [legend]="lineChartLegend">
+                    </canvas>
+                </div>
+
+            </div>
+
+            <div class="col-12 nopadding">
+                <strong *ngIf="this.vehiclesStatus.length > 0" (click)="clearVehicleStatus()">{{this.vehiclesStatus.length}} found</strong>
+            </div>
+
+            <ng-container *ngFor="let vehicle of vehiclesStatus; let i=index; let even=even">
+                <div class="list-group col-3" (click)="getDetail(vehicle, i )">
+                    <a class="list-group-item list-group-item-action py-1" style="background-color: lightgrey;"
+                        [class.active]="i != cindex">
+                        <!-- <i (click)="printPage('print-content')" class="bi-printer"></i> -->
+                        {{i+1}}.
+                        #{{vehicle.id}}
+                        {{vehicle.year}}
+                        {{vehicle.make}} {{vehicle.model}}
+                        {{vehicle.color}}
+                    </a>
+
+                    <a class="list-group-item list-group-item-action py-0">
+                        <i class="bi bi-truck"></i> {{vehicle.description}}
+                    </a>
+                    <a class="list-group-item list-group-item-action py-0">
+                        <i class="bi bi-menu-up"></i>
+                        <ng-container *ngFor="let jobRequestType of jobRequestTypes; let i=index">
+                            <ng-container *ngIf="vehicle.jobRequestType==jobRequestType.id">
+                                <strong> {{jobRequestType.name}}</strong></ng-container>
+                        </ng-container>
+                    </a>
+                    <a class="list-group-item list-group-item-action py-0">
+                        <i class="bi bi-truck"></i> {{vehicle.workRequest}}
+                    </a>
+                    <a class="list-group-item list-group-item-action py-0">
+                        <i class="bi bi-menu-up"></i>
+                        <ng-container *ngFor="let option of statuss; let i=index">
+                            <strong *ngIf="vehicle.status==option.id">
+                                {{option.name}}</strong>
+                        </ng-container>
+                    </a>
+                    <a class="list-group-item list-group-item-action py-0">
+                        <i class="bi bi-menu-up"></i>
+                        <ng-container *ngFor="let location of locations; let i=index">
+                            <label *ngIf="vehicle.location==location.id">
+                                &nbsp;{{location.name}}</label>
+                        </ng-container>
+                    </a>
+                    <a class="list-group-item list-group-item-action py-0">
+                        <i class="bi bi-menu-up"></i>
+                        <ng-container *ngFor="let approvalStatus of approvalStatuss; let i=index">
+                            <label *ngIf="vehicle.approvalStatus==approvalStatus.id">
+                                &nbsp;{{approvalStatus.name}}</label>
+                        </ng-container>
+                    </a>
+                    <a class="list-group-item list-group-item-action py-0">
+                        <i class="bi bi-bank"></i>&nbsp;
+                        <strong style="color: teal" *ngIf="vehicle.paid==true"
+                            (click)="changePaidStatus(vehicle, false)">Paid</strong>
+                        <strong style="color: tomato" *ngIf="vehicle.paid==false"
+                            (click)="changePaidStatus(vehicle, true)">N.Paid</strong>
+                    </a>
+
+
+                    <a class="list-group-item list-group-item-action py-0">
+                        <i class="bi bi-clock"></i> Been {{vehicle.daysInShop}} days
+                    </a>
+                </div>
+            </ng-container>
+            <div class="form-group col-12 nopadding">
+                <label></label>
+            </div>
+            <div class="form-group col-12 nopadding">
+                <label>Display all vehicles at the time entering into the system</label>
+                <div class="input-group">
+                    <div class="input-group-append">
+                        <button type="button" class="btn-outline-secondary" title="Refresh"><i
+                                class="bi-arrow-repeat"></i></button>
+                    </div>
+                    <div class="input-group-append">
+                        <button type="button" class="btn-outline-secondary" title="Clear" id="refresh"
+                            (click)="resetEmployeeJobs()"><i class="bi bi-x-circle"></i></button>
+                    </div>
+                    <div class="input-group-append">
+                        <input type="week" (change)="setWeekVehicle($event)">
+                    </div>
+                    <div class="input-group-append">
+                        <select [(ngModel)]="rangeVehicle">
+                            <option>1</option>
+                            <option>2</option>
+                            <option>3</option>
+                            <option>4</option>
+                            <option>5</option>
+                            <option>6</option>
+                            <option>7</option>
+                            <option>8</option>
+                            <option>9</option>
+                            <option>10</option>
+                            <option>11</option>
+                            <option>12</option>
+                        </select>
+                    </div>
+                </div>
+
+            </div>
+            <div class="form-group col-12 nopadding">
+                <label>{{this.jobCarriers.length}}</label>
+            </div>
+            <div class="form-group col-12 nopadding">
+                <div style="display: block; border-color: lightgray;">
+                    <canvas baseChart [type]="'bar'" [data]="lineVehicleChartData" width="700" class="card"
+                        [options]="lineChartOptionsVehicle" [legend]="lineChartLegend">
+                    </canvas>
+                </div>
+
+            </div>
+
+            <div class="form-group col-12 nopadding">
+                <label></label>
+            </div>
+
+            <div class="col-12 nopadding">
+                <strong *ngIf="this.vehicles.length>0">{{this.vehicles.length}} found</strong>
+            </div>
+
+            <ng-container *ngFor="let vehicle of vehicles; let i=index; let even=even">
+                <div class="list-group col-3" (click)="getDetail(vehicle, i )">
+                    <a class="list-group-item list-group-item-action py-1" style="background-color: lightgrey;"
+                        [class.active]="i != cindex">
+                        <!-- <i (click)="printPage('print-content')" class="bi-printer"></i> -->
+                        {{i+1}}.
+                        #{{vehicle.id}}
+                        {{vehicle.year}}
+                        {{vehicle.make}} {{vehicle.model}}
+                        {{vehicle.color}}
+                    </a>
+
+                    <a class="list-group-item list-group-item-action py-0">
+                        <i class="bi bi-truck"></i> {{vehicle.description}}
+                    </a>
+                    <a class="list-group-item list-group-item-action py-0">
+                        <i class="bi bi-menu-up"></i>
+                        <ng-container *ngFor="let jobRequestType of jobRequestTypes; let i=index">
+                            <ng-container *ngIf="vehicle.jobRequestType==jobRequestType.id">
+                                <strong> {{jobRequestType.name}}</strong></ng-container>
+                        </ng-container>
+                    </a>
+                    <a class="list-group-item list-group-item-action py-0">
+                        <i class="bi bi-truck"></i> {{vehicle.workRequest}}
+                    </a>
+                    <a class="list-group-item list-group-item-action py-0">
+                        <i class="bi bi-menu-up"></i>
+                        <ng-container *ngFor="let option of statuss; let i=index">
+                            <strong *ngIf="vehicle.status==option.id">
+                                {{option.name}}</strong>
+                        </ng-container>
+                    </a>
+                    <a class="list-group-item list-group-item-action py-0">
+                        <i class="bi bi-menu-up"></i>
+                        <ng-container *ngFor="let location of locations; let i=index">
+                            <label *ngIf="vehicle.location==location.id">
+                                &nbsp;{{location.name}}</label>
+                        </ng-container>
+                    </a>
+                    <a class="list-group-item list-group-item-action py-0">
+                        <i class="bi bi-menu-up"></i>
+                        <ng-container *ngFor="let approvalStatus of approvalStatuss; let i=index">
+                            <label *ngIf="vehicle.approvalStatus==approvalStatus.id">
+                                &nbsp;{{approvalStatus.name}}</label>
+                        </ng-container>
+                    </a>
+                    <a class="list-group-item list-group-item-action py-0">
+                        <i class="bi bi-bank"></i>&nbsp;
+                        <strong style="color: teal" *ngIf="vehicle.paid==true"
+                            (click)="changePaidStatus(vehicle, false)">Paid</strong>
+                        <strong style="color: tomato" *ngIf="vehicle.paid==false"
+                            (click)="changePaidStatus(vehicle, true)">N.Paid</strong>
+                    </a>
+
+
+                    <a class="list-group-item list-group-item-action py-0">
+                        <i class="bi bi-clock"></i> Been {{vehicle.daysInShop}} days
+                    </a>
+                </div>
+            </ng-container>
+
+
+        </div>
+    </div>
+    <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="profile-tab">Customers
+    </div>
+    <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="contact-tab">Revernues</div>
+    <div class="tab-pane fade" id="nav-employee" role="tabpanel" aria-labelledby="employee-tab">
+        <div class="input-group col-mb-12">
+
+
+            <div class="form-group col-6 nopadding">
+                <label>Employees</label>
+                <div class="input-group">
+                    <select class="form-control" #deviceEmployee [disabled]="user.allowAssignUser == false"
+                        (change)="getMyJobs( deviceEmployee.value)" placeholder="Model">
+                        <option [value]="employee.id" *ngFor="let employee of users;let i=index;">
+                            <ng-container *ngFor="let role of employeeRoles">
+                                <ng-container *ngIf="role.id == employee.roleId">
+                                    {{employee.firstName}} {{employee.lastName}} :
+                                    {{role.name}}
+                                </ng-container>
+                            </ng-container>
+                        </option>
+                    </select>
+
+                    <div class="input-group-append">
+                        <button type="button" class="btn-outline-secondary" title="Refresh"
+                            (click)="getMyJobs(currentEmplyeeId)"><i class="bi-arrow-repeat"></i></button>
+                    </div>
+                    <div class="input-group-append">
+                        <button type="button" class="btn-outline-secondary" title="Clear" id="refresh"
+                            (click)="resetEmployeeJobs()"><i class="bi bi-x-circle"></i></button>
+                    </div>
+                    <div class="input-group-append">
+                        <input type="week" (change)="setWeek($event)">
+                    </div>
+                    <div class="input-group-append">
+                        <select [(ngModel)]="range">
+                            <option>1</option>
+                            <option>2</option>
+                            <option>3</option>
+                            <option>4</option>
+                            <option>5</option>
+                            <option>6</option>
+                            <option>7</option>
+                            <option>8</option>
+                            <option>9</option>
+                            <option>10</option>
+                            <option>11</option>
+                            <option>12</option>
+                        </select>
+                    </div>
+                </div>
+
+            </div>
+            <div class="form-group col-12 nopadding">
+                <label>{{this.jobCarriers.length}}</label>
+            </div>
+            <div class="form-group col-12 nopadding">
+                <div style="display: block;">
+                    <canvas baseChart [type]="'line'" width="700" [data]="lineChartData" [options]="lineChartOptions"
+                        class="card" [legend]="lineChartLegend">
+                    </canvas>
+                </div>
+
+            </div>
+            <div class="form-group col-12 nopadding">
+
+            </div>
+            <div class="form-group col-12 nopadding">
+                <label>{{this.jobCarriers.length}}</label>
+            </div>
+            <ng-container>
+                <ng-container *ngFor="let jobCarrier of this.jobCarriers">
+                    <div class="form-group col-12 nopadding">
+                        <label></label>
+                    </div>
+                    <div class="form-group col-12 nopadding">
+                        <ng-container *ngFor="let employee of this.users">
+                            <ng-container *ngFor="let employeeRole of this.employeeRoles">
+                                <strong
+                                    *ngIf="jobCarrier.employeeId == employee.id && employee.roleId == employeeRole.id">
+                                    {{employee.firstName }} {{employee.lastName }} : {{employeeRole.name }}
+                                </strong>
+                            </ng-container>
+                        </ng-container>
+                    </div>
+                    <ng-container *ngFor="let vehicle of jobCarrier.vehicles; let i=index; let even=even">
+                        <div class="list-group col-3" (click)="getDetail(vehicle, i )">
+                            <a class="list-group-item list-group-item-action py-1" style="background-color: lightgrey;"
+                                [class.active]="i != cindex">
+                                <!-- <i (click)="printPage('print-content')" class="bi-printer"></i> -->
+                                {{i+1}}.
+                                #{{vehicle.id}}
+                                {{vehicle.year}}
+                                {{vehicle.make}} {{vehicle.model}}
+                                {{vehicle.color}}
+                            </a>
+
+                            <a class="list-group-item list-group-item-action py-0">
+                                <i class="bi bi-truck"></i> {{vehicle.description}}
+                            </a>
+                            <a class="list-group-item list-group-item-action py-0">
+                                <i class="bi bi-truck"></i> {{vehicle.workRequest}}
+                            </a>
+                            <a class="list-group-item list-group-item-action py-0">
+                                <i class="bi bi-menu-up"></i>
+                                <ng-container *ngFor="let jobRequestType of jobRequestTypes; let i=index">
+                                    <ng-container *ngIf="vehicle.jobRequestType==jobRequestType.id">
+                                        <strong> {{jobRequestType.name}}</strong></ng-container>
+                                </ng-container>
+                            </a>
+                            <a class="list-group-item list-group-item-action py-0">
+                                <i class="bi bi-menu-up"></i>
+                                <ng-container *ngFor="let option of statuss; let i=index">
+                                    <strong *ngIf="vehicle.status==option.id">
+                                        {{option.name}}</strong>
+                                </ng-container>
+                            </a>
+                            <a class="list-group-item list-group-item-action py-0">
+                                <i class="bi bi-menu-up"></i>
+                                <ng-container *ngFor="let location of locations; let i=index">
+                                    <label *ngIf="vehicle.location==location.id">
+                                        &nbsp;{{location.name}}</label>
+                                </ng-container>
+                            </a>
+                            <a class="list-group-item list-group-item-action py-0">
+                                <i class="bi bi-menu-up"></i>
+                                <ng-container *ngFor="let approvalStatus of approvalStatuss; let i=index">
+                                    <label *ngIf="vehicle.approvalStatus==approvalStatus.id">
+                                        &nbsp;{{approvalStatus.name}}</label>
+                                </ng-container>
+                            </a>
+                            <a class="list-group-item list-group-item-action py-0">
+                                <i class="bi bi-clock"></i> Been {{vehicle.daysInShop}} days
+                            </a>
+                            <ng-container *ngFor="let job of vehicle.jobs; let j=index ">
+
+                                <a class="list-group-item list-group-item-action py-0" (click)="setJobId(job.id)"
+                                    [class.active]="job.id == currentJobId">
+                                    <strong>{{j+1}}.</strong> {{job.name}} => {{job.notes}}
+                                </a>
+                                <a class="list-group-item list-group-item-action py-0" (click)="setJobId(job.id)">
+                                    <input type="checkbox" [checked]="isJobChecked(job)"
+                                        [disabled]="user.allowUpdateJobStatus == false"
+                                        *ngIf="job.employeeId > 0 && job.targetDate != null">
+                                    by {{job.targetDate | date}}
+                                </a>
+
+                            </ng-container>
+                        </div>
+                    </ng-container>
+                </ng-container>
+            </ng-container>
+        </div>
+    </div>

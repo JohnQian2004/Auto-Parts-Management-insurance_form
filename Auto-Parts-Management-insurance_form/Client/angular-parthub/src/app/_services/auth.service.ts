@@ -1,0 +1,158 @@
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { Config } from '../models/config.model';
+
+
+
+const httpOptions = {
+  headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+};
+
+@Injectable({
+  providedIn: 'root',
+})
+export class AuthService {
+
+  config: Config = new Config();
+
+  AUTH_API = this.config.baseUrl + '/auth/';
+
+  constructor(private http: HttpClient) { }
+
+  login(username: string, password: string): Observable<any> {
+    return this.http.post(
+      this.AUTH_API + 'signin',
+      {
+        username,
+        password,
+      },
+      httpOptions
+    );
+  }
+
+  resendEmail(username: string, password: string): Observable<any> {
+    return this.http.post(
+      this.AUTH_API + 'resendemail',
+      {
+        username,
+        password,
+      },
+      httpOptions
+    );
+  }
+
+  forgetPasswordRequest(username: string, password: string): Observable<any> {
+    return this.http.post(
+      this.AUTH_API + 'forgetpassword',
+      {
+        username,
+        password,
+      },
+      httpOptions
+    );
+  }
+
+  register2(companyId: any, firstName: string, lastName: string, username: string, email: string, password: string, role: string,
+    phone: string, bussinessname: string, street: string, city: string, state: string, zip: string, bussinessurl: string
+
+  ): Observable<any> {
+
+    console.log(" register ");
+
+    let roles: string[] = [role];
+
+    return this.http.post(
+      this.AUTH_API + 'signup',
+      {
+        companyId,
+        firstName,
+        lastName,
+        username,
+        email,
+        password,
+        "role": roles,
+        phone,
+        bussinessname,
+        bussinessurl,
+        street,
+        city,
+        state,
+        zip
+      },
+      httpOptions
+    );
+  }
+
+  register(firstName: string, lastName: string, username: string, email: string, password: string, role: string,
+    phone: string, bussinessname: string, street: string, city: string, state: string, zip: string, bussinessurl: string
+
+  ): Observable<any> {
+
+    console.log(" register ");
+
+    let roles: string[] = [role];
+
+    return this.http.post(
+      this.AUTH_API + 'signup',
+      {
+        firstName,
+        lastName,
+        username,
+        email,
+        password,
+        "role": roles,
+        phone,
+        bussinessname,
+        bussinessurl,
+        street,
+        city,
+        state,
+        zip
+      },
+      httpOptions
+    );
+  }
+
+  register3(firstName: string, lastName: string, username: string, email: string, password: string, role: string,
+    phone: string, bussinessname: string, street: string, city: string, state: string, zip: string, bussinessurl: string
+
+  ): Observable<any> {
+
+    console.log(" register ");
+
+    let roles: string[] = [role];
+
+    return this.http.post(
+      this.AUTH_API + 'signup3',
+      {
+        firstName,
+        lastName,
+        username,
+        email,
+        password,
+        "role": roles,
+        phone,
+        bussinessname,
+        bussinessurl,
+        street,
+        city,
+        state,
+        zip
+      },
+      httpOptions
+    );
+  }
+
+  logout(): Observable<any> {
+    return this.http.post(this.AUTH_API + 'signout', {}, httpOptions);
+  }
+
+  activate(uuid: string): Observable<any> {
+    return this.http.get(this.AUTH_API + 'activate/' + uuid, {});
+  }
+
+  verify(uuid: string): Observable<any> {
+    return this.http.get(this.AUTH_API + 'verification/' + uuid, {});
+  }
+}

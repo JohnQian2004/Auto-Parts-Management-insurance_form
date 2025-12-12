@@ -1,0 +1,97 @@
+<div class="grey-bg container-fluid">
+    <section id="minimal-statistics">
+        <div class="row">
+            <div class="col-12 mt-3 mb-1">
+                <h4 class="text-uppercase">Overview</h4>
+                <p>Statistics</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xl-3 col-sm-6 col-12" (click)="navigateTo('listpart')">
+                <div class="card">
+                    <div class="card-content">
+                        <div class="card-body">
+                            <div class="media d-flex">
+                                <div class="align-self-center">
+                                    <i class="icon-pencil primary font-large-2 float-left"></i>
+                                </div>
+                                <div class="media-body text-right">
+                                    <h3>{{ userSatisticsResponse?.totalAutopartsPublished }}</h3>
+                                    <span>Published</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-sm-6 col-12" (click)="navigateTo('listpart')">
+                <div class="card">
+                    <div class="card-content">
+                        <div class="card-body">
+                            <div class="media d-flex">
+                                <div class="align-self-center">
+                                    <i class="icon-speech warning font-large-2 float-left"></i>
+                                </div>
+                                <div class="media-body text-right">
+                                    <h3>{{ userSatisticsResponse?.totalAutopartsUnpublished }}</h3>
+                                    <span>Not Published</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-sm-6 col-12" (click)="navigateTo('listpart')">
+                <div class="card">
+                    <div class="card-content">
+                        <div class="card-body">
+                            <div class="media d-flex">
+                                <div class="align-self-center">
+                                    <i class="icon-graph success font-large-2 float-left"></i>
+                                </div>
+                                <div class="media-body text-right">
+                                    <h3>{{ userSatisticsResponse?.totalAutopartsArchieved }}</h3>
+                                    <span>Archived</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-sm-6 col-12" (click)="navigateTo('listpart')">
+                <div class="card">
+                    <div class="card-content">
+                        <div class="card-body">
+                            <div class="media d-flex">
+                                <div class="align-self-center">
+                                    <i class="icon-graph success font-large-2 float-left"></i>
+                                </div>
+                                <div class="media-body text-right">
+                                    <h3>{{ userSatisticsResponse?.totalViewCount }}</h3>
+                                    <span>Views</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-sm-6 col-12" (click)="navigateTo('saveditem')">
+                <div class="card">
+                    <div class="card-content">
+                        <div class="card-body">
+                            <div class="media d-flex">
+                                <div class="align-self-center">
+                                    <i class="icon-pointer danger font-large-2 float-left"></i>
+                                </div>
+                                <div class="media-body text-right">
+                                    <h3>{{ userSatisticsResponse?.totalSavedItems }}</h3>
+                                    <span>Saved Items</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>

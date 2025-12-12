@@ -1,0 +1,373 @@
+.subscription-analytics {
+  padding: 0;
+}
+
+.stats-card {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border: none;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.stats-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+}
+
+.stats-card .h3 {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.card {
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  border-radius: 15px;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+}
+
+.card-header {
+  border-radius: 15px 15px 0 0;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.card-body {
+  border-radius: 0 0 15px 15px;
+}
+
+/* Chart containers */
+.chart-container {
+  position: relative;
+  height: 300px;
+  width: 100%;
+}
+
+/* Loading states */
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  border-radius: 15px;
+}
+
+/* Table customizations */
+.table {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.table thead th {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border: none;
+  font-weight: 600;
+  color: #495057;
+  padding: 1rem;
+}
+
+.table tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+.table tbody td {
+  padding: 1rem;
+  border: none;
+  border-bottom: 1px solid #e9ecef;
+}
+
+/* Badge customizations */
+.badge {
+  font-weight: 500;
+  padding: 0.5em 0.75em;
+  border-radius: 20px;
+}
+
+.badge.bg-success {
+  background: linear-gradient(135deg, #198754 0%, #20c997 100%) !important;
+}
+
+.badge.bg-warning {
+  background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%) !important;
+  color: #000 !important;
+}
+
+.badge.bg-danger {
+  background: linear-gradient(135deg, #dc3545 0%, #e74c3c 100%) !important;
+}
+
+.badge.bg-info {
+  background: linear-gradient(135deg, #0dcaf0 0%, #6f42c1 100%) !important;
+}
+
+.badge.bg-primary {
+  background: linear-gradient(135deg, #0d6efd 0%, #6610f2 100%) !important;
+}
+
+/* Button customizations */
+.btn {
+  transition: all 0.2s ease;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn-outline-primary:hover {
+  background: linear-gradient(135deg, #0d6efd 0%, #6610f2 100%);
+  border-color: #0d6efd;
+}
+
+.btn-outline-success:hover {
+  background: linear-gradient(135deg, #198754 0%, #20c997 100%);
+  border-color: #198754;
+}
+
+.btn-outline-info:hover {
+  background: linear-gradient(135deg, #0dcaf0 0%, #6f42c1 100%);
+  border-color: #0dcaf0;
+}
+
+.btn-outline-warning:hover {
+  background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+  border-color: #ffc107;
+  color: #000;
+}
+
+/* Form controls */
+.form-select {
+  border-radius: 8px;
+  border: 1px solid #ced4da;
+  transition: all 0.2s ease;
+}
+
+.form-select:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+/* Dropdown customizations */
+.dropdown-menu {
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  padding: 0.5rem 0;
+}
+
+.dropdown-item {
+  padding: 0.5rem 1rem;
+  transition: background-color 0.2s ease;
+  border-radius: 5px;
+  margin: 0 0.5rem;
+}
+
+.dropdown-item:hover {
+  background-color: #f8f9fa;
+}
+
+/* Spinner customizations */
+.spinner-border {
+  width: 2rem;
+  height: 2rem;
+}
+
+.spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* Text color utilities */
+.text-primary {
+  color: #0d6efd !important;
+}
+
+.text-success {
+  color: #198754 !important;
+}
+
+.text-warning {
+  color: #ffc107 !important;
+}
+
+.text-danger {
+  color: #dc3545 !important;
+}
+
+.text-info {
+  color: #0dcaf0 !important;
+}
+
+/* Icon customizations */
+.fa-3x {
+  font-size: 3rem;
+  opacity: 0.7;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .d-flex.gap-2 {
+    flex-direction: column;
+    gap: 0.5rem !important;
+  }
+  
+  .btn {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+  
+  .stats-card .h3 {
+    font-size: 1.5rem;
+  }
+  
+  .table-responsive {
+    font-size: 0.875rem;
+  }
+  
+  .card-body {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .subscription-analytics {
+    padding: 0.5rem;
+  }
+  
+  .card {
+    margin-bottom: 1rem;
+  }
+  
+  .stats-card .h3 {
+    font-size: 1.25rem;
+  }
+  
+  .table thead th,
+  .table tbody td {
+    padding: 0.5rem;
+  }
+}
+
+/* Animation keyframes */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.card {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.table tbody tr {
+  animation: slideIn 0.3s ease-out;
+}
+
+/* Chart placeholder styles */
+.chart-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #6c757d;
+}
+
+.chart-placeholder i {
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+/* Empty state styles */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #6c757d;
+}
+
+.empty-state i {
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+/* Quick actions card */
+.quick-actions .btn {
+  margin-bottom: 0.5rem;
+  text-align: left;
+}
+
+.quick-actions .btn:last-child {
+  margin-bottom: 0;
+}
+
+/* Revenue breakdown styles */
+.revenue-breakdown .d-flex {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.revenue-breakdown .d-flex:last-child {
+  border-bottom: none;
+}
+
+/* Growth metrics styles */
+.growth-metrics .d-flex {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.growth-metrics .d-flex:last-child {
+  border-bottom: none;
+}
+
+/* Performance indicators */
+.performance-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.performance-indicator.positive {
+  color: #198754;
+}
+
+.performance-indicator.negative {
+  color: #dc3545;
+}
+
+.performance-indicator.neutral {
+  color: #6c757d;
+}

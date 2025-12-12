@@ -1,0 +1,26 @@
+/* Minimal custom styles for modal functionality */
+.modal.show {
+    display: block !important;
+}
+
+.modal-backdrop.show {
+    z-index: 1040;
+}
+
+/* Ensure modal is above backdrop */
+.modal {
+    z-index: 1050;
+}
+
+/* Custom modal size for better form display */
+.modal-lg {
+    max-width: 800px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .modal-lg {
+        max-width: calc(100% - 2rem);
+        margin: 1rem;
+    }
+}

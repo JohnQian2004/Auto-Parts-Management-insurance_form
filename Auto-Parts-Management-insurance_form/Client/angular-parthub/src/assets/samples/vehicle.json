@@ -1,0 +1,211 @@
+{
+    "vehicle": {
+      "year": 2015,
+      "make": "Toyota",
+      "model": "RAV4",
+      "submodel": "XLE FWD 4D UTV",
+      "engine": "4-2.5L Gasoline Sequential MPI",
+      "color": "Magnetic Gray Metallic",
+      "customer": {
+        "title": "Mr.",
+        "first_name": "Ololade",
+        "last_name": "Akerele"
+      },
+      "purchaseOrders": [
+        {
+          "name": "Non OEM CAPA RT Molding extn",
+          "partNumber": "521120R030",
+          "price": 31.93,
+          "quantity": 1,
+          "itemType": 3, // "parts"
+          "autoparts": [
+            {
+              "name": "Non OEM CAPA RT Molding extn",
+              "partNumber": "521120R030",
+              "price": 31.93,
+              "quantity": 1,
+              "itemType": 3 // "parts"
+            }
+          ]
+        },
+        {
+          "name": "Opt OEM RT Wheel opng mldg (Canada Built)",
+          "partNumber": "756010R030",
+          "price": 69.79,
+          "quantity": 1,
+          "itemType": 3, // "parts"
+          "autoparts": [
+            {
+              "name": "Opt OEM RT Wheel opng mldg (Canada Built)",
+              "partNumber": "756010R030",
+              "price": 69.79,
+              "quantity": 1,
+              "itemType": 3 // "parts"
+            }
+          ]
+        }
+      ],
+      "jobs": [
+        {
+          "type": 1, // R&I
+          "name": "Bumper cover",
+          "description": "Remove and reinstall the bumper cover",
+          "area": "Front Bumper & Grille",
+          "timeRequired": 1.2,
+          "estimated_cost": 72.00
+        },
+        {
+          "type": 2, // Rpr
+          "name": "RT Fender",
+          "description": "Repair the right fender",
+          "area": "Fender",
+          "timeRequired": 3.0,
+          "estimated_cost": 180.00
+        },
+        {
+          "type": 3, // Add
+          "name": "Clear Coat",
+          "description": "Apply clear coat to fender",
+          "area": "Fender",
+          "timeRequired": 0.7,
+          "estimated_cost": 42.00
+        },
+        {
+          "type": 4, // Feather
+          "name": "Prime and Block",
+          "description": "Feather prime and block the fender",
+          "area": "Fender",
+          "timeRequired": 0.5,
+          "estimated_cost": 30.00
+        },
+        {
+          "type": 2, // Rpr
+          "name": "RT Outer panel (HSS)",
+          "description": "Repair right outer panel",
+          "area": "Front Door",
+          "timeRequired": 1.5,
+          "estimated_cost": 90.00
+        },
+        {
+          "type": 2, // Rpr
+          "name": "RT Outer panel (HSS)",
+          "description": "Repair right outer panel",
+          "area": "Rear Door",
+          "timeRequired": 3.0,
+          "estimated_cost": 180.00
+        }
+      ],
+      "receipts": [
+        {
+          "type": 1, // labor
+          "name": "body_labor",
+          "details": {
+            "hours": 16.8,
+            "rate": 60.00,
+            "total": 1008.00
+          }
+        },
+        {
+          "type": 1, // labor
+          "name": "paint_labor",
+          "details": {
+            "hours": 9.5,
+            "rate": 60.00,
+            "total": 570.00
+          }
+        },
+        {
+          "type": 2, // material
+          "name": "paint_supplies",
+          "details": {
+            "hours": 9.5,
+            "rate": 42.00,
+            "total": 399.00
+          }
+        },
+        {
+          "type": 2, // material
+          "name": "body_supplies",
+          "details": {
+            "hours": 11.0,
+            "rate": 3.00,
+            "total": 33.00
+          }
+        },
+        {
+          "type": 3, // parts
+          "name": "autoparts",
+          "details": {
+            "total": 111.72
+          }
+        },
+        {
+          "type": 4, // other
+          "name": "other_charges",
+          "details": {
+            "total": 3.00
+          }
+        }
+      ],
+      "vendors": [
+        {
+          "name": "KSI Trading Corp - Richmond",
+          "address": "Mechanicsville, VA 23111",
+          "phone": "(800) 552-2867",
+          "quote": "157366709",
+          "expires": "12/02/2024"
+        },
+        {
+          "name": "Automotive Alliance-Maryland",
+          "address": "815 Central Avenue, Suite F-G, Linthicum Heights, MD 21076",
+          "phone": "(954) 742-7661",
+          "quote": "3112154652",
+          "expires": "12/02/2024"
+        }
+      ]
+    },
+    "JobOrderType": [
+      {
+        "id": 1,
+        "code": "R&I",
+        "description": "Remove and reinstall"
+      },
+      {
+        "id": 2,
+        "code": "Rpr",
+        "description": "Repair"
+      },
+      {
+        "id": 3,
+        "code": "Add",
+        "description": "Add operation, e.g., clear coat"
+      },
+      {
+        "id": 4,
+        "code": "Feather",
+        "description": "Feather prime and block"
+      }
+    ],
+    "ItemType": [
+      {
+        "id": 1,
+        "code": "labor",
+        "description": "Labor costs associated with jobs"
+      },
+      {
+        "id": 2,
+        "code": "material",
+        "description": "Costs for consumable materials (e.g., paint)"
+      },
+      {
+        "id": 3,
+        "code": "parts",
+        "description": "Cost of parts used in the repair"
+      },
+      {
+        "id": 4,
+        "code": "other",
+        "description": "Miscellaneous charges or fees"
+      }
+    ]
+  }

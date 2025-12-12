@@ -1,0 +1,131 @@
+<div style="margin-left:-50px;padding:30px 10px;">
+  <div class="row">
+    <div class="col-12">
+      <div class="container">
+        <header class="bg-white rounded-3 p-3 border shadow-sm">
+          <a href="/"><img src="../../assets/images/company-logo.png" alt="Logo" width="100" /></a>
+        </header>
+      </div>
+    </div>
+  </div>
+<div class="container">
+  <div class="row" *ngIf="selectedAutopart">
+    <div class="col-12">
+      <h1 class="h4 fw-bolder mt-4">{{ selectedAutopart.year }} {{ selectedAutopart.make }} {{selectedAutopart.model }} {{selectedAutopart.title }}</h1>
+    </div>
+  </div>
+  <div class="row align-items-stretch" *ngIf="selectedAutopart">
+    <div class="col-lg-3 col-md-4 mt-3">
+      <div class="bg-white rounded-3 border px-3 py-2 h-100 overflow-y-auto" style="max-height:790px;">
+        <div *ngFor='let imageModel of selectedAutopart.imageModels; let i=index'>
+          <img class="img-fluid rounded-2 img-thumbnail my-2 object-fit-cover w-100" style="max-height:150px;" src="{{baseUrlResizeImage + '/' + imageModel.id}}" (click)="setImage(i)" />
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-9 col-md-8 mt-3">
+      <div class="bg-white rounded-3 border p-3 h-100">
+        <img class="img-fluid rounded-2 img-thumbnail my-2 object-fit-cover w-100" style="max-height:500px;" *ngIf="selectedAutopart.imageModels" src="{{baseUrlImage + '/' + selectedImage}}" />
+        <div class="mt-4 pt-1">
+          <p class="py-2 fs-13 line-height-130" style="display: inline-block; word-break: break-word;">{{
+            selectedAutopart.comments }}</p>
+          <p class="py-2 fs-13 line-height-130" style="display: inline-block; word-break: break-word;">{{
+            selectedAutopart.description }}</p>
+          <div class="clearfix"></div>
+          <p class="py-2 fs-13 line-height-130 w-50 d-inline-block"
+            style="display: inline-block; word-break: break-word;"><b>Part No.: </b>
+            {{ selectedAutopart.partNumber
+            }}</p>
+          <p class="py-2 fs-13 line-height-130 w-50 d-inline-block"
+            style="display: inline-block; word-break: break-word;"><b>Stock No.: </b>
+            {{ selectedAutopart.stocknumber
+            }}</p>
+          <p class="py-2 fs-13 line-height-130 w-50 d-inline-block"><b>Grade: </b> {{ selectedAutopart.grade }}</p>
+          <p class="py-2 fs-13 line-height-130 w-50 d-inline-block"><b>Sales Price: </b> $ {{
+            selectedAutopart.salePrice }}</p>
+          <p *ngIf=" selectedAutopart.bussinessUrl && selectedAutopart.bussinessName "
+            class="py-2 fs-13 line-height-130 w-50 d-inline-block"
+            style="display: inline-block; word-break: break-word;"><b>Dealer Info: </b>
+            <a target="_blank" [attr.href]="'//'+ selectedAutopart.bussinessUrl ">{{selectedAutopart.bussinessName |
+              titlecase}}</a>
+          </p>
+          <p class="py-2 fs-13 line-height-130 w-50 d-inline-block"
+            style="display: inline-block; word-break: break-word;"><b>Phone: </b> {{
+            formatPhoneNumber(
+            selectedAutopart.phone) }}</p>
+          <p class="py-2 fs-13 line-height-13 w-50 d-inline-block"
+            style="display: inline-block; word-break: break-word;"><b>Address: </b>
+            {{selectedAutopart.street }} {{selectedAutopart.city |
+            titlecase}}, {{ selectedAutopart.state}} {{ selectedAutopart.zip}} </p>
+          <!-- <p class="py-2 fs-13 line-height-130 w-50 d-inline-block" *ngIf="selectedAutopart.distance !='0' ">
+            <b>Distance: </b> {{ selectedAutopart.distance }} Mil.
+          </p> -->
+          <p class="py-2 fs-13 line-height-13 w-50 d-inline-block" *ngIf="selectedAutopart.published == true"><b>Posted on:</b> {{
+            selectedAutopart.postingAt | date}}</p>
+          <p class="py-2 fs-13 line-height-13 w-50 d-inline-block" *ngIf="selectedAutopart.published == false"><b>Posted on:</b> {{
+            selectedAutopart.createdAt | date}}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row py-5">
+  <div *ngIf="showSavedItem==true" class="col-md-12 p-3">
+    <div class="card">
+      <div class="card-header">
+        <h5>Saved Items {{ savedItems.length}}</h5>
+      </div>
+
+      <table class="col-md-12">
+        <tr>
+          <th>#</th>
+          <th>Year<br>Make<br>Model</th>
+          <th>Name</th>
+          <th>Description</th>
+          <th style="text-align: center">Grade</th>
+          <th style="text-align: center">Stock #</th>
+          <th style="text-align: center">Sale Price</th>
+          <th>Dealer Info</th>
+          <th style="text-align: center">Action</th>
+        </tr>
+        <tr id="{{autopart.id}}" [style.background-color]="i == cindex? 'lightyellow' : (even ? 'white' : 'white')"
+          *ngFor="let autopart of savedItems; let i = index;  let even=even">
+          <td>{{i+1}}</td>
+          <td> {{ autopart.id }} {{ autopart.year }}<br>
+            {{ autopart.make }}<br>
+            {{ autopart.model }}<br>
+            <!-- {{autopart.engine}}.L {{ autopart.transmission}} <br> -->
+
+          </td>
+          <td>{{autopart.title}}</td>
+          <td>
+
+            <img height="100" width="100" *ngIf="autopart.imageModels"
+              src="{{baseUrlResizeImage + '/' + autopart.showInSearchImageId}}" alt="">
+            {{ autopart.description }}
+            {{ autopart.partNumber }}
+          </td>
+          <td style="text-align: center">{{ autopart.grade}}</td>
+          <td style="text-align: center">#{{ autopart.id}}</td>
+          <td style="text-align: center">${{autopart.salePrice}}</td>
+          <td>
+            <div *ngIf="currentUser"><a target="_blank" href={{autopart.bussinessUrl}}>{{autopart.bussinessName |
+                titlecase}}</a> {{
+              formatPhoneNumber( autopart.phone)}} <br>
+            </div>
+            {{autopart.city |
+            titlecase}}, {{ autopart.state}}
+          </td>
+          <td style="text-align: center">
+            <a style="TEXT-DECORATION: underline; color: blue" *ngIf="autopart.id != selectedAutopart.id"
+              (click)="getDetailSavedItem(autopart, i)">Detail</a>
+            <br><a style="TEXT-DECORATION: underline; color: blue" (click)="deleteSavedItem(null, autopart.id)"
+              title="Remove from saved items">Remove</a>
+          </td>
+
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+</div>

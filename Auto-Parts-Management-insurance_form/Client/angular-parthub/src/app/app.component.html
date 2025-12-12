@@ -1,0 +1,440 @@
+<div id="app">
+
+  <nav class="navbar-collapse main-menu sticky-top overflow-hidden h-100 start- top-0 bottom-0 bg-white"
+    id="navbarCollapse" style="position:fixed" *ngIf="showNavationBar==true && market_only==false ">
+    <ng-container *ngIf="this.config.domainName.toLocaleLowerCase() != 'BayCounter.com'.toLocaleLowerCase()">
+      <a href="#/autoparts" class="company-logo d-block text-center py-4 px-2"><img src="assets/images/company-logo.png"
+          alt="Company Logo" class="img-fluid" /></a>
+    </ng-container>
+    <ng-container *ngIf="this.config.domainName.toLocaleLowerCase() == 'BayCounter.com'.toLocaleLowerCase()">
+      <a href="#/login" class="company-logo d-block text-center py-4 px-2"><img src="assets/images/bayCounterIcon1.png"
+          alt="Company Logo" class="img-fluid" /></a>
+    </ng-container>
+    <ul class="navs">
+
+      <ng-container *ngIf="this.config.domainName.toLocaleLowerCase() == 'BayCounter.com'.toLocaleLowerCase()">
+        <li [class.active]="isActive('/shop-management')"
+          *ngIf="showModeratorBoard && isLoggedIn && isActivated && showAdminBoard" class="m-1">
+          <a [routerLink]="'/shop-management'" title="Dashboard Super Admin"
+            class="p-3 border-radius-4 d-block fs-14 fw-400 text-decoration-none"><i
+              class="fa-solid fa-gauge-high fs-18"></i> Dashboard Shop Overviews</a>
+        </li>
+        <li [class.active]="isActive('/shop-management-shop')"
+          *ngIf="showModeratorBoard && isLoggedIn && isActivated && showAdminBoard" class="m-1">
+          <a [routerLink]="'/shop-management-shop'" title="Shop Management"
+            class="p-3 border-radius-4 d-block fs-14 fw-400 text-decoration-none"><i
+              class="fa-solid fa-store fs-18"></i> Shop Management</a>
+        </li>
+      </ng-container>
+      <ng-container *ngIf="this.config.domainName.toLocaleLowerCase() != 'BayCounter.com'.toLocaleLowerCase()">
+        <li [class.active]="isActive('/users-parts-market')"
+          *ngIf="showModeratorBoard && isLoggedIn && isActivated && showAdminBoard" class="m-1">
+          <a [routerLink]="'/users-parts-market'" title="Dashboard Super Admin"
+            class="p-3 border-radius-4 d-block fs-14 fw-400 text-decoration-none"><i
+              class="fa-solid fa-gauge-high fs-18"></i> Dashboard Super Admin</a>
+        </li>
+        <li [class.active]="isActive('/users-parts-market3')"
+          *ngIf="showModeratorBoard && isLoggedIn && isActivated && showAdminBoard" class="m-1">
+          <a [routerLink]="'/users-parts-market3'" title="Top 100 Posting Users"
+            class="p-3 border-radius-4 d-block fs-14 fw-400 text-decoration-none"><i
+              class="fa-solid fa-users fs-18"></i>
+            Top 100 Posting Users</a>
+        </li>
+        <li [class.active]="isActive('/users-parts-market2')"
+          *ngIf="showModeratorBoard && isLoggedIn && isActivated && showAdminBoard" class="m-1">
+          <a [routerLink]="'/users-parts-market2'" title="User Managements"
+            class="p-3 border-radius-4 d-block fs-14 fw-400 text-decoration-none"><i
+              class="fa-solid fa-users fs-18"></i>
+            User Managements</a>
+        </li>
+        <li [class.active]="isActive('/service-types')"
+          *ngIf="showModeratorBoard && isLoggedIn && isActivated && showAdminBoard" class="m-1">
+          <a [routerLink]="'/service-types'" title="Market Service Types"
+            class="p-3 border-radius-4 d-block fs-14 fw-400 text-decoration-none"><i
+              class="fa-solid fa-gears fs-18"></i>
+            Market Service Types</a>
+        </li>
+        <li [class.active]="isActive('/banners')"
+          *ngIf="showModeratorBoard && isLoggedIn && isActivated && showAdminBoard" class="m-1">
+          <a [routerLink]="'/banners'" title="Banners"
+            class="p-3 border-radius-4 d-block fs-14 fw-400 text-decoration-none"><i class="fa-solid fa-flag fs-18"></i>
+            Banners</a>
+        </li>
+      </ng-container>
+      <li [class.active]="isActive('/emailinfo')"
+        *ngIf="showModeratorBoard && isLoggedIn && isActivated && showAdminBoard" class="m-1">
+        <a [routerLink]="'/emailinfo'" title="Banners"
+          class="p-3 border-radius-4 d-block fs-14 fw-400 text-decoration-none"><i class="fa-solid fa-gears fs-18"></i>
+          SMPT Settings</a>
+      </li>
+      <li [class.active]="isActive('/feedbacks')"
+        *ngIf="showModeratorBoard && isLoggedIn && isActivated && showAdminBoard" class="m-1">
+        <a [routerLink]="'/feedbacks'" title="Feedbacks"
+          class="p-3 border-radius-4 d-block fs-14 fw-400 text-decoration-none"><i
+            class="fa-solid fa-comments fs-18"></i> Feedbacks</a>
+      </li>
+      <li [class.active]="isActive('/dashboard')"
+        *ngIf="showModeratorBoard && isLoggedIn && isActivated  && showAdminBoard == false  && isNotShopDisplayUser()"
+        class="m-1">
+        <a [routerLink]="'/dashboard'" title="Dashboard"
+          class="p-3 border-radius-4 d-block fs-14 fw-400 text-decoration-none"><i
+            class="fa-solid fa-gauge-high fs-18"></i> Dashboard</a>
+      </li>
+      <li [class.active]="isActive('/payroll')"
+        *ngIf="showModeratorBoard && isLoggedIn && isActivated  && showAdminBoard == false  && isNotShopDisplayUser()"
+        class="m-1">
+        <a [routerLink]="'/payroll'" title="Payroll"
+          class="p-3 border-radius-4 d-block fs-14 fw-400 text-decoration-none"><i class="fa-solid fa-dollar fs-18"></i>
+          Payroll Manager</a>
+      </li>
+      <li [class.active]="isActive('/customers')" data-bs-toggle="collapse" href="#customersDropdown"
+        *ngIf="showModeratorBoard && isLoggedIn && isActivated  && showAdminBoard == false  && isNotShopDisplayUser() "
+        class="m-1 has-subnav">
+        <a (click)="toggleSubMenu('customersDropdown')" [routerLink]="'/customers'" title="Our Customers"
+          class="p-3 border-radius-4 d-block fs-14 fw-400 text-decoration-none"><i class="fa-solid fa-user fs-18"></i>
+          Our Customers <i class="float-end fa w-auto"
+            [ngClass]="{'fa-angle-right': !isSubMenuOpen('customersDropdown'), 'fa-angle-down': isSubMenuOpen('customersDropdown')}"></i></a>
+        <ul class="sub-nav collapse" id="customersDropdown">
+          <li [class.active]="isActive('/add-customers')" class="m-1"><a [routerLink]="'/add-customers'" title="Jobs"
+              class="px-3 py-2 border-radius-4 d-block fs-13 fw-400 text-decoration-none"><i
+                class="fa-solid fa-check fs-18"></i> Add New Customer</a></li>
+        </ul>
+      </li>
+      <li [class.active]="isActive('/inshop')" class="has-subnav"
+        *ngIf="showModeratorBoard && isLoggedIn && isActivated  && showAdminBoard == false  && isNotShopDisplayUser() "
+        class="m-1" data-bs-toggle="collapse" href="#vehiclesDropdown">
+        <a (click)="toggleSubMenu('vehiclesDropdown')" [routerLink]="'/inshop'" title="Our Vehicles"
+          class="p-3 border-radius-4 d-block fs-14 fw-400 text-decoration-none"><i class="fa-solid fa-car fs-18"></i>
+          My Shop <i class="float-end fa w-auto"
+            [ngClass]="{'fa-angle-right': !isSubMenuOpen('vehiclesDropdown'), 'fa-angle-down': isSubMenuOpen('vehiclesDropdown')}"></i></a>
+        <ul class="sub-nav collapse" id="vehiclesDropdown">
+          <li [class.active]="isActive('/add-new-vehicle')" class="m-1"><a [routerLink]="'/add-new-vehicle'"
+              title="Jobs" class="px-3 py-2 border-radius-4 d-block fs-13 fw-400 text-decoration-none"><i
+                class="fa-solid fa-check fs-18"></i> Add New Vehicle</a></li>
+          <li [class.active]="isActive('/snapshot')" class="m-1"><a [routerLink]="'/snapshot'" title="Shop snapshort"
+              class="px-3 py-2 border-radius-4 d-block fs-13 fw-400 text-decoration-none"><i
+                class="fa-solid fa-check fs-18"></i> Shop Snapshot</a></li>
+
+          <li [class.active]="isActive('/paymenthistories')" class="m-1"><a [routerLink]="'/paymenthistories'"
+              title="Payment History" class="px-3 py-2 border-radius-4 d-block fs-13 fw-400 text-decoration-none"><i
+                class="fa-solid fa-check fs-18"></i> Payment Histories</a></li>
+
+
+          <li [class.active]="isActive('/inshop3')" class="m-1"><a [routerLink]="'/inshop3'" title="Jobs"
+              class="px-3 py-2 border-radius-4 d-block fs-13 fw-400 text-decoration-none"><i
+                class="fa-solid fa-check fs-18"></i> Shop Display</a></li>
+
+          <li [class.active]="isActive('/report-viewing')" class="m-1"><a [routerLink]="'/report-viewing'" title="Jobs"
+              class="px-3 py-2 border-radius-4 d-block fs-13 fw-400 text-decoration-none"><i
+                class="fa-solid fa-check fs-18"></i> Reports</a></li>
+        </ul>
+      </li>
+      <li [class.active]="isActive('/inshop3')" class="has-subnav"
+        *ngIf="showModeratorBoard && isLoggedIn && isActivated  && showAdminBoard == false && isNotShopDisplayUser() == false "
+        class="m-1" data-bs-toggle="collapse" href="#vehiclesDropdown">
+        <a (click)="toggleSubMenu('vehiclesDropdown')" [routerLink]="'/inshop3'" title="Our Vehicles"
+          class="p-3 border-radius-4 d-block fs-14 fw-400 text-decoration-none"><i class="fa-solid fa-car fs-18"></i>
+          Shop Display <i class="float-end fa w-auto"
+            [ngClass]="{'fa-angle-right': !isSubMenuOpen('vehiclesDropdown'), 'fa-angle-down': isSubMenuOpen('vehiclesDropdown')}"></i></a>
+
+      </li>
+      <ng-container *ngIf="this.config.domainName.toLocaleLowerCase() != 'BayCounter.com'.toLocaleLowerCase()">
+        <li [class.active]="isActive('/autoparts')" class="has-subnav"
+          *ngIf="showAdminBoard == false  && isNotShopDisplayUser()" class="m-1">
+          <a href="#/autoparts" title="Auto Parts Market"
+            class="p-3 border-radius-4 d-block fs-14 fw-400 text-decoration-none"><i
+              class="fa-solid fa-screwdriver-wrench fs-18"></i> Auto Part Market</a>
+        </li>
+      </ng-container>
+
+      <li [class.active]="isActive('/login')" class="has-subnav" *ngIf="currentUser == null" class="m-1">
+        <a href="#/login" title="log in" class="p-3 border-radius-4 d-block fs-14 fw-400 text-decoration-none"><i
+            class="fa-solid fa-sign-in fs-18"></i> Log In</a>
+      </li>
+
+
+
+      <!-- <li [class.active]="isActive('/saveditem')" class="has-subnav"
+        *ngIf="isLoggedIn && isActivated && currentUser != null && currentUser.id> 0 && this.user.partMarketOnly == true"
+        class="m-1">
+        <a (click)="navigateToSilence('saveditem')" title="Admin: Part Market User Saved Items"
+          class="p-3 border-radius-4 d-block fs-14 fw-400 text-decoration-none"><i
+            class="fa-solid fa-screwdriver-wrench fs-18"></i> Admin: Saved Items</a>
+      </li> -->
+
+      <ng-container *ngIf="this.config.domainName.toLocaleLowerCase() != 'BayCounter.com'.toLocaleLowerCase()">
+        <li [class.active]="isActive('/auto-parts')" class="has-subnav"
+          *ngIf="isLoggedIn && isActivated && currentUser != null && currentUser.id> 0  && showAdminBoard == false  && isNotShopDisplayUser()"
+          class="m-1">
+          <a (click)="navigateToSilence('auto-parts')" title="Admin: Part Market User backend"
+            class="p-3 border-radius-4 d-block fs-14 fw-400 text-decoration-none"><i
+              class="fa-solid fa-gears fs-18"></i>
+            Auto Part Market Admin</a>
+        </li>
+      </ng-container>
+
+      <!-- <li [class.active]="isActive('/schedule')" class="has-subnav"
+        *ngIf="showModeratorBoard && isLoggedIn && isActivated  && showAdminBoard == false " class="m-1">
+        <a href="#/schedule" title="Schedule" class="p-3 border-radius-4 d-block fs-14 fw-400 text-decoration-none"><i
+            class="fa-solid fa-calendar-days fs-18"></i> Schedule</a>
+      </li> -->
+      <li [class.active]="isActive('/repair-manual')" class="has-subnav"
+        *ngIf="showModeratorBoard && isLoggedIn && isActivated  && showAdminBoard == false  && isNotShopDisplayUser()"
+        class="m-1">
+        <a href="#/repair-manual" title="Repair Menual Helper"
+          class="p-3 border-radius-4 d-block fs-14 fw-400 text-decoration-none"><i
+            class="fa-solid fa-check-square fs-18"></i> Repair Manual Helper</a>
+      </li>
+      <li [class.active]="isActive('/expense')" class="has-subnav"
+        *ngIf="showModeratorBoard && isLoggedIn && isActivated  && showAdminBoard == false  && isNotShopDisplayUser()"
+        class="m-1">
+        <a href="#/expense" title="Shop Expenses"
+          class="p-3 border-radius-4 d-block fs-14 fw-400 text-decoration-none"><i
+            class="fa-solid fa-file-invoice-dollar fs-18"></i> Expenses</a>
+      </li>
+      <li [class.active]="isActive('/inventory')" class="has-subnav"
+        *ngIf="showModeratorBoard && isLoggedIn && isActivated  && showAdminBoard == false  && isNotShopDisplayUser()"
+        class="m-1">
+        <a href="#/inventory" title="Inventory" class="p-3 border-radius-4 d-block fs-14 fw-400 text-decoration-none"><i
+            class="fa-solid fa-file-lines fs-18"></i> Inventory</a>
+      </li>
+      <li [class.active]="isActive('/invoices')" class="has-subnav"
+        *ngIf="showModeratorBoard && isLoggedIn && isActivated  && showAdminBoard == false  && isNotShopDisplayUser()"
+        class="m-1">
+        <a href="#/invoices" title="Invoices" class="p-3 border-radius-4 d-block fs-14 fw-400 text-decoration-none"><i
+            class="fa-solid fa-file-invoice-dollar fs-18"></i> Invoices</a>
+      </li>
+      <li data-bs-toggle="collapse" href="#settingsDropdown" [class.active]="isActive('/admin')"
+        *ngIf="showModeratorBoard && isLoggedIn && isActivated  && showAdminBoard == false  && isNotShopDisplayUser()"
+        class="m-1 has-subnav">
+        <a (click)="toggleSubMenu('settingsDropdown')" href="#/admin" title="Settings"
+          class="p-3 border-radius-4 d-block fs-14 fw-400 text-decoration-none"><i class="fa-solid fa-gears fs-18"></i>
+          Settings <i class="float-end fa w-auto"
+            [ngClass]="{'fa-angle-right': !isSubMenuOpen('settingsDropdown'), 'fa-angle-down': isSubMenuOpen('settingsDropdown')}"></i></a>
+        <ul class="sub-nav collapse" id="settingsDropdown">
+          <li [class.active]="isActive('/profile')" class="m-1"><a [routerLink]="'/profile'"
+              class="px-3 py-2 border-radius-4 d-block fs-13 fw-400 text-decoration-none"><i
+                class="fa-solid fa-check fs-18"></i> Profile</a></li>
+          <li [class.active]="isActive('/disclaimers')" class="m-1"><a [routerLink]="'/disclaimers'"
+              class="px-3 py-2 border-radius-4 d-block fs-13 fw-400 text-decoration-none"><i
+                class="fa-solid fa-check fs-18"></i> Disclaimers</a></li>
+          <li [class.active]="isActive('/warranties')" class="m-1"><a [routerLink]="'/warranties'"
+              class="px-3 py-2 border-radius-4 d-block fs-13 fw-400 text-decoration-none"><i
+                class="fa-solid fa-check fs-18"></i> Warranties</a></li>
+          <li [class.active]="isActive('/employee-roles')" class="m-1"><a [routerLink]="'/employee-roles'"
+              class="px-3 py-2 border-radius-4 d-block fs-13 fw-400 text-decoration-none"><i
+                class="fa-solid fa-check fs-18"></i> Employee Roles</a></li>
+          <li [class.active]="isActive('/users')" class="m-1"><a [routerLink]="'/users'"
+              class="px-3 py-2 border-radius-4 d-block fs-13 fw-400 text-decoration-none"><i
+                class="fa-solid fa-check fs-18"></i> Users</a></li>
+          <li [class.active]="isActive('/employees')" class="m-1"><a [routerLink]="'/employees'"
+              class="px-3 py-2 border-radius-4 d-block fs-13 fw-400 text-decoration-none"><i
+                class="fa-solid fa-check fs-18"></i> Employees</a></li>
+          <li [class.active]="isActive('/insurance-companies')" class="m-1"><a [routerLink]="'/insurance-companies'"
+              class="px-3 py-2 border-radius-4 d-block fs-13 fw-400 text-decoration-none"><i
+                class="fa-solid fa-check fs-18"></i> Insurance Companies</a></li>
+          <li [class.active]="isActive('/insurance-management')" class="m-1"><a [routerLink]="'/insurance-management'"
+              class="px-3 py-2 border-radius-4 d-block fs-13 fw-400 text-decoration-none"><i
+                class="fa-solid fa-shield-halved fs-18"></i> Insurance Management</a></li>
+          <li [class.active]="isActive('/rental-companies')" class="m-1"><a [routerLink]="'/rental-companies'"
+              class="px-3 py-2 border-radius-4 d-block fs-13 fw-400 text-decoration-none"><i
+                class="fa-solid fa-check fs-18"></i> Rental Companies</a></li>
+          <li [class.active]="isActive('/payment-method')" class="m-1"><a [routerLink]="'/payment-method'"
+              class="px-3 py-2 border-radius-4 d-block fs-13 fw-400 text-decoration-none"><i
+                class="fa-solid fa-check fs-18"></i> Payment Methods</a></li>
+          <li [class.active]="isActive('/payment-status')" class="m-1"><a [routerLink]="'/payment-status'"
+              class="px-3 py-2 border-radius-4 d-block fs-13 fw-400 text-decoration-none"><i
+                class="fa-solid fa-check fs-18"></i> Payment Status</a></li>
+          <li [class.active]="isActive('/item-types')" class="m-1"><a [routerLink]="'/item-types'"
+              class="px-3 py-2 border-radius-4 d-block fs-13 fw-400 text-decoration-none"><i
+                class="fa-solid fa-check fs-18"></i> Estimate/Receipt Item Types</a></li>
+          <li [class.active]="isActive('/expense-types')" class="m-1"><a [routerLink]="'/expense-types'"
+              class="px-3 py-2 border-radius-4 d-block fs-13 fw-400 text-decoration-none"><i
+                class="fa-solid fa-check fs-18"></i> Expense Types</a></li>
+          <li [class.active]="isActive('/doc-types')" class="m-1"><a [routerLink]="'/doc-types'"
+              class="px-3 py-2 border-radius-4 d-block fs-13 fw-400 text-decoration-none"><i
+                class="fa-solid fa-check fs-18"></i> Document Types</a></li>
+          <li [class.active]="isActive('/job-status')" class="m-1"><a [routerLink]="'/job-status'"
+              class="px-3 py-2 border-radius-4 d-block fs-13 fw-400 text-decoration-none"><i
+                class="fa-solid fa-check fs-18"></i> Job Status</a></li>
+          <li [class.active]="isActive('/job-request-type')" class="m-1"><a [routerLink]="'/job-request-type'"
+              class="px-3 py-2 border-radius-4 d-block fs-13 fw-400 text-decoration-none"><i
+                class="fa-solid fa-check fs-18"></i> Job Request Types</a></li>
+          <li [class.active]="isActive('/paid-in-categories')" class="m-1"><a [routerLink]="'/paid-in-categories'"
+              class="px-3 py-2 border-radius-4 d-block fs-13 fw-400 text-decoration-none"><i
+                class="fa-solid fa-check fs-18"></i> Paid In Categories</a></li>
+          <li [class.active]="isActive('/pre-defined-jobs')" class="m-1"><a [routerLink]="'/pre-defined-jobs'"
+              class="px-3 py-2 border-radius-4 d-block fs-13 fw-400 text-decoration-none"><i
+                class="fa-solid fa-check fs-18"></i> Pre-Defined Jobs</a></li>
+          <li [class.active]="isActive('/parking-location')" class="m-1"><a [routerLink]="'/parking-location'"
+              class="px-3 py-2 border-radius-4 d-block fs-13 fw-400 text-decoration-none"><i
+                class="fa-solid fa-check fs-18"></i> Parking Location</a></li>
+          <li [class.active]="isActive('/key-location')" class="m-1"><a [routerLink]="'/key-location'"
+              class="px-3 py-2 border-radius-4 d-block fs-13 fw-400 text-decoration-none"><i
+                class="fa-solid fa-check fs-18"></i> Key Location</a></li>
+          <li [class.active]="isActive('/arrival-mode')" class="m-1"><a [routerLink]="'/arrival-mode'"
+              class="px-3 py-2 border-radius-4 d-block fs-13 fw-400 text-decoration-none"><i
+                class="fa-solid fa-check fs-18"></i> Arrival Modes</a></li>
+          <li [class.active]="isActive('/approval-status')" class="m-1"><a [routerLink]="'/approval-status'"
+              class="px-3 py-2 border-radius-4 d-block fs-13 fw-400 text-decoration-none"><i
+                class="fa-solid fa-check fs-18"></i> Approval Status</a></li>
+          <!-- <li [class.active]="isActive('/vehicle-status')" class="m-1"><a [routerLink]="'/vehicle-status'"
+              class="px-3 py-2 border-radius-4 d-block fs-13 fw-400 text-decoration-none"><i
+                class="fa-solid fa-check fs-18"></i> Vehicle Status</a></li> -->
+          <li [class.active]="isActive('/vendors')" class="m-1"><a [routerLink]="'/vendors'"
+              class="px-3 py-2 border-radius-4 d-block fs-13 fw-400 text-decoration-none"><i
+                class="fa-solid fa-check fs-18"></i> Vendors</a></li>
+        </ul>
+      </li>
+      <li [class.active]="isActive('/logout')" class="has-subnav" *ngIf="currentUser" class="m-1">
+        <a (click)="logout()" title="log out" class="p-3 border-radius-4 d-block fs-14 fw-400 text-decoration-none"><i
+            class="fa-solid fa-sign-out fs-18"></i> Log Out</a>
+      </li>
+      <li [class.active]="isActive('/login')" class="has-subnav"
+        *ngIf="currentUser != null  && showAdminBoard == false  && isNotShopDisplayUser()" class="m-1"
+        data-bs-toggle="modal" data-bs-target="#feedbackForm">
+        <a title="Send Feedback to Operator" class="p-3 border-radius-4 d-block fs-14 fw-400 text-decoration-none"><i
+            class="fa-solid fa-comments fs-18"></i> Contact Us</a>
+      </li>
+    </ul>
+    <ul class="position-absolute bottom-0 start-0 w-100 m-0">
+      <!-- <li>
+        <a href="javascript:;" class="bg-light-blue d-block py-4 px-2 text-center w-100"><img width="170"
+            src="assets/images/Logo.svg" alt="Our Logo" class="img-fluid" /></a>
+      </li> -->
+    </ul>
+  </nav>
+
+
+  <div class="reminders-box position-fixed bottom-0 top-0 overflow-hidden"
+    *ngIf="showNavationBar==true && market_only==false">
+    <h4 class="text-white fs-14 fw-600 p-4"><span class="ps-2">Reminders</span> <span
+        class="badge badge-warning text-white ms-2">{{notes.length}}</span></h4>
+    <div class="reminders-scrolls">
+      <div class="list-group list-group-flush" cdkDropList (cdkDropListDropped)="droppedNote($event)">
+        <ng-container *ngFor="let note of notes; let i=index ">
+          <a class="reminder-list pt-3 pb-3 pe-3 ps-4 text-decoration-none" *ngIf="note.jobId == 0" cdkDrag>
+            <p class="fs-12  mb-3 line-height-150">
+              <span class="text-white opacity-50"> {{i+1}}.</span>
+              <span class="text-white opacity-50"> {{note.creatorShortName}}</span><span class="text-white opacity-50">:
+              </span><span [ngClass]="note.color">{{note.notes}}</span>
+            </p>
+            <p>
+              <!-- <ng-container *ngIf="note.jobId > 0 ">
+                <div class="btn d-flex bg-navy text-white gap-2 align-items-center white-space my-1 border p-1 shadow "
+                  title="job: {{note.jobId}} {{note.jobName}} is {{note.type}}" data-toggle="tooltip"
+                  data-placement="bottom" (click)="getNoteDetail(note)"
+                  [ngClass]="{'border-success': note.type=='Done','border-primary': note.type !='Done'}">
+                  <span title="{{note.make}}" [ngClass]="note.color"
+                    class="car-{{ note.make| lowercase }} fs-24"></span>
+
+                  <span class="d-block text-start">
+                    <strong class="fs-10 fw-500 d-flex gap-2 align-items-center" title="Click to view vehicle details">
+                      <i class="fa-solid fa-square border border-radius-1" style="color: {{note.colorVehicle}}"></i>
+                      <small>
+                        {{ note.year }} {{ note.make }} {{ note.model }} </small></strong>
+                    <strong class="fw-700 fs-11 py-1 line-height-150 text-secondary">
+                      <span class="text-white opacity-50">{{note.creatorShortName}}</span><span
+                        class="text-white opacity-50">:
+                      </span>
+                      <span class="fs-10 fw-700 text-white ">{{note.jobId}} </span>
+                      <span class="fs-10 fw-700 text-uppercase" [ngClass]="note.color"> {{note.type}} </span>
+                      <span class="fs-10 fw-700 text-white "> {{note.jobName}}</span>
+                    </strong>
+                  </span>
+                </div>
+              </ng-container> -->
+            </p>
+            <div class="d-flex w-100 justify-content-between">
+              <small class="fs-10 date mt-2 opacity-75">
+                {{note.createdAt| date: 'MM/dd/yyyy HH:mm' }}</small>
+              <div>
+                <button class="btn btn-sm btn-warning btn-xs" (click)="printJobDetail(note)">
+                  <!-- <i [ngClass]="{'fa fa-pencil': note.jobId ==0, 'fa fa-bell text-success': note.jobId > 0}"></i> -->
+                  <i *ngIf=" note.jobId == 0" class="fa fa-pencil"></i>
+                  <i *ngIf=" note.jobId > 0" title="Print Job Order" class="fa fa-print"></i>
+                </button>
+                &nbsp;
+                <button class="btn btn-sm btn-danger btn-xs" title="Remove" (click)="deleteNote(note)"><i
+                    class="fa fa-trash"></i></button>
+              </div>
+            </div>
+          </a>
+        </ng-container>
+      </div>
+    </div>
+    <div class="input-group ps-4 pe-3 py-3 add-note-footer bottom-0 position-absolute">
+      <input type="text" class="form-control rounded-start-1 rounded-end-0" [(ngModel)]="note.notes" name="reminder"
+        #device title="Enter/return to save" placeholder="Type Here..." (keyup.enter)="onSaveNote($event)" />
+      <button class="btn btn-danger btn-sm" title="Add note" (click)="addNewNote()"><i class="fa fa-times"></i></button>
+      <button class="btn btn-primary-abs btn-sm" title="Save" (click)="saveNote();"><i class="fa fa-save"></i></button>
+    </div>
+  </div>
+  <div class="area">
+    <router-outlet></router-outlet>
+  </div>
+</div>
+
+<div class="modal fade" id="feedbackForm" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+  aria-labelledby="feedbackFormLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content border-radius-8">
+      <div class="modal-header p-4">
+        <h1 class="modal-title fs-20 fw-600 text-capitalize" id="feedbackFormLabel">Contact US</h1>
+        <button type="button" class="btn-close mt-1" data-bs-dismiss="modal" aria-label="Close"
+          (click)="resetFeedbackForm()"></button>
+      </div>
+      <div class="modal-body px-2" *ngIf="currentUser">
+        <form name="form" (ngSubmit)="f.form.valid && setFeedback()" #f="ngForm" novalidate>
+          <div class="row">
+            <div class="col-md-12">
+              <div class="mt-4 pt-1">
+                <label for="category" class="form-label fs-14 fw-400 mb-3">Category</label>
+                <select name="category" class="form-select h-48 px-3 border-radius-8" size="1" required
+                  #category="ngModel" [ngClass]="{ 'is-invalid': category.errors }" placeHolder="Please select Category"
+                  [(ngModel)]="feedback.name">
+                  <option value="undefined" disabled selected>Select Category</option>
+                  <option value="Report Issues/Bugs">Report Issues/Bugs</option>
+                  <option value="Suggestions">Suggestions</option>
+                  <option value="General Feedback">General Feedback</option>
+                  <option value="General Feedback">Contact Us</option>
+                  <option value="Others">Others</option>
+
+                </select>
+                <div class="invalid-feedback" *ngIf="category.errors ">
+                  <span *ngIf="category.errors['required']">Category is required</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-12">
+              <div class="mt-4 pt-1">
+                <label for="comments" class="form-label fs-14 fw-400 mb-3">Comments</label>
+                <textarea class="form-control h-48 px-3 border-radius-8" type="text" style="line-height: 2;"
+                  placeholder="Enter Comments" rows="5" #comments="ngModel"
+                  [ngClass]="{ 'is-invalid': comments.errors }" minlength="2" maxlength="2000" required
+                  [(ngModel)]="feedback.comments" name="description"></textarea>
+                <div class="invalid-feedback" *ngIf="comments.errors ">
+                  <span *ngIf="comments.errors['required']">Comments are required</span>
+                  <span *ngIf="comments.errors['minlength']">Comments must be at least 2 characters</span>
+                  <span *ngIf="comments.errors['maxlength']">Comments must be at most 2000 characters</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-12 py-4 mt-4" *ngIf="errorMessageFeedback != ''">
+              <span class="alert alert-success line-height-150" role="alert">{{errorMessageFeedback}}</span>
+            </div>
+          </div>
+          <div class="d-flex align-items-center gap-3 mt-4 px-3" *ngIf="currentUser && this.feedback.id ==0">
+            <button class="btn btn-primary-abs h-45 px-4 rounded-4 fs-14 fw-600" title="Submit Feedback">Submit
+            </button>
+          </div>
+          <div class="d-flex align-items-center gap-3 mt-4 px-3" *ngIf="currentUser && this.feedback.id > 0">
+            <button class="btn btn-primary-abs h-45 px-4 rounded-4 fs-14 fw-600" title="Close" data-bs-dismiss="modal"
+              (click)="resetFeedbackForm()">Close</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

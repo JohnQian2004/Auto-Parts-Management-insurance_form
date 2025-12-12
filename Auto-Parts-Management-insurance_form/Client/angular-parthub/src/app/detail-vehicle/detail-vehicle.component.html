@@ -1,0 +1,108 @@
+<div style="margin-left:-50px;padding:20px 10px;">
+
+
+  <div id="componentID2" class="container-fluid">
+    <div class="row">
+      <!-- <div class="qrcode-wrapper">
+              <div class="qrcode-sizer" #qrSizer>
+                <qrcode [qrdata]="url" [width]="qrSize" [errorCorrectionLevel]="'M'">
+                </qrcode>
+              </div>
+            </div> -->
+      <div class="col-12 mt-4">
+        <div class="d-flex flex-row justify-content-center align-items-center">
+           <h3 class="fs-32 fw-700">{{this.setting.company.name}}</h3>
+        </div>
+      </div>
+      <div class="col-12 mt-4">
+        <div class="d-flex flex-row justify-content-center align-items-center">
+          <qrcode [qrdata]="url" id="qrcode" [width]="900" title="Scan it with your phone" [errorCorrectionLevel]="'M'">
+          </qrcode>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mt-4">
+      <div class="col-12 table-responsive tt">
+        <table class="table table-bordered border-radius-8 overflow-hidden">
+          <thead>
+            <tr class="bg-navy">
+              <th width="30%" class="text-white fs-32 py-2"
+                style="background-color: rgb(13, 173, 226);word-break:break-all;line-height: 0.6;"> Item</th>
+              <th width="70%" class="text-white fs-32 py-2"
+                style="background-color: rgb(13, 173, 226);word-break:break-all;line-height: 0.6;"> Info</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="fs-32" style="border: 1px solid lightgray;word-break:break-all;line-height: 0.6;">
+                <strong>Vehicle</strong>
+              </td>
+              <td class="fs-32" style="border: 1px solid lightgray;word-break:break-all;line-height: 0.6;">
+                {{selectedVehicle.year}}
+                {{selectedVehicle.make}}
+                {{selectedVehicle.model}}
+                {{selectedVehicle.color}}</td>
+            </tr>
+            <tr *ngIf="selectedVehicle.description != ''">
+              <td class="fs-32" style="border: 1px solid lightgray;word-break:break-all;line-height: 0.6;">
+                <strong>Specification</strong>
+              </td>
+              <td class="fs-32" style="border: 1px solid lightgray;word-break:break-all;line-height: 0.6;">
+                {{selectedVehicle.description}}</td>
+            </tr>
+            <tr *ngIf="selectedVehicle.vin != ''">
+              <td class="fs-32" style="border: 1px solid lightgray;word-break:break-all;line-height: 0.6;">
+                <strong>VIN</strong>
+              </td>
+              <td class="fs-32" style="border: 1px solid lightgray;word-break:break-all;line-height: 0.6;">
+                {{selectedVehicle.vin}}</td>
+            </tr>
+
+            <tr *ngIf="selectedVehicle.jobReqeustTypeString != ''">
+              <td class="fs-32" style="border: 1px solid lightgray;word-break:break-all;line-height: 0.6;">
+                <strong>Request Type</strong>
+              </td>
+              <td class="fs-32" style="border: 1px solid lightgray;word-break:break-all;line-height: 0.6;">
+                {{selectedVehicle.jobReqeustTypeString}}</td>
+            </tr>
+
+            <tr *ngIf="selectedVehicle.workRequest != ''">
+              <td class="fs-32" style="border: 1px solid lightgray;word-break:break-all;line-height: 0.8;"><strong>Work
+                  Request</strong>
+              </td>
+              <td class="fs-32" style="border: 1px solid lightgray; line-height: 0.8;">
+                {{selectedVehicle.workRequest}}
+              </td>
+            </tr>
+            <tr *ngIf="selectedVehicle.priorDamage != ''">
+              <td class="fs-32" style="border: 1px solid lightgray;word-break:break-all;line-height: 0.8;"><strong>Prior
+                  Damage</strong>
+              </td>
+              <td class="fs-32" style="border: 1px solid lightgray; line-height: 0.8;">
+                {{selectedVehicle.priorDamage}} </td>
+            </tr>
+
+            <tr>
+              <td class="fs-32" style="border: 1px solid lightgray;word-break:break-all;line-height: 0.6;">
+                <strong>Since</strong>
+              </td>
+              <td class="fs-32" style="border: 1px solid lightgray;word-break:break-all;line-height: 0.6;">
+                {{selectedVehicle.createdAt | date}} </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+
+
+
+
+    <p class="col-lg-7 col-md-7 col-sm-7 col-xs-7"></p>
+    <p class="col-lg-5 col-md-5 col-sm-5 col-xs-5"></p>
+  </div>
+
+
+
+</div>

@@ -1,0 +1,143 @@
+<div>
+  <div class="row nogot">
+    <div class="my-fluid-col main-content col mt-4 pt-2">
+      <div class="row px-2 position-sticky common-bar-top">
+        <nav class="navbar navbar-expand navbar-white bg-white border-radius-8 d-flex justify-content-between">
+          <button class="btn btn-primary-abs" (click)="toggleClass()"><i class="fa fa-bars"></i></button>
+          <ul class="navbar-nav d-flex align-items-center gap-5">
+
+            <li class="nav-item dropdown">
+              <div class="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                <div class="d-flex align-items-center gap-3">
+                  <!-- <img width="40" height="40" class="border-radius-4"
+                    *ngIf="company.icon != null && company.icon.length > 0"
+                    [src]="'data:image/jpeg;base64,'+ company.icon" /> -->
+                  <div class="user-details"> <strong class="fs-14 mb-1 d-block">{{user.firstName}}
+                      {{user.lastName}}</strong>
+                    <!-- <small
+                      class="fs-13 text-dark- opacity-50">{{this.company.name}}</small>  -->
+                  </div>
+                  <i class="fa fa-angle-down opacity-50"></i>
+                </div>
+              </div>
+              <!-- <div class="dropdown-menu p-0 border-0 shadow border-radius-8 overflow-hidden w-100 mt-3">
+                <ul class="d-flex flex-column">
+                  <li class="d-block p-0"><a routerLink="/users" class="dropdown-item p-3 fs-12"><i
+                        class="fa fa-users text-primary-abs fs-15 me-2 ms-1"></i> Manage Users</a></li>
+                  <li class="d-block p-0"><button data-bs-toggle="modal" data-bs-target="#myAccount"
+                      class="dropdown-item p-3 fs-12"><i class="fa fa-user text-primary-abs fs-15 me-2 ms-1"></i> My
+                      Account</button></li>
+                  <li class="d-block p-0"><button data-bs-toggle="modal" data-bs-target="#resetPassword"
+                      class="dropdown-item p-3 fs-12"><i class="fa fa-key text-primary-abs fs-15 me-2 ms-1"></i> Reset
+                      Password</button></li>
+                  <li class="d-block p-0"><a routerLink="/login" class="dropdown-item p-3 fs-12" (click)="logout()"><i
+                        class="fa fa-power-off text-primary-abs fs-15 me-2 ms-1"></i> Logout</a></li>
+                </ul>
+              </div> -->
+            </li>
+          </ul>
+        </nav>
+      </div>
+
+      <div class="d-md-flex align-items-center justify-content-between px-2 my-4 pt-4">
+        <h2 class="heading-color fw-700 text-uppercase fs-18">SMTP Server Settings</h2>
+        <!-- <button *ngIf="currentUserUser.allowAddCompany == true && user && (  user.roles[0].name == 'ROLE_ADMIN')"
+          (click)="addNew()" class="btn btn-primary-abs fs-13 px-3 py-2 mt-15-mob"><i class="fa fa-user-tie me-2"></i>
+          Add Users</button> -->
+      </div>
+
+      <div class="row mx-negative">
+
+        <div class="col-md-6">
+          <div class="mt-6 pt-1">
+            <label for="name" class="form-label fs-14 fw-400 mb-3">SMTP Server Address (e.g: mail.office365.com)</label>
+            <input trimText class="form-control h-48 px-3 border-radius-8" name="text" type="text"
+              [(ngModel)]="emailInfo.smtpServerAddress" required #smtpServerAddress="ngModel"
+              [ngClass]="{ 'is-invalid': smtpServerAddress.errors }" maxlength="200"
+              placeholder="Enter smtp Server Address" />
+            <div class="invalid-feedback" *ngIf="smtpServerAddress.errors ">
+              <span *ngIf="smtpServerAddress.errors['required']">smtp Server Address is Required</span>
+              <span *ngIf="smtpServerAddress.errors['maxlength']">smtp Server Address is at most at 200
+                characteris</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="mt-6 pt-1">
+            <label for="name" class="form-label fs-14 fw-400 mb-3">SMTP Server Port (e.g 587)</label>
+            <input trimText class="form-control h-48 px-3 border-radius-8" name="text" type="number"
+              [(ngModel)]="emailInfo.smtpServerPort" required #smtpServerPort="ngModel"
+              [ngClass]="{ 'is-invalid': smtpServerPort.errors }" maxlength="200"
+              placeholder="Enter smtp Server Address" />
+            <div class="invalid-feedback" *ngIf="smtpServerPort.errors ">
+              <span *ngIf="smtpServerPort.errors['required']">smtp Server Port is Required</span>
+              <span *ngIf="smtpServerPort.errors['maxlength']">smtp Server Port is at most at 200
+                characteris</span>
+            </div>
+          </div>
+        </div>
+
+
+        <div class="col-md-6">
+          <div class="mt-6 pt-1">
+            <label for="name" class="form-label fs-14 fw-400 mb-3">SMTP Server Username</label>
+            <input trimText class="form-control h-48 px-3 border-radius-8" name="text" type="text"
+              [(ngModel)]="emailInfo.smtpServerUsername" required #smtpServerUsername="ngModel"
+              [ngClass]="{ 'is-invalid': smtpServerUsername.errors }" maxlength="100"
+              placeholder="Enter smtp Server Address" />
+            <div class="invalid-feedback" *ngIf="smtpServerUsername.errors ">
+              <span *ngIf="smtpServerUsername.errors['required']">smtp Server Username is Required</span>
+              <span *ngIf="smtpServerUsername.errors['maxlength']">smtp Server Username is at most at 100
+                characteris</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="mt-6 pt-1">
+            <label for="name" class="form-label fs-14 fw-400 mb-3">SMTP Server Password</label>
+            <input trimText class="form-control h-48 px-3 border-radius-8" name="text" type="text"
+              [(ngModel)]="emailInfo.smtpServerPassword" required #smtpServerPassword="ngModel"
+              [ngClass]="{ 'is-invalid': smtpServerPassword.errors }" maxlength="100"
+              placeholder="Enter smtp Server Address" />
+            <div class="invalid-feedback" *ngIf="smtpServerPassword.errors ">
+              <span *ngIf="smtpServerPassword.errors['required']">smtp Server Password is Required</span>
+              <span *ngIf="smtpServerPassword.errors['maxlength']">smtp Server Password is at most at 100
+                characteris</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12">
+          <div *ngIf="errorMessage" class="form-group mt-4">
+            <div class="form-group">
+              <div *ngIf="errorMessage" class="alert alert-danger fs-13" role="alert">
+                {{ errorMessage }}
+              </div>
+            </div>
+          </div>
+          <div *ngIf="successMessage" class="form-group mt-4">
+            <div class="form-group">
+              <div *ngIf="successMessage" class="alert alert-success fs-13" role="alert">
+                {{ successMessage }}
+              </div>
+            </div>
+          </div>
+          <br />
+          <a (click)="saveEmailInfo()" class="btn btn-primary-abs h-45 px-4 rounded-4 fs-14 fw-600 my-4">Save
+            Details</a>
+        </div>
+
+        <!-- <div class="col-12">
+          <div class="d-flex align-items-center gap-3 mt-5 mb-5">
+            <button (click)="saveEmailInfo()" class="btn btn-primary-abs h-45 px-4 rounded-4 fs-14 fw-600">Save
+              Details</button>
+          
+          </div>
+        </div> -->
+
+      </div>
+    </div>
+  </div>
+</div>

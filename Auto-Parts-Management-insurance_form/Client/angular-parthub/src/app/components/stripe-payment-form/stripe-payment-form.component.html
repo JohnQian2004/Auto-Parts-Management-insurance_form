@@ -1,0 +1,260 @@
+<div class="stripe-payment-form" *ngIf="isVisible">
+  <div class="payment-form-header">
+    <h5 class="mb-3">
+      <i class="bi bi-credit-card me-2"></i>
+      Payment Information
+    </h5>
+    <p class="text-muted mb-4">
+      Complete your subscription payment securely with Stripe
+    </p>
+  </div>
+
+  <div class="payment-details mb-4">
+    <div class="row">
+      <div class="col-6">
+        <strong>Amount:</strong> ${{ amount | number:'1.2-2' }} {{ currency.toUpperCase() }}
+      </div>
+      <div class="col-6">
+        <strong>Description:</strong> {{ description }}
+      </div>
+    </div>
+  </div>
+
+  <form (ngSubmit)="processPayment()" #paymentForm="ngForm">
+    <!-- Cardholder Information -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <h6 class="mb-3">
+          <i class="bi bi-person me-2"></i>
+          Cardholder Information
+        </h6>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Full Name *</label>
+        <input type="text" 
+               [(ngModel)]="cardholderInfo.name" 
+               name="cardholderName"
+               class="form-control" 
+               placeholder="Name as shown on card"
+               required>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Email *</label>
+        <input type="email" 
+               [(ngModel)]="cardholderInfo.email" 
+               name="cardholderEmail"
+               class="form-control" 
+               placeholder="your@email.com"
+               required>
+      </div>
+    </div>
+
+    <!-- Card Information -->
+    <div class="mb-4">
+      <label class="form-label">Card Information *</label>
+      <div *ngIf="!isStripeLoaded" class="form-control d-flex align-items-center justify-content-center" style="height: 40px; padding: 10px;">
+        <div class="spinner-border spinner-border-sm me-2" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <small class="text-muted">Loading payment system...</small>
+      </div>
+      <div *ngIf="isStripeLoaded" id="card-element" class="form-control" style="height: 40px; padding: 10px;">
+        <!-- Stripe Elements will create form elements here -->
+      </div>
+      <div *ngIf="error" class="text-danger mt-2">
+        <i class="bi bi-exclamation-triangle me-1"></i>
+        {{ error }}
+      </div>
+    </div>
+
+    <!-- Billing Address -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <h6 class="mb-3">
+          <i class="bi bi-geo-alt me-2"></i>
+          Billing Address
+        </h6>
+      </div>
+      <div class="col-12">
+        <label class="form-label">Street Address *</label>
+        <input type="text" 
+               [(ngModel)]="billingAddress.street" 
+               name="billingStreet"
+               class="form-control" 
+               placeholder="123 Main Street"
+               required>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">City *</label>
+        <input type="text" 
+               [(ngModel)]="billingAddress.city" 
+               name="billingCity"
+               class="form-control" 
+               placeholder="City"
+               required>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">State *</label>
+        <input type="text" 
+               [(ngModel)]="billingAddress.state" 
+               name="billingState"
+               class="form-control" 
+               placeholder="State"
+               required>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">ZIP Code *</label>
+        <input type="text" 
+               [(ngModel)]="billingAddress.zipCode" 
+               name="billingZip"
+               class="form-control" 
+               placeholder="12345"
+               required>
+      </div>
+    </div>
+
+    <!-- Test Card Numbers Section -->
+    <div class="mb-4" *ngIf="isStripeLoaded">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-secondary text-white">
+          <h6 class="card-title mb-0">
+            <i class="bi bi-credit-card me-2"></i>
+            🧪 Test Card Numbers
+          </h6>
+          <small class="text-muted">For testing purposes - click "Copy" to copy card numbers</small>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-info mb-3">
+            <i class="bi bi-info-circle me-2"></i>
+            <strong>Instructions:</strong> Click the "Copy" button next to any test card number, then paste it into the card field above.
+          </div>
+
+          <!-- Basic Test Cards -->
+          <div class="mb-3">
+            <h6 class="fw-bold text-primary mb-2">Basic Test Cards:</h6>
+            <div class="row g-2">
+              <div class="col-md-6">
+                <div class="d-flex justify-content-between align-items-center p-2 border rounded">
+                  <span class="font-monospace">4242 4242 4242 4242</span>
+                  <div class="d-flex align-items-center">
+                    <small class="text-muted me-2">Visa</small>
+                    <button class="btn btn-sm btn-outline-primary" (click)="copyToClipboard('4242 4242 4242 4242')">
+                      Copy
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="d-flex justify-content-between align-items-center p-2 border rounded">
+                  <span class="font-monospace">5555 5555 5555 4444</span>
+                  <div class="d-flex align-items-center">
+                    <small class="text-muted me-2">MasterCard</small>
+                    <button class="btn btn-sm btn-outline-primary" (click)="copyToClipboard('5555 5555 5555 4444')">
+                      Copy
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="d-flex justify-content-between align-items-center p-2 border rounded">
+                  <span class="font-monospace">3782 822463 10005</span>
+                  <div class="d-flex align-items-center">
+                    <small class="text-muted me-2">Amex</small>
+                    <button class="btn btn-sm btn-outline-primary" (click)="copyToClipboard('3782 822463 10005')">
+                      Copy
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="d-flex justify-content-between align-items-center p-2 border rounded">
+                  <span class="font-monospace">6011 1111 1111 1117</span>
+                  <div class="d-flex align-items-center">
+                    <small class="text-muted me-2">Discover</small>
+                    <button class="btn btn-sm btn-outline-primary" (click)="copyToClipboard('6011 1111 1111 1117')">
+                      Copy
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Error Test Cards -->
+          <div class="mb-3">
+            <h6 class="fw-bold text-danger mb-2">Error Test Cards:</h6>
+            <div class="row g-2">
+              <div class="col-md-4">
+                <div class="d-flex justify-content-between align-items-center p-2 border rounded">
+                  <span class="font-monospace">4000 0000 0000 0002</span>
+                  <div class="d-flex align-items-center">
+                    <small class="text-muted me-2">Declined</small>
+                    <button class="btn btn-sm btn-outline-danger" (click)="copyToClipboard('4000 0000 0000 0002')">
+                      Copy
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="d-flex justify-content-between align-items-center p-2 border rounded">
+                  <span class="font-monospace">4000 0000 0000 0069</span>
+                  <div class="d-flex align-items-center">
+                    <small class="text-muted me-2">Expired</small>
+                    <button class="btn btn-sm btn-outline-danger" (click)="copyToClipboard('4000 0000 0000 0069')">
+                      Copy
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="d-flex justify-content-between align-items-center p-2 border rounded">
+                  <span class="font-monospace">4000 0000 0000 0119</span>
+                  <div class="d-flex align-items-center">
+                    <small class="text-muted me-2">Insufficient</small>
+                    <button class="btn btn-sm btn-outline-danger" (click)="copyToClipboard('4000 0000 0000 0119')">
+                      Copy
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="alert alert-secondary mb-0">
+            <small>
+              <strong>Note:</strong> Use any future expiration date (e.g., 12/25) and any 3-digit CVC for testing.
+              These test cards will not charge any real money.
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="payment-actions">
+      <button 
+        type="button" 
+        class="btn btn-outline-secondary me-2" 
+        (click)="cancelPayment()"
+        [disabled]="isProcessing">
+        <i class="bi bi-x-circle me-1"></i>
+        Cancel
+      </button>
+      
+      <button 
+        type="submit" 
+        class="btn btn-primary"
+        [disabled]="isProcessing || !isStripeLoaded">
+        <span *ngIf="isProcessing" class="spinner-border spinner-border-sm me-2"></span>
+        <i *ngIf="!isProcessing" class="bi bi-credit-card me-1"></i>
+        {{ isProcessing ? 'Processing...' : 'Complete Payment' }}
+      </button>
+    </div>
+  </form>
+
+  <div class="payment-security mt-4">
+    <small class="text-muted">
+      <i class="bi bi-shield-check me-1"></i>
+      Your payment information is secure and encrypted
+    </small>
+  </div>
+</div>

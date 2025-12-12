@@ -1,0 +1,31 @@
+<div class="modal-backdrop" (click)="onCancel()"></div>
+<div class="modal-content p-0">
+  <div class="modal-header bg-navy text-white fw-700">
+    <h2>{{ title }}</h2> <!-- Dynamic title -->
+  </div>
+  <!-- Modal Message -->
+  <div class="modal-body bg-light">
+    <p>{{ message }}</p> <!-- Dynamic message -->
+  </div>
+  <!-- Modal Footer with Buttons aligned to the right -->
+
+  <div class="modal-footer">
+    <!-- Show "Yes" and "No" buttons -->
+    <button *ngIf="buttonType === 'yesNo'" class="btn btn-success" (click)="onConfirm()">Yes</button>
+    <button *ngIf="buttonType === 'yesNo'" class="btn btn-secondary" (click)="onCancel()">No</button>
+
+    <!-- Show "OK" and "Cancel" buttons -->
+
+    <button *ngIf="buttonType === 'okCancel'" class="btn btn-success" (click)="onConfirm()">OK</button>
+    <button *ngIf="buttonType === 'okCancel'" class="btn btn-secondary" (click)="onCancel()">Cancel</button>
+
+    <!-- Show only "OK" button -->
+    <button *ngIf="buttonType === 'okOnly'" class="btn btn-success" (click)="onConfirm()">OK</button>
+
+    <button *ngIf="buttonType === 'yesNoCancel'" class="btn btn-success" (click)="onConfirm()">Yes</button>
+    <button *ngIf="buttonType === 'yesNoCancel'" class="btn btn-secondary" (click)="onCancel()">No</button>
+    <button *ngIf="buttonType === 'yesNoCancel'" class="btn btn-info" (click)="onDismiss()">Cancel</button>
+
+  </div>
+
+</div>

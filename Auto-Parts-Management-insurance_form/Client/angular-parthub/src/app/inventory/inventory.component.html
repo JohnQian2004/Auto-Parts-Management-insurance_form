@@ -1,0 +1,1779 @@
+<div>
+  <div class="row nogot">
+    <div class="my-fluid-col main-content col mt-4 pt-2">
+      <div class="row px-2 position-sticky common-bar-top">
+        <nav class="navbar navbar-expand navbar-white bg-white border-radius-8 d-flex justify-content-between">
+          <button class="btn btn-primary-abs" (click)="toggleClass()"><i class="fa fa-bars"></i></button>
+          <ul class="navbar-nav d-flex align-items-center gap-5">
+            <li class="search-bar" *ngIf="this.showSearchBar==true && archivedFlag== false">
+              <div class="position-relative">
+                <input type="text" class="form-control bg-light height-40 border-0"
+                  [(ngModel)]="searchInputAutopartInventory"
+                  (keyup.enter)="searchPartNumberOrTitleInventory(searchInputAutopartInventory, 2, false)"
+                  placeholder="Search inventoried part name, part # or descriptoin" />
+                <a (click)="searchPartNumberOrTitleInventory(searchInputAutopartInventory, 2, false)"
+                  title="Search inventoried part name, part # or descriptoin"
+                  class="position-absolute end-0 top-0 mt-3 me-3 text-muted"><i class="fa fa-search"></i></a>
+              </div>
+            </li>
+            <li class="search-bar" *ngIf="this.showSearchBar==true && archivedFlag== true">
+              <div class="position-relative">
+                <input type="text" class="form-control bg-light height-40 border-0"
+                  [(ngModel)]="searchInputAutopartInventory"
+                  (keyup.enter)="searchPartNumberOrTitleInventory(searchInputAutopartInventory, 2, true)"
+                  placeholder="Search archived part name, part # or descriptoin" />
+                <a (click)="searchPartNumberOrTitleInventory(searchInputAutopartInventory, 2, true)"
+                  title="Search archived part name, part # or descriptoin"
+                  class="position-absolute end-0 top-0 mt-3 me-3 text-muted"><i class="fa fa-search"></i></a>
+              </div>
+            </li>
+            <!-- <li class="nav-item dropdown">
+              <div class="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"> <a href="javascript:;"
+                  class="notification position-relative"><i class="fa fa-bell text-dark opacity-50 fs-20"></i> <span
+                    class="position-absolute top-0 start-100 translate-middle bg-danger rounded-circle text-white text-white text-center line-height-200">10</span></a>
+              </div>
+              <div class="dropdown-menu p-0 border-0 shadow border-radius-8 overflow-hidden w-100 notification-box">
+                <div class="d-flex align-items-center justify-content-between p-4 border-bottom"> <strong
+                    class="fs-14">Notifications <span class="text-muted">(10)</span></strong> <a href="javascript:;"
+                    class="fs-12">Mark All Read</a> </div>
+                <div class="notice-scroller"> <a href="javascript:;" class="w-100 d-block">
+                    <div class="d-flex gap-3 align-items-center p-4 border-bottom"> <i
+                        class="fa fa-car fs-18 text-primary-abs text-center"></i> <span class="text-muted pe-4">
+                        <p class="fs-13">Vehicle <b class="text-dark">Chevrolet</b> is due 28 days.</p>
+                        <small class="fs-12">2 Hours ago</small>
+                      </span> </div>
+                  </a> <a href="javascript:;" class="w-100 d-block">
+                    <div class="d-flex gap-3 align-items-center p-4 border-bottom"> <i
+                        class="fa fa-user-tie fs-18 text-primary-abs text-center"></i> <span class="text-muted pe-4">
+                        <p class="fs-13">New <b class="text-dark">Customer</b> has been added.</p>
+                        <small class="fs-12">1 Day ago</small>
+                      </span> </div>
+                  </a> <a href="javascript:;" class="w-100 d-block">
+                    <div class="d-flex gap-3 align-items-center p-4 border-bottom"> <i
+                        class="fa fa-car fs-18 text-primary-abs text-center"></i> <span class="text-muted pe-4">
+                        <p class="fs-13">Vehicle <b class="text-dark">Chevrolet</b> is due 28 days.</p>
+                        <small class="fs-12">2 Hours ago</small>
+                      </span> </div>
+                  </a> <a href="javascript:;" class="w-100 d-block">
+                    <div class="d-flex gap-3 align-items-center p-4 border-bottom"> <i
+                        class="fa fa-user-tie fs-18 text-primary-abs text-center"></i> <span class="text-muted pe-4">
+                        <p class="fs-13">New <b class="text-dark">Customer</b> has been added.</p>
+                        <small class="fs-12">1 Day ago</small>
+                      </span> </div>
+                  </a> <a href="javascript:;" class="w-100 d-block">
+                    <div class="d-flex gap-3 align-items-center p-4"> <i
+                        class="fa fa-car fs-18 text-primary-abs text-center"></i> <span class="text-muted pe-4">
+                        <p class="fs-13">Vehicle <b class="text-dark">Chevrolet</b> is due 28 days.</p>
+                        <small class="fs-12">2 Hours ago</small>
+                      </span> </div>
+                  </a> </div>
+                <a href="javascript:;" class="text-center mx-auto pt-3 fs-12 d-block border-top">See all
+                  notifications</a>
+              </div>
+            </li> -->
+            <li class="nav-item dropdown">
+              <div class="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                <div class="d-flex align-items-center gap-3"> <img width="40" height="40" class="border-radius-4"
+                    *ngIf="company.icon != null && company.icon.length > 0"
+                    [src]="'data:image/jpeg;base64,'+ company.icon" />
+                  <div class="user-details"> <strong class="fs-14 mb-1 d-block">{{user.firstName}}
+                      {{user.lastName}}</strong> <small
+                      class="fs-13 text-dark- opacity-50">{{this.company.name}}</small> </div>
+                  <i class="fa fa-angle-down opacity-50"></i>
+                </div>
+              </div>
+              <div class="dropdown-menu p-0 border-0 shadow border-radius-8 overflow-hidden w-100 mt-3">
+                <ul class="d-flex flex-column">
+                  <li class="d-block p-0"><a routerLink="/users" class="dropdown-item p-3 fs-12"><i
+                        class="fa fa-users text-primary-abs fs-15 me-2 ms-1"></i> Manage Users</a></li>
+                  <li class="d-block p-0"><button data-bs-toggle="modal" data-bs-target="#myAccount"
+                      class="dropdown-item p-3 fs-12"><i class="fa fa-user text-primary-abs fs-15 me-2 ms-1"></i> My
+                      Account</button></li>
+                  <li class="d-block p-0"><button data-bs-toggle="modal" data-bs-target="#resetPassword"
+                      class="dropdown-item p-3 fs-12"><i class="fa fa-key text-primary-abs fs-15 me-2 ms-1"></i> Reset
+                      Password</button></li>
+                  <li class="d-block p-0"><a routerLink="/login" class="dropdown-item p-3 fs-12" (click)="logout()"><i
+                        class="fa fa-power-off text-primary-abs fs-15 me-2 ms-1"></i> Logout</a></li>
+                </ul>
+              </div>
+            </li>
+          </ul>
+        </nav>
+      </div>
+
+      <div class="d-md-flex align-items-center justify-content-between px-2 my-4 pt-4">
+        <h2 class="heading-color fw-700 text-uppercase fs-18">
+          Inventory
+          <button (click)="getCompanyPurchaseOrder(this.user.companyId, 4)" class="btn btn-sm btn-secondary-abs ms-2"
+            title="Get All Purchase Orders"><i class="fa fa-rotate"></i></button>
+          <button (click)="getCompanyAutopart(this.user.companyId, 3)" class="btn btn-sm btn-secondary-abs ms-2"
+            title="Get All Received and Return Parts"><i class="fa fa-rotate"></i></button>
+        </h2>
+        <div class="d-md-flex align-items-center gap-3 mt-15-mob">
+          <button (click)="createNewAutopart(true)" data-bs-toggle="modal" data-bs-target="#addNewPart"
+            class="btn btn-primary-abs fs-13 px-3 py-2 mt-15-mob"><i class="fa fa-plus me-2"></i> Add Purchase
+            Order</button>
+          <button (click)="createNewAutopart(false)" data-bs-toggle="modal" data-bs-target="#addNewPart"
+            class="btn btn-primary-abs fs-13 px-3 py-2 mt-15-mob"><i class="fa fa-plus me-2"></i> Add Part
+            Info</button>
+        </div>
+      </div>
+
+      <div class="row mx-n2">
+        <div class="col-12">
+          <div class="bg-white shadow-sm rounded-pill py-3 px-2">
+            <div class="scroller">
+              <ul class="nav nav-tabs pb-1 w-100 inventory-tabs border-0" id="inventoryTabs" role="tablist">
+                <li class="nav-item mx-2" role="presentation">
+                  <button class="nav-link active rounded-pill border-0" id="inventory-tab-one" data-bs-toggle="tab"
+                    data-bs-target="#inventory-tab-one-pane" type="button" role="tab" (click)="setSearchBar(false)"
+                    aria-controls="inventory-tab-one-pane" aria-selected="true">Purchase Order
+                    ({{filterPurchaseOrders(0).length}})</button>
+                </li>
+                <li class="nav-item mx-2" role="presentation">
+                  <button class="nav-link rounded-pill border-0" id="inventory-tab-two" data-bs-toggle="tab"
+                    title="Submitted Purchase Orders" (click)="setSearchBar(false)"
+                    data-bs-target="#inventory-tab-two-pane" type="button" role="tab"
+                    aria-controls="inventory-tab-two-pane" aria-selected="false">Submitted PO
+                    ({{filterPurchaseOrders(1).length}})</button>
+                </li>
+                <li class="nav-item mx-2" role="presentation">
+                  <button class="nav-link rounded-pill border-0" id="inventory-tab-three" data-bs-toggle="tab"
+                    title="Approved Purchase Orders" (click)="setSearchBar(false)"
+                    data-bs-target="#inventory-tab-three-pane" type="button" role="tab"
+                    aria-controls="inventory-tab-three-pane" aria-selected="false">Approved PO
+                    ({{filterPurchaseOrders(2).length}})</button>
+                </li>
+                <li class="nav-item mx-2" role="presentation">
+                  <button class="nav-link rounded-pill border-0" id="inventory-tab-four" data-bs-toggle="tab"
+                    title="Ordred Purchase Orders" (click)="setSearchBar(false)"
+                    data-bs-target="#inventory-tab-four-pane" type="button" role="tab"
+                    aria-controls="inventory-tab-four-pane" aria-selected="false">Ordered PO
+                    ({{filterPurchaseOrders(3).length}})</button>
+                </li>
+                <li class="nav-item mx-2" role="presentation">
+                  <button class="nav-link rounded-pill border-0" id="inventory-tab-five" data-bs-toggle="tab"
+                    title="Received Auto Parts" (click)="setSearchBar(false)" data-bs-target="#inventory-tab-five-pane"
+                    type="button" role="tab" aria-controls="inventory-tab-five-pane" aria-selected="false">Received
+                    ({{filterAutoparts(0).length}})</button>
+                </li>
+                <li class="nav-item mx-2" role="presentation">
+                  <button class="nav-link rounded-pill border-0" id="inventory-tab-six" data-bs-toggle="tab"
+                    title="Shall be returned Auto Parts" (click)="setSearchBar(false)"
+                    data-bs-target="#inventory-tab-six-pane" type="button" role="tab"
+                    aria-controls="inventory-tab-six-pane" aria-selected="false">Returns
+                    ({{filterAutoparts(1).length}})</button>
+                </li>
+                <li class="nav-item mx-2" role="presentation">
+                  <button class="nav-link rounded-pill border-0" id="inventory-tab-seven" data-bs-toggle="tab"
+                    title="Inventoried Auto Parts"
+                    (click)="setSearchBar(true);setArchivedFlag(false);getAllAutopartsWithPage(0, pageSize,2, false)"
+                    data-bs-target="#inventory-tab-seven-pane" type="button" role="tab"
+                    aria-controls="inventory-tab-seven-pane" aria-selected="false">Inventoried
+                    ({{filterAutopartsInventory(2).length}})</button>
+                </li>
+                <li class="nav-item mx-2" role="presentation">
+                  <button class="nav-link rounded-pill border-0" id="inventory-tab-eight" data-bs-toggle="tab"
+                    title="Archived Auto Parts"
+                    (click)="setSearchBar(true); setArchivedFlag(true); getAllAutopartsWithPage(0, pageSize,2, true)"
+                    data-bs-target="#inventory-tab-eight-pane" type="button" role="tab"
+                    aria-controls="inventory-tab-eight-pane" aria-selected="false">Archived
+                    ({{this.autopartsArchived.length}})</button>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="tab-content" id="inventoryTabsContent">
+            <div #taggroup class="tab-pane fade show active" id="inventory-tab-one-pane" role="tabpanel"
+              aria-labelledby="inventory-tab-one" tabindex="0">
+              <div class="bg-white border-radius-8 shadow mt-5">
+                <div class="d-flex align-items-center justify-content-between px-4">
+                  <div class="py-4">
+                    <strong class="fs-18">Purchase Orders </strong>
+                  </div>
+                </div>
+                <div class="p-4 border-top">
+                  <div class="table-container shadow border-radius-8 border w-100">
+                    <table class="table-bordered table-striped overflow-hidden border-radius-8">
+                      <thead>
+                        <tr>
+                          <th (click)="sortListPurchaseOrder('title')" class="fs-14 text-center mw-130">Parts Name</th>
+                          <th (click)="sortListPurchaseOrder('partNumber')" class="fs-14 text-center mw-100">Part No.
+                          </th>
+                          <th (click)="sortListPurchaseOrder('description')" class="fs-14 text-center mw-150">
+                            Description</th>
+                          <th (click)="sortListPurchaseOrder('price')" class="fs-14 text-center mw-100">Price</th>
+                          <th (click)="sortListPurchaseOrder('paymentMethodId')" class="fs-14 text-center mw-100">
+                            Payment Method</th>
+                          <th (click)="sortListPurchaseOrder('grade')" class="fs-14 text-center mw-130">Grade</th>
+                          <th class="fs-14 text-center mw-150">Year / Make / Model</th>
+                          <th (click)="sortListPurchaseOrder('vendorId')" class="fs-14 text-center mw-100">Vendor</th>
+                          <th (click)="sortListPurchaseOrder('createdAt')" class="fs-14 text-center mw-130">Date</th>
+                          <th (click)="sortListPurchaseOrder('userId')" class="fs-14 text-center mw-130">By</th>
+                          <th class="fs-14 text-center mw-150">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let autopart of filterPurchaseOrders(0); let i=index; let even=even"
+                          [style.background-color]="i == cindexAutopart? 'lightyellow' : (even ? 'white' : 'white')"
+                          (click)="getAutopartDetail(autopart, i, true)">
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13"
+                            style="word-break: break-word;"><a class="text-primary-abs fw-700"
+                              href="{{autopart.source}}" target="_blank">{{autopart.title}}</a></td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13"
+                            style="word-break: break-word;">
+                            {{autopart.partNumber}}</td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13"
+                            style="word-break: break-word;">
+                            {{autopart.description}}</td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13 fw-700">
+                            ${{autopart.price}}</td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13">
+                            <ng-container *ngFor="let paymentMethod of paymentMethods;let i=index;">
+                              <ng-container *ngIf="autopart.paymentMethodId ==paymentMethod.id">
+                                {{paymentMethod.name}}
+                              </ng-container>
+                            </ng-container>
+                          </td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13">
+                            {{autopart.grade}}</td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13">
+                            <ng-container *ngIf="autopart.year > 0">
+                              {{autopart.year}} {{autopart.make}} {{autopart.model}}
+                            </ng-container>
+                          </td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13">
+                            <ng-container *ngFor="let vendor of vendors;let i=index;">
+                              <ng-container *ngIf="autopart.vendorId ==vendor.id">
+                                {{vendor.name}}
+                              </ng-container>
+                            </ng-container>
+                          </td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13"
+                            style="word-break: break-word;">
+                            {{autopart.createdAt | date}}</td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13"
+                            style="word-break: break-word;">
+                            <ng-container *ngFor="let emplyee of users;let i=index;">
+                              <ng-container *ngIf="emplyee.id ==autopart.userId">
+                                {{emplyee.firstName}} {{emplyee.lastName}}
+                              </ng-container>
+                            </ng-container>
+                          </td>
+                          <td class="text-center fs-13">
+                            <button class="btn btn-danger btn-sm mx-1" (click)="deletePurchseOrder(autopart)"
+                              [disabled]="user.allowAddUpdatePurchaseOrder == false"><i
+                                class="fa fa-trash"></i></button>
+                            <button class="btn btn-warning btn-sm mx-1" (click)="setPurchaseOrderStatus(autopart, 1)"
+                              title="Submit for Approval" [disabled]="user.allowAddUpdatePurchaseOrder == false"><i
+                                class="fa fa-angle-right"></i></button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div #taggroup class="tab-pane fade" id="inventory-tab-two-pane" role="tabpanel"
+              aria-labelledby="inventory-tab-two" tabindex="0">
+              <div class="bg-white border-radius-8 shadow mt-5">
+                <div class="d-flex align-items-center justify-content-between px-4">
+                  <div class="py-4">
+                    <strong class="fs-18">Submitted Purchase Orders </strong>
+                  </div>
+                </div>
+                <div class="p-4 border-top">
+                  <div class="table-container shadow border-radius-8 border w-100" *ngIf="purchaseOrders.length> 0">
+                    <table class="table-bordered table-striped overflow-hidden border-radius-8">
+                      <thead>
+                        <tr>
+                          <th (click)="sortListPurchaseOrder('title')" class="fs-14 text-center mw-130">Parts Name</th>
+                          <th (click)="sortListPurchaseOrder('partNumber')" class="fs-14 text-center mw-100">Part No.
+                          </th>
+                          <th (click)="sortListPurchaseOrder('description')" class="fs-14 text-center mw-150">
+                            Description</th>
+                          <th (click)="sortListPurchaseOrder('price')" class="fs-14 text-center mw-100">Price</th>
+                          <th (click)="sortListPurchaseOrder('paymentMethodId')" class="fs-14 text-center mw-100">
+                            Payment Method</th>
+                          <th (click)="sortListPurchaseOrder('grade')" class="fs-14 text-center mw-130">Grade</th>
+                          <th class="fs-14 text-center mw-150">Year / Make / Model</th>
+                          <th (click)="sortListPurchaseOrder('vendorId')" class="fs-14 text-center mw-100">Vendor</th>
+
+                          <th class="fs-14 text-center mw-100">Rejection Reason</th>
+
+                          <th (click)="sortListPurchaseOrder('createdAt')" class="fs-14 text-center mw-130">Date</th>
+                          <th (click)="sortListPurchaseOrder('userId')" class="fs-14 text-center mw-130">By</th>
+                          <th class="fs-14 text-center mw-150">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let autopart of filterPurchaseOrders(1); let i=index; let even=even"
+                          [style.background-color]="i == cindexAutopart? 'lightyellow' : (even ? 'white' : 'white')"
+                          (click)="getAutopartDetail(autopart, i, true)">
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13"
+                            style="word-break: break-word;"><a class="text-primary-abs fw-700"
+                              href="{{autopart.source}}" target="_blank">{{autopart.title}}</a></td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13"
+                            style="word-break: break-word;">
+                            {{autopart.partNumber}}</td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13"
+                            style="word-break: break-word;">
+                            {{autopart.description}}</td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13 fw-700">
+                            ${{autopart.price}}</td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13">
+                            <ng-container *ngFor="let paymentMethod of paymentMethods;let i=index;">
+                              <ng-container *ngIf="autopart.paymentMethodId ==paymentMethod.id">
+                                {{paymentMethod.name}}
+                              </ng-container>
+                            </ng-container>
+                          </td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13">
+                            {{autopart.grade}}</td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13">
+                            <ng-container *ngIf="autopart.year > 0">
+                              {{autopart.year}} {{autopart.make}} {{autopart.model}}
+                            </ng-container>
+                          </td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13">
+                            <ng-container *ngFor="let vendor of vendors;let i=index;">
+                              <ng-container *ngIf="autopart.vendorId ==vendor.id">
+                                {{vendor.name}}
+                              </ng-container>
+                            </ng-container>
+                          </td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13 fw-700"
+                            style="word-break: break-word;">
+                            <b style="color:red">{{autopart.reason}}</b>
+                          </td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13">
+                            {{autopart.createdAt | date}}</td>
+                          <td class="text-center fs-13">
+                            <ng-container *ngFor="let emplyee of users;let i=index;">
+                              <ng-container *ngIf="emplyee.id ==autopart.userId">
+                                {{emplyee.firstName}} {{emplyee.lastName}}
+                              </ng-container>
+                            </ng-container>
+                          </td>
+                          <td class="text-center fs-13">
+                            <button class="btn btn-danger btn-sm mx-1" (click)="deletePurchseOrder(autopart)"
+                              [disabled]="user.allowAddUpdatePurchaseOrder == false"><i
+                                class="fa fa-trash"></i></button>
+                            <button class="btn btn-warning btn-sm mx-1" (click)="setPurchaseOrderStatus(autopart, 0)"
+                              title="Reject this purchase order"
+                              [disabled]="user.allowApproveRejectPurchaseOrder == false"><i
+                                class="fa fa-times"></i></button>
+                            <button class="btn btn-success btn-sm mx-1" (click)="setPurchaseOrderStatus(autopart,2)"
+                              title="Approve this purchase order"
+                              [disabled]="user.allowApproveRejectPurchaseOrder == false"><i
+                                class="fa fa-check"></i></button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div #taggroup class="tab-pane fade" id="inventory-tab-three-pane" role="tabpanel"
+              aria-labelledby="inventory-tab-three" tabindex="0">
+              <div class="bg-white border-radius-8 shadow mt-5">
+                <div class="d-flex align-items-center justify-content-between px-4">
+                  <div class="py-4">
+                    <strong class="fs-18">Approved Purchase Orders </strong>
+                  </div>
+                </div>
+                <div class="p-4 border-top">
+                  <div class="table-container shadow border-radius-8 border w-100" *ngIf="purchaseOrders.length> 0">
+                    <table class="table-bordered table-striped overflow-hidden border-radius-8">
+                      <thead>
+                        <tr>
+                          <th (click)="sortListPurchaseOrder('title')" class="fs-14 text-center mw-130">Parts Name</th>
+                          <th (click)="sortListPurchaseOrder('partNumber')" class="fs-14 text-center mw-100">Part No.
+                          </th>
+                          <th (click)="sortListPurchaseOrder('description')" class="fs-14 text-center mw-150">
+                            Description</th>
+                          <th (click)="sortListPurchaseOrder('price')" class="fs-14 text-center mw-100">Price</th>
+                          <th (click)="sortListPurchaseOrder('paymentMethodId')" class="fs-14 text-center mw-100">
+                            Payment Method</th>
+                          <th (click)="sortListPurchaseOrder('grade')" class="fs-14 text-center mw-130">Grade</th>
+                          <th class="fs-14 text-center mw-150">Year / Make / Model</th>
+                          <th (click)="sortListPurchaseOrder('vendorId')" class="fs-14 text-center mw-100">Vendor</th>
+                          <th (click)="sortListPurchaseOrder('createdAt')" class="fs-14 text-center mw-130">Date</th>
+                          <th (click)="sortListPurchaseOrder('userId')" class="fs-14 text-center mw-130">By</th>
+                          <th class="fs-14 text-center mw-150">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let autopart of filterPurchaseOrders(2); let i=index; let even=even"
+                          [style.background-color]="i == cindexAutopart? 'lightyellow' : (even ? 'white' : 'white')"
+                          (click)="getAutopartDetail(autopart, i, true)">
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13"
+                            style="word-break: break-word;"><a class="text-primary-abs fw-700"
+                              href="{{autopart.source}}" target="_blank">{{autopart.title}}</a></td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13"
+                            style="word-break: break-word;">
+                            {{autopart.partNumber}}</td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13"
+                            style="word-break: break-word;">
+                            {{autopart.description}}</td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13 fw-700">
+                            ${{autopart.price}}</td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13">
+                            <ng-container *ngFor="let paymentMethod of paymentMethods;let i=index;">
+                              <ng-container *ngIf="autopart.paymentMethodId ==paymentMethod.id">
+                                {{paymentMethod.name}}
+                              </ng-container>
+                            </ng-container>
+                          </td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13">
+                            {{autopart.grade}}</td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13">
+                            <ng-container *ngIf="autopart.year > 0">
+                              {{autopart.year}} {{autopart.make}} {{autopart.model}}
+                            </ng-container>
+                          </td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13">
+                            <ng-container *ngFor="let vendor of vendors;let i=index;">
+                              <ng-container *ngIf="autopart.vendorId ==vendor.id">
+                                {{vendor.name}}
+                              </ng-container>
+                            </ng-container>
+                          </td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13">
+                            {{autopart.createdAt | date}}</td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13">
+                            <ng-container *ngFor="let emplyee of users;let i=index;">
+                              <ng-container *ngIf="emplyee.id ==autopart.userId">
+                                {{emplyee.firstName}} {{emplyee.lastName}}
+                              </ng-container>
+                            </ng-container>
+                          </td>
+                          <td class="text-center fs-13">
+                            <button class="btn btn-danger btn-sm mx-1" (click)="deletePurchseOrder(autopart)"
+                              [disabled]="user.allowAddUpdatePurchaseOrder == false"><i
+                                class="fa fa-trash"></i></button>
+                            <button class="btn btn-warning btn-sm mx-1" (click)="setPurchaseOrderStatus(autopart, 1)"
+                              title="Un-Approve this purchase order"
+                              [disabled]="user.allowAddUpdatePurchaseOrder == false"><i
+                                class="fa fa-times"></i></button>
+                            <button class="btn btn-success btn-sm mx-1" (click)="setPurchaseOrderStatus(autopart,3)"
+                              title="Order this" [disabled]="user.allowApproveRejectPurchaseOrder == false"><i
+                                class="fa fa-check"></i></button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div #taggroup class="tab-pane fade" id="inventory-tab-four-pane" role="tabpanel"
+              aria-labelledby="inventory-tab-four" tabindex="0">
+              <div class="bg-white border-radius-8 shadow mt-5">
+                <div class="d-flex align-items-center justify-content-between px-4">
+                  <div class="py-4">
+                    <strong class="fs-18">Ordered Purchase Orders </strong>
+                  </div>
+                </div>
+                <div class="p-4 border-top">
+                  <div class="table-container shadow border-radius-8 border w-100" *ngIf="purchaseOrders.length> 0">
+                    <table class="table-bordered table-striped overflow-hidden border-radius-8">
+                      <thead>
+                        <tr>
+                          <th (click)="sortListPurchaseOrder('title')" class="fs-14 text-center mw-130">Parts Name</th>
+                          <th (click)="sortListPurchaseOrder('partNumber')" class="fs-14 text-center mw-100">Part No.
+                          </th>
+                          <th (click)="sortListPurchaseOrder('description')" class="fs-14 text-center mw-150">
+                            Description</th>
+                          <th (click)="sortListPurchaseOrder('price')" class="fs-14 text-center mw-100">Price</th>
+                          <th (click)="sortListPurchaseOrder('paymentMethodId')" class="fs-14 text-center mw-100">
+                            Payment Method</th>
+                          <th (click)="sortListPurchaseOrder('grade')" class="fs-14 text-center mw-130">Grade</th>
+                          <th class="fs-14 text-center mw-150">Year / Make / Model</th>
+                          <th (click)="sortListPurchaseOrder('vendorId')" class="fs-14 text-center mw-100">Vendor</th>
+                          <th (click)="sortListPurchaseOrder('createdAt')" class="fs-14 text-center mw-130">Date</th>
+                          <th (click)="sortListPurchaseOrder('userId')" class="fs-14 text-center mw-130">By</th>
+                          <th class="fs-14 text-center mw-150">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let autopart of filterPurchaseOrders(3); let i=index; let even=even"
+                          [style.background-color]="i == cindexAutopart? 'lightyellow' : (even ? 'white' : 'white')"
+                          (click)="getAutopartDetail(autopart, i, true)">
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13"
+                            style="word-break: break-word;"><a class="text-primary-abs fw-700"
+                              href="{{autopart.source}}" target="_blank">{{autopart.title}}</a></td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13"
+                            style="word-break: break-word;">
+                            {{autopart.partNumber}}</td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13"
+                            style="word-break: break-word;">
+                            {{autopart.description}}</td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13 fw-700">
+                            ${{autopart.price}}</td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13">
+                            <ng-container *ngFor="let paymentMethod of paymentMethods;let i=index;">
+                              <ng-container *ngIf="autopart.paymentMethodId ==paymentMethod.id">
+                                {{paymentMethod.name}}
+                              </ng-container>
+                            </ng-container>
+                          </td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13">
+                            {{autopart.grade}}</td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13">
+                            <ng-container *ngIf="autopart.year > 0">
+                              {{autopart.year}} {{autopart.make}} {{autopart.model}}
+                            </ng-container>
+                          </td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13">
+                            <ng-container *ngFor="let vendor of vendors;let i=index;">
+                              <ng-container *ngIf="autopart.vendorId ==vendor.id">
+                                {{vendor.name}}
+                              </ng-container>
+                            </ng-container>
+                          </td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13">
+                            {{autopart.createdAt | date}}</td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13">
+                            <ng-container *ngFor="let emplyee of users;let i=index;">
+                              <ng-container *ngIf="emplyee.id ==autopart.userId">
+                                {{emplyee.firstName}} {{emplyee.lastName}}
+                              </ng-container>
+                            </ng-container>
+                          </td>
+                          <td class="text-center fs-13">
+                            <button class="btn btn-danger btn-sm mx-1" (click)="deletePurchseOrder(autopart)"
+                              [disabled]="user.allowAddUpdatePurchaseOrder == false"><i
+                                class="fa fa-trash"></i></button>
+                            <button class="btn btn-warning btn-sm mx-1" (click)="setPurchaseOrderStatus(autopart, 2)"
+                              title="Un-Order this" [disabled]="user.allowAddUpdatePurchaseOrder == false"><i
+                                class="fa fa-angle-left"></i></button>
+                            <button class="btn btn-success btn-sm mx-1" title="Received"
+                              (click)="archivePurchaseOrder(autopart, true, 'arvhived')"
+                              [disabled]="user.allowAddUpdatePurchaseOrder == false"><i
+                                class="fa fa-check"></i></button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div #taggroup class="tab-pane fade" id="inventory-tab-five-pane" role="tabpanel"
+              aria-labelledby="inventory-tab-five" tabindex="0">
+              <div class="bg-white border-radius-8 shadow mt-5">
+                <div class="d-flex align-items-center justify-content-between px-4">
+                  <div class="py-4">
+                    <strong class="fs-18">Received Parts </strong>
+                  </div>
+                </div>
+                <div class="p-4 border-top">
+                  <div class="table-container shadow border-radius-8 border w-100" *ngIf="filterAutoparts(0).length> 0">
+                    <table class="table-bordered table-striped overflow-hidden border-radius-8">
+                      <thead>
+                        <tr>
+                          <th (click)="sortListAutopart('title')">Parts Name</th>
+                          <th (click)="sortListAutopart('partNumber')" class="fs-14 text-center mw-100">Part No.</th>
+                          <th (click)="sortListAutopart('description')" class="fs-14 text-center mw-150">Description
+                          </th>
+                          <th (click)="sortListAutopart('price')" class="fs-14 text-center mw-100">Price</th>
+                          <th (click)="sortListAutopart('paymentMethodId')" class="fs-14 text-center mw-100">Payment
+                            Method</th>
+                          <th (click)="sortListAutopart('grade')" class="fs-14 text-center mw-130">Grade</th>
+                          <th class="fs-14 text-center mw-150">Year / Make / Model</th>
+                          <th (click)="sortListAutopart('vendorId')" class="fs-14 text-center mw-100">Vendor</th>
+                          <th (click)="sortListAutopart('createdAt')" class="fs-14 text-center mw-130">Date</th>
+                          <th (click)="sortListAutopart('userId')" class="fs-14 text-center mw-130">By</th>
+                          <th class="fs-14 text-center mw-150">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let autopart of filterAutoparts(0); let i=index; let even=even"
+                          [style.background-color]="i == cindexAutopart? 'lightyellow' : (even ? 'white' : 'white')"
+                          (click)="getAutopartDetail(autopart, i, false)">
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13"
+                            style="word-break: break-word;">
+                            <ng-container *ngIf="autopart.source != null && autopart.source !='' ">
+                              <a class="text-primary-abs fw-700" href="{{autopart.source}}"
+                                target="_blank">{{autopart.title}}</a>
+                            </ng-container>
+                            <ng-container
+                              *ngIf="autopart.source == null || autopart.source =='' ">{{autopart.title}}</ng-container>
+                          </td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13"
+                            style="word-break: break-word;">
+                            {{autopart.partNumber}}</td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13"
+                            style="word-break: break-word;">
+                            <ng-container
+                              *ngIf="autopart.imageModels != null && autopart.imageModels.length > 0 &&  autopart.showInSearchImageId > 0">
+                              <img class="rounded-4 me-3" height="100" width="100"
+                                src="{{baseUrlResizeImage + '/' + autopart?.showInSearchImageId}}" />
+                            </ng-container>
+                            {{autopart.description}}
+                          </td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13 fw-700">
+                            ${{autopart.price}}</td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13">
+                            <ng-container *ngFor="let paymentMethod of paymentMethods;let i=index;">
+                              <ng-container *ngIf="autopart.paymentMethodId ==paymentMethod.id">
+                                {{paymentMethod.name}}
+                              </ng-container>
+                            </ng-container>
+                          </td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13">
+                            {{autopart.grade}}</td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13">
+                            <ng-container *ngIf="autopart.year > 0">
+                              {{autopart.year}} {{autopart.make}} {{autopart.model}}
+                            </ng-container>
+                          </td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13">
+                            <ng-container *ngFor="let vendor of vendors;let i=index;">
+                              <ng-container *ngIf="autopart.vendorId ==vendor.id">
+                                {{vendor.name}}
+                              </ng-container>
+                            </ng-container>
+                          </td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13">
+                            {{autopart.createdAt | date}}</td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13">
+                            <ng-container *ngFor="let emplyee of users;let i=index;">
+                              <ng-container *ngIf="emplyee.id ==autopart.userId">
+                                {{emplyee.firstName}} {{emplyee.lastName}}
+                              </ng-container>
+                            </ng-container>
+                          </td>
+                          <td class="text-center fs-13">
+                            <button class="btn btn-danger btn-sm mx-1" (click)="deleteAutopart(autopart)"
+                              [disabled]="user.allowAddUpdateAutopart == false"><i class="fa fa-trash"></i></button>
+                            <button class="btn btn-warning btn-sm mx-1" (click)="setAutopartStatus(autopart, 1)"
+                              title="Return this" [disabled]="user.allowAddUpdateAutopart == false"><i
+                                class="fa fa-angle-right"></i></button>
+                            <button class="btn btn-warning btn-sm mx-1" (click)="setAutopartStatus(autopart,2)"
+                              title="Inventory this" [disabled]="user.allowAddUpdateAutopart == false"><i
+                                class="fa fa-angle-right"></i></button>
+                            <button class="btn btn-success btn-sm mx-1"
+                              (click)="archiveAutopart(autopart, true, 'archive')" title="Use it"
+                              [disabled]="user.allowAddUpdateAutopart == false"><i class="fa fa-check"></i></button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div #taggroup class="tab-pane fade" id="inventory-tab-six-pane" role="tabpanel"
+              aria-labelledby="inventory-tab-six" tabindex="0">
+              <div class="bg-white border-radius-8 shadow mt-5">
+                <div class="d-flex align-items-center justify-content-between px-4">
+                  <div class="py-4">
+                    <strong class="fs-18">Shall be Returned Parts </strong>
+                  </div>
+                </div>
+                <div class="p-4 border-top">
+                  <div class="table-container shadow border-radius-8 border w-100" *ngIf="filterAutoparts(1).length> 0">
+                    <table class="table-bordered table-striped overflow-hidden border-radius-8">
+                      <thead>
+                        <tr>
+                          <th (click)="sortListAutopart('title')">Parts Name</th>
+                          <th (click)="sortListAutopart('partNumber')" class="fs-14 text-center mw-100">Part No.</th>
+                          <th (click)="sortListAutopart('description')" class="fs-14 text-center mw-150">Description
+                          </th>
+                          <th (click)="sortListAutopart('price')" class="fs-14 text-center mw-100">Price</th>
+                          <th (click)="sortListAutopart('paymentMethodId')" class="fs-14 text-center mw-100">Payment
+                            Method</th>
+                          <th (click)="sortListAutopart('grade')" class="fs-14 text-center mw-130">Grade</th>
+                          <th class="fs-14 text-center mw-150">Year / Make / Model</th>
+                          <th (click)="sortListAutopart('vendorId')" class="fs-14 text-center mw-100">Vendor</th>
+                          <th (click)="sortListAutopart('createdAt')" class="fs-14 text-center mw-130">Date</th>
+                          <th (click)="sortListAutopart('userId')" class="fs-14 text-center mw-130">By</th>
+                          <th class="fs-14 text-center mw-150">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let autopart of filterAutoparts(1); let i=index; let even=even"
+                          [style.background-color]="i == cindexAutopart? 'lightyellow' : (even ? 'white' : 'white')"
+                          (click)="getAutopartDetail(autopart, i, false)">
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13"
+                            style="word-break: break-word;">
+                            <ng-container *ngIf="autopart.source != null && autopart.source !='' ">
+                              <a class="text-primary-abs fw-700" href="{{autopart.source}}"
+                                target="_blank">{{autopart.title}}</a>
+                            </ng-container>
+                            <ng-container
+                              *ngIf="autopart.source == null || autopart.source =='' ">{{autopart.title}}</ng-container>
+                          </td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13"
+                            style="word-break: break-word;">
+                            {{autopart.partNumber}}</td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13"
+                            style="word-break: break-word;">
+                            <ng-container
+                              *ngIf="autopart.imageModels != null && autopart.imageModels.length > 0 &&  autopart.showInSearchImageId > 0">
+                              <img class="rounded-4 me-3" height="100" width="100"
+                                src="{{baseUrlResizeImage + '/' + autopart?.showInSearchImageId}}" />
+                            </ng-container>
+                            {{autopart.description}}
+                          </td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13 fw-700">
+                            ${{autopart.price}}</td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13">
+                            <ng-container *ngFor="let paymentMethod of paymentMethods;let i=index;">
+                              <ng-container *ngIf="autopart.paymentMethodId ==paymentMethod.id">
+                                {{paymentMethod.name}}
+                              </ng-container>
+                            </ng-container>
+                          </td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13">
+                            {{autopart.grade}}</td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13">
+                            <ng-container *ngIf="autopart.year > 0">
+                              {{autopart.year}} {{autopart.make}} {{autopart.model}}
+                            </ng-container>
+                          </td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13">
+                            <ng-container *ngFor="let vendor of vendors;let i=index;">
+                              <ng-container *ngIf="autopart.vendorId ==vendor.id">
+                                {{vendor.name}}
+                              </ng-container>
+                            </ng-container>
+                          </td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13">
+                            {{autopart.createdAt | date}}</td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13">
+                            <ng-container *ngFor="let emplyee of users;let i=index;">
+                              <ng-container *ngIf="emplyee.id ==autopart.userId">
+                                {{emplyee.firstName}} {{emplyee.lastName}}
+                              </ng-container>
+                            </ng-container>
+                          </td>
+                          <td class="text-center fs-13">
+                            <button class="btn btn-danger btn-sm mx-1" (click)="deleteAutopart(autopart)"
+                              [disabled]="user.allowAddUpdateAutopart == false"><i class="fa fa-trash"></i></button>
+                            <button class="btn btn-warning btn-sm mx-1" (click)="setAutopartStatus(autopart, 0)"
+                              title="Un-Return this part" [disabled]="user.allowAddUpdateAutopart == false"><i
+                                class="fa fa-angle-left"></i></button>
+                            <button class="btn btn-warning btn-sm mx-1" (click)="setAutopartStatus(autopart,2)"
+                              title="Inventory this" [disabled]="user.allowAddUpdateAutopart == false"><i
+                                class="fa fa-angle-right"></i></button>
+                            <button class="btn btn-success btn-sm mx-1" title="Returned"
+                              (click)="archiveAutopart(autopart, true, 'Returned')"
+                              [disabled]="user.allowAddUpdateAutopart == false"><i class="fa fa-check"></i></button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div #taggroup class="tab-pane fade" id="inventory-tab-seven-pane" role="tabpanel"
+              aria-labelledby="inventory-tab-seven" tabindex="0">
+              <div class="bg-white border-radius-8 shadow mt-5">
+                <div class="d-flex align-items-center justify-content-between px-4">
+                  <div class="py-4">
+                    <strong class="fs-18">Inventoried Parts <button class="btn btn-primary-abs btn-sm"
+                        (click)="getAllAutopartsWithPage(0, pageSize,2, false)"><i
+                          class="fa fa-rotate"></i></button></strong>
+                  </div>
+                </div>
+                <div class="p-4 border-top">
+                  <div class="table-container shadow border-radius-8 border w-100" *ngIf="autopartsInventory.length> 0">
+                    <table class="table-bordered table-striped overflow-hidden border-radius-8">
+                      <thead>
+                        <tr>
+                          <th class="fs-14 text-center mw-100">Parts Name</th>
+                          <th class="fs-14 text-center mw-100">Part No.</th>
+                          <th class="fs-14 text-center mw-150">Description</th>
+                          <th class="fs-14 text-center mw-100">Price/Sale Price</th>
+                          <th class="fs-14 text-center mw-100">Payment Method</th>
+                          <th class="fs-14 text-center mw-130">Grade</th>
+                          <th class="fs-14 text-center mw-150">Year / Make / Model</th>
+                          <th class="fs-14 text-center mw-100">Vendor</th>
+                          <th class="fs-14 text-center mw-130">Date</th>
+                          <th class="fs-14 text-center mw-130">By</th>
+                          <th class="fs-14 text-center mw-130">Posting Date</th>
+                          <th class="fs-14 text-center mw-150">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr
+                          *ngFor="let autopart of filterAutopartsInventory(2)| paginate: { itemsPerPage: this.pageSize,currentPage: currantPageNumberInventory , totalItems: totalCountInventory}; let i=index; let even=even"
+                          [style.background-color]="i == cindexAutopart? 'lightyellow' : (even ? 'white' : 'white')"
+                          (click)="getAutopartDetail(autopart, i, false)">
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13"
+                            style="word-break: break-word;">
+                            <ng-container *ngIf="autopart.source != null && autopart.source !='' ">
+                              <a class="text-primary-abs fw-700" href="{{autopart.source}}"
+                                target="_blank">{{autopart.title}}</a>
+                            </ng-container>
+                            <ng-container
+                              *ngIf="autopart.source == null || autopart.source =='' ">{{autopart.title}}</ng-container>
+                          </td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13"
+                            style="word-break: break-word;">
+                            {{autopart.partNumber}}</td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13"
+                            style="word-break: break-word;">
+                            <ng-container
+                              *ngIf="autopart.imageModels != null && autopart.imageModels.length > 0 &&  autopart.showInSearchImageId > 0">
+                              <img class="rounded-4 me-3" height="100" width="100"
+                                src="{{baseUrlResizeImage + '/' + autopart?.showInSearchImageId}}" />
+                            </ng-container>
+                            {{autopart.description}}
+                          </td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13 fw-700">
+                            ${{autopart.price}}/${{autopart.salePrice}}</td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13">
+                            <ng-container *ngFor="let paymentMethod of paymentMethods;let i=index;">
+                              <ng-container *ngIf="autopart.paymentMethodId ==paymentMethod.id">
+                                {{paymentMethod.name}}
+                              </ng-container>
+                            </ng-container>
+                          </td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13">
+                            {{autopart.grade}}</td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13">
+                            <ng-container *ngIf="autopart.year > 0">
+                              {{autopart.year}} {{autopart.make}} {{autopart.model}}
+                            </ng-container>
+                          </td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13">
+                            <ng-container *ngFor="let vendor of vendors;let i=index;">
+                              <ng-container *ngIf="autopart.vendorId ==vendor.id">
+                                {{vendor.name}}
+                              </ng-container>
+                            </ng-container>
+                          </td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13">
+                            {{autopart.createdAt | date}}
+                          </td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13">
+                            <ng-container *ngFor="let emplyee of users;let i=index;">
+                              <ng-container *ngIf="emplyee.id ==autopart.userId">
+                                {{emplyee.firstName}} {{emplyee.lastName}}
+                              </ng-container>
+                            </ng-container>
+                          </td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13">
+                            <b class="text-danger" *ngIf="autopart.published == true">{{autopart.postingAt | date}}</b>
+                          </td>
+                          <td class="text-center fs-13">
+                            <button class="btn btn-danger btn-sm mx-1"
+                              (click)="deleteAutopartWithStatusInventory(autopart,2)"
+                              [disabled]="user.allowAddUpdateAutopart == false"><i class="fa fa-trash"></i></button>
+                            <button class="btn btn-warning btn-sm mx-1" *ngIf="autopart.published == true"
+                              title="Pull this Part off the market" (click)="setAutopartStatus(autopart, 2)"
+                              [disabled]="user.allowAddUpdateAutopart == false"><i
+                                class="fa fa-angle-left"></i></button>
+                            <button class="btn btn-success btn-sm mx-1" *ngIf="autopart.published == true"
+                              (click)="archiveAutopart(autopart, true, 'archive')" title="Sold/Archive it"
+                              [disabled]="user.allowAddUpdateAutopart == false"><i class="fa fa-check"></i></button>
+                            <button class="btn btn-warning btn-sm mx-1" *ngIf="autopart.published == false"
+                              title="Un-Invetory this Part" (click)="setAutopartStatus(autopart,0)"
+                              [disabled]="user.allowAddUpdateAutopart == false"><i
+                                class="fa fa-angle-left"></i></button>
+                            <button class="btn btn-warning btn-sm mx-1" *ngIf="autopart.published == false"
+                              title="Post/Publish it to autopart market place" (click)="publishAutopart(autopart)"
+                              [disabled]="user.allowAddUpdateAutopart == false"><i
+                                class="fa fa-angle-right"></i></button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+              </div>
+              <div class="d-flex align-items-center justify-content-between my-4 table-bottom"
+                *ngIf="this.showSearchBar==true">
+                <div class="d-flex align-items-center gap-3 my-2"> <span>Showing</span>
+                  <select class="form-select px-3" [(ngModel)]="pageSize" title="Page Size"
+                    (change)="getAllAutopartsWithPage(0, pageSize,2, false)">
+                    <option>10</option>
+                    <option>20</option>
+                    <option>30</option>
+                    <option>40</option>
+                    <option>50</option>
+                    <option>60</option>
+                    <option>70</option>
+                    <option>80</option>
+                    <option>90</option>
+                    <option>100</option>
+                  </select>
+                  <span>of {{this.totalCountInventory}} entries</span>
+                </div>
+                <nav class="paginations my-2">
+                  <ul class="pagination d-flex align-items-center gap-3">
+
+                    <pagination-controls previousLabel="Prev" nextLabel="Next" [maxSize]=10
+                      (pageChange)="getAllAutopartsWithPage($event, pageSize,2, false)">
+                    </pagination-controls>
+
+                    <!-- <li class="page-item"> <a class="page-link bg-light border-radius-4 px-3 py-2 fw-bold"
+                        (click)="getAllAutopartsWithPage(this.currantPageNumberInventory-1, pageSize,2, false)">
+                        Previous
+                      </a> </li>
+                    <li (click)="getAllAutopartsWithPage(i, pageSize,2, false)"
+                      *ngFor="let page of pagesArrayInventory; let i=index" class="page-item"><a
+                        class="page-link border-radius-4 px-3 py-2"
+                        [style.background-color]="i == currantPageNumberInventory? '#1580DA' : (false ? '#EEE' : '#EEE')"
+                        [style.color]="i == currantPageNumberInventory? '#FFF' : (false ? '#666' : '#666')"
+                        href="javascript:;">{{page}}</a></li>
+                    <li class="page-item"> <a class="page-link bg-light border-radius-4 px-3 py-2 fw-bold"
+                        (click)="getAllAutopartsWithPage(this.currantPageNumberInventory+1, pageSize,2, false)">
+                        Next </a> </li> -->
+                  </ul>
+                </nav>
+              </div>
+            </div>
+            <div #taggroup class="tab-pane fade" id="inventory-tab-eight-pane" role="tabpanel"
+              aria-labelledby="inventory-tab-eight" tabindex="0">
+              <div class="bg-white border-radius-8 shadow mt-5">
+                <div class="d-flex align-items-center justify-content-between px-4">
+                  <div class="py-4">
+                    <strong class="fs-18">Archived Parts <button class="btn btn-primary-abs btn-sm"
+                        (click)="getAllAutopartsWithPage(0, pageSize, 0, true)"><i
+                          class="fa fa-rotate"></i></button></strong>
+                  </div>
+                </div>
+                <div class="p-4 border-top">
+                  <div class="table-container shadow border-radius-8 border w-100" *ngIf="autopartsArchived.length> 0">
+                    <table class="table-bordered table-striped overflow-hidden border-radius-8">
+                      <thead>
+                        <tr>
+                          <th class="fs-14 text-center mw-150">Parts Name</th>
+                          <th class="fs-14 text-center mw-100">Part No.</th>
+                          <th class="fs-14 text-center mw-150">Description</th>
+                          <th class="fs-14 text-center mw-100">Price/Sale Price</th>
+                          <th class="fs-14 text-center mw-100">Payment Method</th>
+                          <th class="fs-14 text-center mw-130">Grade</th>
+                          <th class="fs-14 text-center mw-150">Year / Make / Model</th>
+                          <th class="fs-14 text-center mw-100">Vendor</th>
+                          <th class="fs-14 text-center mw-130">Date</th>
+                          <th class="fs-14 text-center mw-130">By</th>
+                          <th class="fs-14 text-center mw-130">Posting Date</th>
+                          <th class="fs-14 text-center mw-150">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr
+                          *ngFor="let autopart of autopartsArchived | paginate: { itemsPerPage: this.pageSize,currentPage: currantPageNumberArchived , totalItems: totalCountArchived}; let i=index; let even=even"
+                          [style.background-color]="i == cindexAutopart? 'lightyellow' : (even ? 'white' : 'white')"
+                          (click)="getAutopartDetail(autopart, i, false)">
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13"
+                            style="word-break: break-word;">
+                            <ng-container *ngIf="autopart.source != null && autopart.source !='' ">
+                              <a class="text-primary-abs fw-700" href="{{autopart.source}}"
+                                target="_blank">{{autopart.title}}</a>
+                            </ng-container>
+                            <ng-container
+                              *ngIf="autopart.source == null || autopart.source =='' ">{{autopart.title}}</ng-container>
+                          </td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13"
+                            style="word-break: break-word;">
+                            {{autopart.partNumber}}</td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13"
+                            style="word-break: break-word;">
+                            <ng-container
+                              *ngIf="autopart.imageModels != null && autopart.imageModels.length > 0 &&  autopart.showInSearchImageId > 0">
+                              <img class="rounded-4 me-3" height="100" width="100"
+                                src="{{baseUrlResizeImage + '/' + autopart?.showInSearchImageId}}" />
+                            </ng-container>
+                            {{autopart.description}}
+                          </td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13 fw-700">
+                            ${{autopart.price}}/${{autopart.salePrice}}</td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13">
+                            <ng-container *ngFor="let paymentMethod of paymentMethods;let i=index;">
+                              <ng-container *ngIf="autopart.paymentMethodId ==paymentMethod.id">
+                                {{paymentMethod.name}}
+                              </ng-container>
+                            </ng-container>
+                          </td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13">
+                            {{autopart.grade}}</td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13">
+                            <ng-container *ngIf="autopart.year > 0">
+                              {{autopart.year}} {{autopart.make}} {{autopart.model}}
+                            </ng-container>
+                          </td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13">
+                            <ng-container *ngFor="let vendor of vendors;let i=index;">
+                              <ng-container *ngIf="autopart.vendorId ==vendor.id">
+                                {{vendor.name}}
+                              </ng-container>
+                            </ng-container>
+                          </td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13">
+                            {{autopart.createdAt | date}}
+                          </td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13">
+                            <ng-container *ngFor="let emplyee of users;let i=index;">
+                              <ng-container *ngIf="emplyee.id ==autopart.userId">
+                                {{emplyee.firstName}} {{emplyee.lastName}}
+                              </ng-container>
+                            </ng-container>
+                          </td>
+                          <td data-bs-toggle="modal" data-bs-target="#addNewPart" class="text-center fs-13"> <b
+                              class="text-danger" *ngIf="autopart.published == true">{{autopart.postingAt | date}}</b>
+                          </td>
+                          <td class="text-center fs-13">
+                            <button class="btn btn-danger btn-sm mx-1"
+                              (click)="deleteAutopartWithStatusArchived(autopart,0)"
+                              [disabled]="user.allowAddUpdateAutopart == false"><i class="fa fa-trash"></i></button>
+                            <button class="btn btn-warning btn-sm mx-1" title="Un-Archived this"
+                              (click)="archiveAutopart(autopart, false, 'un-archive')"
+                              [disabled]="user.allowAddUpdateAutopart == false"><i class="fa fa-check"></i></button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+              <div class="d-flex align-items-center justify-content-between my-4 table-bottom"
+                *ngIf="this.showSearchBar==true">
+                <div class="d-flex align-items-center gap-3 my-2"> <span>Showing</span>
+                  <select class="form-select px-3" [(ngModel)]="pageSize" title="Page Size"
+                    (change)="getAllAutopartsWithPage(0, pageSize,2, true)">
+                    <option>10</option>
+                    <option>20</option>
+                    <option>30</option>
+                    <option>40</option>
+                    <option>50</option>
+                    <option>60</option>
+                    <option>70</option>
+                    <option>80</option>
+                    <option>90</option>
+                    <option>100</option>
+                  </select>
+                  <span>of {{this.totalCountArchived}} entries</span>
+                </div>
+                <nav class="paginations my-2">
+                  <ul class="pagination d-flex align-items-center gap-3">
+
+                    <pagination-controls #pagination2 previousLabel="Prev" nextLabel="Next" [maxSize]=10
+                      (pageChange)="getAllAutopartsWithPage($event, pageSize,2, true)">
+                    </pagination-controls>
+
+                    <!-- <li class="page-item"> <a class="page-link bg-light border-radius-4 px-3 py-2 fw-bold"
+                        (click)="getAllAutopartsWithPage(this.currantPageNumberInventory-1, pageSize,2, true)">
+                        Previous
+                      </a> </li>
+                    <li (click)="getAllAutopartsWithPage(i, pageSize,2, true)"
+                      *ngFor="let page of pagesArrayArchived; let i=index" class="page-item"><a
+                        class="page-link border-radius-4 px-3 py-2"
+                        [style.background-color]="i == currantPageNumberArchived? '#1580DA' : (false ? '#EEE' : '#EEE')"
+                        [style.color]="i == currantPageNumberArchived? '#FFF' : (false ? '#666' : '#666')"
+                        href="javascript:;">{{page}}</a></li>
+                    <li class="page-item"> <a class="page-link bg-light border-radius-4 px-3 py-2 fw-bold"
+                        (click)="getAllAutopartsWithPage(this.currantPageNumberArchived+1, pageSize,2, true)">
+                        Next </a> </li> -->
+                  </ul>
+                </nav>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<div class="modal fade" id="addNewPart" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+  aria-labelledby="addNewPartLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content border-radius-8">
+      <div class="modal-header p-4">
+        <h1 class="modal-title fs-20 fw-600 text-capitalize" id="addNewPartLabel"> {{formTitle}}</h1>
+        <button type="button" class="btn-close mt-1" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body px-2">
+        <div class="row">
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="partName" class="form-label fs-14 fw-400 mb-3">Parts Name</label>
+              <input trimText [disabled]="user.allowAddUpdateAutopart == false" (keyup.enter)="saveAutopart()" required
+                #title="ngModel" [(ngModel)]="autopart.title" minlength="5" maxlength="200"
+                [ngClass]="{ 'is-invalid': title.errors }" class="form-control h-48 px-3 border-radius-8" type="text"
+                name="partName" placeholder="Enter Parts Name" />
+              <div class="invalid-feedback" *ngIf="title.errors">
+                <span *ngIf="title.errors['required']">Parts Name is required</span>
+                <span *ngIf="title.errors['minlength']">Parts Name must be at least 5 characters</span>
+                <span *ngIf="title.errors['maxlength']">Parts Name must be at most 200 characters</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="partNumber" class="form-label fs-14 fw-400 mb-3">Parts Number</label>
+              <input trimText [(ngModel)]="autopart.partNumber" [disabled]="user.allowAddUpdateAutopart == false"
+                maxlength="200" (keyup.enter)="saveAutopart()" class="form-control h-48 px-3 border-radius-8"
+                type="text" name="partNumber" placeholder="Enter Parts Number" />
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="description" class="form-label fs-14 fw-400 mb-3">Description</label>
+              <input trimText (keyup.enter)="saveAutopart()" minlength="20" maxlength="200"
+                [ngClass]="{ 'is-invalid': description.errors }" required #description="ngModel"
+                [(ngModel)]="autopart.description" [disabled]="user.allowAddUpdateAutopart == false"
+                class="form-control h-48 px-3 border-radius-8" type="text" name="description"
+                placeholder="Enter Description" />
+              <div class="invalid-feedback" *ngIf="description.errors">
+                <span *ngIf="description.errors['required']">Description is required</span>
+                <span *ngIf="description.errors['minlength']">Description must be at least 20 characters</span>
+                <span *ngIf="description.errors['maxlength']">Description must be at most 200 characters</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4" *ngIf="forPurchaseOrder == true">
+            <div class="mt-4 pt-1">
+              <label for="source" class="form-label fs-14 fw-400 mb-3">Source URL</label>
+              <div class="input-group">
+                <input trimText (keyup.enter)="saveAutopart()" [disabled]="user.allowAddUpdateAutopart == false"
+                  maxlength="200" [(ngModel)]="autopart.source" class="form-control h-48 px-3" type="text" name="source"
+                  placeholder="Enter Sourc URL" />
+                <div class="input-group-append" *ngIf="autopart.source != ''">
+                  <button class="btn btn-outline-secondary" type="button" (click)="openSourceLink(autopart.source)"><i
+                      class="fa fa-link"></i></button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="price" class="form-label fs-14 fw-400 mb-3">Price($)</label>
+              <input trimText (keyup.enter)="saveAutopart()" [(ngModel)]="autopart.price"
+                [disabled]="user.allowAddUpdateAutopart == false" #price="ngModel" maxlength="10"
+                oninput="if(this.value<0)this.value=this.value * -1" onKeyPress="if(this.value.length==10) return false"
+                [ngClass]="{ 'is-invalid': price.errors }" required class="form-control h-48 px-3 border-radius-8"
+                type="number" name="price" placeholder="Enter Part Price" />
+              <div class="invalid-feedback" *ngIf="price.errors">
+                <span *ngIf="price.errors['required']">Price is required</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4" *ngIf="this.forPurchaseOrder == false">
+            <div class="mt-4 pt-1">
+              <label for="salesPrice" class="form-label fs-14 fw-400 mb-3">Sales Price($)</label>
+              <input trimText (keyup.enter)="saveAutopart()" [(ngModel)]="autopart.salePrice" maxlength="10"
+                oninput="if(this.value<0)this.value=this.value * -1" onKeyPress="if(this.value.length==10) return false"
+                [disabled]="user.allowAddUpdateAutopart == false" #salePrice="ngModel"
+                [ngClass]="{ 'is-invalid': salePrice.errors }" required class="form-control h-48 px-3 border-radius-8"
+                type="number" name="salesPrice" placeholder="Enter Part Sales Price" />
+              <div class="invalid-feedback" *ngIf="salePrice.errors">
+                <span *ngIf="salePrice.errors['required']">Sales Price is required</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="grade" class="form-label fs-14 fw-400 mb-3">Grade</label>
+              <select class="form-select h-48 px-3 border-radius-8" name="grade" size="1" [(ngModel)]="autopart.grade"
+                required #grade="ngModel" [ngClass]="{ 'is-invalid': grade.errors }">
+                <option value="undefined" disabled selected>Select Grade</option>
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+                <option value="Used">Used</option>
+                <option value="New">New</option>
+                <option value="Insurance">Insurance</option>
+              </select>
+              <div class="invalid-feedback" *ngIf="grade.errors">
+                <span *ngIf="grade.errors['required']">Grade is required</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="vendor" data-bs-toggle="tooltip" data-bs-dismiss="modal" title="Click to go to Configuration"
+                [routerLink]="'/vendors'" class="form-label fs-14 fw-400 mb-3">Vendor</label>
+              <select class="form-select h-48 px-3 border-radius-8" name="vendor" [(ngModel)]="autopart.vendorId"
+                [disabled]="user.allowAddUpdateAutopart == false" #vendor="ngModel" required
+                [ngClass]="{ 'is-invalid': vendor.errors }">
+                <option value="undefined" disabled selected>Select Vendor</option>
+                <option [value]="vendor.id" *ngFor="let vendor of vendors;let i=index;">{{vendor.name}}</option>
+              </select>
+              <div class="invalid-feedback" *ngIf="vendor.errors">
+                <span *ngIf="vendor.errors['required']">Vendor is required</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="payment" data-bs-toggle="tooltip" data-bs-dismiss="modal" title="Click to go to Configuration"
+                [routerLink]="'/payment-method'" class="form-label fs-14 fw-400 mb-3">Payment Method</label>
+              <select class="form-select h-48 px-3 border-radius-8" name="payment"
+                [(ngModel)]="autopart.paymentMethodId" [disabled]="user.allowAddUpdateAutopart == false"
+                #paymentMethod="ngModel" required [ngClass]="{ 'is-invalid': paymentMethod.errors }">
+                <option value="undefined" disabled selected>Select Payment Method</option>
+                <option [value]="paymentMethod.id" *ngFor="let paymentMethod of paymentMethods;let i=index;">
+                  {{paymentMethod.name}}</option>
+              </select>
+              <div class="invalid-feedback" *ngIf="paymentMethod.errors">
+                <span *ngIf="paymentMethod.errors['required']">Payment Method is required</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="notes" class="form-label fs-14 fw-400 mb-3">Notes</label>
+              <input trimText (keyup.enter)="saveAutopart()" [disabled]="user.allowAddUpdateAutopart == false"
+                minlength="2" maxlength="200" [(ngModel)]="autopart.comments"
+                class="form-control h-48 px-3 border-radius-8" type="text" name="notes" placeholder="Enter Notes"
+                [ngClass]="{ 'is-invalid': notes.errors }" #notes="ngModel" />
+              <div class="invalid-feedback" *ngIf="notes.errors">
+                <!-- <span *ngIf="description.errors['required']">Description is required</span> -->
+                <span *ngIf="notes.errors['minlength']">Notes must be at least 2 characters</span>
+                <span *ngIf="notes.errors['maxlength']">Notes must be at most 200 characters</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="year" class="form-label fs-14 fw-400 mb-3">Year</label>
+              <div class="input-group">
+                <select [ngClass]="{ 'is-invalid': year.errors }" [(ngModel)]="autopart.year" #year="ngModel"
+                  class="form-select h-48 px-3" name="year">
+                  <option value="0" disabled selected>Select Year</option>
+                  <option [value]="option" *ngFor="let option of optionsYear;let i=index;">{{option}}</option>
+                </select>
+                <!-- <div class="input-group-append">
+                  <button class="btn btn-outline-secondary" type="button" (click)="searchPartWithYearMakeModel(4)"><i
+                      class="fa fa-search"></i></button>
+                </div> -->
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="make" class="form-label fs-14 fw-400 mb-3">Make</label>
+              <div class="input-group">
+                <select (change)="onChange($event, device.value)" [(ngModel)]="autopart.make" #device #make="ngModel"
+                  class="form-select h-48 px-3" name="make">
+                  <option value="undefined" disabled selected>Select Make</option>
+                  <option [value]="option" *ngFor="let option of optionsMake;let i=index;">{{option}}</option>
+                </select>
+                <!-- <div class="input-group-append">
+                  <button class="btn btn-outline-secondary" type="button" (click)="searchPartWithYearMakeModel(3)"><i
+                      class="fa fa-search"></i></button>
+                </div> -->
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="model" class="form-label fs-14 fw-400 mb-3">Model</label>
+              <div class="input-group">
+                <select #model="ngModel" [(ngModel)]="autopart.model" class="form-select h-48 px-3" name="model">
+                  <option value="undefined" disabled selected>Select Model</option>
+                  <option [value]="option" *ngFor="let option of optionsModel;let i=index;">{{option}}</option>
+                </select>
+                <!-- <div class="input-group-append">
+                  <button class="btn btn-outline-secondary" type="button" (click)="searchPartWithYearMakeModel(2)"><i
+                      class="fa fa-search"></i></button>
+                </div> -->
+              </div>
+            </div>
+          </div>
+          <div class="col-md-12" *ngIf="forPurchaseOrder == false && autopart.id > 0">
+            <div class="row">
+              <div class="col-md-4">
+                <div class="mt-4 pt-1 position-relative">
+                  <button name="btn" class="btn btn-secondary-abs py-3 px-3 w-100" (click)="fileInput.click()"><i
+                      class="fa fa-cloud-upload me-2"></i> Upload Images</button>
+                  <input type='file' accept="image/jpg, image/jpeg"
+                    class="form-control h-48 ps-5 border-radius-8 mt-5 opacity-0 top-0 position-absolute" #fileInput
+                    (change)="onSelectFile($event)" multiple (click)="fileInput.value = ''" />
+                </div>
+                <!-- <div class="mt-4 pt-1 position-relative">
+                <button (click)="deleteImage(selectedAutopart.id, selectedImage)" class="btn btn-danger mt-3 btn-sm"
+                  title="Remove Current Image"><i class="fa fa-trash"></i></button>
+              </div> -->
+              </div>
+              <div class="col-md-4">
+                <div class="mt-2 pt-1 position-relative">
+                  <div *ngFor='let imageModel of autopart.imageModels; let i=index' class="d-inline-block me-2">
+                    <img class="mt-3 preview img-fluid img-thumbnail me-3" width="100"
+                      *ngIf="autopart.showInSearchImageId != imageModel.id"
+                      src="{{baseUrlResizeImage + '/' + imageModel.id}}" (click)="setImage(i)"
+                      style="border: 3px solid #555;">
+                    <img class="mt-3 preview img-fluid img-thumbnail me-3" width="100"
+                      *ngIf="autopart.showInSearchImageId == imageModel.id"
+                      src="{{baseUrlResizeImage + '/' + imageModel.id}}" (click)="setImage(i)" title="Show in search"
+                      style="border: 3px solid lightcoral;">
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mt-4 pt-1 position-relative">
+                  <div class="containerImage" *ngIf="autopart.imageModels.length > 0">
+                    <img *ngIf="selectedImage != null &&  autopart.showInSearchImageId != selectedImage"
+                      class="image w-100 img-fluid img-thumbnail" src="{{baseUrlImage + '/' + selectedImage}}"
+                      alt="Image" />
+                    <img *ngIf="selectedImage != null &&  autopart.showInSearchImageId == selectedImage"
+                      class="image w-100 img-fluid img-thumbnail" src="{{baseUrlImage + '/' + selectedImage}}"
+                      alt="Image" />
+                    <label *ngIf="selectedImage == autopart.showInSearchImageId" class="top-left" for="title">Will
+                      Show This During Search</label>
+                    <div class="bottom-right py-2">
+                      <button *ngIf="selectedImage != autopart.showInSearchImageId" title="As index image during search"
+                        (click)="setImageForSearch(autopart.id, selectedImage)" class="btn btn-primary mt-3 btn-sm"
+                        for="title">Set for Search</button>
+                      <button (click)="deleteImage(autopart.id, selectedImage)" data-toggle="tooltip"
+                        data-placement="top" title="Remove this image" class="btn btn-danger mt-3 btn-sm" for="title">
+                        <i class="bi-trash"></i>
+                      </button>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- <div class="mt-4 pt-1">
+              <ng-container *ngIf="autopart.imageModels != null && autopart.imageModels.length > 0 ">
+                <ng-container *ngFor='let imageModel of autopart.imageModels;let i=index'>
+                  <img class="preview" *ngIf="autopart.showInSearchImageId != imageModel.id"
+                    src="{{baseUrlResizeImage + '/' + imageModel.id}}" (click)="setImage(i)" />
+                  <img class="preview" *ngIf="autopart.showInSearchImageId == imageModel.id"
+                    src="{{baseUrlResizeImage + '/' + imageModel.id}}" (click)="setImage(i)" />
+                </ng-container>
+              </ng-container>
+              <ng-container *ngIf="autopart.imageModels.length > 0"></ng-container>
+              <div class="clearfix"></div>
+              <button class="btn btn-primary-abs mt-4" (click)="fileInput.click()" data-toggle="tooltip"
+                data-placement="top" title="Add Images">
+                <i class="bi-plus-circle"></i> Upload Images
+                <input #fileInput class="btn btn-primary d-none" type='file' (change)="onSelectFile($event)" multiple />
+              </button>
+              <div class="text-danger mt-4">{{ message1}}</div>
+              <div class="containerImage">
+                <img *ngIf="autopart != null && selectedImage !=null && autopart.showInSearchImageId != selectedImage"
+                  class="card-img-top" src="{{baseUrlImage + '/' + selectedImage}}" (click)="exitPreview()"
+                  title="Click to exit preview" alt="Image" />
+                <img *ngIf="autopart != null && selectedImage !=null && autopart.showInSearchImageId == selectedImage"
+                  class="card-img-top" src="{{baseUrlImage + '/' + selectedImage}}" (click)="exitPreview()"
+                  title="Click to exit preview" alt="Image" />
+                <label *ngIf="selectedImage !=null && selectedImage == autopart.showInSearchImageId" class="top-left"
+                  for="title">Will Show This During Search</label>
+                <div class="bottom-right">
+                  <button *ngIf="selectedImage !=null && selectedImage != autopart.showInSearchImageId"
+                    (click)="setImageForSearch(autopart.id, selectedImage)" class="btn btn-primary  mr-1"
+                    for="title">Set for Search</button>
+                  <button *ngIf="selectedImage !=null" (click)="deleteImage(autopart.id, selectedImage)"
+                    data-toggle="tooltip" data-placement="top" title="Remove this image" class="btn btn-primary  mr-1"
+                    for="title"><i class="fa fa-search"></i></button>
+                </div>
+              </div>
+            </div> -->
+          </div>
+          <div class="col-12 mt-4">
+            <div class="alert alert-success" *ngIf="messagePart !=''">{{ messagePart}}</div>
+            <div *ngIf="errorMessageCounterInvoiceSearch">
+              <div class="form-group">
+                <label *ngIf="errorMessageCounterInvoiceSearch">Error</label>
+                <div *ngIf="errorMessageCounterInvoiceSearch" class="alert alert-danger" role="alert">{{
+                  errorMessageCounterInvoiceSearch }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="d-flex align-items-center gap-3 mt-4 px-3">
+          <button [disabled]="user.allowAddUpdateAutopart == false" (click)="saveAutopart()"
+            class="btn btn-primary-abs h-45 px-4 rounded-4 fs-14 fw-600">Save Details</button>
+          <!-- <button (click)="previewAutopart()" [disabled]="user.allowAddUpdateAutopart == false"
+            *ngIf="this.forPurchaseOrder == false"
+            class="btn btn-secondary-abs h-45 px-4 rounded-4 fs-14 fw-600">Preview Images</button> -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<div class="modal fade" id="myAccount" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+  aria-labelledby="myAccountLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content border-radius-8">
+      <div class="modal-header p-4">
+        <h1 class="modal-title fs-20 fw-600 text-capitalize" id="myAccountLabel">My Account</h1>
+        <button type="button" class="btn-close mt-1" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body px-2" *ngIf="currentUser">
+        <form *ngIf="!isSuccessful" name="form" (ngSubmit)="f.form.valid && onSubmit()" #f="ngForm" novalidate>
+          <div class="row">
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="title" class="form-label fs-14 fw-400 mb-3">Account Type</label>
+                <select class="form-select h-48 px-3 border-radius-8" name="role" #type="ngModel" size="1" style=" appearance: none;
+                background-image: url('');" [(ngModel)]="form.role" required disabled
+                  [ngClass]="{ 'is-invalid': f.submitted && type.errors }">
+                  <option value="ROLE_USER" selected>Employee</option>
+                  <option value="ROLE_SHOP">Auto Shop</option>
+                  <option value="ROLE_ADMIN">Admin</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-4" *ngIf="form.role == 'ROLE_SHOP' || form.role == 'ROLE_RECYCLER' ">
+              <div class="mt-4 pt-1">
+                <label for="bussnessName" class="form-label fs-14 fw-400 mb-3">Business/Company Name</label>
+                <input trimText class="form-control h-48 px-3 border-radius-8" name="bussinessname"
+                  [(ngModel)]="form.bussinessname" required minlength="5" maxlength="200" #bussinessname="ngModel"
+                  placeHolder="Enter Business/Company Name"
+                  [ngClass]="{ 'is-invalid': f.submitted && bussinessname.errors }" />
+                <div class="invalid-feedback" *ngIf="bussinessname.errors && f.submitted">
+                  <span *ngIf="bussinessname.errors['required']">Business Name is required</span>
+                  <span *ngIf="bussinessname.errors['minlength']">Business Name must be at least 5 characters</span>
+                  <span *ngIf="bussinessname.errors['maxlength']">Business Name must be at most 200 characters</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="firstName" class="form-label fs-14 fw-400 mb-3">First Name</label>
+                <input trimText class="form-control h-48 px-3 border-radius-8" type="text" name="firstName"
+                  [(ngModel)]="form.firstName" required minlength="2" maxlength="20" #firstName="ngModel"
+                  [ngClass]="{ 'is-invalid': f.submitted && firstName.errors }" placeholder="Enter Your First Name" />
+                <div class="invalid-feedback" *ngIf="firstName.errors && f.submitted">
+                  <span *ngIf="firstName.errors['required']">First Name is required</span>
+                  <span *ngIf="firstName.errors['minlength']">First Name must be at least 2 characters</span>
+                  <span *ngIf="firstName.errors['maxlength']">First Name must be at most 20 characters</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="lastName" class="form-label fs-14 fw-400 mb-3">Last Name</label>
+                <input trimText class="form-control h-48 px-3 border-radius-8" type="text" name="lastName"
+                  [(ngModel)]="form.lastName" required minlength="2" maxlength="20" #lastName="ngModel"
+                  [ngClass]="{ 'is-invalid': f.submitted && lastName.errors }" placeholder="Enter Your Last Name" />
+                <div class="invalid-feedback" *ngIf="lastName.errors && f.submitted">
+                  <span *ngIf="lastName.errors['required']">Last Name is required</span>
+                  <span *ngIf="lastName.errors['minlength']">Last Name must be at least 2 characters</span>
+                  <span *ngIf="lastName.errors['maxlength']">Last Name must be at most 20 characters</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="email" class="form-label fs-14 fw-400 mb-3">Email Address</label>
+                <input trimText class="form-control h-48 px-3 border-radius-8" name="email" [(ngModel)]="form.email"
+                  pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" required email #email="ngModel"
+                  [ngClass]="{ 'is-invalid': f.submitted && email.errors }" maxlength="100"
+                  placeholder="Enter Your Email Address" />
+                <div class="invalid-feedback" *ngIf="email.errors && f.submitted">
+                  <span *ngIf="email.errors['required']">Email is required</span>
+                  <span *ngIf="email.errors['email']">Email must be a valid email address</span>
+                  <span *ngIf="email.errors['pattern']">Email must be a valid email address</span>
+                  <span *ngIf="email.errors['maxlength']">Email must be at most 100 characters</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="phone" class="form-label fs-14 fw-400 mb-3">Phone</label>
+                <input trimText class="form-control h-48 px-3 border-radius-8" name="phone" [(ngModel)]="form.phone"
+                  type="text" required maxlength="20" #phone="ngModel"
+                  [ngClass]="{ 'is-invalid': f.submitted && phone.errors }" pattern="^[-+()0-9]{10,12}(?:-\d+)?$"
+                  placeholder="Enter Your Phone Number" />
+                <div class="invalid-feedback" *ngIf="phone.errors && f.submitted">
+                  <span *ngIf="phone.errors['required']">Phone is required</span>
+                  <span *ngIf="phone.errors['pattern']">Phone must be a valid phone number</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="street" class="form-label fs-14 fw-400 mb-3">Street</label>
+                <input trimText class="form-control h-48 px-3 border-radius-8" name="street" [(ngModel)]="form.street"
+                  required minlength="2" maxlength="200" #street="ngModel"
+                  [ngClass]="{ 'is-invalid': f.submitted && street.errors }" placeholder="Enter Your Street" />
+                <div class="invalid-feedback" *ngIf="street.errors && f.submitted">
+                  <span *ngIf="street.errors['required']">Street is required</span>
+                  <span *ngIf="street.errors['minlength']">Street must be at least 2 characters</span>
+                  <span *ngIf="street.errors['maxlength']">Street must be at most 200 characters</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="city" class="form-label fs-14 fw-400 mb-3">City</label>
+                <input trimText class="form-control h-48 px-3 border-radius-8" name="city" [(ngModel)]="form.city"
+                  required minlength="2" maxlength="200" #city="ngModel"
+                  [ngClass]="{ 'is-invalid': f.submitted && city.errors }" placeholder="Enter Your City" />
+                <div class="invalid-feedback" *ngIf="city.errors && f.submitted">
+                  <span *ngIf="city.errors['required']">City is required</span>
+                  <span *ngIf="city.errors['minlength']">City must be at least 2 characters</span>
+                  <span *ngIf="city.errors['maxlength']">City must be at most 200 characters</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="state" class="form-label fs-14 fw-400 mb-3">State</label>
+                <select class="form-select h-48 px-3 border-radius-8" name="state" #state="ngModel" size="1" required
+                  [(ngModel)]="form.state" [ngClass]="{ 'is-invalid': f.submitted && state.errors }">
+                  <option value="AL">Alabama</option>
+                  <option value="AK">Alaska</option>
+                  <option value="AZ">Arizona</option>
+                  <option value="AR">Arkansas</option>
+                  <option value="CA">California</option>
+                  <option value="CO">Colorado</option>
+                  <option value="CT">Connecticut</option>
+                  <option value="DE">Delaware</option>
+                  <option value="DC">District Of Columbia</option>
+                  <option value="FL">Florida</option>
+                  <option value="GA">Georgia</option>
+                  <option value="HI">Hawaii</option>
+                  <option value="ID">Idaho</option>
+                  <option value="IL">Illinois</option>
+                  <option value="IN">Indiana</option>
+                  <option value="IA">Iowa</option>
+                  <option value="KS">Kansas</option>
+                  <option value="KY">Kentucky</option>
+                  <option value="LA">Louisiana</option>
+                  <option value="ME">Maine</option>
+                  <option value="MD">Maryland</option>
+                  <option value="MA">Massachusetts</option>
+                  <option value="MI">Michigan</option>
+                  <option value="MN">Minnesota</option>
+                  <option value="MS">Mississippi</option>
+                  <option value="MO">Missouri</option>
+                  <option value="MT">Montana</option>
+                  <option value="NE">Nebraska</option>
+                  <option value="NV">Nevada</option>
+                  <option value="NH">New Hampshire</option>
+                  <option value="NJ">New Jersey</option>
+                  <option value="NM">New Mexico</option>
+                  <option value="NY">New York</option>
+                  <option value="NC">North Carolina</option>
+                  <option value="ND">North Dakota</option>
+                  <option value="OH">Ohio</option>
+                  <option value="OK">Oklahoma</option>
+                  <option value="OR">Oregon</option>
+                  <option value="PA">Pennsylvania</option>
+                  <option value="RI">Rhode Island</option>
+                  <option value="SC">South Carolina</option>
+                  <option value="SD">South Dakota</option>
+                  <option value="TN">Tennessee</option>
+                  <option value="TX">Texas</option>
+                  <option value="UT">Utah</option>
+                  <option value="VT">Vermont</option>
+                  <option value="VA">Virginia</option>
+                  <option value="WA">Washington</option>
+                  <option value="WV">West Virginia</option>
+                  <option value="WI">Wisconsin</option>
+                  <option value="WY">Wyoming</option>
+                </select>
+                <div class="invalid-feedback d-block" *ngIf="state.errors && f.submitted">
+                  <span *ngIf="state.errors['required']">State is required</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="zip" class="form-label fs-14 fw-400 mb-3">Zip Code</label>
+                <input trimText class="form-control h-48 px-3 border-radius-8" pattern="[0-9]*" name="zip"
+                  [(ngModel)]="form.zip" maxlength="20" required minlength="5" maxlength="20" #zip="ngModel"
+                  [ngClass]="{ 'is-invalid': f.submitted && zip.errors }" placeholder="Enter Your Zip Code" />
+                <div class="invalid-feedback" *ngIf="zip.errors && f.submitted">
+                  <span *ngIf="zip.errors['required']">Zip Code is required</span>
+                  <span *ngIf="zip.errors['pattern']">Must be a valid Zip Code</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-12 mt-4">
+              <div *ngIf="f.submitted && isUpdateFailed">
+                <span *ngIf="errorMessageProfile" class="alert alert-danger" role="alert">Update failed: {{
+                  errorMessageProfile
+                  }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="d-flex align-items-center gap-3 mt-5 px-3" *ngIf="currentUser">
+            <button class="btn btn-primary-abs h-45 px-4 rounded-4 fs-14 fw-600">Update Account</button>
+          </div>
+        </form>
+        <div *ngIf="isSuccessful" class="p-4">
+          <span class="alert alert-success" role="alert">Your update is successful! <button
+              class="btn btn-sm btn-primary-abs ms-3" (click)="reload()">Ok</button></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="resetPassword" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+  aria-labelledby="resetPasswordLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content border-radius-8">
+      <div class="modal-header p-4">
+        <h1 class="modal-title fs-20 fw-600 text-capitalize" id="resetPasswordLabel">Reset Password</h1>
+        <button type="button" class="btn-close mt-1" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body px-2" *ngIf="currentUser">
+        <form name="form" (ngSubmit)="f.form.valid && changePasswordRequest()" #f="ngForm" novalidate>
+          <div class="row">
+            <div class="col-md-4" *ngIf="form.role == 'ROLE_SHOP' || form.role == 'ROLE_RECYCLER' ">
+              <div class="mt-4 pt-1">
+                <label for="password" class="form-label fs-14 fw-400 mb-3">Old Password</label>
+                <div class="input-group">
+                  <input trimText class="form-control h-48 px-3" [type]="showPassword ? 'text' : 'password'"
+                    name="password" [(ngModel)]="form.password" required minlength="6" #password="ngModel"
+                    maxlength="30" [ngClass]="{ 'is-invalid': f.submitted && password.errors }"
+                    placeholder="Enter Your Old Password" />
+                  <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button"> <i alt="show" class="far fa-eye eye-show"
+                        (click)="showPassword = !showPassword" [class.hide]="showPassword"></i>
+                      <i alt="hide" class="far fa-eye-slash eye-hide" (click)="showPassword = !showPassword"
+                        [class.hide]="!showPassword"></i></button>
+                  </div>
+                </div>
+                <div class="invalid-feedback" *ngIf="password.errors && f.submitted">
+                  <span *ngIf="password.errors['required']">Password is required</span>
+                  <span *ngIf="password.errors['minlength']">Password must be at least 6 characters</span>
+                  <span *ngIf="password.errors['maxlength']">Password must be at most 30 characters</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="newPassword" class="form-label fs-14 fw-400 mb-3">New Password</label>
+                <div class="input-group">
+                  <input trimText class="form-control h-48 px-3" [type]="showPasswordNew ? 'text' : 'password'"
+                    name="newPassword" [(ngModel)]="form.newPassword" required minlength="6" #newPassword="ngModel"
+                    maxlength="30" [ngClass]="{ 'is-invalid': f.submitted && newPassword.errors }"
+                    placeholder="Enter Your New Password" />
+                  <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button"> <i alt="show" class="far fa-eye eye-show"
+                        (click)="showPasswordNew = !showPasswordNew" [class.hide]="showPasswordNew"></i>
+                      <i alt="hide" class="far fa-eye-slash eye-hide" (click)="showPasswordNew = !showPasswordNew"
+                        [class.hide]="!showPasswordNew"></i></button>
+                  </div>
+                </div>
+                <div class="invalid-feedback" *ngIf="newPassword.errors && f.submitted">
+                  <span *ngIf="newPassword.errors['required']">New Password is required</span>
+                  <span *ngIf="newPassword.errors['minlength']">New Password must be at least 6 characters</span>
+                  <span *ngIf="newPassword.errors['maxlength']">New Password must be at most 30 characters</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="newPasswordComfirmed" class="form-label fs-14 fw-400 mb-3">Confirm New Password</label>
+                <div class="input-group">
+                  <input trimText class="form-control h-48 px-3" [type]="showPaswordNewConfirmed ? 'text' : 'password'"
+                    name="passwordNew" [(ngModel)]="form.newPasswordComfirmed" required minlength="6"
+                    #newPasswordComfirmed="ngModel" maxlength="30"
+                    [ngClass]="{ 'is-invalid': f.submitted && newPasswordComfirmed.errors }"
+                    placeholder="Please Re-Type Your New Password" />
+                  <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button"> <i alt="show" class="far fa-eye eye-show"
+                        (click)="showPaswordNewConfirmed = !showPaswordNewConfirmed"
+                        [class.hide]="showPaswordNewConfirmed"></i>
+                      <i alt="hide" class="far fa-eye-slash eye-hide"
+                        (click)="showPaswordNewConfirmed = !showPaswordNewConfirmed"
+                        [class.hide]="!showPaswordNewConfirmed"></i></button>
+                  </div>
+                </div>
+                <div class="invalid-feedback" *ngIf="newPasswordComfirmed.errors && f.submitted">
+                  <span *ngIf="newPasswordComfirmed.errors['required']">Confirm New Password is required</span>
+                  <span *ngIf="newPasswordComfirmed.errors['minlength']">Confirm New Password must be at least 6
+                    characters</span>
+                  <span *ngIf="newPasswordComfirmed.errors['maxlength']">Confirm New Password must be at most 30
+                    characters</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-12 py-4 mt-4" *ngIf="errorMessageResetPassword != ''">
+              <span class="alert alert-success line-height-150" role="alert">{{errorMessageResetPassword}}</span>
+            </div>
+          </div>
+          <div class="d-flex align-items-center gap-3 mt-4 px-3" *ngIf="currentUser">
+            <button class="btn btn-primary-abs h-45 px-4 rounded-4 fs-14 fw-600">Reset Password</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" tabindex="-1" role="dialog" [ngStyle]="{'display':displayStyle}">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header" style="background-color: lightgrey">
+          <h4 class="modal-title">Purchase Order for [{{ this.autopart.title}}]</h4>
+        </div>
+        <div class="modal-body">
+          <div class="form-group nopadding">
+            <label>Reason for Rejection</label>
+            <div class="input-group">
+              <input type="text" name="reason" class="form-control" placeholder="Reason for Rejection" required
+                [(ngModel)]="autopart.reason" #reason="ngModel" [ngClass]="{ 'is-invalid': reason.errors }" />
+            </div>
+          </div>
+          <div class="form-group nopadding">
+            <label> </label>
+          </div>
+          <div class="alert alert-danger" *ngIf="messageReasonRejection !=''">
+            {{ messageReasonRejection}}
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closePopupYes()">
+            Reject It
+          </button>
+          <button type="button" class="btn btn-secondary" (click)="closePopup()">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" tabindex="-1" role="dialog" [ngStyle]="{'display':displayStyleMarket}">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header" style="background-color: lightgrey">
+          <h4 class="modal-title">Posting [{{ this.autopart.title}}] to market</h4>
+        </div>
+        <div class="modal-body">
+          <div class="form-group nopadding">
+            <label>Sale Price (the origianl is ${{ autopart.price}})</label>
+            <div class="input-group">
+              <input type="number" name="reason" class="form-control" placeholder="Save Price" required
+                oninput="if(this.value<0)this.value=this.value * -1" [(ngModel)]="autopart.salePrice" maxlength="10"
+                onKeyPress="if(this.value.length==10) return false" #salePrice="ngModel"
+                [ngClass]="{ 'is-invalid': salePrice.errors }" />
+            </div>
+          </div>
+          <div class="form-group nopadding">
+            <label> </label>
+          </div>
+          <div class="alert alert-danger" *ngIf="messageReasonMarket !=''">
+            {{ messageReasonMarket}}
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closePopupYesMarket()">
+            Post It
+          </button>
+          <button type="button" class="btn btn-secondary" (click)="closePopupMarket()">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>

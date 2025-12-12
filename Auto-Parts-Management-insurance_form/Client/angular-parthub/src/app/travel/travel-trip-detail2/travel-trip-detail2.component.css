@@ -1,0 +1,209 @@
+/* Trip Detail Modal Styles */
+.modal-xl {
+  max-width: 1200px;
+}
+
+.modal-body {
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+/* Image Gallery Styles */
+.thumbnail-container {
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.thumbnail-container:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.thumbnail-container.border-primary {
+  border-color: #007bff !important;
+  box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+}
+
+/* Navigation Arrows */
+.btn-light {
+  background-color: rgba(255,255,255,0.9);
+  border: 1px solid rgba(0,0,0,0.1);
+  color: #333;
+  transition: all 0.3s ease;
+}
+
+.btn-light:hover {
+  background-color: rgba(255,255,255,1);
+  transform: scale(1.1);
+}
+
+/* Tab Navigation */
+.nav-tabs .nav-link {
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: #6c757d;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.nav-tabs .nav-link:hover {
+  border-color: #dee2e6;
+  color: #495057;
+}
+
+.nav-tabs .nav-link.active {
+  border-color: #007bff;
+  color: #007bff;
+  background-color: transparent;
+}
+
+/* Tab Content */
+.tab-content {
+  min-height: 300px;
+}
+
+.tab-pane {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Card Styles */
+.card {
+  transition: all 0.3s ease;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.card:hover {
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  transform: translateY(-2px);
+}
+
+.card-header {
+  border-bottom: none;
+  font-weight: 600;
+}
+
+/* Table Styles */
+.table th {
+  border-top: none;
+  font-weight: 600;
+  color: #495057;
+}
+
+.table td {
+  vertical-align: middle;
+}
+
+/* Badge Styles */
+.badge {
+  font-size: 0.75rem;
+  padding: 0.5em 0.75em;
+}
+
+/* Accordion Styles */
+.accordion-button {
+  background-color: #f8f9fa;
+  border: none;
+  font-weight: 600;
+}
+
+.accordion-button:not(.collapsed) {
+  background-color: #e7f3ff;
+  color: #0c63e4;
+}
+
+.accordion-button:focus {
+  box-shadow: none;
+  border-color: #86b7fe;
+}
+
+/* Button Styles */
+.btn-primary {
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,123,255,0.4);
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, #6c757d 0%, #545b62 100%);
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(108,117,125,0.4);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .modal-xl {
+    max-width: 95vw;
+    margin: 1rem;
+  }
+  
+  .modal-body {
+    max-height: 70vh;
+  }
+  
+  .thumbnail-container img {
+    width: 60px !important;
+    height: 45px !important;
+  }
+}
+
+/* Loading States */
+.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Status Colors */
+.text-success {
+  color: #28a745 !important;
+}
+
+.text-danger {
+  color: #dc3545 !important;
+}
+
+.text-warning {
+  color: #ffc107 !important;
+}
+
+.text-info {
+  color: #17a2b8 !important;
+}
+
+.text-muted {
+  color: #6c757d !important;
+}
+
+/* Custom Scrollbar */
+.modal-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}

@@ -1,0 +1,1478 @@
+<div #taggroup>
+  <div class="row nogot">
+    <div class="my-fluid-col main-content col mt-4 pt-2">
+      <div class="row px-2 position-sticky common-bar-top">
+        <nav class="navbar navbar-expand navbar-white bg-white border-radius-8 d-flex justify-content-between">
+          <button class="btn btn-primary-abs" (click)="toggleClass()"><i class="fa fa-bars"></i></button>
+          <ul class="navbar-nav d-flex align-items-center gap-5">
+            <li class="search-bar">
+              <div class="position-relative">
+                <input type="text" class="form-control bg-light height-40 border-0" [(ngModel)]="searchInput"
+                  title="Search customer last name" (input)="onSearchChangeCustomer($event)"
+                  placeholder="Search customer last name..." />
+                <a (click)="searchCustomerByLastName(searchInput)" title="Search customer last name"
+                  class="position-absolute end-0 top-0 mt-3 me-3 text-muted"><i class="fa fa-search"></i></a>
+              </div>
+            </li>
+            <!-- <li class="nav-item dropdown">
+              <div class="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"> <a href="javascript:;"
+                  class="notification position-relative"><i class="fa fa-bell text-dark opacity-50 fs-20"></i> <span
+                    class="position-absolute top-0 start-100 translate-middle bg-danger rounded-circle text-white text-white text-center line-height-200">10</span></a>
+              </div>
+              <div class="dropdown-menu p-0 border-0 shadow border-radius-8 overflow-hidden w-100 notification-box">
+                <div class="d-flex align-items-center justify-content-between p-4 border-bottom"> <strong
+                    class="fs-14">Notifications <span class="text-muted">(10)</span></strong> <a href="javascript:;"
+                    class="fs-12">Mark All Read</a> </div>
+                <div class="notice-scroller"> <a href="javascript:;" class="w-100 d-block">
+                    <div class="d-flex gap-3 align-items-center p-4 border-bottom"> <i
+                        class="fa fa-car fs-18 text-primary-abs text-center"></i> <span class="text-muted pe-4">
+                        <p class="fs-13">Vehicle <b class="text-dark">Chevrolet</b> is due 28 days.</p>
+                        <small class="fs-12">2 Hours ago</small>
+                      </span> </div>
+                  </a> <a href="javascript:;" class="w-100 d-block">
+                    <div class="d-flex gap-3 align-items-center p-4 border-bottom"> <i
+                        class="fa fa-user-tie fs-18 text-primary-abs text-center"></i> <span class="text-muted pe-4">
+                        <p class="fs-13">New <b class="text-dark">Customer</b> has been added.</p>
+                        <small class="fs-12">1 Day ago</small>
+                      </span> </div>
+                  </a> <a href="javascript:;" class="w-100 d-block">
+                    <div class="d-flex gap-3 align-items-center p-4 border-bottom"> <i
+                        class="fa fa-car fs-18 text-primary-abs text-center"></i> <span class="text-muted pe-4">
+                        <p class="fs-13">Vehicle <b class="text-dark">Chevrolet</b> is due 28 days.</p>
+                        <small class="fs-12">2 Hours ago</small>
+                      </span> </div>
+                  </a> <a href="javascript:;" class="w-100 d-block">
+                    <div class="d-flex gap-3 align-items-center p-4 border-bottom"> <i
+                        class="fa fa-user-tie fs-18 text-primary-abs text-center"></i> <span class="text-muted pe-4">
+                        <p class="fs-13">New <b class="text-dark">Customer</b> has been added.</p>
+                        <small class="fs-12">1 Day ago</small>
+                      </span> </div>
+                  </a> <a href="javascript:;" class="w-100 d-block">
+                    <div class="d-flex gap-3 align-items-center p-4"> <i
+                        class="fa fa-car fs-18 text-primary-abs text-center"></i> <span class="text-muted pe-4">
+                        <p class="fs-13">Vehicle <b class="text-dark">Chevrolet</b> is due 28 days.</p>
+                        <small class="fs-12">2 Hours ago</small>
+                      </span> </div>
+                  </a> </div>
+                <a href="javascript:;" class="text-center mx-auto pt-3 fs-12 d-block border-top">See all
+                  notifications</a>
+              </div>
+            </li> -->
+            <li class="nav-item dropdown">
+              <div class="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                <div class="d-flex align-items-center gap-3"> <img width="40" height="40" class="border-radius-4"
+                    *ngIf="company.icon != null && company.icon.length >0"
+                    [src]="'data:image/jpeg;base64,'+ company.icon" />
+                  <div class="user-details"> <strong class="fs-14 mb-1 d-block">{{user.firstName}}
+                      {{user.lastName}}</strong> <small
+                      class="fs-13 text-dark- opacity-50">{{this.company.name}}</small> </div>
+                  <i class="fa fa-angle-down opacity-50"></i>
+                </div>
+              </div>
+              <div class="dropdown-menu p-0 border-0 shadow border-radius-8 overflow-hidden w-100 mt-3">
+                <ul class="d-flex flex-column">
+                  <li class="d-block p-0"><a routerLink="/users" class="dropdown-item p-3 fs-12"><i
+                        class="fa fa-users text-primary-abs fs-15 me-2 ms-1"></i> Manage Users</a></li>
+                  <li class="d-block p-0"><button data-bs-toggle="modal" data-bs-target="#myAccount"
+                      class="dropdown-item p-3 fs-12"><i class="fa fa-user text-primary-abs fs-15 me-2 ms-1"></i> My
+                      Account</button></li>
+                  <li class="d-block p-0"><button data-bs-toggle="modal" data-bs-target="#resetPassword"
+                      class="dropdown-item p-3 fs-12"><i class="fa fa-key text-primary-abs fs-15 me-2 ms-1"></i> Reset
+                      Password</button></li>
+                  <li class="d-block p-0"><a routerLink="/login" class="dropdown-item p-3 fs-12" (click)="logout()"><i
+                        class="fa fa-power-off text-primary-abs fs-15 me-2 ms-1"></i> Logout</a></li>
+                </ul>
+              </div>
+            </li>
+          </ul>
+        </nav>
+      </div>
+
+      <div class="d-md-flex align-items-center justify-content-between px-2 my-4 pt-4">
+        <h2 class="heading-color fw-700 text-uppercase fs-18">Invoices</h2>
+        <div class="d-md-flex align-items-center gap-3 mt-15-mob">
+          <a class="btn btn-primary-abs fs-13 px-3 py-2 mt-15-mob" *ngIf="user.allowUpdateCustomerInfo == true"
+            href="#/add-customers"><i class="fa fa-user-tie me-2"></i> Add Customer</a>
+        </div>
+      </div>
+
+      <div *ngIf="errorMessageCounterInvoiceSearch" class="form-group col-12 nopadding">
+        <div class="form-group">
+          <label *ngIf="errorMessageCounterInvoiceSearch">Error</label>
+          <div *ngIf="errorMessageCounterInvoiceSearch" class="alert alert-danger" role="alert">
+            {{ errorMessageCounterInvoiceSearch }}
+          </div>
+        </div>
+      </div>
+
+      <div class="row mx-negative">
+        <div class="col-lg-3 col-md-6 py-2" (click)="getCustomerDetail(customer2, i)"
+          *ngFor="let customer2 of customers; let i=index; let even=even">
+          <div class="bg-white shadow-sm border-radius-8 p-4 cursor-pointer"
+            [style.border]="i == cindex? '1px solid #1580da' : (even ? 'white' : 'white')">
+            <div class="text-center">
+              <i class="fa-solid fa-circle-user fa-4x heading-color"></i>
+              <strong class="text-black fs-14 d-block pt-4 pb-2" style="word-break: break-word;">{{ customer2.title}} {{
+                customer2.firstName }}
+                {{customer2.lastName }}</strong>
+            </div>
+            <ul class="customers-details">
+              <li class="d-flex gap-3 align-items-center mt-4"><i
+                  class="fa fa-mobile-alt text-primary-abs border-radius-4 text-center "></i>
+                <p class="fs-12 text-black opacity-75 line-height-150" style="word-break: break-word;">{{
+                  formatPhoneNumber(customer2.phone) }} {{
+                  formatPhoneNumber(customer2.phone2) }} {{formatPhoneNumber(customer2.phone3) }}</p>
+              </li>
+              <li class="d-flex gap-3 align-items-center mt-4"><i
+                  class="fa fa-envelope text-primary-abs border-radius-4 text-center "></i>
+                <p class="fs-12 text-black opacity-75 line-height-150">{{ customer2.email }}</p>
+              </li>
+              <li class="d-flex gap-3 align-items-center mt-4"><i
+                  class="fa fa-map-marker-alt text-primary-abs border-radius-4 text-center "></i>
+                <p class="fs-12 text-black opacity-75 line-height-150" style="word-break: break-word;">
+                  {{customer2.street}}, {{customer2.city}},
+                  {{customer2.state}} {{customer2.zip}}</p>
+              </li>
+              <li class="d-flex gap-3 align-items-center mt-4"><i
+                  class="fa fa-calendar text-primary-abs border-radius-4 text-center "></i>
+                <p class="fs-12 text-black opacity-75 line-height-150">Since {{customer2.createdAt| date}}</p>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white border-radius-8 shadow vehicles-overview mx-2">
+        <div class="d-flex align-items-center justify-content-between px-4">
+          <div class="p-4">
+
+            <strong class="fs-18">Invoices List <span class="fs-14 fw-400">
+              </span> <button class="btn btn-success fs-12 btn-sm me-3" title="Load invoices from server"
+                (click)="getAllCounterInvoiceWithPage(0, pageSize)"><i class="fa fa-refresh"></i></button></strong>
+            <button id="openModalButton" [hidden]="true" data-bs-toggle="modal" data-bs-target="#editInvoice">Open
+              Modal</button>
+          </div>
+          <a *ngIf="user.allowAddCounterInvoice == true && this.vehicle.customer.id > 0"
+            (click)="createCounterInvoice(this.vehicle.customer.id)" class="btn btn-primary-abs fs-13 px-3 py-2"><i
+              class="fa fa-plus me-2"></i>
+            Add Invoice to {{
+            this.vehicle.customer.title}} {{ this.vehicle.customer.firstName}} {{ this.vehicle.customer.lastName}}</a>
+        </div>
+        <div class="p-4 border-top">
+          <div class="table-container table-striped shadow border-radius-8 border w-100">
+            <table class="table-bordered overflow-hidden border-radius-8">
+              <thead>
+                <tr>
+                  <th class="fs-14 text-center mw-100">Invoice Type</th>
+                  <th class="fs-14 text-center mw-130">Invoice Name</th>
+                  <th class="fs-14 text-center mw-130">Customer</th>
+                  <th class="fs-14 text-center mw-100">Amount</th>
+                  <th class="fs-14 text-center mw-100">Payment Method</th>
+                  <th class="fs-14 text-center mw-100">Items</th>
+                  <th class="fs-14 text-center mw-150">Description</th>
+                  <th class="fs-14 text-center mw-130">Date</th>
+                  <th class="fs-14 text-center mw-130">By</th>
+                  <th class="fs-14 text-center">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  *ngFor="let counterInvoice of this.counterInvoices| paginate: { itemsPerPage: this.pageSize,currentPage: currantPageNumber , totalItems: totalCount}; let i=index; let even=even"
+                  [style.background-color]="i == cindexCounterInvoice? 'lightyellow' : (even ? '#FFF' : '#F5F5F5')"
+                  (click)="getCounterInvoiceDetail(counterInvoice, i)">
+                  <td data-bs-toggle="modal" data-bs-target="#editInvoice" class="text-center fs-13"
+                    style="word-break: break-word;">
+                    {{counterInvoice.type}}</td>
+                  <td data-bs-toggle="modal" data-bs-target="#editInvoice" class="text-center fs-13"
+                    style="word-break: break-word;">
+                    {{counterInvoice.name}}</td>
+                  <td data-bs-toggle="modal" data-bs-target="#editInvoice" class="text-center fs-13">
+                    {{counterInvoice.customer?.title}}
+                    {{counterInvoice.customer?.firstName}}
+                    {{counterInvoice.customer?.lastName}} {{formatPhoneNumber(counterInvoice.customer?.phone)}} </td>
+                  <td data-bs-toggle="modal" data-bs-target="#editInvoice" class="text-center fs-13">
+                    {{counterInvoice.amount}}</td>
+                  <td data-bs-toggle="modal" data-bs-target="#editInvoice" class="text-center fs-13">
+                    <ng-container *ngFor="let paymentMethod of paymentMethods;let i=index;">
+                      <ng-container *ngIf="counterInvoice.paymentMethod ==paymentMethod.id">
+                        {{paymentMethod.name}}
+                      </ng-container>
+                    </ng-container>
+                  </td>
+                  <td data-bs-toggle="modal" data-bs-target="#editInvoice" class="text-center fs-13">
+                    {{counterInvoice.itemCounts}}</td>
+                  <td data-bs-toggle="modal" data-bs-target="#editInvoice" class="text-center fs-13 line-height-150"
+                    style="word-break: break-word;">
+                    {{counterInvoice.notes}}</td>
+                  <td data-bs-toggle="modal" data-bs-target="#editInvoice" class="text-center fs-13">
+                    {{counterInvoice.createdAt | date}}</td>
+                  <td data-bs-toggle="modal" data-bs-target="#editInvoice" class="text-center fs-13">
+                    <ng-container *ngFor="let emplyee of users;let i=index;">
+                      <ng-container *ngIf="emplyee.id ==counterInvoice.userId">
+                        {{emplyee.firstName}} {{emplyee.lastName}}
+                      </ng-container>
+                    </ng-container>
+                  </td>
+                  <td class="text-center fs-13">
+                    <button class="btn btn-danger btn-sm" [disabled]="user.allowAddCounterInvoice == false"
+                      (click)="deleteCounterInvoice(null, counterInvoice)"><i class="fa fa-trash"></i></button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex align-items-center justify-content-between my-4 table-bottom">
+        <div class="d-flex align-items-center gap-3 my-2"> <span>Showing</span>
+          <select class="form-select px-3" [(ngModel)]="pageSize" title="Page Size"
+            (change)="getAllCounterInvoiceWithPage(0, pageSize)">
+            <option>10</option>
+            <option>20</option>
+            <option>30</option>
+            <option>40</option>
+            <option>50</option>
+            <option>60</option>
+            <option>70</option>
+            <option>80</option>
+            <option>90</option>
+            <option>100</option>
+          </select>
+          <span>of {{this.totalCount}} entries</span>
+        </div>
+        <nav class="paginations my-2">
+          <ul class="pagination d-flex align-items-center gap-3">
+
+            <pagination-controls previousLabel="Prev" nextLabel="Next" [maxSize]=10
+              (pageChange)="getAllCounterInvoiceWithPage($event, pageSize)">
+            </pagination-controls>
+
+            <!-- <li class="page-item"> <a class="page-link bg-light border-radius-4 px-3 py-2 fw-bold"
+                (click)="getAllCounterInvoiceWithPage(this.currantPageNumber-1, pageSize)">
+                Previous
+              </a> </li>
+            <li (click)="getAllCounterInvoiceWithPage(i, pageSize)" *ngFor="let page of pagesArray; let i=index"
+              class="page-item"><a class="page-link border-radius-4 px-3 py-2"
+                [style.background-color]="i == currantPageNumber? '#1580DA' : (false ? '#EEE' : '#EEE')"
+                [style.color]="i == currantPageNumber? '#FFF' : (false ? '#666' : '#666')"
+                href="javascript:;">{{page}}</a></li>
+            <li class="page-item"> <a class="page-link bg-light border-radius-4 px-3 py-2 fw-bold"
+                (click)="getAllCounterInvoiceWithPage(this.currantPageNumber+1, pageSize)">
+                Next </a> </li> -->
+          </ul>
+        </nav>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+
+<div class="modal fade" id="editInvoice" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+  aria-labelledby="editInvoiceLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content border-radius-8">
+      <div class="modal-header p-4">
+        <h1 class="modal-title fs-20 fw-600 text-capitalize" id="editInvoiceLabel">Edit Invoice
+          #:{{this.counterInvoice.invoiceNumber}}</h1>
+        <button type="button" class="btn-close mt-1" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body pb-4 px-2">
+        <div class="row" *ngIf="editModeCustomer==true">
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="title" class="form-label fs-14 fw-400 mb-3">Title</label>
+              <select class="form-select h-48 px-3 border-radius-8" name="title" #title="ngModel" size="1" required
+                [(ngModel)]="vehicle.customer.title" [ngClass]="{ 'is-invalid': title.errors }">
+                <option *ngFor="let title of optionsTitle">{{ title}}</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="firstname" class="form-label fs-14 fw-400 mb-3">First Name</label>
+              <input trimText class="form-control h-48 px-3 border-radius-8" type="text" name="firstName" required
+                minlength="2" maxlength="200" #firstName="ngModel" [ngClass]="{ 'is-invalid': firstName.errors }"
+                [(ngModel)]="vehicle.customer.firstName" />
+              <div class="invalid-feedback" *ngIf="firstName.errors">
+                <span *ngIf="firstName.errors['required']">First Name is required</span>
+                <span *ngIf="firstName.errors['minlength']">First Name must be at least 2 characters</span>
+                <span *ngIf="firstName.errors['maxlength']">First Name must be at most 200 characters</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="lastname" class="form-label fs-14 fw-400 mb-3">Last Name</label>
+              <input trimText class="form-control h-48 px-3 border-radius-8" type="text" required minlength="2"
+                maxlength="200" #lastName="ngModel" [ngClass]="{ 'is-invalid': lastName.errors }"
+                [(ngModel)]="vehicle.customer.lastName" placeholder="Enter Your Last Name" />
+              <div class="invalid-feedback" *ngIf="lastName.errors">
+                <span *ngIf="lastName.errors['required']">Last Name is required</span>
+                <span *ngIf="lastName.errors['minlength']">Last Name must be at least 2 characters</span>
+                <span *ngIf="lastName.errors['maxlength']">Last Name must be at most 200 characters</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="phone" class="form-label fs-14 fw-400 mb-3">Mobile Phone</label>
+              <input trimText class="form-control h-48 px-3 border-radius-8" name="phone" type="text" pname="phone"
+                required [(ngModel)]="vehicle.customer.phone" #phone="ngModel"
+                [ngClass]="{ 'is-invalid': phone.errors }" pattern="^[-+()0-9]{10,12}(?:-\d+)?$"
+                placeholder=" Enter Your Mobile Phone Number" />
+              <div class="invalid-feedback" *ngIf="phone.errors">
+                <span *ngIf="phone.errors['required']">Mobile Phone is required</span>
+                <span *ngIf="phone.errors['pattern']">Phone must be a valid phone number</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="homePhone" class="form-label fs-14 fw-400 mb-3">Home Phone</label>
+              <input trimText class="form-control h-48 px-3 border-radius-8" name="phone2" type="text" name="phone2"
+                [(ngModel)]="vehicle.customer.phone2" #phone2="ngModel" [ngClass]="{ 'is-invalid': phone2.errors }"
+                pattern="^[-+()0-9]{10,12}(?:-\d+)?$" placeholder="Enter Your Home Phone Number" />
+              <div class="invalid-feedback" *ngIf="phone2.errors ">
+                <span *ngIf="phone2.errors['phone2']">Home Phone must be a valid phone number</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="workPhone" class="form-label fs-14 fw-400 mb-3">Work Phone</label>
+              <input trimText class="form-control h-48 px-3 border-radius-8" name="phone3" type="text"
+                [(ngModel)]="vehicle.customer.phone3" #phone3="ngModel" [ngClass]="{ 'is-invalid': phone3.errors }"
+                pattern="^[-+()0-9]{10,12}(?:-\d+)?$" placeholder="Enter Your Work Phone Number" />
+              <div class="invalid-feedback" *ngIf="phone3.errors ">
+                <span *ngIf="phone3.errors['phone3']">Work Phone must be a valid phone number</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="email" class="form-label fs-14 fw-400 mb-3">Email Address</label>
+              <input trimText class="form-control h-48 px-3 border-radius-8" name="email" type="text"
+                [(ngModel)]="vehicle.customer.email" placeholder="Enter Your Email Address" />
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="email" class="form-label fs-14 fw-400 mb-3">Street</label>
+              <input trimText class="form-control h-48 px-3 border-radius-8" name="email" type="text" minlength="2"
+                maxlength="200" #street="ngModel" required [ngClass]="{ 'is-invalid': street.errors }"
+                [(ngModel)]="vehicle.customer.street" placeholder="Enter Your Street" />
+              <div class="invalid-feedback" *ngIf="street.errors">
+                <span *ngIf="street.errors['required']">Street is required</span>
+                <span *ngIf="street.errors['minlength']">Street must be at least 2 characters</span>
+                <span *ngIf="street.errors['maxlength']">Street must be at most 200 characters</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="city" class="form-label fs-14 fw-400 mb-3">City</label>
+              <input trimText class="form-control h-48 px-3 border-radius-8" name="city" type="text" minlength="2"
+                #city="ngModel" maxlength="200" required [ngClass]="{ 'is-invalid': city.errors }"
+                [(ngModel)]="vehicle.customer.city" placeholder="Enter Your City" />
+              <div class="invalid-feedback" *ngIf="city.errors">
+                <span *ngIf="city.errors['required']">City is required</span>
+                <span *ngIf="city.errors['minlength']">City must be at least 2 characters</span>
+                <span *ngIf="city.errors['maxlength']">City must be at most 200 characters</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="state" class="form-label fs-14 fw-400 mb-3">State</label>
+              <select class="form-select h-48 px-3 border-radius-8" name="state" #state="ngModel" size="1" required
+                [(ngModel)]="vehicle.customer.state" [ngClass]="{ 'is-invalid': state.errors }">
+                <option value="AL">Alabama</option>
+                <option value="AK">Alaska</option>
+                <option value="AZ">Arizona</option>
+                <option value="AR">Arkansas</option>
+                <option value="CA">California</option>
+                <option value="CO">Colorado</option>
+                <option value="CT">Connecticut</option>
+                <option value="DE">Delaware</option>
+                <option value="DC">District Of Columbia</option>
+                <option value="FL">Florida</option>
+                <option value="GA">Georgia</option>
+                <option value="HI">Hawaii</option>
+                <option value="ID">Idaho</option>
+                <option value="IL">Illinois</option>
+                <option value="IN">Indiana</option>
+                <option value="IA">Iowa</option>
+                <option value="KS">Kansas</option>
+                <option value="KY">Kentucky</option>
+                <option value="LA">Louisiana</option>
+                <option value="ME">Maine</option>
+                <option value="MD">Maryland</option>
+                <option value="MA">Massachusetts</option>
+                <option value="MI">Michigan</option>
+                <option value="MN">Minnesota</option>
+                <option value="MS">Mississippi</option>
+                <option value="MO">Missouri</option>
+                <option value="MT">Montana</option>
+                <option value="NE">Nebraska</option>
+                <option value="NV">Nevada</option>
+                <option value="NH">New Hampshire</option>
+                <option value="NJ">New Jersey</option>
+                <option value="NM">New Mexico</option>
+                <option value="NY">New York</option>
+                <option value="NC">North Carolina</option>
+                <option value="ND">North Dakota</option>
+                <option value="OH">Ohio</option>
+                <option value="OK">Oklahoma</option>
+                <option value="OR">Oregon</option>
+                <option value="PA">Pennsylvania</option>
+                <option value="RI">Rhode Island</option>
+                <option value="SC">South Carolina</option>
+                <option value="SD">South Dakota</option>
+                <option value="TN">Tennessee</option>
+                <option value="TX">Texas</option>
+                <option value="UT">Utah</option>
+                <option value="VT">Vermont</option>
+                <option value="VA">Virginia</option>
+                <option value="WA">Washington</option>
+                <option value="WV">West Virginia</option>
+                <option value="WI">Wisconsin</option>
+                <option value="WY">Wyoming</option>
+              </select>
+              <div class="invalid-feedback d-block" *ngIf="state.errors ">
+                <span *ngIf="state.errors['required']">State is required</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="zip" class="form-label fs-14 fw-400 mb-3">Zip Code</label>
+              <input trimText class="form-control h-48 px-3 border-radius-8" name="email" type="text" minlength="5"
+                required #zip="ngModel" [ngClass]="{ 'is-invalid': zip.errors }" #zipCode
+                (keyup.enter)="searchZip(zipCode.value, vehicle)" maxlength="5" [(ngModel)]="vehicle.customer.zip"
+                placeholder="Enter Your Xip Code" />
+              <div class="invalid-feedback" *ngIf="zip.errors ">
+                <span *ngIf="zip.errors['required']">Zip is required</span>
+                <span *ngIf="zip.errors['zip']">Must be a valid zip</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="notes" class="form-label fs-14 fw-400 mb-3">Notes</label>
+              <input trimText class="form-control h-48 px-3 border-radius-8" name="notes" type="text" maxlength="200"
+                [(ngModel)]="vehicle.customer.notes" placeholder="Enter Your Notes" />
+            </div>
+          </div>
+          <div class="col-md-4 mt-4">
+            <div *ngIf="errorMessage">
+              <span *ngIf="errorMessage" class="alert alert-danger" role="alert">{{ errorMessage }}</span>
+            </div>
+            <div *ngIf="successMessage">
+              <span *ngIf="successMessage" class="alert alert-success" role="alert">{{ successMessage }}</span>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="editModeCustomer==true" class="d-flex align-items-center gap-3 mt-4 px-3 mb-4"
+          (click)="editModeVehicle=!editModeVehicle">
+          <button (click)="saveCustomerInfo(vehicle.customer)"
+            *ngIf="editModeCustomer == true && this.user.allowUpdateCustomerInfo == true"
+            class="btn btn-primary-abs h-45 px-4 rounded-4 fs-14 fw-600">Save Details</button>
+        </div>
+        <div class="row">
+          <div class="col-lg-4 col-md-5 mt-3 mb-4" (click)="editModeCustomer = !editModeCustomer"
+            *ngIf="editModeCustomer==false && vehicle.customer.id> 0">
+            <div class="bg-white shadow border-radius-8 p-4 cursor-pointer">
+              <div class="text-center">
+                <i class="fa-solid fa-circle-user fa-5x heading-color"></i>
+                <strong class="text-black fs-14 d-block pt-4 pb-2" style="word-break: break-word;">{{
+                  vehicle.customer.title}} {{
+                  vehicle.customer.firstName }} {{vehicle.customer.lastName }}</strong>
+              </div>
+              <ul class="customers-details">
+                <li class="d-flex gap-3 align-items-center mt-4"><i
+                    class="fa fa-mobile-alt text-primary-abs border-radius-4 text-center "></i>
+                  <p class="fs-12 text-black opacity-75 line-height-150">{{ formatPhoneNumber(vehicle.customer.phone) }}
+                    {{ formatPhoneNumber(vehicle.customer.phone2) }} {{formatPhoneNumber(vehicle.customer.phone3) }}</p>
+                </li>
+                <li class="d-flex gap-3 align-items-center mt-4"><i
+                    class="fa fa-envelope text-primary-abs border-radius-4 text-center "></i>
+                  <p class="fs-12 text-black opacity-75 line-height-150">{{ vehicle.customer.email }}</p>
+                </li>
+                <li class="d-flex gap-3 align-items-center mt-4"><i
+                    class="fa fa-map-marker-alt text-primary-abs border-radius-4 text-center "></i>
+                  <p class="fs-12 text-black opacity-75 line-height-150" style="word-break: break-word;">
+                    {{vehicle.customer.street}},
+                    {{vehicle.customer.city}}, {{vehicle.customer.state}} {{vehicle.customer.zip}}</p>
+                </li>
+                <li class="d-flex gap-3 align-items-center mt-4"><i
+                    class="fa fa-calendar text-primary-abs border-radius-4 text-center "></i>
+                  <p class="fs-12 text-black opacity-75 line-height-150">Since {{vehicle.customer.createdAt| date}}</p>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <!-- <div class="col-lg-4 col-md-5 mt-3 mb-4" *ngIf="customers.length > 0">
+            <div class="bg-white shadow border-radius-8 p-4 cursor-pointer" (click)="getCustomerDetail(customer2, i)"
+              *ngFor="let customer2 of customers; let i=index;  let even=even">
+              <div class="text-center">
+                <i class="fa-solid fa-circle-user fa-5x heading-color"></i>
+                <strong class="text-black fs-14 d-block pt-4 pb-2">{{ customer2.title}} {{ customer2.firstName }}
+                  {{customer2.lastName }}</strong>
+              </div>
+              <ul class="customers-details">
+                <li class="d-flex gap-3 align-items-center mt-4"><i
+                    class="fa fa-mobile-alt text-primary-abs border-radius-4 text-center "></i>
+                  <p class="fs-12 text-black opacity-75 line-height-150">{{ formatPhoneNumber(customer2.phone) }} {{
+                    formatPhoneNumber(customer2.phone2) }} {{formatPhoneNumber(customer2.phone3) }}</p>
+                </li>
+                <li class="d-flex gap-3 align-items-center mt-4"><i
+                    class="fa fa-envelope text-primary-abs border-radius-4 text-center "></i>
+                  <p class="fs-12 text-black opacity-75 line-height-150">{{ customer2.email }}</p>
+                </li>
+                <li class="d-flex gap-3 align-items-center mt-4"><i
+                    class="fa fa-map-marker-alt text-primary-abs border-radius-4 text-center "></i>
+                  <p class="fs-12 text-black opacity-75 line-height-150">{{customer2.street}}, {{customer2.city}},
+                    {{customer2.state}} {{customer2.zip}}</p>
+                </li>
+                <li class="d-flex gap-3 align-items-center mt-4"><i
+                    class="fa fa-calendar text-primary-abs border-radius-4 text-center "></i>
+                  <p class="fs-12 text-black opacity-75 line-height-150">Since {{vehicle.customer.createdAt| date}}</p>
+                </li>
+              </ul>
+            </div>
+          </div> -->
+          <div class="col-lg-8 col-md-7 mt-3 px-0 mb-4" *ngIf="editModeCustomer==false && vehicle.customer.id> 0">
+            <div class="row">
+              <div class="col-lg-6">
+                <div class="mt-4 pt-1">
+                  <label for="invoiceType" class="form-label fs-14 fw-400 mb-3">Invoice Type</label>
+                  <input trimText class="form-control h-48 px-3 border-radius-8" type="text"
+                    [(ngModel)]="counterInvoice.type" [disabled]="user.allowAddCounterInvoice == false" maxlength="50"
+                    (keyup.enter)="onEnterCounterInvoice('invoice type',counterInvoice)" />
+                </div>
+              </div>
+              <div class="col-lg-6">
+                <div class="mt-4 pt-1">
+                  <label for="invoiceName" class="form-label fs-14 fw-400 mb-3">Invoice Name</label>
+                  <input trimText class="form-control h-48 px-3 border-radius-8" type="text"
+                    [(ngModel)]="counterInvoice.name" [disabled]="user.allowAddCounterInvoice == false" maxlength="200"
+                    (keyup.enter)="onEnterCounterInvoice('invoice name',counterInvoice)" />
+                </div>
+              </div>
+              <div class="col-lg-6">
+                <div class="mt-4 pt-1">
+                  <label for="amount" class="form-label fs-14 fw-400 mb-3">Amount($)</label>
+                  <input trimText class="form-control h-48 px-3 border-radius-8" type="text"
+                    [disabled]="user.allowAddCounterInvoice == false"
+                    oninput="if(this.value<0)this.value=this.value * -1"
+                    (keyup.enter)="onEnterCounterInvoice('invoice amount',counterInvoice)"
+                    [(ngModel)]="counterInvoice.amount" pattern="[0-9]" />
+                </div>
+              </div>
+              <div class="col-lg-6">
+                <div class="mt-4 pt-1">
+                  <label for="paymentMethod" data-bs-toggle="tooltip" data-bs-dismiss="modal"
+                    data-bs-title="Click to go to Configuration" [routerLink]="'/payment-method'"
+                    class="form-label fs-14 fw-400 mb-3">Payment Method</label>
+                  <select class="form-select h-48 px-3 border-radius-8"
+                    (change)="onChangeCounterInvoicePaymentMethod($event, paymentMethod.value, counterInvoice)"
+                    #paymentMethod [(ngModel)]="counterInvoice.paymentMethod"
+                    [disabled]="user.allowAddCounterInvoice == false">
+                    <option value="undefined" disabled selected>Select Payment Method</option>
+                    <option [value]="paymentMethod.id" *ngFor="let paymentMethod of paymentMethods;let i=index;">
+                      {{paymentMethod.name}}</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-lg-6">
+                <div class="mt-4 pt-1">
+                  <label for="description" class="form-label fs-14 fw-400 mb-3">Description / Notes</label>
+                  <input trimText class="form-control h-48 px-3 border-radius-8" type="text" maxlength="200"
+                    (keyup.enter)="onEnterCounterInvoice('invoice notes',counterInvoice)"
+                    [disabled]="user.allowAddCounterInvoice == false" [(ngModel)]="counterInvoice.notes" />
+                </div>
+              </div>
+              <div class="col-lg-6">
+                <div class="mt-4 pt-1">
+                  <label for="disclaimer" data-bs-toggle="tooltip" data-bs-dismiss="modal"
+                    title="Click to go to Configuration" [routerLink]="'/disclaimers'"
+                    class="form-label fs-14 fw-400 mb-3">Disclaimer</label>
+                  <select class="form-select h-48 px-3 border-radius-8"
+                    (change)="setDisclaimerText(optionDisclaimerId.value)" placeholder="Disclaimer"
+                    [(ngModel)]="disclaimerId" #optionDisclaimerId>
+                    <option value="undefined" disabled selected>Select Disclaimer</option>
+                    <option [value]="disclaimer.id" *ngFor="let disclaimer of disclaimers;let i=index;">
+                      {{disclaimer.name}}</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="mt-4 pt-1">
+                  <div class="d-flex align-items-center gap-3">
+                    <button [disabled]="user.allowAddCounterInvoice == false"
+                      (click)="onEnterCounterInvoice('update invoice', counterInvoice)"
+                      class="btn btn-primary-abs h-45 px-4 rounded-4 fs-14 fw-600">Save Details</button>
+                    <button [disabled]="user.allowAddCounterInvoice == false"
+                      (click)="deleteCounterInvoice(null, counterInvoice)"
+                      class="btn btn-danger h-45 px-4 rounded-4 fs-14 fw-600">Delete</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-lg-flex align-items-center gap-3 w-100" *ngIf="counterInvoice.id> 0">
+            <button (click)="createCounterInvoiceItem(counterInvoice.id)"
+              *ngIf="user.allowAddCounterInvoice == true && vehicle.customer.id> 0 && counterInvoice.id> 0"
+              class="col btn btn-primary-abs h-45 px-4 rounded-4 fs-14 fw-600 mt-4"><i class="fa fa-plus"></i> Add
+              Invoice Items</button>
+            <input type="date" class="form-control h-48 px-3 border-radius-8 col mt-4"
+              [disabled]="user.allowAddCounterInvoice == false" title="Change Date"
+              (change)="onChangeCounterInvoiceDate($event)" [ngModel]="counterInvoice.createdAt |  date:'yyyy-MM-dd'">
+            <div class="form-check form-switch d-flex ms-3 mw-150 col mt-4">
+              <input class="form-check-input mt-0" type="checkbox" role="switch" id="tax"
+                (change)="onChangeNoTax($event)" [(ngModel)]="counterInvoice.noTax" />
+              <label class="form-check-label fa-13 mt-1 ms-4" for="tax">No Tax</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-responsive jobs-table px-2 pt-4" cdkDropList
+          (cdkDropListDropped)="droppedCounterInvoiceItem($event)">
+          <table class="table table-bordered border-radius-8 overflow-hidden">
+            <thead>
+              <tr>
+                <th class="bg-dark py-3 px-2 fs-13 text-center text-white">
+                  <input trimText type="text" class="form-control form-control-sm h-40 border-radius-4 p-2"
+                    maxlength="50" [disabled]="user.allowAddCounterInvoice == false"
+                    [(ngModel)]="counterInvoice.headingName" />
+                </th>
+                <th class="bg-dark py-3 px-2 fs-13 text-center text-white mw-100">
+                  <input trimText type="text" class="form-control form-control-sm h-40 border-radius-4 p-2"
+                    maxlength="50" [disabled]="user.allowAddCounterInvoice == false"
+                    [(ngModel)]="counterInvoice.headingQuantity" />
+                </th>
+                <th class="bg-dark py-3 px-2 fs-13 text-center text-white mw-100">
+                  <input trimText type="text" class="form-control form-control-sm h-40 border-radius-4 p-2"
+                    maxlength="50" [disabled]="user.allowAddCounterInvoice == false" [(ngModel)]="headingAmount" />
+                </th>
+                <th class="bg-dark py-3 px-2 fs-13 text-center text-white">
+                  <input trimText type="text" class="form-control form-control-sm h-40 border-radius-4 p-2"
+                    maxlength="50" [disabled]="user.allowAddCounterInvoice == false"
+                    [(ngModel)]="counterInvoice.headingDescription">
+                </th>
+                <th class="bg-dark py-3 px-2 fs-13 text-center text-white mw-100">
+                  <input trimText type="text" class="form-control form-control-sm h-40 border-radius-4 p-2"
+                    maxlength="50" [disabled]="user.allowAddCounterInvoice == false"
+                    [(ngModel)]="counterInvoice.headingSubtotal" />
+                </th>
+                <th class="bg-dark py-3 px-2 fs-13 text-center text-white">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="alert-info" (click)="setCounterInvoice(counterInvoiceItem.id)"
+                *ngFor="let counterInvoiceItem of this.counterInvoiceItems; let i=index">
+                <td class="p-2">
+                  <input trimText (keyup.enter)="onEnterCounterInvoiceItem('invoice item name',counterInvoiceItem)"
+                    [(ngModel)]="counterInvoiceItem.name" [disabled]="user.allowAddCounterInvoice == false" type="text"
+                    maxlength="50" class="form-control form-control-sm h-40 border-radius-4" />
+                </td>
+                <td class="p-2">
+                  <input type="number" class="form-control form-control-sm h-40 border-radius-4" placeholder="Quantity"
+                    maxlength="50" min="1" [disabled]="user.allowAddCounterInvoice == false"
+                    (keyup.enter)="onEnterCounterInvoiceItem('invoice item amount',counterInvoiceItem)"
+                    oninput="if(this.value<0)this.value=this.value * -1" [(ngModel)]="counterInvoiceItem.quantity"
+                    pattern="[0-9]" />
+                </td>
+                <td class="p-2">
+                  <input type="number" class="form-control form-control-sm h-40 border-radius-4" maxlength="10"
+                    [disabled]="user.allowAddCounterInvoice == false"
+                    oninput="if(this.value<0)this.value=this.value * -1"
+                    (keyup.enter)="onEnterCounterInvoiceItem('invoice item amount',counterInvoiceItem)"
+                    [(ngModel)]="counterInvoiceItem.amount" pattern="[0-9]" />
+                </td>
+                <td class="p-2">
+                  <input trimText type="text" class="form-control form-control-sm h-40 border-radius-4"
+                    [(ngModel)]="counterInvoiceItem.notes" maxlength="200"
+                    (keyup.enter)="onEnterCounterInvoiceItem('invoice item notes',counterInvoiceItem)"
+                    oninput='this.style.height = "";this.style.height = this.scrollHeight + "px"'
+                    [disabled]="user.allowAddCounterInvoice == false" />
+                </td>
+                <td class="p-2 text-center fs-13">
+                  <span class="form-control form-control-sm h-40 border-radius-4">{{ counterInvoiceItem.quantity *
+                    counterInvoiceItem.amount }}</span>
+                </td>
+                <td class="p-2">
+                  <div class="d-flex align-items-center justifyc-ntent-center gap-2">
+                    <button class="btn btn-danger btn-sm" (click)="deleteCounterInvoiceItem(null, counterInvoiceItem)"
+                      [disabled]="user.allowAddCounterInvoice == false"><i class="fa fa-trash"></i></button>
+                    <button class="btn btn-success btn-sm"
+                      (click)="onEnterCounterInvoiceItem('update invoice item', counterInvoiceItem)"
+                      [disabled]="user.allowAddCounterInvoice == false"><i class="fa fa-check"></i></button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div *ngIf="counterInvoice.id> 0">
+          <div id="print-content-receipt" *ngIf="this.counterInvoice.id> 0">
+            <div id="componentID">
+              <!-- <div id="componentID2">
+                <div class="row mx-negative mt-4 align-items-center">
+                  <div class="col-lg-5 col-md-6 mt-3">
+                    <div class="d-flex align-items-center gap-3">
+                      <img [src]="company.iconString" class="img-fluid rounded" alt="Company Logo" width="120" />
+                      <h3 class="fs-20 fw-300 line-height-150">{{this.company.name}}, Inc.<br /><span class="fs-13"
+                          [innerHtml]="company.slogan"></span></h3>
+                    </div>
+                  </div>
+                  <div class="col-lg-4 col-md-2"></div>
+                  <div class="col-lg-3 col-md-4 mt-3">
+                    <span class="d-block bg-primary-abs pt-3 pe-3 pb-3 ps-5 text-white fw-700 fs-16 left-pill">Date:
+                      {{counterInvoice.createdAt| date}}</span>
+                  </div>
+                  <div class="col-12 mt-3">
+                    <hr />
+                  </div>
+                  <div class="col-md-6 mb-4">
+                    <p class="fs-15 d-block my-3">Invoice To</p>
+                    <h3 class="fs-20 fw-700 my-3">{{this.vehicle.customer.firstName}} {{this.vehicle.customer.lastName}}
+                    </h3>
+                    <p class="fs-15 d-block my-3">{{this.vehicle.customer.email}}</p>
+                    <p class="fs-15 d-block my-4 line-height-150">{{this.vehicle.customer.street}},
+                      {{this.vehicle.customer.city}}, <br />{{this.vehicle.customer.zip}},
+                      {{this.vehicle.customer.state}}.</p>
+                    <p class="fs-15 d-block my-3"> {{formatPhoneNumber(this.vehicle.customer.phone)}}</p>
+                  </div>
+                  <div class="col-md-6 mb-4 text-end">
+                    <p class="fs-15 d-block my-3">Invoice From</p>
+                    <h3 class="fs-20 fw-700 my-3">{{this.company.name}}</h3>
+                    <p class="fs-15 d-block my-3 line-height-150">{{formatPhoneNumber(this.company.phone)}} -
+                      {{this.company.street}}, {{this.company.city}}, {{this.company.zip}}, {{this.company.state}}.</p>
+                    <p class="fs-15 d-block my-3 fw-700">{{this.counterInvoice.type}} #:
+                      {{this.counterInvoice.invoiceNumber}}</p>
+                    <p class="fs-15 d-block mb-3 mt-4 text-primary-abs">{{this.counterInvoice.name}}</p>
+                    <p class="fs-12 d-block my-3">{{this.counterInvoice.notes}}</p>
+                  </div>
+                  <div class="col-12" *ngIf="counterInvoiceItems.length >0">
+                    <div class="table-responsive">
+                      <table class="table table-striped">
+                        <thead>
+                          <tr class="bg-primary-abs">
+                            <th class="bg-primary-abs mw-100 fs-14 text-white py-3">{{counterInvoice.headingQuantity}}
+                            </th>
+                            <th class="bg-primary-abs mw-150 fs-14 text-white py-3">Invoice Number</th>
+                            <th class="bg-primary-abs mw-150 fs-14 text-white py-3">{{counterInvoice.headingName}}</th>
+                            <th class="bg-primary-abs mw-150 fs-14 text-white py-3">
+                              {{counterInvoice.headingDescription}}</th>
+                            <th class="bg-primary-abs mw-150 fs-14 text-white py-3">{{counterInvoice.headingSubtotal}}
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr *ngFor="let counterInvoiceItem of counterInvoiceItems; let i=index">
+                            <td class="fs-13 py-3">{{counterInvoiceItem.quantity}}</td>
+                            <td class="fs-13 py-3">{{counterInvoiceItem.invoiceNumber}}</td>
+                            <td class="fs-13 py-3">{{counterInvoiceItem.name}}</td>
+                            <td class="fs-13 py-3">{{counterInvoiceItem.notes}}</td>
+                            <td class="fs-13 py-3">${{ counterInvoiceItem.quantity * counterInvoiceItem.amount }}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                  <div class="col-lg-6 col-md-8">
+                    <div *ngIf="getSubtotal() > 0">
+                      <h3 class="fs-20 fw-700 my-3">Payment Method</h3>
+                      <ng-container *ngFor="let paymentMethod of this.paymentMethods">
+                        <p class="fs-14" *ngIf="paymentMethod.id==counterInvoice.paymentMethod">{{paymentMethod.name}}
+                        </p>
+                      </ng-container>
+                      <small class="fw-bold d-block pt-2">Amount Due: <span
+                          class="text-danger">{{counterInvoice.createdAt | date}}</span></small>
+                    </div>
+                    <h3 class="fs-20 fw-700 my-4 pt-3">Terms &amp; Conditions</h3>
+                    <p [innerHtml]="disclaimerText" *ngIf="disclaimerText != ''" class="wave fs-13 line-height-130"></p>
+                  </div>
+                  <div class="col-lg-3 col-md-12"></div>
+                  <div class="col-lg-3 col-md-4" *ngIf="getSubtotal() > 0">
+                    <ul>
+                      <li class="d-flex justify-content-between my-4"><strong class="fs-15">Subtotal:</strong>
+                        <p class="fs-15 text-black opacity-75">${{getSubtotal()}}</p>
+                      </li>
+                      <li class="d-flex justify-content-between my-4"><strong class="fs-15">Tax ({{company.taxRate
+                          *100}}%):</strong>
+                        <p class="fs-15 text-black opacity-75">${{getTax() }}</p>
+                      </li>
+                      <li class="d-flex justify-content-between my-4 rounded-start-pill bg-navy text-white p-3"><strong
+                          class="fs-15">Total:</strong>
+                        <p class="fs-15">${{getTotal()}}</p>
+                      </li>
+                    </ul>
+                  </div>
+                  <div class="col-12 mt-5">
+                    <div class="bg-light ps-3 pe-3 pb-3 pt-5">
+                      <div class="d-md-flex align-items-end justify-content-between">
+                        <div class="d-flex gap-2">
+                          <p>Signature</p>
+                          <span>_________________________________</span>
+                        </div>
+                        <div class="d-flex gap-2 mt-30-mob">
+                          <p>Date</p>
+                          <span>_________________________________</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div> -->
+              <div id="componentID2">
+                <div class="row mx-negative mt-4 align-items-center">
+                  <div class="col-lg-5 col-md-6 col-sm-6 mt-3">
+                    <!-- <div class="d-flex align-items-center gap-3">
+                      <img [src]="company.iconString" class="img-fluid rounded" alt="Company Logo" width="120" />
+                      <h3 class="fs-20 fw-300 line-height-150">{{this.company.name}}, Inc.<br /><span class="fs-13"
+                          [innerHtml]="company.slogan"></span></h3>
+                    </div> -->
+                  </div>
+                  <div class="col-lg-4 col-md-2 col-sm-2"></div>
+                  <div class="col-lg-3 col-md-4 col-sm-4 mt-3">
+                    <span class="d-block bg-primary-abs pt-3 pe-3 pb-3 ps-5 text-white fw-700 fs-16 left-pill">Date:
+                      {{counterInvoice.createdAt| date}}</span>
+                  </div>
+                  <div class="col-12 mt-3">
+                    <hr />
+                  </div>
+                  <div class="col-md-6 col-sm-6 mb-4">
+                    <p class="fs-15 d-block my-3">Invoice To</p>
+                    <h3 class="fs-20 fw-700 my-3">{{this.vehicle.customer.firstName}} {{this.vehicle.customer.lastName}}
+                    </h3>
+                    <p class="fs-15 d-block my-3">{{this.vehicle.customer.email}}</p>
+                    <p class="fs-15 d-block my-4 line-height-150" style="word-break: break-word;">
+                      {{this.vehicle.customer.street}},
+                      {{this.vehicle.customer.city}}, <br />{{this.vehicle.customer.zip}},
+                      {{this.vehicle.customer.state}}.</p>
+                    <p class="fs-15 d-block my-3"> {{formatPhoneNumber(this.vehicle.customer.phone)}}</p>
+                  </div>
+                  <div class="col-md-6 col-sm-6 mb-4 text-end">
+                    <p class="fs-15 d-block my-3">Invoice From</p>
+                    <h3 class="fs-20 fw-700 my-3">{{this.company.name}}</h3>
+                    <p class="fs-15 d-block my-3 line-height-150">{{formatPhoneNumber(this.company.phone)}} -
+                      {{this.company.street}}, {{this.company.city}}, {{this.company.zip}}, {{this.company.state}}.</p>
+                    <p class="fs-15 d-block my-3 fw-700">{{this.counterInvoice.type}} #:
+                      {{this.counterInvoice.invoiceNumber}}</p>
+                    <p class="fs-15 d-block mb-3 mt-4 text-primary-abs" style="word-break: break-word;">
+                      {{this.counterInvoice.name}}</p>
+                    <p class="fs-12 d-block my-3" style="word-break: break-word;">{{this.counterInvoice.notes}}</p>
+                  </div>
+                  <div class="col-12" *ngIf="counterInvoiceItems.length >0">
+                    <div class="table-responsive">
+                      <table class="table table-striped">
+                        <thead>
+                          <tr class="bg-navy">
+                            <th class="bg-navy mw-100 fs-14 text-black py-3">{{counterInvoice.headingQuantity}}
+                            </th>
+                            <th class="bg-navy mw-150 fs-14 text-black py-3">Item Number</th>
+                            <th class="bg-navy mw-150 fs-14 text-black py-3">{{counterInvoice.headingName}}</th>
+                            <th class="bg-navy mw-150 fs-14 text-black py-3">
+                              {{counterInvoice.headingDescription}}</th>
+                            <th class="bg-navy mw-150 fs-14 text-black py-3">{{counterInvoice.headingSubtotal}}
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr *ngFor="let counterInvoiceItem of counterInvoiceItems; let i=index">
+                            <td class="fs-15 py-3">{{counterInvoiceItem.quantity}}</td>
+                            <td class="fs-15 py-3">{{counterInvoiceItem.invoiceNumber}}</td>
+                            <td class="fs-15 py-3" style="word-break: break-word;">{{counterInvoiceItem.name}}</td>
+                            <td class="fs-15 py-3" style="word-break: break-word;">{{counterInvoiceItem.notes}}</td>
+                            <td class="fs-15 py-3">${{ counterInvoiceItem.quantity * counterInvoiceItem.amount }}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                  <div class="col-lg-6 col-md-8 col-sm-8">
+                    <div *ngIf="getSubtotal() > 0">
+                      <h3 class="fs-20 fw-700 my-3">Payment Method</h3>
+                      <ng-container *ngFor="let paymentMethod of this.paymentMethods">
+                        <p class="fs-14" *ngIf="paymentMethod.id==counterInvoice.paymentMethod">{{paymentMethod.name}}
+                        </p>
+                      </ng-container>
+                      <small class="fw-bold d-block pt-2">Amount Due: <span
+                          class="text-danger">{{counterInvoice.createdAt | date}}</span></small>
+                    </div>
+                    <h3 class="fs-20 fw-700 my-4 pt-3">Terms &amp; Conditions</h3>
+                    <p [innerHtml]="disclaimerText" *ngIf="disclaimerText != ''" class="wave fs-13 line-height-130"></p>
+                  </div>
+                  <div class="col-lg-3 col-md-12 hide-sm"></div>
+                  <div class="col-lg-3 col-md-4 col-sm-4" *ngIf="getSubtotal() > 0">
+                    <ul>
+                      <li class="d-flex justify-content-between my-4"><strong class="fs-15">Subtotal:</strong>
+                        <p class="fs-15 text-black opacity-75">${{getSubtotal()}}</p>
+                      </li>
+                      <li class="d-flex justify-content-between my-4"><strong class="fs-15">Tax ({{company.taxRate
+                          *100}}%):</strong>
+                        <p class="fs-15 text-black opacity-75">${{getTax() }}</p>
+                      </li>
+                      <li class="d-flex justify-content-between my-4 rounded-start-pill bg-navy text-white p-3"><strong
+                          class="fs-15">Total:</strong>
+                        <p class="fs-15">${{getTotal()}}</p>
+                      </li>
+                    </ul>
+                  </div>
+                  <div class="col-12 mt-5">
+                    <div class="bg-light ps-3 pe-3 pb-3 pt-5">
+                      <div class="d-flex align-items-end justify-content-between">
+                        <div class="d-flex gap-2">
+                          <p>Signature</p>
+                          <span>_________________________________</span>
+                        </div>
+                        <div class="d-flex gap-2 mt-30-mob">
+                          <p>Date</p>
+                          <span>_________________________________</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 mt-5">
+          <button *ngIf="counterInvoice.id> 0" (click)="printPage('print-content-receipt', 'Receipt')"
+            class="btn btn-secondary-abs h-45 px-4 rounded-4 fs-14 fw-600"><i class="fa fa-print me-2"></i> Print
+            It</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="addCustomer" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+  aria-labelledby="addCustomerLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content border-radius-8">
+      <div class="modal-header p-4">
+        <h1 class="modal-title fs-20 fw-600 text-capitalize" id="addCustomerLabel">Add Customer</h1>
+        <button type="button" class="btn-close mt-1" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body px-2">
+        <div class="row" *ngIf="editModeCustomer==true">
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="title" class="form-label fs-14 fw-400 mb-3">Title</label>
+              <select class="form-select h-48 px-3 border-radius-8" name="title" #title="ngModel" size="1" required
+                [(ngModel)]="vehicle.customer.title" [ngClass]="{ 'is-invalid': title.errors }">
+                <option *ngFor="let title of optionsTitle">{{ title}}</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="firstname" class="form-label fs-14 fw-400 mb-3">First Name</label>
+              <input trimText class="form-control h-48 px-3 border-radius-8" type="text" name="firstName" required
+                minlength="2" maxlength="200" #firstName="ngModel" [ngClass]="{ 'is-invalid': firstName.errors }"
+                [(ngModel)]="vehicle.customer.firstName" />
+              <div class="invalid-feedback" *ngIf="firstName.errors">
+                <span *ngIf="firstName.errors['required']">First Name is required</span>
+                <span *ngIf="firstName.errors['minlength']">First Name must be at least 2 characters</span>
+                <span *ngIf="firstName.errors['maxlength']">First Name must be at most 200 characters</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="lastname" class="form-label fs-14 fw-400 mb-3">Last Name</label>
+              <input trimText class="form-control h-48 px-3 border-radius-8" type="text" required minlength="2"
+                maxlength="200" #lastName="ngModel" [ngClass]="{ 'is-invalid': lastName.errors }"
+                [(ngModel)]="vehicle.customer.lastName" placeholder="Enter Your Last Name" />
+              <div class="invalid-feedback" *ngIf="lastName.errors">
+                <span *ngIf="lastName.errors['required']">Last Name is required</span>
+                <span *ngIf="lastName.errors['minlength']">Last Name must be at least 2 characters</span>
+                <span *ngIf="lastName.errors['maxlength']">Last Name must be at most 200 characters</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="phone" class="form-label fs-14 fw-400 mb-3">Mobile Phone</label>
+              <input trimText class="form-control h-48 px-3 border-radius-8" name="phone" type="text" pname="phone"
+                required [(ngModel)]="vehicle.customer.phone" #phone="ngModel"
+                [ngClass]="{ 'is-invalid': phone.errors }" pattern="^[-+()0-9]{10,12}(?:-\d+)?$"
+                placeholder=" Enter Your Mobile Phone Number" />
+              <div class="invalid-feedback" *ngIf="phone.errors">
+                <span *ngIf="phone.errors['required']">Mobile Phone is required</span>
+                <span *ngIf="phone.errors['phone']">Mobile Phone must be a valid phone number</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="homePhone" class="form-label fs-14 fw-400 mb-3">Home Phone</label>
+              <input trimText class="form-control h-48 px-3 border-radius-8" name="phone2" type="text" name="phone2"
+                [(ngModel)]="vehicle.customer.phone2" #phone2="ngModel" [ngClass]="{ 'is-invalid': phone2.errors }"
+                pattern="^[-+()0-9]{10,12}(?:-\d+)?$" placeholder="Enter Your Home Phone Number" />
+              <div class="invalid-feedback" *ngIf="phone2.errors ">
+                <span *ngIf="phone2.errors['phone2']">Phone must be a valid phone number</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="workPhone" class="form-label fs-14 fw-400 mb-3">Work Phone</label>
+              <input trimText class="form-control h-48 px-3 border-radius-8" name="phone3" type="text"
+                [(ngModel)]="vehicle.customer.phone3" #phone3="ngModel" [ngClass]="{ 'is-invalid': phone3.errors }"
+                pattern="^[-+()0-9]{10,12}(?:-\d+)?$" placeholder="Enter Your Work Phone Number" />
+              <div class="invalid-feedback" *ngIf="phone3.errors ">
+                <span *ngIf="phone3.errors['phone3']">Phone must be a valid phone number</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="email" class="form-label fs-14 fw-400 mb-3">Email Address</label>
+              <input trimText class="form-control h-48 px-3 border-radius-8" name="email" type="text"
+                [(ngModel)]="vehicle.customer.email" placeholder="Enter Your Email Address" />
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="email" class="form-label fs-14 fw-400 mb-3">Street</label>
+              <input trimText class="form-control h-48 px-3 border-radius-8" name="email" type="text" minlength="2"
+                maxlength="200" #street="ngModel" required [ngClass]="{ 'is-invalid': street.errors }"
+                [(ngModel)]="vehicle.customer.street" placeholder="Enter Your Street" />
+              <div class="invalid-feedback" *ngIf="street.errors">
+                <span *ngIf="street.errors['required']">Street is required</span>
+                <span *ngIf="street.errors['minlength']">Street must be at least 2 characters</span>
+                <span *ngIf="street.errors['maxlength']">Street must be at most 200 characters</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="city" class="form-label fs-14 fw-400 mb-3">City</label>
+              <input trimText class="form-control h-48 px-3 border-radius-8" name="city" type="text" minlength="2"
+                #city="ngModel" maxlength="200" required [ngClass]="{ 'is-invalid': city.errors }"
+                [(ngModel)]="vehicle.customer.city" placeholder="Enter Your City" />
+              <div class="invalid-feedback" *ngIf="city.errors">
+                <span *ngIf="city.errors['required']">City is required</span>
+                <span *ngIf="city.errors['minlength']">City must be at least 2 characters</span>
+                <span *ngIf="city.errors['maxlength']">City must be at most 200 characters</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="state" class="form-label fs-14 fw-400 mb-3">State</label>
+              <select class="form-select h-48 px-3 border-radius-8" name="state" #state="ngModel" size="1" required
+                [(ngModel)]="vehicle.customer.state" [ngClass]="{ 'is-invalid': state.errors }">
+                <option value="AL">Alabama</option>
+                <option value="AK">Alaska</option>
+                <option value="AZ">Arizona</option>
+                <option value="AR">Arkansas</option>
+                <option value="CA">California</option>
+                <option value="CO">Colorado</option>
+                <option value="CT">Connecticut</option>
+                <option value="DE">Delaware</option>
+                <option value="DC">District Of Columbia</option>
+                <option value="FL">Florida</option>
+                <option value="GA">Georgia</option>
+                <option value="HI">Hawaii</option>
+                <option value="ID">Idaho</option>
+                <option value="IL">Illinois</option>
+                <option value="IN">Indiana</option>
+                <option value="IA">Iowa</option>
+                <option value="KS">Kansas</option>
+                <option value="KY">Kentucky</option>
+                <option value="LA">Louisiana</option>
+                <option value="ME">Maine</option>
+                <option value="MD">Maryland</option>
+                <option value="MA">Massachusetts</option>
+                <option value="MI">Michigan</option>
+                <option value="MN">Minnesota</option>
+                <option value="MS">Mississippi</option>
+                <option value="MO">Missouri</option>
+                <option value="MT">Montana</option>
+                <option value="NE">Nebraska</option>
+                <option value="NV">Nevada</option>
+                <option value="NH">New Hampshire</option>
+                <option value="NJ">New Jersey</option>
+                <option value="NM">New Mexico</option>
+                <option value="NY">New York</option>
+                <option value="NC">North Carolina</option>
+                <option value="ND">North Dakota</option>
+                <option value="OH">Ohio</option>
+                <option value="OK">Oklahoma</option>
+                <option value="OR">Oregon</option>
+                <option value="PA">Pennsylvania</option>
+                <option value="RI">Rhode Island</option>
+                <option value="SC">South Carolina</option>
+                <option value="SD">South Dakota</option>
+                <option value="TN">Tennessee</option>
+                <option value="TX">Texas</option>
+                <option value="UT">Utah</option>
+                <option value="VT">Vermont</option>
+                <option value="VA">Virginia</option>
+                <option value="WA">Washington</option>
+                <option value="WV">West Virginia</option>
+                <option value="WI">Wisconsin</option>
+                <option value="WY">Wyoming</option>
+              </select>
+              <div class="invalid-feedback d-block" *ngIf="state.errors ">
+                <span *ngIf="state.errors['required']">State is required</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="zip" class="form-label fs-14 fw-400 mb-3">Zip Code</label>
+              <input trimText class="form-control h-48 px-3 border-radius-8" name="email" type="text" minlength="5"
+                required #zip="ngModel" [ngClass]="{ 'is-invalid': zip.errors }" #zipCode
+                (keyup.enter)="searchZip(zipCode.value, vehicle)" maxlength="5" [(ngModel)]="vehicle.customer.zip"
+                placeholder="Enter Your Xip Code" />
+              <div class="invalid-feedback" *ngIf="zip.errors ">
+                <span *ngIf="zip.errors['required']">Zip is required</span>
+                <span *ngIf="zip.errors['zip']">Must be a valid zip</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="notes" class="form-label fs-14 fw-400 mb-3">Notes</label>
+              <input trimText class="form-control h-48 px-3 border-radius-8" name="notes" type="text"
+                [(ngModel)]="vehicle.customer.notes" placeholder="Enter Your Notes" />
+            </div>
+          </div>
+          <div class="col-md-4 mt-4">
+            <div *ngIf="errorMessage">
+              <span *ngIf="errorMessage" class="alert alert-danger" role="alert">{{ errorMessage }}</span>
+            </div>
+            <div *ngIf="successMessage">
+              <span *ngIf="successMessage" class="alert alert-success" role="alert">{{ successMessage }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="d-flex align-items-center gap-3 mt-4 px-3" (click)="editModeVehicle=!editModeVehicle">
+          <button (click)="saveCustomerInfo(vehicle.customer)" *ngIf="editModeCustomer == true"
+            class="btn btn-primary-abs h-45 px-4 rounded-4 fs-14 fw-600">Save Details</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="modal fade" id="myAccount" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+  aria-labelledby="myAccountLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content border-radius-8">
+      <div class="modal-header p-4">
+        <h1 class="modal-title fs-20 fw-600 text-capitalize" id="myAccountLabel">My Account</h1>
+        <button type="button" class="btn-close mt-1" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body px-2" *ngIf="currentUser">
+        <form *ngIf="!isSuccessful" name="form" (ngSubmit)="f.form.valid && onSubmit()" #f="ngForm" novalidate>
+          <div class="row">
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="title" class="form-label fs-14 fw-400 mb-3">Account Type</label>
+                <select class="form-select h-48 px-3 border-radius-8" name="role" #type="ngModel" size="1" style=" appearance: none;
+                background-image: url('');" [(ngModel)]="form.role" required disabled
+                  [ngClass]="{ 'is-invalid': f.submitted && type.errors }">
+                  <option value="ROLE_USER" selected>Employee</option>
+                  <option value="ROLE_SHOP">Auto Shop</option>
+                  <option value="ROLE_ADMIN">Admin</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-4" *ngIf="form.role == 'ROLE_SHOP' || form.role == 'ROLE_RECYCLER' ">
+              <div class="mt-4 pt-1">
+                <label for="bussnessName" class="form-label fs-14 fw-400 mb-3">Business/Company Name</label>
+                <input trimText class="form-control h-48 px-3 border-radius-8" name="bussinessname"
+                  [(ngModel)]="form.bussinessname" required minlength="5" maxlength="200" #bussinessname="ngModel"
+                  placeHolder="Enter Business/Company Name"
+                  [ngClass]="{ 'is-invalid': f.submitted && bussinessname.errors }" />
+                <div class="invalid-feedback" *ngIf="bussinessname.errors && f.submitted">
+                  <span *ngIf="bussinessname.errors['required']">Business Name is required</span>
+                  <span *ngIf="bussinessname.errors['minlength']">Business Name must be at least 5 characters</span>
+                  <span *ngIf="bussinessname.errors['maxlength']">Business Name must be at most 200 characters</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="firstName" class="form-label fs-14 fw-400 mb-3">First Name</label>
+                <input trimText class="form-control h-48 px-3 border-radius-8" type="text" name="firstName"
+                  [(ngModel)]="form.firstName" required minlength="2" maxlength="20" #firstName="ngModel"
+                  [ngClass]="{ 'is-invalid': f.submitted && firstName.errors }" placeholder="Enter Your First Name" />
+                <div class="invalid-feedback" *ngIf="firstName.errors && f.submitted">
+                  <span *ngIf="firstName.errors['required']">First Name is required</span>
+                  <span *ngIf="firstName.errors['minlength']">First Name must be at least 2 characters</span>
+                  <span *ngIf="firstName.errors['maxlength']">First Name must be at most 20 characters</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="lastName" class="form-label fs-14 fw-400 mb-3">Last Name</label>
+                <input trimText class="form-control h-48 px-3 border-radius-8" type="text" name="lastName"
+                  [(ngModel)]="form.lastName" required minlength="2" maxlength="20" #lastName="ngModel"
+                  [ngClass]="{ 'is-invalid': f.submitted && lastName.errors }" placeholder="Enter Your Last Name" />
+                <div class="invalid-feedback" *ngIf="lastName.errors && f.submitted">
+                  <span *ngIf="lastName.errors['required']">Last Name is required</span>
+                  <span *ngIf="lastName.errors['minlength']">Last Name must be at least 2 characters</span>
+                  <span *ngIf="lastName.errors['maxlength']">Last Name must be at most 20 characters</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="email" class="form-label fs-14 fw-400 mb-3">Email Address</label>
+                <input trimText class="form-control h-48 px-3 border-radius-8" name="email" [(ngModel)]="form.email"
+                  required email #email="ngModel" [ngClass]="{ 'is-invalid': f.submitted && email.errors }"
+                  maxlength="100" pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                  placeholder="Enter Your Email Address" />
+                <div class="invalid-feedback" *ngIf="email.errors && f.submitted">
+                  <span *ngIf="email.errors['required']">Email is required</span>
+                  <span *ngIf="email.errors['email']">Email must be a valid email address</span>
+                  <span *ngIf="email.errors['pattern']">Email must be a valid email address</span>
+                  <span *ngIf="email.errors['maxlength']">Email must be at most 100 characters</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="phone" class="form-label fs-14 fw-400 mb-3">Phone</label>
+                <input trimText class="form-control h-48 px-3 border-radius-8" name="phone" [(ngModel)]="form.phone"
+                  required maxlength="20" #phone="ngModel" [ngClass]="{ 'is-invalid': f.submitted && phone.errors }"
+                  pattern="^[-+()0-9]{10,12}(?:-\d+)?$" placeholder=" Enter Your Mobile Phone Number" />
+                <div class="invalid-feedback" *ngIf="phone.errors && f.submitted">
+                  <span *ngIf="phone.errors['required']">Phone is required</span>
+                  <span *ngIf="phone.errors['pattern']">Phone must be a valid phone number</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="street" class="form-label fs-14 fw-400 mb-3">Street</label>
+                <input trimText class="form-control h-48 px-3 border-radius-8" name="street" [(ngModel)]="form.street"
+                  required minlength="2" maxlength="200" #street="ngModel"
+                  [ngClass]="{ 'is-invalid': f.submitted && street.errors }" placeholder="Enter Your Street" />
+                <div class="invalid-feedback" *ngIf="street.errors && f.submitted">
+                  <span *ngIf="street.errors['required']">Street is required</span>
+                  <span *ngIf="street.errors['minlength']">Street must be at least 2 characters</span>
+                  <span *ngIf="street.errors['maxlength']">Street must be at most 200 characters</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="city" class="form-label fs-14 fw-400 mb-3">City</label>
+                <input trimText class="form-control h-48 px-3 border-radius-8" name="city" [(ngModel)]="form.city"
+                  required minlength="2" maxlength="200" #city="ngModel"
+                  [ngClass]="{ 'is-invalid': f.submitted && city.errors }" placeholder="Enter Your City" />
+                <div class="invalid-feedback" *ngIf="city.errors && f.submitted">
+                  <span *ngIf="city.errors['required']">City is required</span>
+                  <span *ngIf="city.errors['minlength']">City must be at least 2 characters</span>
+                  <span *ngIf="city.errors['maxlength']">City must be at most 200 characters</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="state" class="form-label fs-14 fw-400 mb-3">State</label>
+                <select class="form-select h-48 px-3 border-radius-8" name="state" #state="ngModel" size="1" required
+                  [(ngModel)]="form.state" [ngClass]="{ 'is-invalid': f.submitted && state.errors }">
+                  <option value="AL">Alabama</option>
+                  <option value="AK">Alaska</option>
+                  <option value="AZ">Arizona</option>
+                  <option value="AR">Arkansas</option>
+                  <option value="CA">California</option>
+                  <option value="CO">Colorado</option>
+                  <option value="CT">Connecticut</option>
+                  <option value="DE">Delaware</option>
+                  <option value="DC">District Of Columbia</option>
+                  <option value="FL">Florida</option>
+                  <option value="GA">Georgia</option>
+                  <option value="HI">Hawaii</option>
+                  <option value="ID">Idaho</option>
+                  <option value="IL">Illinois</option>
+                  <option value="IN">Indiana</option>
+                  <option value="IA">Iowa</option>
+                  <option value="KS">Kansas</option>
+                  <option value="KY">Kentucky</option>
+                  <option value="LA">Louisiana</option>
+                  <option value="ME">Maine</option>
+                  <option value="MD">Maryland</option>
+                  <option value="MA">Massachusetts</option>
+                  <option value="MI">Michigan</option>
+                  <option value="MN">Minnesota</option>
+                  <option value="MS">Mississippi</option>
+                  <option value="MO">Missouri</option>
+                  <option value="MT">Montana</option>
+                  <option value="NE">Nebraska</option>
+                  <option value="NV">Nevada</option>
+                  <option value="NH">New Hampshire</option>
+                  <option value="NJ">New Jersey</option>
+                  <option value="NM">New Mexico</option>
+                  <option value="NY">New York</option>
+                  <option value="NC">North Carolina</option>
+                  <option value="ND">North Dakota</option>
+                  <option value="OH">Ohio</option>
+                  <option value="OK">Oklahoma</option>
+                  <option value="OR">Oregon</option>
+                  <option value="PA">Pennsylvania</option>
+                  <option value="RI">Rhode Island</option>
+                  <option value="SC">South Carolina</option>
+                  <option value="SD">South Dakota</option>
+                  <option value="TN">Tennessee</option>
+                  <option value="TX">Texas</option>
+                  <option value="UT">Utah</option>
+                  <option value="VT">Vermont</option>
+                  <option value="VA">Virginia</option>
+                  <option value="WA">Washington</option>
+                  <option value="WV">West Virginia</option>
+                  <option value="WI">Wisconsin</option>
+                  <option value="WY">Wyoming</option>
+                </select>
+                <div class="invalid-feedback d-block" *ngIf="state.errors && f.submitted">
+                  <span *ngIf="state.errors['required']">State is required</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="zip" class="form-label fs-14 fw-400 mb-3">Zip Code</label>
+                <input trimText class="form-control h-48 px-3 border-radius-8" pattern="[0-9]*" name="zip"
+                  [(ngModel)]="form.zip" maxlength="20" required minlength="5" maxlength="20" #zip="ngModel"
+                  [ngClass]="{ 'is-invalid': f.submitted && zip.errors }" placeholder="Enter Your Zip Code" />
+                <div class="invalid-feedback" *ngIf="zip.errors && f.submitted">
+                  <span *ngIf="zip.errors['required']">Zip Code is required</span>
+                  <span *ngIf="zip.errors['pattern']">Must be a valid Zip Code</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-12 mt-4">
+              <div *ngIf="f.submitted && isUpdateFailed">
+                <span *ngIf="errorMessageProfile" class="alert alert-danger" role="alert">Update failed: {{
+                  errorMessageProfile
+                  }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="d-flex align-items-center gap-3 mt-5 px-3" *ngIf="currentUser">
+            <button class="btn btn-primary-abs h-45 px-4 rounded-4 fs-14 fw-600">Update Account</button>
+          </div>
+        </form>
+        <div *ngIf="isSuccessful" class="p-4">
+          <span class="alert alert-success" role="alert">Your update is successful! <button
+              class="btn btn-sm btn-primary-abs ms-3" (click)="reload()">Ok</button></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="resetPassword" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+  aria-labelledby="resetPasswordLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content border-radius-8">
+      <div class="modal-header p-4">
+        <h1 class="modal-title fs-20 fw-600 text-capitalize" id="resetPasswordLabel">Reset Password</h1>
+        <button type="button" class="btn-close mt-1" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body px-2" *ngIf="currentUser">
+        <form name="form" (ngSubmit)="f.form.valid && changePasswordRequest()" #f="ngForm" novalidate>
+          <div class="row">
+            <div class="col-md-4" *ngIf="form.role == 'ROLE_SHOP' || form.role == 'ROLE_RECYCLER' ">
+              <div class="mt-4 pt-1">
+                <label for="password" class="form-label fs-14 fw-400 mb-3">Old Password</label>
+                <div class="input-group">
+                  <input trimText class="form-control h-48 px-3" [type]="showPassword ? 'text' : 'password'"
+                    name="password" [(ngModel)]="form.password" required minlength="6" #password="ngModel"
+                    maxlength="30" [ngClass]="{ 'is-invalid': f.submitted && password.errors }"
+                    placeholder="Enter Your Old Password" />
+                  <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button"> <i alt="show" class="far fa-eye eye-show"
+                        (click)="showPassword = !showPassword" [class.hide]="showPassword"></i>
+                      <i alt="hide" class="far fa-eye-slash eye-hide" (click)="showPassword = !showPassword"
+                        [class.hide]="!showPassword"></i></button>
+                  </div>
+                </div>
+                <div class="invalid-feedback" *ngIf="password.errors && f.submitted">
+                  <span *ngIf="password.errors['required']">Password is required</span>
+                  <span *ngIf="password.errors['minlength']">Password must be at least 6 characters</span>
+                  <span *ngIf="password.errors['maxlength']">Password must be at most 30 characters</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="newPassword" class="form-label fs-14 fw-400 mb-3">New Password</label>
+                <div class="input-group">
+                  <input trimText class="form-control h-48 px-3" [type]="showPasswordNew ? 'text' : 'password'"
+                    name="newPassword" [(ngModel)]="form.newPassword" required minlength="6" #newPassword="ngModel"
+                    maxlength="30" [ngClass]="{ 'is-invalid': f.submitted && newPassword.errors }"
+                    placeholder="Enter Your New Password" />
+                  <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button"> <i alt="show" class="far fa-eye eye-show"
+                        (click)="showPasswordNew = !showPasswordNew" [class.hide]="showPasswordNew"></i>
+                      <i alt="hide" class="far fa-eye-slash eye-hide" (click)="showPasswordNew = !showPasswordNew"
+                        [class.hide]="!showPasswordNew"></i></button>
+                  </div>
+                </div>
+                <div class="invalid-feedback" *ngIf="newPassword.errors && f.submitted">
+                  <span *ngIf="newPassword.errors['required']">New Password is required</span>
+                  <span *ngIf="newPassword.errors['minlength']">New Password must be at least 6 characters</span>
+                  <span *ngIf="newPassword.errors['maxlength']">New Password must be at most 30 characters</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="newPasswordComfirmed" class="form-label fs-14 fw-400 mb-3">Confirm New Password</label>
+                <div class="input-group">
+                  <input trimText class="form-control h-48 px-3" [type]="showPaswordNewConfirmed ? 'text' : 'password'"
+                    name="passwordNew" [(ngModel)]="form.newPasswordComfirmed" required minlength="6"
+                    #newPasswordComfirmed="ngModel" maxlength="30"
+                    [ngClass]="{ 'is-invalid': f.submitted && newPasswordComfirmed.errors }"
+                    placeholder="Please Re-Type Your New Password" />
+                  <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button"> <i alt="show" class="far fa-eye eye-show"
+                        (click)="showPaswordNewConfirmed = !showPaswordNewConfirmed"
+                        [class.hide]="showPaswordNewConfirmed"></i>
+                      <i alt="hide" class="far fa-eye-slash eye-hide"
+                        (click)="showPaswordNewConfirmed = !showPaswordNewConfirmed"
+                        [class.hide]="!showPaswordNewConfirmed"></i></button>
+                  </div>
+                </div>
+                <div class="invalid-feedback" *ngIf="newPasswordComfirmed.errors && f.submitted">
+                  <span *ngIf="newPasswordComfirmed.errors['required']">Confirm New Password is required</span>
+                  <span *ngIf="newPasswordComfirmed.errors['minlength']">Confirm New Password must be at least 6
+                    characters</span>
+                  <span *ngIf="newPasswordComfirmed.errors['maxlength']">Confirm New Password must be at most 30
+                    characters</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-12 py-4 mt-4" *ngIf="errorMessageResetPassword != ''">
+              <span class="alert alert-success line-height-150" role="alert">{{errorMessageResetPassword}}</span>
+            </div>
+          </div>
+          <div class="d-flex align-items-center gap-3 mt-4 px-3" *ngIf="currentUser">
+            <button class="btn btn-primary-abs h-45 px-4 rounded-4 fs-14 fw-600">Reset Password</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

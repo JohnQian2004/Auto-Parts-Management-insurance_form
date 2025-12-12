@@ -1,0 +1,598 @@
+<div class="subscription-plan-management">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0">
+      <span *ngIf="isAdminMode">💳 Subscription Plan Management</span>
+      <span *ngIf="isVendorMode">📋 Available Subscription Plans</span>
+    </h4>
+    <div class="d-flex gap-2" *ngIf="isAdminMode">
+      <button class="btn btn-outline-info" (click)="syncAllPlansWithStripe()" [disabled]="isLoading || !isStripeLoaded">
+        <i class="fab fa-stripe me-2"></i>Sync All with Stripe
+      </button>
+      <button class="btn btn-primary" (click)="addNewPlan()">
+        ➕ Create New Plan
+      </button>
+    </div>
+  </div>
+
+  <!-- Search and Filters -->
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+      <div class="row g-3 align-items-end">
+        <div class="col-12 col-md-4">
+          <label class="form-label">Search Plans</label>
+          <input type="text" placeholder="Search by name or description..." [(ngModel)]="planSearchTerm" class="form-control">
+        </div>
+        <div class="col-12 col-md-3">
+          <label class="form-label">Status</label>
+          <select [(ngModel)]="planStatusFilter" class="form-select">
+            <option value="">All Status</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </div>
+        <div class="col-12 col-md-3">
+          <label class="form-label">Price Range</label>
+          <select [(ngModel)]="planPriceFilter" class="form-select">
+            <option value="">All Prices</option>
+            <option value="0-50">$0 - $50</option>
+            <option value="50-100">$50 - $100</option>
+            <option value="100+">$100+</option>
+          </select>
+        </div>
+        <div class="col-12 col-md-2">
+          <button class="btn btn-outline-secondary w-100" (click)="clearPlanFilters()">
+            Clear Filters
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="text-center py-4">
+    <div class="spinner-border text-primary"></div>
+    <p class="mt-2 text-muted">Loading subscription plans...</p>
+  </div>
+
+  <!-- Subscription Plans Grid -->
+  <div *ngIf="!isLoading" class="row g-4">
+    <div *ngFor="let plan of filteredPlans" class="col-12 col-md-6 col-lg-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-start">
+          <div>
+            <h5 class="card-title mb-1">{{ plan.name }}</h5>
+            <div class="d-flex gap-2">
+              <span class="badge" [class]="plan.isActive ? 'bg-success' : 'bg-secondary'">
+                {{ plan.isActive ? 'Active' : 'Inactive' }}
+              </span>
+              <span *ngIf="plan.isTrialOnly" class="badge bg-warning" title="Trial-Only Plan">
+                <i class="fas fa-gift me-1"></i> Trial
+              </span>
+              <span *ngIf="plan.stripeSync" class="badge bg-info" title="Synced with Stripe">
+                <i class="fab fa-stripe"></i> Synced
+              </span>
+            </div>
+          </div>
+          <div class="dropdown">
+            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" 
+                    data-bs-toggle="dropdown" aria-expanded="false">
+              Actions
+            </button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#" (click)="editPlan(plan)">✏️ Edit</a></li>
+              <li><a class="dropdown-item" href="#" (click)="duplicatePlan(plan)">📋 Duplicate</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li class="dropdown-header">🔗 Stripe Integration</li>
+              <li *ngIf="!plan.stripeSync">
+                <a class="dropdown-item" href="#" (click)="syncPlanWithStripe(plan)">
+                  <i class="fab fa-stripe me-2"></i>Sync with Stripe
+                </a>
+              </li>
+              <li *ngIf="plan.stripeSync">
+                <a class="dropdown-item" href="#" (click)="updateStripePrice(plan)">
+                  <i class="fas fa-sync me-2"></i>Update Stripe Price
+                </a>
+              </li>
+              <li *ngIf="plan.stripeSync">
+                <a class="dropdown-item" [href]="getStripeDashboardUrl(plan)" target="_blank">
+                  <i class="fas fa-external-link-alt me-2"></i>View in Stripe
+                </a>
+              </li>
+              <li *ngIf="plan.stripeSync">
+                <a class="dropdown-item text-warning" href="#" (click)="archiveStripeProduct(plan)">
+                  <i class="fas fa-archive me-2"></i>Archive from Stripe
+                </a>
+              </li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item text-danger" href="#" (click)="deletePlan(plan.id!)">🗑️ Delete</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="text-center mb-3">
+            <div class="display-6 fw-bold text-primary">${{ plan.price }}</div>
+            <small class="text-muted">per {{ plan.durationMonths }} month(s)</small>
+            
+            <!-- Discount Badge -->
+            <div *ngIf="plan.discountPercent && plan.discountPercent > 0" class="mt-2">
+              <span class="badge bg-success fs-6">
+                <i class="fas fa-percentage me-1"></i>
+                {{ plan.discountPercent }}% OFF
+              </span>
+            </div>
+          </div>
+          
+          <!-- Discount Details -->
+          <div *ngIf="plan.discountPercent && plan.discountPercent > 0" class="alert alert-success py-2 px-3 mb-3">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <small class="fw-medium">
+                  <i class="fas fa-tag me-1"></i>
+                  You save: ${{ getPlanSavings(plan) }}
+                </small>
+              </div>
+              <div>
+                <small class="text-muted">
+                  ${{ getMonthlyEquivalent(plan) }}/month
+                </small>
+              </div>
+            </div>
+          </div>
+          
+          <p class="text-muted small mb-3">{{ plan.description }}</p>
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="small text-muted">Max Trips:</span>
+            <span class="fw-medium">{{ plan.maxTrips === 0 ? 'Unlimited' : plan.maxTrips }}</span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="small text-muted">Features:</span>
+            <span class="fw-medium">{{ (plan.features && plan.features.split(',').length) || 0 }} items</span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center">
+            <span class="small text-muted">Subscribers:</span>
+            <span class="fw-medium">{{plan.subscriberCount}}</span>
+          </div>
+        </div>
+        <div class="card-footer bg-transparent border-0">
+          <!-- Stripe Sync Status -->
+          <div class="mb-2">
+            <small class="text-muted d-flex align-items-center">
+              <i class="fas fa-link me-1"></i>
+              Stripe: {{ getStripeSyncStatus(plan) }}
+            </small>
+          </div>
+          
+          <!-- Action Buttons -->
+          <div class="d-flex gap-1 flex-wrap">
+            <!-- Admin Mode Actions -->
+            <div *ngIf="isAdminMode" class="d-flex gap-1 flex-wrap w-100">
+              <button class="btn btn-outline-primary btn-sm flex-fill" (click)="editPlan(plan)">
+                ✏️ Edit
+              </button>
+              
+              <!-- Stripe Actions -->
+              <div *ngIf="!plan.isTrialOnly" class="d-flex gap-1 flex-fill">
+                <button *ngIf="!isPlanSyncedWithStripe(plan)" 
+                        class="btn btn-outline-success btn-sm flex-fill" 
+                        (click)="syncPlanWithStripe(plan)"
+                        [disabled]="!isStripeLoaded">
+                  🔗 Sync Stripe
+                </button>
+                <button *ngIf="isPlanSyncedWithStripe(plan)" 
+                        class="btn btn-outline-warning btn-sm flex-fill" 
+                        (click)="updateStripePrice(plan)"
+                        [disabled]="!isStripeLoaded">
+                  🔄 Update Price
+                </button>
+                <button *ngIf="isPlanSyncedWithStripe(plan)" 
+                        class="btn btn-outline-secondary btn-sm flex-fill" 
+                        (click)="openStripeDashboard(plan)">
+                  📊 Dashboard
+                </button>
+              </div>
+            </div>
+
+            <!-- Vendor Mode Actions -->
+            <div *ngIf="isVendorMode" class="d-flex gap-1 flex-wrap w-100">
+              <span *ngIf="getVendorSubscriptionStatus(plan) === 'ACTIVE'"
+                    class="badge bg-success align-self-center me-auto">
+                Subscribed
+              </span>
+              <span *ngIf="getVendorSubscriptionStatus(plan) === 'CANCELLED'"
+                    class="badge bg-warning align-self-center me-auto">
+                Cancelled
+              </span>
+              <span *ngIf="getVendorSubscriptionStatus(plan) === 'EXPIRED'"
+                    class="badge bg-danger align-self-center me-auto">
+                Expired
+              </span>
+              <button *ngIf="canVendorSubscribe(plan)" 
+                      class="btn btn-success btn-sm flex-fill" 
+                      (click)="onVendorSubscribe(plan)">
+                <i class="bi bi-check-circle me-1"></i>Subscribe
+              </button>
+              <button *ngIf="!canVendorSubscribe(plan) && getVendorSubscriptionStatus(plan) === null" 
+                      class="btn btn-outline-secondary btn-sm flex-fill" 
+                      disabled>
+                <i class="bi bi-lock me-1"></i>Not Available
+              </button>
+            </div>
+
+            <!-- Active Subscription Details -->
+            <div *ngIf="isVendorMode && getVendorSubscriptionStatus(plan) === 'ACTIVE'" class="mt-3">
+              <div class="card border-success">
+                <div class="card-header bg-success text-white py-2">
+                  <h6 class="card-title mb-0">
+                    <i class="bi bi-info-circle me-2"></i>
+                    Active Subscription Details
+                  </h6>
+                </div>
+                <div class="card-body py-2">
+                  <div class="row g-2">
+                    <div class="col-md-6">
+                      <small class="text-muted">Start Date:</small>
+                      <div class="fw-bold">{{ getVendorSubscription(plan)?.startDate | date:'MMM dd, yyyy' }}</div>
+                    </div>
+                    <div class="col-md-6">
+                      <small class="text-muted">End Date:</small>
+                      <div class="fw-bold">{{ getVendorSubscription(plan)?.endDate | date:'MMM dd, yyyy' }}</div>
+                    </div>
+                    <div class="col-md-6" *ngIf="getVendorSubscription(plan)?.trialStartDate">
+                      <small class="text-muted">Trial Start:</small>
+                      <div class="fw-bold text-info">{{ getVendorSubscription(plan)?.trialStartDate | date:'MMM dd, yyyy' }}</div>
+                    </div>
+                    <div class="col-md-6" *ngIf="getVendorSubscription(plan)?.trialEndDate">
+                      <small class="text-muted">Trial End:</small>
+                      <div class="fw-bold text-info">{{ getVendorSubscription(plan)?.trialEndDate | date:'MMM dd, yyyy' }}</div>
+                    </div>
+                  </div>
+                  
+                  <!-- Cancellation Reason (if cancelled) -->
+                  <div *ngIf="getVendorSubscription(plan)?.cancellationReason" class="mt-2 pt-2 border-top">
+                    <small class="text-muted">Cancellation Reason:</small>
+                    <div class="fw-bold text-warning">
+                      <i class="fas fa-info-circle me-1"></i>
+                      {{ getCancellationReasonDisplay(getVendorSubscription(plan)?.cancellationReason) }}
+                    </div>
+                    <div *ngIf="getVendorSubscription(plan)?.supersededBySubscriptionId" class="mt-1">
+                      <small class="text-muted">Superseded by subscription ID: {{ getVendorSubscription(plan)?.supersededBySubscriptionId }}</small>
+                    </div>
+                  </div>
+                  
+                  <!-- Debug Payment Info (only show if has Stripe data) -->
+                  <div *ngIf="getVendorSubscription(plan)?.stripeSubscriptionId || getVendorSubscription(plan)?.paymentMethodId" 
+                       class="mt-2 pt-2 border-top">
+                    <small class="text-muted">Payment Info (Debug):</small>
+                    <div class="row g-1">
+                      <div class="col-12" *ngIf="getVendorSubscription(plan)?.stripeSubscriptionId">
+                        <small class="text-muted">Stripe Subscription:</small>
+                        <div class="font-monospace small">{{ getVendorSubscription(plan)?.stripeSubscriptionId }}</div>
+                      </div>
+                      <div class="col-12" *ngIf="getVendorSubscription(plan)?.paymentMethodId">
+                        <small class="text-muted">Payment Method:</small>
+                        <div class="font-monospace small">{{ getVendorSubscription(plan)?.paymentMethodId }}</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Cancel Subscription Button -->
+                  <div class="mt-3">
+                    <button class="btn btn-outline-danger btn-sm" 
+                            (click)="cancelVendorSubscription(plan)"
+                            [disabled]="isCancelling">
+                      <i class="bi bi-x-circle me-1"></i>
+                      <span *ngIf="!isCancelling">Cancel Subscription</span>
+                      <span *ngIf="isCancelling">
+                        <span class="spinner-border spinner-border-sm me-1"></span>
+                        Cancelling...
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="filteredPlans.length === 0" class="col-12">
+      <div class="text-center py-5">
+        <div class="mb-3">
+          <i class="fas fa-credit-card fa-3x text-muted"></i>
+        </div>
+        <h5 class="text-muted">No subscription plans found</h5>
+        <p class="text-muted mb-4">Create your first subscription plan to get started.</p>
+        <button class="btn btn-primary" (click)="addNewPlan()">
+          ➕ Create First Plan
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Plan Statistics -->
+  <div class="row g-4 mt-4">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-transparent border-0">
+          <h5 class="card-title mb-0">📊 Plan Statistics</h5>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-6 col-md-3">
+              <div class="d-flex align-items-center p-3 bg-light rounded">
+                <div class="fs-1 me-3">💳</div>
+                <div>
+                  <h4 class="mb-1 fw-bold text-primary">{{ subscriptionPlans.length }}</h4>
+                  <p class="mb-0 text-muted small">Total Plans</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-6 col-md-3">
+              <div class="d-flex align-items-center p-3 bg-light rounded">
+                <div class="fs-1 me-3">✅</div>
+                <div>
+                  <h4 class="mb-1 fw-bold text-success">{{ getActivePlansCount() }}</h4>
+                  <p class="mb-0 text-muted small">Active Plans</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-6 col-md-3">
+              <div class="d-flex align-items-center p-3 bg-light rounded">
+                <div class="fs-1 me-3">👥</div>
+                <div>
+                  <h4 class="mb-1 fw-bold text-info">{{ getTotalSubscribers() }}</h4>
+                  <p class="mb-0 text-muted small">Total Subscribers</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-6 col-md-3">
+              <div class="d-flex align-items-center p-3 bg-light rounded">
+                <div class="fs-1 me-3">💰</div>
+                <div>
+                  <h4 class="mb-1 fw-bold text-warning">${{ getMonthlyRevenue() }}</h4>
+                  <p class="mb-0 text-muted small">Monthly Revenue</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Unified Plan Modal (Create/Edit Wizard) -->
+  <div *ngIf="showPlanModal || showPlanWizard" class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title fw-bold">{{ isEditingPlan ? 'Edit Subscription Plan' : 'Create New Subscription Plan' }}</h5>
+          <button type="button" class="btn-close btn-close-white" (click)="showPlanWizard ? closePlanWizard() : closePlanModal()"></button>
+        </div>
+        <div class="modal-body">
+          <!-- Progress Indicator -->
+          <div class="progress mb-3" style="height: 8px;">
+            <div class="progress-bar bg-success" role="progressbar" [style.width.%]="(currentStep / 4) * 100"></div>
+          </div>
+
+          <!-- Step Indicators -->
+          <div class="wizard-steps mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+              <div *ngFor="let step of [1,2,3,4]; let i = index" class="d-flex align-items-center flex-fill">
+                <div class="step-circle me-2" 
+                     [class.active]="currentStep >= step"
+                     [class.completed]="currentStep > step">
+                  {{ step }}
+                </div>
+                <div class="step-info me-3">
+                  <div class="step-title" [class.active]="currentStep >= step">
+                    {{ getStepTitle(step) }}
+                  </div>
+                  <small class="step-desc">{{ getStepDescription(step) }}</small>
+                </div>
+                <div *ngIf="i < 3" class="step-line flex-fill" 
+                     [class.active]="currentStep > step"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 1: Basic Info -->
+          <div *ngIf="currentStep === 1" class="step-panel">
+            <h5 class="mb-3">📝 Basic Information</h5>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label fw-medium">Plan Name</label>
+                <input type="text" [(ngModel)]="planForm.name" class="form-control" placeholder="Enter plan name" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-medium">Description</label>
+                <input type="text" [(ngModel)]="planForm.description" class="form-control" placeholder="Enter plan description" required>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 2: Pricing & Billing -->
+          <div *ngIf="currentStep === 2" class="step-panel">
+            <h5 class="mb-3">💰 Pricing & Billing</h5>
+            <div class="row g-3">
+              <div class="col-12">
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" [(ngModel)]="planForm.isTrialOnly" (ngModelChange)="onTrialOnlyChange()">
+                  <label class="form-check-label fw-medium">
+                    🎁 Trial-Only Plan (No recurring billing)
+                  </label>
+                </div>
+              </div>
+
+              <div class="col-md-6" *ngIf="!planForm.isTrialOnly">
+                <label class="form-label fw-medium">Price (USD) *</label>
+                <div class="input-group">
+                  <span class="input-group-text">$</span>
+                  <input type="number" [(ngModel)]="planForm.price" (ngModelChange)="onPriceChange()" placeholder="29.99" min="0" step="0.01" class="form-control">
+                </div>
+
+                <!-- Discount Information Display -->
+                <div *ngIf="computeDiscountInfo().hasDiscount" class="mt-2">
+                  <div class="alert alert-success d-flex align-items-center" role="alert">
+                    <i class="fas fa-percentage me-2"></i>
+                    <div>
+                      <strong>🎉 Discount Applied!</strong><br>
+                      <small>
+                        Monthly equivalent: ${{ computeDiscountInfo().monthlyEquivalent }}/month<br>
+                        You save: ${{ computeDiscountInfo().savings }} ({{ planForm.discountPercent }}% off)
+                      </small>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Manual Discount Display -->
+                <div *ngIf="planForm.discountPercent && planForm.discountPercent > 0 && !computeDiscountInfo().hasDiscount" class="mt-2">
+                  <div class="alert alert-info d-flex align-items-center" role="alert">
+                    <i class="fas fa-tag me-2"></i>
+                    <div>
+                      <strong>💰 Manual Discount Set!</strong><br>
+                      <small>
+                        Discount: {{ planForm.discountPercent }}%<br>
+                        Final price: ${{ planForm.price }} ({{ planForm.durationMonths }} months)
+                      </small>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Suggested Pricing Helper -->
+                <div *ngIf="planForm.durationMonths === 12 && !computeDiscountInfo().hasDiscount && planForm.price" class="mt-2">
+                  <div class="alert alert-info d-flex align-items-center" role="alert">
+                    <i class="fas fa-lightbulb me-2"></i>
+                    <div>
+                      <strong>💡 Pro Tip:</strong><br>
+                      <small>
+                        For yearly plans, consider offering a discount!<br>
+                        Suggested: ${{ (planForm.price! / 12 * 12 * 0.8).toFixed(2) }} (20% off) or ${{ (planForm.price! / 12 * 12 * 0.75).toFixed(2) }} (25% off)
+                      </small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-6" *ngIf="!planForm.isTrialOnly">
+                <label class="form-label fw-medium">Billing Cycle *</label>
+                <select [(ngModel)]="planForm.durationMonths" (ngModelChange)="onDurationMonthsChange($event)" class="form-select">
+                  <option value="1">Monthly</option>
+                  <option value="3">Quarterly</option>
+                  <option value="6">Semi-Annual</option>
+                  <option value="12">Annual</option>
+                </select>
+              </div>
+
+              <!-- Discount Field -->
+              <div class="col-md-6" *ngIf="!planForm.isTrialOnly">
+                <label class="form-label fw-medium">Discount Percentage</label>
+                <div class="input-group">
+                  <input type="number" [(ngModel)]="planForm.discountPercent" (ngModelChange)="onDiscountChange()" placeholder="0" min="0" max="100" step="0.01" class="form-control">
+                  <span class="input-group-text">%</span>
+                </div>
+                <small class="form-text text-muted">
+                  <i class="fas fa-info-circle me-1"></i>
+                  Enter discount percentage (0-100%). Auto-calculated for yearly plans.
+                </small>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label fw-medium">Trial Period (Days)</label>
+                <select [(ngModel)]="planForm.trialDays" class="form-select">
+                  <option value="0">No Trial</option>
+                  <option value="7">7 Days Free</option>
+                  <option value="14">14 Days Free</option>
+                  <option value="30">30 Days Free</option>
+                </select>
+              </div>
+              <div class="col-md-6" *ngIf="planForm.trialDays && planForm.trialDays > 0">
+                <label class="form-label fw-medium">Trial Price (USD)</label>
+                <div class="input-group">
+                  <span class="input-group-text">$</span>
+                  <input type="number" [(ngModel)]="planForm.trialPrice" placeholder="0.00" min="0" step="0.01" class="form-control">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 3: Features & Limits -->
+          <div *ngIf="currentStep === 3" class="step-panel">
+            <h5 class="mb-3">✨ Features & Limits</h5>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label fw-medium">Maximum Trips</label>
+                <input type="number" [(ngModel)]="planForm.maxTrips" placeholder="0 for unlimited" min="0" class="form-control">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-medium">Plan Status</label>
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" [(ngModel)]="planForm.isActive">
+                  <label class="form-check-label">
+                    {{ planForm.isActive ? '🟢 Active' : '🔴 Inactive' }}
+                  </label>
+                </div>
+              </div>
+              <div class="col-12">
+                <label class="form-label fw-medium">Features List</label>
+                <textarea [(ngModel)]="planForm.features" placeholder="Feature 1, Feature 2, Feature 3" rows="3" class="form-control"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 4: Review & Confirm -->
+          <div *ngIf="currentStep === 4" class="step-panel">
+            <h5 class="mb-3">👀 Review & Confirm</h5>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <h6 class="text-muted mb-2">Plan Details</h6>
+                <div class="mb-2"><strong>Name:</strong> {{ planForm.name || 'Not specified' }}</div>
+                <div class="mb-2"><strong>Description:</strong> {{ planForm.description || 'Not specified' }}</div>
+                <div class="mb-2"><strong>Status:</strong> {{ planForm.isActive ? 'Active' : 'Inactive' }}</div>
+                <div class="mb-2"><strong>Type:</strong> {{ planForm.isTrialOnly ? 'Trial Only' : 'Paid Plan' }}</div>
+              </div>
+              <div class="col-md-6">
+                <h6 class="text-muted mb-2">Pricing & Features</h6>
+                <div class="mb-2"><strong>Duration:</strong> {{ planForm.durationMonths || 0 }} month(s)</div>
+                <div class="mb-2"><strong>Price:</strong> ${{ planForm.price || 0 }}</div>
+                <div class="mb-2"><strong>Discount:</strong> {{ planForm.discountPercent || 0 }}%</div>
+                <div class="mb-2" *ngIf="planForm.trialDays && planForm.trialDays > 0">
+                  <strong>Trial:</strong> {{ planForm.trialDays }} days {{ planForm.trialPrice === 0 ? 'FREE' : 'for $' + planForm.trialPrice }}
+                </div>
+                <div class="mb-2"><strong>Max Trips:</strong> {{ planForm.maxTrips || 0 }} {{ planForm.maxTrips === 0 ? '(Unlimited)' : '' }}</div>
+                <div class="mb-2"><strong>Features:</strong> {{ planForm.features || 'None specified' }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Wizard Navigation -->
+        <div class="modal-footer">
+          <div class="d-flex justify-content-between align-items-center w-100">
+            <div>
+              <button *ngIf="currentStep > 1" class="btn btn-outline-secondary" (click)="previousStep()">
+                ← Previous
+              </button>
+            </div>
+            <div class="text-center">
+              <span class="badge bg-secondary px-3 py-2">Step {{ currentStep }} of 4</span>
+            </div>
+            <div>
+              <button class="btn btn-secondary me-2" (click)="closePlanModal()">Cancel</button>
+              <button *ngIf="currentStep < 4" class="btn btn-outline-secondary me-2" (click)="nextStep()">
+                Next →
+              </button>
+              <button *ngIf="currentStep === 4" class="btn btn-success" (click)="savePlan()" [disabled]="!isPlanFormValid() || isLoading">
+                <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+                {{ isEditingPlan ? 'Update Plan' : 'Create Plan' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

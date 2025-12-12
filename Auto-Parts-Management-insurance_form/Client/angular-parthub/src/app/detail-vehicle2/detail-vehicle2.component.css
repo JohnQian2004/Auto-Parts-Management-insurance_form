@@ -1,0 +1,98 @@
+table,
+th,
+td {
+  border: 1px solid lightgrey;
+}
+
+tr:hover td {
+  background-color: rgb(248, 248, 248);
+
+}
+
+.bshadow {
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(5px 5px 5px #222222);
+  opacity: .5;
+
+}
+
+/* Top left text */
+.top-left-0 {
+  position: absolute;
+  top: 4px;
+  left: 0px;
+}
+
+
+/* Container holding the image and the text */
+.containerImage {
+  position: relative;
+  text-align: center;
+  color: white;
+}
+
+/* Bottom left text */
+.bottom-left {
+  position: absolute;
+  bottom: 8px;
+  left: 16px;
+}
+
+/* Top left text */
+.top-left {
+  position: absolute;
+  top: 8px;
+  left: 16px;
+}
+
+/* Top right text */
+.top-right {
+  position: absolute;
+  top: 8px;
+  right: 16px;
+}
+
+/* Bottom right text */
+.bottom-right {
+  position: absolute;
+  bottom: 8px;
+  right: 16px;
+}
+
+.blink {
+  animation: blinker 1s step-start infinite;
+}
+
+@keyframes blinker {
+  50% {
+    opacity: 0;
+  }
+}
+
+.center-me {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+}
+
+.modal-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  margin-top: 20%;
+}

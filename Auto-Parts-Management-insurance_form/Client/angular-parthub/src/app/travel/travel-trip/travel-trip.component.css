@@ -1,0 +1,36 @@
+/* Minimal CSS for Travel Trip Component - Essential Styles Only */
+
+/* Thumbnail container cursor */
+.thumbnail-container {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.thumbnail-container:hover {
+  transform: scale(1.05);
+}
+
+/* Custom modal overlay background */
+.modal.show {
+  background-color: rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Ensure modal content is above overlay */
+.modal-dialog {
+  z-index: 1055;
+}
+
+/* Custom image gallery navigation */
+.gallery-nav {
+  transition: all 0.2s ease;
+}
+
+.gallery-nav:hover {
+  transform: scale(1.1);
+}
+
+/* Image counter styling */
+.image-counter {
+  font-size: 0.875rem;
+  font-weight: 500;
+} 

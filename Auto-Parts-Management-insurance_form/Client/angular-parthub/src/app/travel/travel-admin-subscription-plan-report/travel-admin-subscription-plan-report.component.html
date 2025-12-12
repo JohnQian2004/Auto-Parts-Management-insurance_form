@@ -1,0 +1,270 @@
+<div class="subscription-analytics">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0">📈 Subscription Analytics & Reports</h4>
+    <div class="d-flex gap-2">
+      <select [(ngModel)]="analyticsDateRange" (change)="onAnalyticsDateRangeChange()" class="form-select">
+        <option value="weekly">Weekly</option>
+        <option value="monthly">Monthly</option>
+        <option value="quarterly">Quarterly</option>
+        <option value="yearly">Yearly</option>
+      </select>
+      <button class="btn btn-outline-primary" (click)="refreshAnalytics()" [disabled]="analyticsLoading">
+        <span *ngIf="analyticsLoading" class="spinner-border spinner-border-sm me-2"></span>
+        📊 Refresh Data
+      </button>
+      <div class="dropdown">
+        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+          📥 Export
+        </button>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="#" (click)="exportToCSV()">📊 Export CSV</a></li>
+          <li><a class="dropdown-item" href="#" (click)="exportAnalytics()">📄 Export JSON</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Stats Overview -->
+  <div *ngIf="adminStats" class="row g-4 mb-4">
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm h-100 stats-card">
+        <div class="card-body text-center">
+          <div class="text-muted small mb-2">Total Plans</div>
+          <div class="h3 fw-bold text-primary mb-0">{{ adminStats.totalPlans }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm h-100 stats-card">
+        <div class="card-body text-center">
+          <div class="text-muted small mb-2">Active Subscriptions</div>
+          <div class="h3 fw-bold text-success mb-0">{{ formatNumber(adminStats.activeSubscriptions) }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm h-100 stats-card">
+        <div class="card-body text-center">
+          <div class="text-muted small mb-2">Monthly Revenue</div>
+          <div class="h3 fw-bold text-warning mb-0">{{ formatCurrency(adminStats.monthlyRevenue) }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm h-100 stats-card">
+        <div class="card-body text-center">
+          <div class="text-muted small mb-2">Churn Rate</div>
+          <div class="h3 fw-bold text-danger mb-0">{{ formatPercentage(adminStats.churnRate) }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Section -->
+  <div class="row g-4 mb-4">
+    <!-- Revenue Chart -->
+    <div class="col-12 col-lg-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-transparent border-0">
+          <h5 class="card-title mb-0">💰 Revenue Trends</h5>
+        </div>
+        <div class="card-body" style="min-height: 300px;">
+          <div *ngIf="analyticsLoading" class="d-flex align-items-center justify-content-center h-100">
+            <div class="spinner-border text-primary"></div>
+          </div>
+          <div *ngIf="!analyticsLoading && revenueChartData" class="h-100">
+            <!-- Chart placeholder - would integrate with Chart.js or similar -->
+            <div class="text-center text-muted">
+              <div class="mb-3">
+                <i class="fas fa-chart-line fa-3x text-primary"></i>
+              </div>
+              <p class="mb-2">Revenue: {{ formatCurrency(revenueAnalytics?.totalRevenue || 0) }}</p>
+              <p class="mb-2">Growth Rate: {{ formatPercentage(revenueAnalytics?.growthRate || 0) }}</p>
+              <small class="fst-italic">Chart visualization ready for integration</small>
+            </div>
+          </div>
+          <div *ngIf="!analyticsLoading && !revenueChartData" class="d-flex align-items-center justify-content-center h-100">
+            <div class="text-center text-muted">
+              <p class="mb-2">No revenue data available</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Subscription Growth -->
+    <div class="col-12 col-lg-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-transparent border-0">
+          <h5 class="card-title mb-0">📈 Subscription Growth</h5>
+        </div>
+        <div class="card-body" style="min-height: 300px;">
+          <div *ngIf="analyticsLoading" class="d-flex align-items-center justify-content-center h-100">
+            <div class="spinner-border text-primary"></div>
+          </div>
+          <div *ngIf="!analyticsLoading && growthChartData" class="h-100">
+            <div class="text-center text-muted">
+              <div class="mb-3">
+                <i class="fas fa-chart-area fa-3x text-success"></i>
+              </div>
+              <p class="mb-2">Net Growth: {{ formatNumber(subscriptionGrowth?.netGrowthTotal || 0) }}</p>
+              <p class="mb-2">Monthly Growth: {{ formatNumber(subscriptionGrowth?.monthlyGrowth || 0) }}</p>
+              <small class="fst-italic">Growth chart ready for integration</small>
+            </div>
+          </div>
+          <div *ngIf="!analyticsLoading && !growthChartData" class="d-flex align-items-center justify-content-center h-100">
+            <div class="text-center text-muted">
+              <p class="mb-2">No growth data available</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Plan Performance Table -->
+  <div class="card border-0 shadow-sm">
+    <div class="card-header bg-transparent border-0">
+      <h5 class="card-title mb-0">📊 Plan Performance Analytics</h5>
+    </div>
+    <div class="card-body">
+      <div *ngIf="analyticsLoading" class="text-center py-4">
+        <div class="spinner-border text-primary"></div>
+        <p class="mt-2 text-muted">Loading analytics...</p>
+      </div>
+      <div *ngIf="!analyticsLoading && planAnalytics.length > 0" class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Plan Name</th>
+              <th>Total Subscriptions</th>
+              <th>Active Subscriptions</th>
+              <th>Monthly Revenue</th>
+              <th>Conversion Rate</th>
+              <th>Churn Rate</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let analytics of planAnalytics">
+              <td class="fw-medium">{{ analytics.planName }}</td>
+              <td>{{ formatNumber(analytics.totalSubscriptions) }}</td>
+              <td>
+                <span class="badge bg-success">{{ formatNumber(analytics.activeSubscriptions) }}</span>
+              </td>
+              <td>{{ formatCurrency(analytics.revenue) }}</td>
+              <td>{{ formatPercentage(analytics.conversionRate) }}</td>
+              <td>
+                <span class="badge" [class]="analytics.churnRate > 10 ? 'bg-danger' : 'bg-warning'">
+                  {{ formatPercentage(analytics.churnRate) }}
+                </span>
+              </td>
+              <td>
+                <button class="btn btn-sm btn-outline-primary" 
+                        (click)="viewPlanAnalytics(getSubscriptionPlanById(analytics.planId)!)">
+                  📈 Details
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div *ngIf="!analyticsLoading && planAnalytics.length === 0" class="text-center py-4">
+        <div class="text-muted">
+          <i class="fas fa-chart-bar fa-3x mb-3"></i>
+          <p class="mb-2">No plan analytics available</p>
+          <small>Analytics will appear once subscription data is available</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Additional Analytics Cards -->
+  <div class="row g-4 mt-4">
+    <!-- Revenue Breakdown -->
+    <div class="col-12 col-lg-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-transparent border-0">
+          <h5 class="card-title mb-0">💰 Revenue Breakdown</h5>
+        </div>
+        <div class="card-body">
+          <div *ngIf="revenueAnalytics" class="d-flex flex-column gap-3">
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="text-muted">Monthly Revenue</span>
+              <span class="fw-bold text-primary">{{ formatCurrency(revenueAnalytics.monthlyRevenue) }}</span>
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="text-muted">Quarterly Revenue</span>
+              <span class="fw-bold text-info">{{ formatCurrency(revenueAnalytics.quarterlyRevenue) }}</span>
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="text-muted">Yearly Revenue</span>
+              <span class="fw-bold text-success">{{ formatCurrency(revenueAnalytics.yearlyRevenue) }}</span>
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="text-muted">Growth Rate</span>
+              <span class="fw-bold" [class]="revenueAnalytics.growthRate > 0 ? 'text-success' : 'text-danger'">
+                {{ formatPercentage(revenueAnalytics.growthRate) }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Growth Metrics -->
+    <div class="col-12 col-lg-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-transparent border-0">
+          <h5 class="card-title mb-0">📈 Growth Metrics</h5>
+        </div>
+        <div class="card-body">
+          <div *ngIf="subscriptionGrowth" class="d-flex flex-column gap-3">
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="text-muted">Total Subscribers</span>
+              <span class="fw-bold text-primary">{{ formatNumber(subscriptionGrowth.netGrowthTotal) }}</span>
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="text-muted">Monthly Growth</span>
+              <span class="fw-bold text-success">+{{ formatNumber(subscriptionGrowth.monthlyGrowth) }}</span>
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="text-muted">Quarterly Growth</span>
+              <span class="fw-bold text-info">+{{ formatNumber(subscriptionGrowth.quarterlyGrowth) }}</span>
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="text-muted">Yearly Growth</span>
+              <span class="fw-bold text-warning">+{{ formatNumber(subscriptionGrowth.yearlyGrowth) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="col-12 col-lg-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-transparent border-0">
+          <h5 class="card-title mb-0">⚡ Quick Actions</h5>
+        </div>
+        <div class="card-body">
+          <div class="d-flex flex-column gap-2">
+            <button class="btn btn-outline-primary" (click)="refreshAnalytics()" [disabled]="analyticsLoading">
+              <i class="fas fa-sync me-2"></i>Refresh Data
+            </button>
+            <button class="btn btn-outline-success" (click)="exportToCSV()">
+              <i class="fas fa-download me-2"></i>Export CSV
+            </button>
+            <button class="btn btn-outline-info" (click)="exportAnalytics()">
+              <i class="fas fa-file-export me-2"></i>Export JSON
+            </button>
+            <button class="btn btn-outline-warning" (click)="onAnalyticsDateRangeChange()">
+              <i class="fas fa-calendar me-2"></i>Change Period
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

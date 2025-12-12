@@ -1,0 +1,1717 @@
+<div style="margin-left:-50px;padding:30px 10px;">
+
+
+
+
+    <div class="row align-items-stretch" *ngIf="selectedVehicle && user.allowUpdateVehicleStatus ==true">
+        <div class="col-12 px-0">
+
+
+
+            <div class="bg-white border-radius-8 py-1 px-0 w-100 mt-1 mb-3 shadow">
+                <div class="px-2">
+
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle bg-navy text-white fs-14 fw-semibold w-100"
+                            type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false"
+                            title="Click to select other vehicles">
+                            [ {{this.user.firstName }} {{user.lastName}} ]
+                            ({{vehiclesOriginal.length}}) Vehicles <small class="fs-10 opacity-50">(Ordered By
+                                Make)</small>
+                        </button>
+                        <div class="dropdown-menu w-100" aria-labelledby="dropdownMenuButton">
+
+                            <a class="dropdown-item w-100 v-align-middle fs-18"
+                                *ngFor="let vehicle of vehiclesOriginal; let i=index"
+                                (click)="getDetailByUuid(vehicle.token)">
+
+                                <i class="fa-solid fa-square border border-radius-1"
+                                    style="color: {{vehicle.color}}"></i>
+                                {{vehicle.year}} <span title="{{vehicle.make}}"
+                                    [ngClass]="{'text-danger': vehicle.special==true}"
+                                    class="car-{{ vehicle.make| lowercase }}"></span>
+
+                                <span class="fw-700 opacity-50">&nbsp;
+                                    {{vehicle.model}}</span>
+
+                                <span *ngIf="vehicle.statusString" class="fw-700 opacity-50">&nbsp;[
+                                    {{vehicle.statusString}} ]</span>
+                                <span *ngIf="vehicle.imageModels.length>0"> ({{vehicle.imageModels.length}})</span>
+                                <span class="fs-12 fw-700" *ngIf="vehicle.special == true"> WIP </span>
+                                <!-- <span *ngIf="vehicle.supplements?.length>0"> s({{vehicle.supplements.length}})</span>
+                  <span *ngIf="vehicle.pdfFiles?.length>0"> p({{vehicle.pdfFiles.length}})</span> -->
+
+                                <!-- <strong class="badge badge-success ms-1" title="Paid" *ngIf="vehicle.paid==true"><i
+                                        class="fa-solid fa-dollar-sign"></i></strong> -->
+                            </a>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <section id="shop" *ngIf="selectedTab == 5">
+        <div class="row align-items-stretch" style="margin-bottom: 150px;">
+            <div class="mt-4 p-0">
+                <div class="col-12 p-3 bg-white shadow border border-radius-8">
+
+                    <header class="bg-white rounded-3 border shadow table-responsive">
+                        <table class="table table-bordered broder shadow border-radius-8  w-100"
+                            *ngIf="vehiclesOriginal.length >0">
+                            <thead>
+                                <tr>
+                                    <th class="fs-14 text-center" style="min-width: 20px;" (click)="sortList('id')"
+                                        title="Click to Sort By Arraival Date">
+
+                                        <span>#</span>
+                                    </th>
+                                    <ng-container *ngFor="let columnInfo of this.optionsColumnInfo">
+                                        <th class="fs-14 text-center" style="min-width: {{columnInfo.width}}px;"
+                                            (click)="sortList(columnInfo.fieldName)"
+                                            title="Click to Sort By {{columnInfo.tooltip}}">
+
+                                            <span style="color:{{columnInfo.color}}">{{columnInfo.header}}</span>
+                                        </th>
+                                    </ng-container>
+                                </tr>
+
+                                <!-- <ng-container
+                                *ngFor="let vehicle of vehiclesOriginal| paginate: { itemsPerPage: this.pageSize,currentPage: currantPageNumber , totalItems: searchCount}; let i = index;  let even=even">
+                                <tr id="{{vehicle.id}}" (click)="getDetailByUuid(vehicle.token)"
+                                    style="cursor: pointer;"
+                                    title="{{vehicle.customer.title}} {{vehicle.customer.firstName}} {{vehicle.customer.lastName}}"
+                                    [style.background-color]="i == cindex? '#eef5fb' : (even ? 'white' : 'white')">
+                                    <td class="text-center fs-13" data-bs-toggle="modal" data-bs-target="#editVehicle"
+                                        title="Click to view details; Drag and drop the index number to change orders"
+                                        [style.background-color]="i == cindex? '#CFF4FC' : (true ? 'white' : 'white')">
+                                        <ng-container *ngIf="vehicle.pdfFiles.length > 0">
+                                            <div class="position-relative">
+                                                <i class="fa-solid fa-file-pdf fa-2x"></i>
+                                                <span *ngIf="vehicle.pdfFiles.length > 1"
+                                                    title="{{vehicle.pdfFiles.length}} pdf files"
+                                                    class="badge position-absolute top-0 end-0 translate-middle badge-pill bg-danger">{{vehicle.pdfFiles.length}}</span>
+                                            </div>
+                                        </ng-container>
+                                        <ng-container *ngIf="vehicle.pdfFiles.length == 0">
+                                            {{i+1}}
+                                        </ng-container>
+
+                                    </td>
+                                </tr>
+                            </ng-container> -->
+
+                                <ng-container
+                                    *ngFor="let vehicle of vehiclesOriginal| paginate: { itemsPerPage: this.pageSize,currentPage: currantPageNumber , totalItems: searchCount}; let i = index;  let even=even">
+                                    <tr id="{{vehicle.id}}" (click)="getDetailByUuid(vehicle.token)"
+                                        style="cursor: pointer;" class="fs-10 text-center v-align-middle"
+                                        title="{{vehicle.customer.title}} {{vehicle.customer.firstName}} {{vehicle.customer.lastName}}"
+                                        [style.background-color]="i == cindex? '#eef5fb' : (even ? 'white' : 'white')">
+                                        <td class="text-center fs-13 v-align-middle" data-bs-toggle="modal"
+                                            data-bs-target="#editVehicle"
+                                            [style.background-color]="i == cindex? '#CFF4FC' : (true ? 'white' : 'white')">
+                                            <ng-container *ngIf="vehicle.pdfFiles.length > 0">
+                                                <div class="position-relative">
+                                                    <i class="fa-solid fa-file-pdf"></i>
+                                                    <span *ngIf="vehicle.pdfFiles.length > 1"
+                                                        title="{{vehicle.pdfFiles.length}} pdf files"
+                                                        class="badge position-absolute top-0 end-0 translate-middle badge-pill bg-danger">{{vehicle.pdfFiles.length}}</span>
+                                                </div>
+                                            </ng-container>
+                                            <ng-container *ngIf="vehicle.pdfFiles.length == 0">
+                                                {{i+1}}
+                                            </ng-container>
+
+                                        </td>
+                                        <ng-container *ngFor="let columnInfo of this.optionsColumnInfo">
+                                            <ng-container *ngIf="ifColumnInfoInMyShortList(columnInfo) == true">
+                                                <!-- <ng-container *ngIf="columnInfo.fieldName == 'id'">
+                                                <td class="text-center fs-13 v-align-middle" data-bs-toggle="modal"
+                                                    data-bs-target="#editVehicle" (mouseover)="hover = vehicle"
+                                                    (mouseleave)="hover = null" title="Click to view details">
+                                                    <div
+                                                        class="overflow-hidden hover-img transition rounded-1 border inline-block position-relative">
+                                                        <img *ngIf="vehicle.imageModels.length> 0 && vehicle.showInSearchImageId > 0"
+                                                            src="{{baseUrlResizeImage + '/' + vehicle.showInSearchImageId}}"
+                                                            height="40" alt="Image"
+                                                            class="object-fill rounded-1 w-100" />
+
+                                                        <span *ngIf="vehicle.imageModels.length>1"
+                                                            title="{{vehicle.imageModels.length}} images/photos"
+                                                            class="badge position-absolute top-3 end-12 translate-middle badge-pill bg-danger"
+                                                            style="top:8px; left:10px">
+                                                            {{vehicle.imageModels.length}}</span>
+                                                    </div>
+                                                </td>
+                                            </ng-container> -->
+                                                <ng-container *ngIf="columnInfo.fieldName == 'id'">
+                                                    <td class="text-center fs-13 v-align-middle" data-bs-toggle="modal"
+                                                        data-bs-target="#editVehicle" (mouseover)="hover = vehicle"
+                                                        (mouseleave)="hover = null" title="Click to view details">
+                                                        <span *ngIf="vehicle.imageModels.length>1"
+                                                            title="{{vehicle.imageModels.length}} images/photos"
+                                                            class="badge badge-pill bg-danger">
+                                                            {{vehicle.imageModels.length}}</span>
+                                                    </td>
+                                                </ng-container>
+                                                <ng-container *ngIf="columnInfo.fieldName == 'createdAt'">
+                                                    <td class="text-center fs-13 v-align-middle" data-bs-toggle="modal"
+                                                        data-bs-target="#editVehicle" title="Click to view details">
+                                                        {{vehicle.createdAt | date: 'MM/dd'}} </td>
+                                                </ng-container>
+
+                                                <ng-container *ngIf="columnInfo.fieldName == 'updatedAt'">
+                                                    <td class="text-center fs-13 v-align-middle" data-bs-toggle="modal"
+                                                        data-bs-target="#editVehicle" title="Click to view details">
+                                                        <span>{{vehicle.updatedAt | date: 'MM/dd'}}</span>
+                                                    </td>
+                                                </ng-container>
+
+                                                <ng-container *ngIf="columnInfo.fieldName == 'lastUpdateObjectName'">
+                                                    <td class="text-center fs-13 v-align-middle" data-bs-toggle="modal"
+                                                        data-bs-target="#editVehicle"
+                                                        title="{{vehicle.lastVehicleHistory?.name }}">
+
+                                                        <ng-container
+                                                            *ngIf="vehicle.lastUpdateIconName == null || vehicle.lastUpdateObjectName==null">
+                                                            <i title="No Update" class="fa-solid fa-bell-slash"></i>
+                                                        </ng-container>
+
+                                                        <ng-container
+                                                            *ngIf="vehicle.lastUpdateIconName && vehicle.lastUpdateIconName != '' && vehicle.lastUpdateIconName !=vehicle.lastVehicleHistory.name">
+                                                            <i class="{{vehicle.lastUpdateIconName }}"></i>
+                                                        </ng-container>
+                                                        <ng-container
+                                                            *ngIf="vehicle.lastUpdateIconName && vehicle.lastUpdateIconName ==vehicle.lastVehicleHistory.name">
+                                                            {{vehicle.lastUpdateObjectName }}
+                                                        </ng-container>
+
+                                                    </td>
+                                                </ng-container>
+
+                                                <ng-container *ngIf="columnInfo.fieldName == 'year'">
+
+                                                    <td class="text-center fs-13 v-align-middle" data-bs-toggle="modal"
+                                                        data-bs-target="#editVehicle"
+                                                        title="{{vehicle.customer.title}} {{vehicle.customer.firstName}} {{vehicle.customer.lastName}}">
+                                                        {{vehicle.year}}</td>
+
+                                                </ng-container>
+
+                                                <ng-container *ngIf="columnInfo.fieldName == 'make'">
+                                                    <td class="text-center fs-20 v-align-middle" data-bs-toggle="modal"
+                                                        data-bs-target="#editVehicle" title="Click to view details">
+
+                                                        <span title="{{vehicle.make}}"
+                                                            class="car-{{ vehicle.make| lowercase }}"></span>
+
+
+                                                </ng-container>
+
+                                                <ng-container *ngIf="columnInfo.fieldName == 'model'">
+
+                                                    <td class="text-center fs-13 v-align-middle" data-bs-toggle="modal"
+                                                        data-bs-target="#editVehicle" title="Click to view details">
+                                                        {{vehicle.model}}
+                                                    </td>
+                                                </ng-container>
+
+                                                <ng-container *ngIf="columnInfo.fieldName == 'vin'">
+                                                    <td class="text-center fs-13 v-align-middle" data-bs-toggle="modal"
+                                                        data-bs-target="#editVehicle" title="Click to view details">
+                                                        {{vehicle.vin}}
+                                                    </td>
+                                                </ng-container>
+
+                                                <ng-container *ngIf="columnInfo.fieldName == 'vip'">
+                                                    <td class="text-center fs-13 v-align-middle" data-bs-toggle="modal"
+                                                        data-bs-target="#editVehicle" title="Click to view details">
+                                                        <span *ngIf="vehicle.special == true" style="color:red"
+                                                            class="fs-700">VIP</span>
+                                                    </td>
+                                                </ng-container>
+
+                                                <ng-container *ngIf="columnInfo.fieldName == 'insuranceCompany'">
+                                                    <td class="text-center fs-13 v-align-middle" data-bs-toggle="modal"
+                                                        data-bs-target="#editVehicle" title="Click to view details">
+                                                        {{vehicle.insuranceCompany}}
+                                                    </td>
+                                                </ng-container>
+
+                                                <ng-container *ngIf="columnInfo.fieldName == 'loanerCarName'">
+                                                    <td class="text-center fs-13 v-align-middle" data-bs-toggle="modal"
+                                                        data-bs-target="#editVehicle" title="Click to view details">
+                                                        {{vehicle.loanerCarName}}
+                                                    </td>
+                                                </ng-container>
+
+                                                <ng-container *ngIf="columnInfo.fieldName == 'daysInShop'">
+                                                    <td class="text-center fs-13 v-align-middle" data-bs-toggle="modal"
+                                                        data-bs-target="#editVehicle" title="Click to view details">
+                                                        {{vehicle.daysInShop}}
+                                                    </td>
+                                                </ng-container>
+
+                                                <ng-container *ngIf="columnInfo.fieldName == 'comments'">
+                                                    <td class="text-center fs-13 v-align-middle" data-bs-toggle="modal"
+                                                        data-bs-target="#editVehicle" title="Click to view details">
+
+                                                        <p class="fs-12 text-black opacity-75" style="display: -webkit-box;
+                                      -webkit-box-orient: vertical;
+                                      -webkit-line-clamp: 4;  /* Number of lines displayed before it truncate */
+                                       overflow: hidden;">
+                                                            {{vehicle.comments}}</p>
+                                                    </td>
+                                                </ng-container>
+
+
+                                                <ng-container *ngIf="columnInfo.fieldName == 'color'">
+                                                    <td class="text-center fs-13 v-align-middle text-shadow"
+                                                        data-bs-toggle="modal" data-bs-target="#editVehicle"
+                                                        title="Click to view details">
+                                                        <i class="fa-solid fa-square" title="{{vehicle.color}}"
+                                                            style="color: {{vehicle.color}}"></i>
+                                                    </td>
+
+                                                </ng-container>
+
+
+                                                <ng-container *ngIf="columnInfo.fieldName == 'price'">
+                                                    <td class="text-center fs-13 v-align-middle" data-bs-toggle="modal"
+                                                        data-bs-target="#editVehicle" title="Click to view details">
+                                                        ${{vehicle.price}}<span *ngIf=" getTotalSupplements(vehicle)> 0"
+                                                            title="Supplement total">
+                                                            ${{getTotalSupplements(vehicle)}}</span>
+                                                    </td>
+                                                </ng-container>
+
+                                                <ng-container *ngIf="columnInfo.fieldName == 'customer'">
+                                                    <td class="text-center fs-13 text-capitalize" data-bs-toggle="modal"
+                                                        data-bs-target="#editVehicle"
+                                                        title="{{formatPhoneNumber(vehicle.customer.phone)}}">
+                                                        {{vehicle.customer.firstName}} {{vehicle.customer.lastName}}
+                                                    </td>
+                                                </ng-container>
+
+
+                                                <ng-container *ngIf="columnInfo.fieldName == 'phone'">
+                                                    <td class="text-center fs-13 text-capitalize" data-bs-toggle="modal"
+                                                        data-bs-target="#editVehicle" title="Click to view details">
+                                                        {{formatPhoneNumber2(vehicle.customer.phone)}}
+                                                    </td>
+                                                </ng-container>
+
+
+                                                <!-- <ng-container *ngIf="columnInfo.fieldName == 'jobRequestType'">
+                                                <td>
+                                                    
+                                                    <select class="form-select border-radius-4 border"
+                                                        [(ngModel)]="vehicle.jobRequestType"
+                                                        placeholder="Job Requst Type" #jobRequestType
+                                                        (change)="onChangeJobRequestType($event, jobRequestType.value)">
+                                                        <option
+                                                            *ngFor="let jobRequestType of jobRequestTypes let i=index"
+                                                            value="{{jobRequestType.id}}">{{jobRequestType.name}}
+                                                        </option>
+                                                    </select>
+                                                </td>
+
+                                            </ng-container> -->
+
+                                                <ng-container *ngIf="columnInfo.fieldName == 'status'">
+                                                    <td class="text-center fs-13 v-align-middle"><select
+                                                            class="form-select border-radius-4 border"
+                                                            [(ngModel)]="vehicle.status" placeholder="status" #device
+                                                            [disabled]="user.allowUpdateVehicleStatus == false"
+                                                            (change)="onChangeStatus($event, device.value)">
+                                                            <option [style.color]="option.color"
+                                                                *ngFor="let option of statuss; let i=index"
+                                                                value="{{option.id}}">{{option.name}}
+                                                            </option>
+                                                        </select></td>
+
+                                                </ng-container>
+
+                                                <!-- <ng-container *ngIf="columnInfo.fieldName == 'approvalStatus'">
+                                                <td> <select class="orm-select border-radius-4 border"
+                                                        [disabled]="user.allowUpdateVehicleStatus == false"
+                                                        (change)="onChangeApprovalStatus($event, approvalStatus.value)"
+                                                        #approvalStatus [(ngModel)]="vehicle.approvalStatus"
+                                                        placeholder="Approval Status">
+                                                       
+                                                        <option [value]="approvalStatus.id"
+                                                            *ngFor="let approvalStatus of approvalStatuss;let i=index;">
+                                                            {{approvalStatus.name}}
+                                                        </option>
+                                                    </select>
+                                                </td>
+
+                                            </ng-container> -->
+
+
+
+
+                                                <ng-container *ngIf="columnInfo.fieldName == 'assignedTo'">
+
+                                                    <td><select class="form-select border-radius-4 border"
+                                                            [(ngModel)]="vehicle.assignedTo" placeholder="status"
+                                                            #assignedTo
+                                                            [disabled]="user.allowUpdateVehicleStatus == false"
+                                                            (change)="onChangeAssignedTo($event, assignedTo.value)">
+                                                            <option *ngFor="let employee of employees; let i=index"
+                                                                value="{{employee.id}}">
+                                                                {{employee.firstName}} {{employee.lastName}}</option>
+                                                        </select></td>
+
+                                                </ng-container>
+
+                                                <!-- <ng-container *ngIf="columnInfo.fieldName == 'keyLocation'">
+                                                <td><select class="form-select border-radius-4 border"
+                                                        [(ngModel)]="vehicle.keyLocation" placeholder="Key Location"
+                                                        #keyLocation [disabled]="user.allowUpdateVehicleStatus == false"
+                                                        (change)="onChangeKeyLocation($event, keyLocation.value)">
+                                                        <option *ngFor="let keyLocation of keyLocations; let i=index"
+                                                            value="{{keyLocation.id}}">
+                                                            {{keyLocation.name}} </option>
+                                                    </select></td>
+
+                                            </ng-container> -->
+
+                                                <ng-container *ngIf="columnInfo.fieldName == 'paid'">
+
+                                                    <td class="text-center"><button
+                                                            class="alert alert-success p-2 border-0 text-success fs-11 rounded-8 m-0"
+                                                            *ngIf="vehicle.paid==true"
+                                                            [disabled]="user.allowAddPayment == false" title="Paid"
+                                                            (click)="changePaidStatus(vehicle, false)">Y</button>
+                                                        <button
+                                                            class="alert alert-danger p-2 border-0 text-danger fs-11 rounded-8 m-0"
+                                                            *ngIf="vehicle.paid==false"
+                                                            [disabled]="user.allowAddPayment == false" title="Not Paid"
+                                                            (click)="changePaidStatus(vehicle, true)">N</button>
+                                                    </td>
+                                                </ng-container>
+
+                                                <ng-container *ngIf="columnInfo.fieldName == 'targetDateCountDown'">
+
+                                                    <td class="text-center"><ng-container
+                                                            *ngIf="vehicle.targetDate != null && vehicle.targetDateCountDown >= 0">
+                                                            <span
+                                                                class="alert alert-secondary p-2 border-0 text-dark fs-11 rounded-8 m-0"
+                                                                title="{{vehicle?.targetDate | date: 'MM/dd/yyyy'}}">{{vehicle.targetDateCountDown}}</span>
+                                                        </ng-container>
+                                                        <ng-container
+                                                            *ngIf="vehicle.targetDate != null && vehicle.targetDateCountDown < 0">
+                                                            <span
+                                                                class="alert alert-danger p-2 border-0 text-danger fs-11 rounded-8 m-0"
+                                                                title="{{vehicle?.targetDate | date: 'MM/dd/yyyy'}}">{{vehicle.targetDateCountDown}}</span>
+                                                        </ng-container>
+                                                    </td>
+                                                </ng-container>
+
+                                                <ng-container *ngIf="columnInfo.fieldName == 'rentalCountDown'">
+
+                                                    <td class="text-center"><ng-container *ngIf="vehicle.loanerCarName != null && vehicle?.loanerCarName !='' &&
+                                    vehicle.rentalDate != null && vehicle.rentalCountDown >= 0 ">
+                                                            <span
+                                                                class="alert alert-secondary p-2 border-0 text-dark fs-11 rounded-8 m-0"
+                                                                title="{{vehicle?.loanerCarName}} {{vehicle?.rentalDate | date: 'MM/dd/yyyy'}}">{{vehicle.rentalCountDown}}</span>
+                                                        </ng-container>
+                                                        <ng-container
+                                                            *ngIf="vehicle.loanerCarName != null && vehicle?.loanerCarName !='' && vehicle.rentalDate !=null && vehicle.rentalCountDown < 0 ">
+                                                            <span
+                                                                class="alert alert-danger p-2 border-0 text-danger fs-11 rounded-8 m-0"
+                                                                title="{{vehicle?.loanerCarName}} {{vehicle?.rentalDate | date: 'MM/dd/yyyy'}}">{{vehicle.rentalCountDown}}</span>
+                                                        </ng-container>
+                                                    </td>
+                                                </ng-container>
+
+                                                <!-- <ng-container *ngIf="columnInfo.fieldName == 'location'">
+
+                                                <td><select class="form-select border-radius-4 border"
+                                                        [(ngModel)]="vehicle.location" placeholder="location"
+                                                        #deviceLocation
+                                                        (change)="onChangeLocation($event, deviceLocation.value)">
+                                                        <option *ngFor="let option of locations; let i=index"
+                                                            value="{{option.id}}">
+                                                            {{option.name}}
+                                                        </option>
+                                                    </select></td>
+
+                                            </ng-container> -->
+                                            </ng-container>
+                                        </ng-container>
+
+                                    </tr>
+                                </ng-container>
+
+                            </thead>
+                        </table>
+
+                    </header>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section id="top" *ngIf="selectedTab == 0">
+        <div class="row align-items-stretch">
+            <div class="col-12 px-1">
+
+                <header class="bg-white rounded-3 border shadow">
+
+                    <div class="d-flex justify-content-between gap-3" *ngIf="selectedVehicle?.id > 0">
+                        <img *ngIf="selectedVehicle !=null && selectedVehicle.showInSearchImageId > 0" width="150"
+                            class="img-fluid rounded-2 img-thumbnail my-2 object-fit-cover" title="Click to logout "
+                            (click)="logout()" src="{{baseUrlImage + '/' + selectedVehicle.showInSearchImageId}}"
+                            alt="Image" />
+
+
+
+                        <qrcode [qrdata]="url" [width]="150" [errorCorrectionLevel]="'M'"></qrcode>
+                    </div>
+
+                </header>
+
+            </div>
+        </div>
+    </section>
+
+    <section id="vehicle" *ngIf="selectedTab < 3">
+        <div class="row align-items-stretch" *ngIf="selectedVehicle != null && selectedVehicle.id> 0">
+            <div class="col-md-12 px-2">
+                <div class="bg-white border-radius-8 py-3 px-0 w-100 mt-3 shadow">
+                    <div class="px-2">
+
+
+                        <div class="user-details">
+
+                        </div>
+                        <h1 class="h4 fw-700 mb-1">
+                            <span [ngClass]="{'text-danger': selectedVehicle.special ==true}"
+                                title="{{selectedVehicle.make}}"
+                                class="car-{{ selectedVehicle.make| lowercase }}"></span>
+
+                            {{ selectedVehicle.year }}
+                            {{
+                            selectedVehicle.make }} {{selectedVehicle.model }} {{selectedVehicle.color }} <i
+                                class="fa-solid fa-square border border-radius-1"
+                                style="color: {{selectedVehicle.color}}"></i>
+                        </h1>
+
+
+
+                        <h1 class="fs-18 fw-700" *ngIf="selectedTab == 0">
+                            <span *ngIf="selectedVehicle.jobReqeustTypeString !=''"
+                                class="fw-700 text-success">{{selectedVehicle.jobReqeustTypeString }} </span>
+                            <span *ngIf="selectedVehicle.statusString !=''"
+                                class="fw-700 text-danger">{{selectedVehicle.statusString
+                                }}</span>
+
+                            <small class="badge badge-success ms-1 opacity-75" title="Paid"
+                                *ngIf="selectedVehicle.paid==true"><i class="fa-solid fa-dollar-sign"></i></small>
+                        </h1>
+
+                        <h1 class="fs-18 fw-700" *ngIf="selectedTab == 0">
+                            <!-- <label class="form-label fs-14 fw-700 text-danger ">Status:</label> -->
+                            <select class="form-select h-48 mt-2" title="Set vehicle status"
+                                [(ngModel)]="selectedVehicle.status" placeholder="status" #device
+                                [disabled]="user.allowUpdateVehicleStatus == false"
+                                (change)="onChangeStatus($event, device.value)">
+                                <option value="0" disabled selected>Select Status</option>
+                                <option *ngFor="let option of statuss; let i=index" value="{{option.id}}">
+                                    {{option.name}}
+                                </option>
+                            </select>
+
+                            <!-- <select class="form-select h-48 mt-2" title="Assign to technicians"
+                                [(ngModel)]="selectedVehicle.assignedTo" placeholder="status" #assignedTo
+                                [disabled]="user.allowAssignUser == false"
+                                (change)="onChangeAssignedTo($event, assignedTo.value)">
+                                <option value="0" disabled selected>Select Employee</option>
+                                <option *ngFor="let employee of employees; let i=index" value="{{employee.id}}">
+                                    {{employee.firstName}} {{employee.lastName}}</option>
+                            </select> -->
+                        </h1>
+
+                        <a *ngIf="selectedTab == 0 && selectedVehicle.customer?.phone &&  user.allowUpdateVehicleStatus == true"
+                            title="Press to call" href="tel:{{selectedVehicle.customer.phone}}"><strong
+                                class="fs-15  text-success py-2"
+                                style="display: inline-block; word-break: break-word;">{{
+                                formatPhoneNumber(selectedVehicle.customer.phone) }} ({{selectedVehicle.customer.title}}
+                                {{selectedVehicle.customer.firstName}}
+                                {{selectedVehicle.customer.lastName}})</strong></a><br>
+                        <!-- <small class="fs-10 text-dark- opacity-50 py-2"
+                            *ngIf="selectedVehicle.customer?.phone &&  user.allowUpdateVehicleStatus == true"
+                            style="display: inline-block; word-break: break-word;">
+                            {{selectedVehicle.customer.street }} {{selectedVehicle.customer.city |
+                            titlecase}}, {{ selectedVehicle.customer.state}} {{ selectedVehicle.customer.zip}}</small> -->
+                        <span class="fs-12 mt-1" *ngIf="user.allowUpdateVehicleStatus == true && selectedTab == 0">
+
+                            {{ selectedVehicle.serachString}}
+                        </span>
+                        <h1 class="fs-18 fw-700">
+
+                            <a *ngIf="selectedVehicle.supplements.length> 0 && ( selectedTab == 0 ) "
+                                title="Click to go to supplement details" (click)="scrollToSection('supplements')">
+                                <h1 class="fs-15 fw-700 mt-1">Supplements
+                                    ({{selectedVehicle.supplements.length}}):
+                                    <small class="fs-12"
+                                        *ngFor="let supplement of selectedVehicle.supplements; let i=index">
+                                        {{ i+1}}.{{ supplement.name}}
+                                        <span>
+                                            <ng-container *ngFor="let approvalStatus of approvalStatuss; let i=index">
+                                                <span *ngIf="supplement.status==approvalStatus.id">
+                                                    ({{approvalStatus.name}})</span>
+                                            </ng-container>
+                                        </span>
+
+                                    </small>
+                                </h1>
+                            </a>
+
+
+                            <a *ngIf="user.allowAddPayment == true && ( selectedTab == 0 ) ">
+                                <h1 class="fs-15 fw-700 mt-1 text-danger">Estimates: ${{selectedVehicle.price}}
+                                    <span *ngIf=" selectedVehicle.supplements.length > 0">
+                                        - ${{getTotalSupplements(selectedVehicle)}}</span>
+                                </h1>
+                            </a>
+
+                            <a *ngIf="autopartsSearch.length> 0 && selectedTab == 1 "
+                                title="Click to go to parts details" (click)="scrollToSection('autoparts')">
+                                <h1 class="fs-15 fw-700 mt-1">Parts
+                                    ({{getAutopartReceivedCounts()}}/{{autopartsSearch.length}}):
+                                    <small class="fs-12" *ngFor="let autopart of autopartsSearch; let i=index">
+                                        {{ i+1}}.{{ autopart.title}}<i class="fa-solid fa-phone-square" title="Ordered"
+                                            *ngIf="autopart.purchaseStatus==1"></i>
+                                        <i class="fa-solid fa-check-square" title="Received"
+                                            *ngIf="autopart.purchaseStatus==2"></i>
+                                        <i class="fa-solid fa-window-close" title="Returned"
+                                            *ngIf="autopart.purchaseStatus==3"></i>
+                                    </small>
+                                </h1>
+                            </a>
+
+                            <a *ngIf="jobs.length> 0 && selectedTab == 2 " title="Click to go to job details"
+                                (click)="scrollToSection('jobs')">
+                                <h1 class="fs-15 fw-700 mt-1" *ngIf="jobs.length> 0"> Jobs (<span
+                                        class="text-success">{{jobCompletedCount}}</span>/{{jobs.length}}):
+                                    <small class="fs-12 fw-400" *ngFor="let job of jobs; let i=index">{{i+1}}.
+                                        <span class="fw-700"
+                                            [ngClass]="{'text-danger': job.status != 1, 'text-success': job.status == 1}">{{
+                                            job.id}}</span> {{ job.name}} <strong class="opacity-25"><i
+                                                class="fa-solid fa-user"></i>
+                                            {{getEmployeeName(job.employeeId) |
+                                            shortName:2}} </strong>
+                                    </small>
+                                </h1>
+                            </a>
+                        </h1>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+
+    <section id="images" *ngIf="selectedTab == 0">
+
+        <div class="row align-items-stretch" *ngIf="selectedVehicle">
+            <div class="row align-items-stretch">
+                <div class="mt-3 position-relative px-0">
+                    <button name="btn" class="btn btn-secondary-abs py-2 px-0 w-100 mt-3 shadow"
+                        [disabled]="readOnly == true" (click)="fileInput.click()"><i class="fa fa-camera"></i> Upload
+                        Images [{{selectedVehicle.imageModels?.length}}]
+                    </button>
+                    <input type='file' accept="image/jpg, image/jpeg"
+                        class="form-control h-48 ps-5 border-radius-8 mt-5 opacity-0 top-0 position-absolute" #fileInput
+                        (change)="onSelectFileEditor($event)" multiple (click)="fileInput.value = ''" />
+                </div>
+            </div>
+        </div>
+
+        <div class="row align-items-stretch" *ngIf="selectedVehicle  && user.allowUpdateVehicleStatus == false">
+            <div class="mt-3 position-relative" *ngIf="selectedVehicle != null">
+                <button name="btn" class="btn btn-secondary-abs py-2 px-0 w-100 mt-3 shadow"><i
+                        class="fa fa-list me-2"></i>
+                    Images [{{selectedVehicle.imageModels?.length}}]
+                </button>
+                <input type='file' accept="image/jpg, image/jpeg"
+                    class="form-control h-48 ps-5 border-radius-8 mt-5 opacity-0 top-0 position-absolute" #fileInput
+                    (change)="onSelectFileEditor($event)" multiple (click)="fileInput.value = ''" />
+            </div>
+
+        </div>
+
+        <div class="row align-items-stretch " *ngIf="selectedVehicle">
+
+            <div class="col-lg-2 col-md-3 col-sm-4 col-6 px-2 py-1 mt-2 shadow"
+                *ngFor='let imageModel of selectedVehicle.imageModels; let i=index'>
+                <div class="containerImage">
+
+                    <label class="top-left-0 w-100 fs-10 fw-700 ms-1 me-1 opacity-75"
+                        [ngClass]="{'text-white bg-primary':imageModel.employeeId> 0, 'text-white bg-secondary':imageModel.employeeId == 0}"
+                        for="title"> <span *ngIf="imageModel.employeeId > 0">{{getTopImageLabel(imageModel)
+                            |shortName}}</span>
+                        {{imageModel?.createdAt | date: 'MM/dd/yyyy, HH:mm'}}
+                        <span *ngIf="imageModel.userName != null">{{imageModel.userName
+                            |shortName}}</span></label>
+
+
+                    <!-- <label class="top-left" for="title">
+                        {{imageModel.createdAt | date}}</label> -->
+
+                    <img class="img-fluid rounded-2 img-thumbnail my-1 object-fit-cover h-100 w-100"
+                        (click)="setImage(i)" src="{{baseUrlResizeImage + '/' + imageModel.id}}"
+                        (click)="setImage(i)" />
+
+                    <div class="bottom-right py-2" *ngIf="user.allowUpdateVehicleStatus == true && readOnly == false">
+                        <button *ngIf="imageModel.id != selectedVehicle.showInSearchImageId"
+                            title="As index image during search"
+                            (click)="setImageForSearch(selectedVehicle.id, imageModel.id)"
+                            class="btn btn-primary-abs me-3 mt-3 btn-sm" for="title">Set for Index</button>
+                        <button (click)="deleteImage(selectedVehicle.id, imageModel.id)" data-toggle="tooltip"
+                            data-placement="top" title="Remove this image" class="btn btn-danger mt-3 btn-sm"
+                            for="title">
+                            <i class="bi-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="row align-items-stretch " style="margin-bottom: 150px;"
+            *ngIf="selectedVehicle && selectedVehicle.imageModels.length  &&  selectedImage > 0">
+
+            <div class="col-lg-12 col-md-12 col-sm-12 px-0 py-3">
+                <div class="bg-white rounded-3 border p-3 h-100">
+                    <div class="containerImage" *ngIf="selectedVehicle.imageModels.length > 0"> <img
+                            *ngIf="selectedImage != null && selectedImage > 0 &&  selectedVehicle.showInSearchImageId != selectedImage"
+                            class="image w-100 img-fluid img-thumbnail" src="{{baseUrlImage + '/' + selectedImage}}"
+                            alt="Image" />
+                        <img *ngIf="selectedImage != null && selectedImage > 0 &&  selectedVehicle.showInSearchImageId == selectedImage"
+                            style="max-height:500px;"
+                            class="img-fluid rounded-2 img-thumbnail my-2 object-fit-cover w-100"
+                            src="{{baseUrlImage + '/' + selectedImage}}" alt="Image" />
+                        <label *ngIf="selectedImage == selectedVehicle.showInSearchImageId" class="top-left"
+                            for="title">
+                            Will Show this in listing</label>
+                        <div class="top-right py-3" *ngIf="readOnly == false">
+                            <button title="Close" (click)="selectedImage =0"
+                                class="btn btn-primary-abs me-3 mt-3 btn-sm" for="title">Close</button>
+                            <button *ngIf="selectedImage != selectedVehicle.showInSearchImageId"
+                                title="As index image during search"
+                                (click)="setImageForSearch(selectedVehicle.id, selectedImage)"
+                                class="btn btn-primary-abs me-3 mt-3 btn-sm" for="title">Set for Index</button>
+                            <button (click)="deleteImage2(selectedVehicle.id, selectedImage)" data-toggle="tooltip"
+                                data-placement="top" title="Remove this image" class="btn btn-danger mt-3 btn-sm"
+                                for="title">
+                                <i class="bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+    <section id="autoparts" *ngIf="selectedTab == 1">
+        <div class="row align-items-stretch" style="margin-bottom: 150px;">
+            <div class="bg-white border-radius-8  px-0 w-100 mt-3 shadow">
+                <div class="row align-items-stretch">
+                    <div class="position-relative px-0" *ngIf="selectedVehicle != null">
+                        <button name="btn" class="btn btn-secondary-abs px-0 w-100 shadow" title="Add Parts"
+                            [disabled]="user.allowAddUpdateAutopart==false" (click)="addNewParts()"><i
+                                class="fa fa-plus me-2"></i>
+                            Add Parts [
+                            <span class="fs-16 fw-700 ">{{getAutopartReceivedCounts()}}/{{autopartsSearch.length
+                                }}</span> ]
+                        </button>
+                    </div>
+                </div>
+
+                <div class="row align-items-stretch px-2">
+
+                    <div class="col-lg-3 col-md-4 col-sm-12 rounded-3 border p-1 h-100 mt-2 mb-1 shadow  col-equal"
+                        [style.background-color]="i == currentIndex ? 'lightyellow' : 'white' "
+                        *ngFor="let autopart of autopartsSearch; let i=index" (click)="getDetailsAutopart(autopart, i)">
+
+                        <div class="d-flex gap-3">
+                            <div class="mr-auto p-2">
+                                <strong class="fs-14 mb-1 d-block">{{ i+1}}. {{autopart.title}} -
+                                    {{autopart.partNumber}} <span *ngIf="
+                      user.allowAddUpdateAutopart==true">- {{autopart.grade}} - </span><span class="text-danger" *ngIf="
+                      user.allowAddUpdateAutopart==true">${{autopart.salePrice}}</span>
+                                </strong>
+                                <small class="fs-13 text-dark opacity-80">
+                                    <p class="fs-12 text-black opacity-75"
+                                        style="display: inline-block; word-break: break-word;">
+                                        {{autopart.description}}
+                                        <span class="text-info">( Created At: {{
+                                            autopart?.createdAt|
+                                            date: 'MM/dd/yyyy
+                                            HH:mm:ss'}} ) by <strong
+                                                *ngIf="job.userName != null &&  job.userName != '' "
+                                                class="opacity-25"><i class="fa-solid fa-user"></i>
+                                                {{job.userName | shortName:2}} </strong></span>
+                                        <ng-container *ngIf="autopart.purchaseStatus==1"><br>
+                                            <span class="text-danger">Ordered &nbsp;&nbsp;At: {{ autopart.orderedAt|
+                                                date: 'MM/dd/yyyy
+                                                HH:mm:ss'}}</span>
+                                        </ng-container>
+                                        <ng-container *ngIf="autopart.purchaseStatus==2"><br>
+                                            <span class="text-danger">Ordered &nbsp;&nbsp;At: {{ autopart.orderedAt|
+                                                date: 'MM/dd/yyyy
+                                                HH:mm:ss'}}</span><br>
+                                            <span class="fw-700 text-danger blink">Received At:{{ autopart.receivedAt|
+                                                date: 'MM/dd/yyyy
+                                                HH:mm:ss'}}</span>
+                                        </ng-container>
+                                        <ng-container *ngIf="autopart.purchaseStatus==3"><br>
+                                            <span class="text-danger">Ordered &nbsp;&nbsp;At: {{ autopart.orderedAt|
+                                                date: 'MM/dd/yyyy
+                                                HH:mm:ss'}}</span><br>
+                                            <span class="text-danger">Received At:{{ autopart.receivedAt| date:
+                                                'MM/dd/yyyy
+                                                HH:mm:ss'}}</span><br>
+                                            <span class="fw-700  text-danger">Returned At:{{ autopart.returnedAt| date:
+                                                'MM/dd/yyyy
+                                                HH:mm:ss'}}</span>
+                                        </ng-container>
+                                        <ng-container *ngIf="autopart.purchaseStatus==4"> <br>
+                                            <span class="text-danger">Ordered At: {{ autopart.orderedAt|
+                                                date: 'MM/dd/yyyy HH:mm:ss'}}</span> <br>
+                                            <span class="text-danger">Received At:{{ autopart.receivedAt|
+                                                date: 'MM/dd/yyyy HH:mm:ss'}}</span> <br>
+                                            <span class="text-danger">Returned At:{{ autopart.returnedAt|
+                                                date: 'MM/dd/yyyy HH:mm:ss'}}</span>
+                                        </ng-container>
+                                    </p>
+                                </small>
+
+
+                            </div>
+
+                            <!-- <div class="pt-1 position-relative">
+                                <button name="btn btn-sm" class="btn btn-success" (click)="editAutopart(autopart)"><i
+                                        class="fa fa-edit me-2"></i><span></span></button>
+                                <button name="btn btn-sm" class="btn btn-warning" (click)="fileInput.click()"><i
+                                        class="fa fa-camera me-2"></i><span *ngIf=" autopart.imageModels?.length> 0">
+                                    </span></button>
+                                <input type='file' id="uploadButton"
+                                    class="form-control h-48 ps-5 border-radius-8 mt-5 opacity-0 top-0 position-absolute"
+                                    accept="image/jpg, image/jpeg" #fileInput
+                                    (change)="onSelectFileEditorAutoparts($event)" multiple
+                                    (click)="fileInput.value = ''" />
+                            </div> -->
+
+                        </div>
+                        <select name="purchaseStatus" class="form-select border-radius-4 w-100" size="1"
+                            [disabled]="user.allowAddUpdateAutopart==false"
+                            (change)="onChangeAutopartPurchaseStatus($event, autopart)"
+                            [(ngModel)]="autopart.purchaseStatus">
+                            <option value="0" selected>No Status</option>
+                            <option value="1">Ordered</option>
+                            <option value="2">Received</option>
+                            <option value="3">Returned</option>
+                            <option value="4">Wrong Part</option>
+                        </select>
+                        <div class="row">
+                            <div class="col-lg-6 col-md-4 col-sm-4 col-6 px-2 py-1 mt-2 shadow d-flex align-items-stretch "
+                                *ngFor='let imageModel of autopart.imageModels; let i=index'>
+                                <div class="containerImage">
+
+                                    <label class="top-left" for="title">
+                                        {{imageModel?.createdAt | date}}</label>
+
+                                    <img class="img-fluid rounded-2 img-thumbnail my-1 object-fit-cover w-100"
+                                        src="{{baseUrlResizeImageParts + '/' + imageModel.id}}" />
+
+                                    <div class="bottom-right py-3" *ngIf="readOnly == false">
+                                        <button *ngIf="imageModel.id != autopart.showInSearchImageId"
+                                            title="As index image during search"
+                                            (click)="setImageForSearchAutoparts(autopart.id, imageModel.id)"
+                                            class="btn btn-primary-abs me-3 mt-3 btn-sm" for="title">Set for
+                                            Index</button>
+                                        <button (click)="deleteImageAutopart(autopart.id, imageModel.id)"
+                                            data-toggle="tooltip" data-placement="top" title="Remove this image"
+                                            class="btn btn-danger mt-3 btn-sm" for="title"> <i class="bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 p-0 mb-2">
+                                <div class="d-flex mt-2 justify-content-end gap-1" *ngIf="readOnly == false">
+
+                                    <input type='file' id="uploadButton" class="form-control opacity-0 top-0 w-25 end-0"
+                                        accept="image/jpg, image/jpeg" #fileInput
+                                        (change)="onSelectFileEditorAutoparts($event)" multiple
+                                        (click)="fileInput.value = ''" />
+
+
+
+                                    <!-- <button class="btn btn-success btn-sm" title="Edit parts"
+                                        (click)="editAutopart(autopart)"><i class="fa fa-save"></i> Edit</button> -->
+
+                                    <button class="btn btn-warning text-white btn-sm" title="add images"
+                                        [disabled]="job.paidWeek> 0" (click)="fileInput.click()"><i
+                                            class="fa fa-camera"></i> Upload</button>
+
+
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+    <section id="jobs" *ngIf="selectedTab == 2">
+        <div class="row align-items-stretch" style="margin-bottom: 150px;">
+            <div class="bg-white border-radius-8  px-0 w-100 mt-3 shadow">
+                <div class="row align-items-stretch">
+                    <div class="position-relative px-0" *ngIf="selectedVehicle != null">
+                        <button name="btn" class="btn btn-secondary-abs px-0 w-100 shadow"
+                            (click)="scrollToSection('top')"><i class="fa fa-list me-2"></i> Jobs [
+                            <span class="fs-16 fw-700 ">{{jobCompletedCount}}/{{jobs.length
+                                }}</span> ]
+                        </button>
+                    </div>
+                </div>
+
+                <div class="row align-items-stretch px-2">
+
+                    <div class="col-lg-3 col-md-4 col-sm-12 rounded-3 border p-1 h-100 mt-2 mb-1 shadow  col-equal"
+                        [style.background-color]="i == currentIndexJob ? 'lightyellow' : 'white' "
+                        *ngFor="let job of jobs; let i=index" (click)="getDetailsJob(job, i)">
+
+                        <div class="d-flex gap-3">
+                            <div class="mr-auto p-2">
+                                <strong class="fs-14 mb-1 d-block">{{ i+1}}. {{job.id}} -
+                                    {{job.name}} <strong class="opacity-50"><i class="fa-solid fa-user"></i>
+                                        {{getEmployeeName(job.employeeId) |
+                                        shortName:2}}</strong>
+                                    <strong
+                                        [ngClass]="{'opacity-25': job.notifiedAt == null, 'opacity-75':job.notifiedAt != null}"><i
+                                            class="fa-solid fa-bell"></i></strong>
+                                    <strong
+                                        [ngClass]="{'opacity-25': job.verifiedAt == null, 'opacity-75':job.verifiedAt != null}">
+                                        <i class="fa-solid fa-square-check"></i>
+                                    </strong>
+                                    <strong
+                                        [ngClass]="{'opacity-25': job.paidWeek == 0, 'opacity-75':job.paidWeek != 0}"><i
+                                            class="fa-solid fa-bank"></i></strong>
+
+                                </strong>
+
+                                <small class="fs-13 text-dark fw-500">
+                                    <p class="fs-12 text-black opacity-75"
+                                        style="display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; overflow: hidden;">
+                                        {{job.notes}} <br>
+                                        <span class="text-primary">( Created At: {{ job.createdAt|
+                                            date: 'MM/dd/yyyy HH:mm'}} ) by <strong *ngIf="job.userName != null"
+                                                class="opacity-25"><i class="fa-solid fa-user"></i>
+                                                {{job.userName | shortName:2}} </strong></span>
+
+                                        <ng-container *ngIf="job.startDate"><br>
+                                            <span class="text-success">Started &nbsp;&nbsp;&nbsp;&nbsp;At: {{
+                                                job.startDate| date: 'MM/dd
+                                                HH:mm'}}</span>
+                                        </ng-container>
+                                        <ng-container *ngIf="job.targetDate"><br>
+                                            <span class="text-success">Targeted &nbsp;&nbsp;At: {{ job.targetDate|
+                                                date:
+                                                'MM/dd
+                                                HH:mm'}}</span>
+                                        </ng-container>
+                                        <ng-container *ngIf="job.endDate"><br>
+                                            <span class="text-success">Finished &nbsp;&nbsp;At: {{ job.endDate|
+                                                date:
+                                                'MM/dd
+                                                HH:mm'}}</span>
+                                        </ng-container>
+                                        <ng-container *ngIf="job.status==1"><br>
+                                            <span class="text-success">Completed&nbsp;At: {{ job.updatedAt| date:
+                                                'MM/dd HH:mm'}}</span>
+                                        </ng-container>
+                                        <ng-container><br>
+                                            <span class="text-success">Notified &nbsp;At: {{ job.notifiedAt| date:
+                                                'MM/dd HH:mm'}}</span>
+                                        </ng-container>
+                                        <ng-container *ngIf="job.userIdVerified > 0"><br>
+                                            <span class="text-primary">Verified &nbsp;At: {{ job.verifiedAt| date:
+                                                'MM/dd HH:mm'}}</span>
+                                        </ng-container>
+                                        <ng-container
+                                            *ngIf="job.employeeId != employeeId && (job.comments !=null && job.comments !='')"><br>
+                                            <span class="opacity-75">Comments: {{job.comments}}</span>
+                                        </ng-container>
+                                    </p>
+                                </small>
+
+
+                            </div>
+
+                            <div class="pt-1 position-relative mr-3">
+                                <div class="form-check form-switch text-center">
+                                    <input trimText class="form-check-input" role="switch" type="checkbox"
+                                        disabled="readOnly == true "
+                                        [title]="job.status ==1 ? 'Completed' : 'Not Completed'"
+                                        [disabled]="job.paidWeek> 0 || user.allowAddService == false"
+                                        *ngIf="job.employeeId > 0" [checked]="isJobChecked(job)"
+                                        (change)="updateJobStatus(job)" />
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <select class="form-select border-radius-4 h-40 border" [disabled]="readOnly == true"
+                            [(ngModel)]="job.employeeId" #device title="Assigned to"
+                            (change)="onChangeEmployee2($event, device.value, job)">
+                            <option value="0" disabled selected>Select Employee</option>
+                            <option [value]="employee.id"
+                                [style.background-color]="employee.id == currentEmplyeeId ? 'lightyellow' : (true ? 'white' : 'white')"
+                                *ngFor="let employee of employees;let i=index;">
+                                {{employee.firstName}}
+                                {{employee.lastName}} <span
+                                    *ngIf="employee.roleName && employee.roleName != ''">({{employee.roleName}})</span>
+
+                            </option>
+                        </select>
+                        <textarea class="form-control h-48 px-3 mt-2 border-radius-8" type="text"
+                            placeholder="Enter Comments" #description="ngModel" style="line-height: 2;"
+                            [ngClass]="{ 'is-invalid': description.errors }" minlength="2" rows="2" maxlength="2000"
+                            required [(ngModel)]="job.comments" name="description"></textarea>
+
+
+                        <!-- <div class="progress  mt-2 w-100">
+                            <div class="progress-bar" role="progressbar" style="width: {{job.steps/100 | percent }}"
+                                aria-valuemin="0" aria-valuemax="100">
+                                {{job.stepDescriptionCumulative }} ({{job.steps/100 | percent}}) </div>
+                        </div> -->
+
+                        <div class="row">
+                            <div class="col-lg-6 col-md-4 col-sm-4 col-6 px-2 py-1 mt-2 shadow d-flex align-items-stretch "
+                                *ngFor='let imageModel of job.imageModels; let i=index'>
+                                <div class="containerImage">
+
+                                    <label class="top-left-0 w-100 fs-12 opacity-75"
+                                        [ngClass]="{'text-white bg-primary':imageModel.employeeId> 0, 'text-white bg-navy':imageModel.employeeId == 0}"
+                                        for="title"> <span
+                                            *ngIf="imageModel.employeeId > 0">{{getTopImageLabel(imageModel )
+                                            |shortName}}</span>
+                                        <span *ngIf="imageModel.userName != null">{{imageModel.userName
+                                            |shortName}}</span>
+                                        {{imageModel?.createdAt | date: 'MMM-dd, HH:mm'}}</label>
+
+                                    <img class="img-fluid rounded-2 img-thumbnail my-1 object-fit-cover w-100"
+                                        src="{{baseUrlResizeImageJobs + '/' + imageModel.id}}" />
+
+                                    <div class="bottom-right py-2" *ngIf="user.allowAddUpdateAutopart == true">
+                                        <!-- <button *ngIf="imageModel.id != job.showInSearchImageId"
+                                            title="As index image during search"
+                                            (click)="setImageForSearchJobs(job.id, imageModel.id)"
+                                            class="btn btn-primary-abs me-3 mt-3 btn-sm" for="title">Set for
+                                            Index</button> -->
+                                        <button (click)="deleteImageJob(job.id, imageModel.id)" data-toggle="tooltip"
+                                            data-placement="top" title="Remove this image"
+                                            class="btn btn-danger mt-3 btn-sm" for="title"> <i class="bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" *ngIf="readOnly == false">
+                            <div class="col-md-12 p-0 mb-2">
+                                <div class="d-flex mt-2 justify-content-end gap-1">
+
+                                    <input type='file' id="uploadButton" class="form-control opacity-0 top-0 w-25 end-0"
+                                        accept="image/jpg, image/jpeg" #fileInput
+                                        (change)="onSelectFileEditorJobs($event, job)" multiple
+                                        (click)="fileInput.value = ''" />
+
+
+
+                                    <ng-container *ngIf="job.startDate == null">
+                                        <button class="btn btn-success btn-sm" [disabled]="job.paidWeek> 0"
+                                            (click)="updateJob('comments',job)"><i class="fa fa-save"
+                                                [ngClass]="{'text-danger':job.startDate != null}"></i> START </button>
+                                    </ng-container>
+                                    <ng-container *ngIf="job.startDate != null && job.comments != null">
+                                        <button class="btn btn-success btn-sm" [disabled]="job.paidWeek> 0"
+                                            (click)="updateJob('comments',job)"><i class="fa fa-save"
+                                                [ngClass]="{'text-danger':job.startDate != null}"></i> SAVE </button>
+
+                                    </ng-container>
+
+
+                                    <ng-container *ngIf="job.status ==0">
+                                        <button class="btn btn-success btn-sm" title="Done"
+                                            [disabled]="job.paidWeek> 0 "
+                                            (click)="updateJob('done',job);notifyManager('Done','text-warning fw-500',job)"><i
+                                                class="fa flag-checkered"></i>
+                                            <span>DONE</span>
+
+                                        </button>
+                                    </ng-container>
+
+                                    <ng-container *ngIf="job.status ==1">
+                                        <button class="btn btn-danger btn-sm" title="Done" [disabled]="job.paidWeek> 0 "
+                                            (click)="updateJob('done',job)"><i class="fa flag-checkered"></i>
+
+                                            <span class="text-deanger">UN-DONE</span>
+                                        </button>
+                                    </ng-container>
+
+                                    <!-- <ng-container *ngIf="shallShowNofityManger(job)">
+                                        <button class="btn btn-success btn-sm" title="notify managers"
+                                            (click)="notifyManager('Noitfy','text-warning fw-500',job)"><i
+                                                class="fa fa-bell"
+                                                [ngClass]="{'text-danger': job.notified == true, 'text-success': job.notified  == false}"></i>
+                                            Notify Manager </button>
+
+                                    </ng-container> -->
+
+                                    <ng-container *ngIf="shallShowNVerified(job)">
+                                        <button class="btn btn-success text-white btn-sm" title="Verify this job"
+                                            (click)="notifyManager('Verified','text-primary fw-700',job)">
+                                            <i class="fa fa-check"
+                                                [ngClass]="{'text-danger': job.verifiedAt != null, 'text-white': job.verifiedAt  == null}"></i>
+                                            Verify </button>
+                                    </ng-container>
+
+
+                                    <button class="btn btn-warning text-white btn-sm" title="add images"
+                                        [disabled]="job.paidWeek> 0" (click)="fileInput.click()"><i
+                                            class="fa fa-camera"></i> Upload</button>
+
+
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </section>
+    <!-- <section id="supplements" *ngIf="selectedTab == 3">
+        <div class="row align-items-stretch" style="margin-bottom: 150px;">
+            <div class="bg-white border-radius-8  px-0 w-100 mt-3 shadow">
+                <div class="row align-items-stretch">
+                    <div class="position-relative px-0" *ngIf="selectedVehicle != null">
+                        <button name="btn" class="btn btn-secondary-abs px-0 w-100 shadow" title="Add Parts"
+                            [disabled]="user.allowAddUpdateAutopart==false"><i class="fa fa-list me-2"></i>
+                            Supplements [
+                            <span class="fs-16 fw-700 ">{{selectedVehicle.supplements.length }}</span> ]
+                        </button>
+                    </div>
+                </div>
+
+                <div class="row align-items-stretch px-2">
+
+                    <div class="col-lg-3 col-md-4 col-sm-12 rounded-3 border p-1 h-100 mt-2 mb-1 shadow  col-equal"
+                        [style.background-color]="i == currentIndex ? 'lightyellow' : 'white' "
+                        *ngFor="let supplement of selectedVehicle.supplements; let i=index">
+
+                        <div class="d-flex gap-3">
+                            <div class="mr-auto p-2">
+                                <strong class="fs-14 mb-1 d-block">{{ i+1}}. {{supplement.name}} - <span
+                                        class="text-danger">${{supplement.price}}</span>
+                                </strong>
+                                <small class="fs-13 text-dark opacity-80">
+                                    <p class="fs-12 text-black opacity-75"
+                                        style="display: inline-block; word-break: break-word;">
+                                        <span class="text-info">( Created At: {{
+                                            supplement?.createdAt|
+                                            date: 'MM/dd/yyyy
+                                            HH:mm:ss'}} )</span><br>
+                                        <span class="text-info">( last update At: {{
+                                            supplement?.updatedAt|
+                                            date: 'MM/dd/yyyy
+                                            HH:mm:ss'}} )</span>
+                                    </p>
+                                </small>
+                            </div>
+                        </div>
+                        <select class="form-select h-48 px-3 border-radius-8"
+                            (change)="onChangeApprovalStatus($event, supplement)" #approvalStatus
+                            [disabled]="readOnly==true" [(ngModel)]="supplement.status" placeholder="Approval Status">
+                            <option value="0" disabled selected>Select Approval Status</option>
+                            <option [value]="approvalStatus.id"
+                                *ngFor="let approvalStatus of approvalStatuss;let i=index;">
+                                {{approvalStatus.name}}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section> -->
+
+    <section id="payments" *ngIf="selectedTab == 3">
+        <div class="row align-items-stretch" style="margin-bottom: 150px;">
+            <div class="bg-white border-radius-8  px-0 w-100 mt-3 shadow">
+                <div class="row align-items-stretch">
+                    <div class="position-relative px-0" *ngIf="selectedVehicle != null">
+                        <button name="btn" class="btn btn-secondary-abs px-0 w-100 shadow" title="Add Parts"
+                            [disabled]="user.allowAddUpdateAutopart==false"><i class="fa fa-list me-2"></i>
+                            Payments [
+                            <span class="fs-16 fw-700 ">{{payments.length }}</span> ]
+                        </button>
+                    </div>
+                </div>
+
+                <div class="row align-items-stretch px-2">
+
+                    <div class="col-lg-3 col-md-4 col-sm-12 rounded-3 border p-1 h-100 mt-2 mb-1 shadow  col-equal"
+                        [style.background-color]="i == currentIndex ? 'lightyellow' : 'white' "
+                        *ngFor="let payment of payments; let i=index" (click)="getDetailsPayment(payment, i)">
+
+                        <div class="d-flex gap-3">
+                            <div class="mr-auto p-2">
+                                <strong class="fs-14 mb-1 d-block">{{ i+1}}. {{payment.name}} - <span
+                                        class="text-danger">${{payment.amount}}</span>
+                                </strong>
+                                <small class="fs-13 text-dark opacity-80">
+                                    <p class="fs-12 text-black opacity-75"
+                                        style="display: inline-block; word-break: break-word;">
+                                        <span class="text-info">( Created At: {{
+                                            payment?.createdAt|
+                                            date: 'MM/dd/yyyy
+                                            HH:mm:ss'}} )</span><br>
+                                        <span class="text-info">( last update At: {{
+                                            payment?.updatedAt|
+                                            date: 'MM/dd/yyyy
+                                            HH:mm:ss'}} )</span>
+                                    </p>
+                                </small>
+
+
+                            </div>
+
+
+                        </div>
+                        <select class="form-select h-48 px-3 border-radius-8" #paymentMethod disabled
+                            [(ngModel)]="payment.paymentMethodId" placeholder="Payment Method">
+                            <option value="0" disabled selected>Select Payment Mothod</option>
+                            <option [value]="paymentMethod.id"
+                                *ngFor="let paymentMethod of paymentMethods;let i=index;">
+                                {{paymentMethod.name}}</option>
+                        </select>
+
+                        <select class="form-select h-48 px-3 border-radius-8 mt-2" #paymentStatus disabled
+                            [(ngModel)]="payment.paymentStatusId" placeholder="Payment Status">
+                            <option value="0" disabled selected>Select Payment Status</option>
+                            <option [value]="paymentStatus.id"
+                                *ngFor="let paymentStatus of paymentStatuss;let i=index;">
+                                {{paymentStatus.name}}</option>
+                        </select>
+
+                        <div class="row">
+                            <div class="col-lg-6 col-md-4 col-sm-4 col-6 px-2 py-1 mt-2 shadow d-flex align-items-stretch "
+                                *ngFor='let imageModel of payment.imageModels; let i=index'>
+                                <div class="containerImage">
+
+                                    <label class="top-left" for="title">
+                                        {{imageModel?.createdAt | date: 'MM/dd/yyyy
+                                        HH:mm:ss'}}</label>
+
+                                    <img class="img-fluid rounded-2 img-thumbnail my-1 object-fit-cover w-100"
+                                        src="{{baseUrlResizeImagePayments + '/' + imageModel.id}}" />
+
+                                    <div class="bottom-right py-3" *ngIf="user.allowAddUpdateAutopart == true">
+
+                                        <button (click)="deleteImagePayment(payment.id, imageModel.id)"
+                                            *ngIf="user.allowAddPayment == true" data-toggle="tooltip"
+                                            data-placement="top" title="Remove this image"
+                                            class="btn btn-danger mt-3 btn-sm" for="title"> <i class="bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 p-0 mb-2">
+                                <div class="d-flex mt-2 justify-content-end gap-1" *ngIf="readOnly == false">
+
+                                    <input type='file' id="uploadButton" class="form-control opacity-0 top-0 w-25 end-0"
+                                        accept="image/jpg, image/jpeg" #fileInput
+                                        (change)="onSelectFileEditorPayments($event)" multiple
+                                        (click)="fileInput.value = ''" />
+
+
+                                    <button class="btn btn-warning text-white btn-sm" title="add images"
+                                        *ngIf="user.allowAddPayment == true" (click)="fileInput.click()"><i
+                                            class="fa fa-camera"></i> Upload</button>
+
+
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+    <section id="expenses" *ngIf="selectedTab == 4">
+        <div class="row align-items-stretch" style="margin-bottom: 150px;">
+            <div class="bg-white border-radius-8  px-0 w-100 mt-3 shadow">
+                <div class="row align-items-stretch">
+                    <div class="position-relative px-0" *ngIf="selectedVehicle != null">
+                        <button name="btn" class="btn btn-secondary-abs px-0 w-100 shadow" title="Expenses"
+                            [disabled]="user.allowAddUpdateAutopart==false"><i class="fa fa-list me-2"></i>
+                            Expenses [
+                            <span class="fs-16 fw-700 ">{{expenses.length }}</span> ]
+                        </button>
+                    </div>
+                </div>
+
+                <div class="row align-items-stretch px-2">
+
+                    <div class="col-lg-3 col-md-4 col-sm-12 rounded-3 border p-1 h-100 mt-2 mb-1 shadow  col-equal"
+                        [style.background-color]="i == currentIndex ? 'lightyellow' : 'white' "
+                        *ngFor="let expense of expenses | paginate: { itemsPerPage: this.pageSize,currentPage: currantPageNumber , totalItems: searchCount }; let i=index"
+                        (click)="getDetailsExpense(expense, i)">
+
+                        <div class="d-flex gap-3">
+                            <div class="mr-auto p-2">
+                                <strong class="fs-14 mb-1 d-block">{{ i+1}}. {{expense.comments}} - <span
+                                        class="text-danger">{{expense.quantity}}x</span><span
+                                        class="text-danger">${{expense.amount}}</span> = <span
+                                        class="text-danger">${{getExpenseSubTotal(expense)}}</span>
+                                </strong>
+                                <small class="fs-13 text-dark opacity-80">
+                                    <p class="fs-12 text-black opacity-75"
+                                        style="display: inline-block; word-break: break-word;">
+                                        <span class="text-info">( Created At: {{
+                                            expense?.createdAt|
+                                            date: 'MM/dd/yyyy
+                                            HH:mm:ss'}} )</span><br>
+                                        <span class="text-info">( last update At: {{
+                                            expense?.updatedAt|
+                                            date: 'MM/dd/yyyy
+                                            HH:mm:ss'}} )</span>
+                                    </p>
+                                </small>
+
+
+                            </div>
+
+
+                        </div>
+
+                        <select class="form-select h-48 px-3 border-radius-8 mt-2" #expenseType disabled
+                            [(ngModel)]="expense.expenseTypeId" placeholder="Expense Type">
+                            <option value="0" disabled selected>Select Type</option>
+                            <option [value]="expenseType.id" *ngFor="let expenseType of expenseTypes;let i=index;">
+                                {{expenseType.name}}</option>
+                        </select>
+
+
+                        <select class="form-select h-48 px-3 border-radius-8 mt-2" #expenseVendor disabled
+                            [(ngModel)]="expense.expenseTypeId" placeholder="Vendor">
+                            <option value="0" disabled selected>Select Vendor</option>
+                            <option [value]="vendor.id" *ngFor="let vendor of vendors;let i=index;">
+                                {{vendor.name}}</option>
+                        </select>
+
+                        <select class="form-select h-48 px-3 border-radius-8 mt-2" #paymentMethod disabled
+                            [(ngModel)]="expense.paymentMethodId" placeholder="Payment Method">
+                            <option value="0" disabled selected>Select Payment</option>
+                            <option [value]="paymentMethod.id"
+                                *ngFor="let paymentMethod of paymentMethods;let i=index;">
+                                {{paymentMethod.name}}</option>
+                        </select>
+
+
+
+                        <div class="row">
+                            <div class="col-lg-6 col-md-4 col-sm-4 col-6 px-2 py-1 mt-2 shadow d-flex align-items-stretch "
+                                *ngFor='let imageModel of expense.imageModels; let i=index'>
+                                <div class="containerImage">
+
+                                    <label class="top-left" for="title">
+                                        {{imageModel?.createdAt | date: 'MM/dd/yyyy
+                                        HH:mm:ss'}}</label>
+
+                                    <img class="img-fluid rounded-2 img-thumbnail my-1 object-fit-cover w-100"
+                                        src="{{baseUrlResizeImageExpenses + '/' + imageModel.id}}" />
+
+                                    <div class="bottom-right py-3" *ngIf="user.allowAddUpdateAutopart == true">
+
+                                        <button (click)="deleteImageExpense(expense.id, imageModel.id)"
+                                            *ngIf="user.allowAddExpense == true" data-toggle="tooltip"
+                                            data-placement="top" title="Remove this image"
+                                            class="btn btn-danger mt-3 btn-sm" for="title"> <i class="bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 p-0 mb-2">
+                                <div class="d-flex mt-2 justify-content-end gap-1" *ngIf="readOnly == false">
+
+                                    <input type='file' id="uploadButton" class="form-control opacity-0 top-0 w-25 end-0"
+                                        accept="image/jpg, image/jpeg" #fileInput
+                                        (change)="onSelectFileEditorExpenses($event)" multiple
+                                        (click)="fileInput.value = ''" />
+
+
+                                    <button class="btn btn-warning text-white btn-sm" title="add images"
+                                        *ngIf="user.allowAddExpense == true" (click)="fileInput.click()"><i
+                                            class="fa fa-camera"></i> Upload</button>
+
+
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex align-items-center justify-content-between my-0 my-sm-4 table-bottom"
+                *ngIf="expenses.length> 0">
+                <div class="d-sm-flex align-items-center gap-3 my-2 justify-content-end"> <span>Showing</span>
+                    <select class="form-select px-3 my-3 my-sm-0" (change)="rememberMePageSize()" [(ngModel)]="pageSize"
+                        title="Page Size">
+                        <option>5</option>
+                        <option>10</option>
+                        <option>20</option>
+                        <option>30</option>
+                        <option>40</option>
+                        <option>50</option>
+                        <option>60</option>
+                        <option>70</option>
+                        <option>80</option>
+                        <option>90</option>
+                        <option>100</option>
+                        <option>200</option>
+                        <option>300</option>
+                    </select>
+                    <span>of {{this.searchCount}} entries</span>
+
+
+                    <div class="ps-2">
+                        <div class="form-check form-switch d-flex ms-3 mw-150 mt-1">
+                            <input type="checkbox" role="switch" id="default2" class="form-check-input mt-0"
+                                [checked]="this.pageSize !=20 " (change)="rememberMePageSize()" />
+                            <label for="default2" class="form-check-label fs-12 fw-600 mt-0 ms-4">Remember My Page
+                                Size</label>
+                        </div>
+                    </div>
+
+                </div>
+
+                <nav class="paginations my-2" *ngIf="expenses.length > 0 ">
+
+                    <ul class="pagination d-flex align-items-center gap-3">
+                        <pagination-controls previousLabel="Prev" nextLabel="Next" [maxSize]=10
+                            (pageChange)="getCompanyExpense(this.user.companyId,$event)">
+                        </pagination-controls>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+    </section>
+
+</div>
+
+
+
+<app-bottom-menu [bottomMenuSetting]="bottomMenuSetting" [menuTextColor]="menuTextColor"
+    [menuTextColorActive]="menuTextColorActive" [showNotification]="showNotification"
+    (tabSelected)="onTabSelected($event)">
+</app-bottom-menu>
+
+
+<div class="modal" tabindex="-1" role="dialog" [ngStyle]="{'display':displayStyle}">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-navy">
+                <h4 class="modal-title fs-18 fw-700 text-white">Vehicle Detail Viewer</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row w-100 my-3 h-100">
+                    <div class="col-lg-2"></div>
+                    <div class="col-lg-8">
+                        <hr class="opacity-25" />
+                        <form *ngIf="!isLoggedIn" name="form" (ngSubmit)="f.form.valid && onSubmit()" #f="ngForm"
+                            novalidate>
+                            <div class="overlap-2 mt-5 text-start">
+                                <div class="email mt-4 position-relative pt-3">
+                                    <label for="username" class="form-label mb-3 fw-400 fs-14">Enter Your Email
+                                        Address</label>
+                                    <input id="username" type="email" class="form-control" placeholder="name@domain.com"
+                                        name="username" minlength="6" maxlength="100" [(ngModel)]="form.username"
+                                        required #username="ngModel"
+                                        pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                                        [ngClass]="{ 'is-invalid':  username.errors }" />
+                                    <div class="invalid-feedback" *ngIf="username.errors ">
+                                        <span *ngIf="username.errors['required']">Email is required</span>
+                                        <span *ngIf="username.errors['pattern']">Email must be a valid email
+                                            address</span>
+                                        <span *ngIf="username.errors['minlength']">Email must be at least 6
+                                            characters</span>
+                                        <span *ngIf="username.errors['maxlength']">Email must be at most 100
+                                            characters</span>
+                                    </div>
+                                </div>
+                                <div class="password mt-4 position-relative pt-3">
+                                    <label for="username" class="form-label mb-3 fw-400 fs-14">Enter Your
+                                        Password</label>
+                                    <div class="input-group">
+                                        <input trimText class="form-control h-48 px-3"
+                                            [type]="showPassword ? 'text' : 'password'" name="password"
+                                            [(ngModel)]="form.password" required minlength="6" #password="ngModel"
+                                            maxlength="30" [ngClass]="{ 'is-invalid': password.errors }"
+                                            placeholder="Enter Your Password" />
+                                        <div class="input-group-append">
+                                            <button class="btn btn-outline-secondary" type="button"> <i alt="show"
+                                                    class="far fa-eye eye-show" (click)="showPassword = !showPassword"
+                                                    [class.hide]="showPassword"></i>
+                                                <i alt="hide" class="far fa-eye-slash eye-hide"
+                                                    (click)="showPassword = !showPassword"
+                                                    [class.hide]="!showPassword"></i></button>
+                                        </div>
+                                        <div class="invalid-feedback" *ngIf="password.errors">
+                                            <span *ngIf="password.errors['required']">Password is required</span>
+                                            <span *ngIf="password.errors['minlength']">Password must be at least 6
+                                                characters</span>
+                                            <span *ngIf="password.errors['maxlength']">Password must be at most 30
+                                                characters</span>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="mt-4 position-relative">
+                                    <!-- <button name="btn"
+                                        class="btn btn-primary-abs btn-lg btn-block fs-15 py-3 border-radius-8 fw-bold mt-5"
+                                        (click)="closePopup()">VIEW ONLY</button> -->
+                                    <button name="btn"
+                                        class="btn btn-primary-abs btn-lg btn-block fs-15 py-3 border-radius-8 fw-bold mt-3">LOGIN</button>
+
+
+                                    <div *ngIf="(f.submitted && isLoginFailed) || errorMessage !=''"
+                                        class="alert alert-danger mt-4" role="alert">Login failed:
+                                        {{ errorMessage }}</div>
+
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-lg-2"></div>
+                </div>
+            </div>
+            <!-- <div class="modal-footer">
+          <button type="button" class="btn btn-danger" (click)="closePopup()">
+            Employee(View Only)
+          </button>
+  
+          <button type="button" class="btn btn-danger" (click)="closePopup()">
+            Login (Managers)
+          </button>
+        </div> -->
+        </div>
+    </div>
+</div>
+
+<div class="modal" *ngIf="selectedVehicle && selectedAutopart && selectedAutopart.id==0" id="addNewPart"
+    [ngStyle]="{'display':displayStyleNewParts}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="addNewPartLabel" aria-hidden="false">
+    <div class="modal-dialog modal-dialog-scrollable" style=" margin-top: 0;  top: 10px;">
+        <div class="modal-content border-radius-8 ">
+            <div class="modal-header p-4">
+                <h1 class="modal-title fs-20 fw-600 text-capitalize" id="addNewPartLabel">Add Parts To
+                    [{{selectedVehicle.year}} {{selectedVehicle.make}} {{selectedVehicle.model}}
+                    {{selectedVehicle.color}}] </h1>
+                <button type="button" class="btn-close mt-1" (click)="displayStyleNewParts= 'none'"
+                    data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body px-2 submit-form">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="mt-4 pt-1 position-relative">
+                            <label for="phone" class="form-label fs-14 fw-400 mb-3">Images / Photos</label>
+                            <button name="btn" class="btn btn-secondary-abs py-3 px-3 w-100"><i
+                                    class="fa fa-cloud-upload me-2"></i>
+                                Upload Images (Not Requried)</button>
+                            <input type='file' accept="image/jpg, image/jpeg"
+                                class="form-control h-48 ps-5 border-radius-8 mt-5 opacity-0 top-0 position-absolute"
+                                #fileInput (click)="fileInput.value = ''" (change)="onSelectFileNew($event)" multiple />
+                        </div>
+                        <h5 class="text-danger fw-700 mt-3">{{ message1}}</h5>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="mt-2 pt-1 position-relative"> <img
+                                *ngFor='let imageModel of imageModels;let i=index' (click)="setShowInSearch(i)"
+                                [src]="imageModel.picByte" class="mt-3 preview img-fluid img-thumbnail me-3"
+                                width="100" /> </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="mt-4 pt-1 position-relative">
+                            <div class="containerImage" *ngIf="imageModels.length> 0"> <img *ngIf="imageUrl"
+                                    [src]="imageUrl" class="image w-100 img-fluid img-thumbnail" />
+                                <label *ngIf="imageUrl" class="top-left" for="title">Will Show This During
+                                    Search</label>
+                                <label *ngIf="imageUrl" class="bottom-left" for="title">Will Show This During
+                                    Search</label>
+                                <div class="bottom-right py-2">
+                                    <button data-toggle="tooltip" data-placement="top" title="Remove this image"
+                                        *ngIf="imageUrl" (click)="deleteCurerntImage()"
+                                        class="btn btn-danger mt-3 btn-sm" for="title"> <i class="bi-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="mt-4 pt-1">
+                            <label for="partInfo" class="form-label fs-14 fw-400 mb-3">Parts Name</label>
+                            <input trimText class="form-control h-48 px-3 border-radius-0" type="text" required
+                                placeholder="Enter Parts name" #name="ngModel" [ngClass]="{ 'is-invalid': name.errors }"
+                                minlength="2" maxlength="50" [(ngModel)]="selectedAutopart.title" />
+                            <div class="invalid-feedback" *ngIf="name.errors "> <span
+                                    *ngIf="name.errors['required']">Parts Name is
+                                    required</span> <span *ngIf="name.errors['minlength']">Parts Name must be at least 2
+                                    characters</span> <span *ngIf="name.errors['maxlength']">Parts Name must be at most
+                                    50
+                                    characters</span> </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="mt-4 pt-1">
+                            <label for="partInfo" class="form-label fs-14 fw-400 mb-3">Parts Number</label>
+                            <div class="input-group">
+                                <input trimText class="form-control h-48 px-3 border-radius-0" type="text"
+                                    placeholder="Enter Parts Number" #partNumber="ngModel"
+                                    [ngClass]="{ 'is-invalid': partNumber.errors }" minlength="2" maxlength="50"
+                                    [(ngModel)]="selectedAutopart.partNumber" name="partInfo" />
+
+                            </div>
+                            <div class="invalid-feedback" *ngIf="partNumber.errors "> <span
+                                    *ngIf="partNumber.errors['required']">Parts Number is required</span> <span
+                                    *ngIf="partNumber.errors['minlength']">Parts Number must be at least 2
+                                    characters</span> <span *ngIf="partNumber.errors['maxlength']">Parts Number must be
+                                    at most 50 characters</span> </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="mt-4 pt-1">
+                            <label for="description" class="form-label fs-14 fw-400 mb-3">Parts Description</label>
+                            <textarea class="form-control h-48 px-3 border-radius-8" type="text"
+                                placeholder="Enter Description" #description="ngModel" style="line-height: 2;"
+                                [ngClass]="{ 'is-invalid': description.errors }" minlength="2" rows="2" maxlength="2000"
+                                required [(ngModel)]="selectedAutopart.description" name="description"></textarea>
+                            <div class="invalid-feedback" *ngIf="description.errors "> <span
+                                    *ngIf="description.errors['required']">Part Description is required</span> <span
+                                    *ngIf="description.errors['minlength']">Part Description must be at least 2
+                                    characters</span> <span *ngIf="description.errors['maxlength']">Part Descripton must
+                                    be at most 2000
+                                    characters</span> </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="mt-4 pt-1">
+                            <label for="vendor" class="form-label fs-14 fw-400 mb-3">Vendor</label>
+                            <select name="grade" class="form-select h-48 px-3 border-radius-8" size="1"
+                                [(ngModel)]="selectedAutopart.vendorId" required #vendor="ngModel"
+                                [ngClass]="{ 'is-invalid': vendor.errors }">
+                                <option value="undefined" disabled selected>Select Vendor</option>
+                                <option *ngFor="let vendor of this.vendors" [value]="vendor.id">{{vendor.name}}</option>
+                            </select>
+                            <div class="invalid-feedback" *ngIf="vendor.errors "> <span
+                                    *ngIf="vendor.errors['required']">Vendor is
+                                    required</span> </div>
+                        </div>
+                    </div>
+                    <!-- <div class="col-lg-6">
+              <div class="mt-4 pt-1">
+                <label for="partInfo" class="form-label fs-14 fw-400 mb-3">Parts Comments</label>
+                <input trimText class="form-control h-48 px-3 border-radius-8" type="text" placeholder="Enter Comments"
+                  #comments="ngModel" [ngClass]="{ 'is-invalid': comments.errors }" minlength="2" maxlength="500"
+                  [(ngModel)]="selectedAutopart.comments" name="comments" />
+                <div class="invalid-feedback" *ngIf="comments.errors ">
+  
+                  <span *ngIf="comments.errors['minlength']">Parts Comments must be at least 2 characters</span> <span
+                    *ngIf="comments.errors['maxlength']">Parts Comments must be at most 500 characters</span>
+                </div>
+              </div>
+            </div> -->
+                    <div class="col-lg-6">
+                        <div class="mt-4 pt-1">
+                            <label for="grade" class="form-label fs-14 fw-400 mb-3">Grade</label>
+                            <select name="grade" class="form-select h-48 px-3 border-radius-8" size="1"
+                                [(ngModel)]="selectedAutopart.grade" required #grade="ngModel"
+                                [ngClass]="{ 'is-invalid': grade.errors }">
+                                <option value="undefined" disabled selected>Select Grade</option>
+                                <option value="A">A</option>
+                                <option value="B">B</option>
+                                <option value="C">C</option>
+                                <option value="Used">Used</option>
+                                <option value="New">New</option>
+                                <option value="Insurance">Insurance</option>
+                            </select>
+                            <div class="invalid-feedback" *ngIf="grade.errors "> <span
+                                    *ngIf="grade.errors['required']">Grade is
+                                    required</span> </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="mt-4 pt-1">
+                            <label for="price" class="form-label fs-14 fw-400 mb-3">Price ($)</label>
+                            <input trimText class="form-control h-48 px-3 border-radius-8" type="number"
+                                placeholder="Enter Price" #salePrice="ngModel"
+                                [ngClass]="{ 'is-invalid': salePrice.errors }" minlength="1" maxlength="10"
+                                onKeyPress="if(this.value.length==10) return false" maxlength="10" required
+                                oninput="if(this.value<0)this.value=this.value * -1"
+                                [(ngModel)]="selectedAutopart.salePrice" name="price" />
+                            <div class="invalid-feedback" *ngIf="salePrice.errors "> <span
+                                    *ngIf="salePrice.errors['required']">Price
+                                    is required</span> <span *ngIf="salePrice.errors['minlength']">Price must be at
+                                    least 1
+                                    characters</span> <span *ngIf="salePrice.errors['maxlength']">Price must be at most
+                                    10
+                                    characters</span> </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12" *ngIf="errorMessage !=''">
+                        <div class="alert alert-danger mt-4">{{ errorMessage}}</div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="mt-4 pt-1">
+                            <button class="btn btn-primary-abs h-45 px-4 rounded-4 fs-14 fw-600"
+                                *ngIf="selectedAutopart.id ==0" (click)="createNewAutopart()"> Save Info</button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

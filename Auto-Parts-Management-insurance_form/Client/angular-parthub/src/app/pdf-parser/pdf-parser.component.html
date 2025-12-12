@@ -1,0 +1,206 @@
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Header -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-file-pdf me-2"></i>
+                        PDF Estimate Parser
+                    </h4>
+                    <small>Upload a PDF estimate to extract data automatically</small>
+                </div>
+            </div>
+
+            <!-- Upload Section -->
+            <div class="card shadow-sm mb-4" *ngIf="!isParsing && !parsedData">
+                <div class="card-body">
+                    <div class="text-center p-4">
+                        <div class="upload-zone" [class.dragover]="isDragOver" (dragover)="onDragOver($event)"
+                            (dragleave)="onDragLeave($event)" (drop)="onDrop($event)" (click)="fileInput.click()">
+                            <i class="fas fa-cloud-upload-alt fa-3x text-primary mb-3"></i>
+                            <h5>Drag & Drop PDF Here</h5>
+                            <p class="text-muted">or click to browse files</p>
+                            <button class="btn btn-outline-primary">
+                                <i class="fas fa-folder-open me-2"></i>
+                                Browse Files
+                            </button>
+                        </div>
+
+                        <input #fileInput type="file" accept=".pdf" style="display: none"
+                            (change)="onFileSelected($event)">
+                    </div>
+
+                    <!-- File Info -->
+                    <div *ngIf="selectedFile" class="mt-3 p-3 bg-light rounded">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <h6 class="mb-1">
+                                    <i class="fas fa-file-pdf text-danger me-2"></i>
+                                    {{ selectedFile.name }}
+                                </h6>
+                                <small class="text-muted">{{ selectedFile.size | number }} bytes</small>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <button class="btn btn-success me-2" (click)="parsePDF()" [disabled]="!selectedFile">
+                                    <i class="fas fa-cogs me-2"></i>
+                                    Parse PDF
+                                </button>
+                                <button class="btn btn-outline-secondary" (click)="clearFile()">
+                                    <i class="fas fa-times me-2"></i>
+                                    Clear
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Parsing Progress -->
+            <div class="card shadow-sm mb-4" *ngIf="isParsing">
+                <div class="card-body text-center p-4">
+                    <div class="spinner-border text-primary mb-3" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <h5>Parsing PDF...</h5>
+                    <p class="text-muted">Extracting estimate data from your PDF file</p>
+
+                    <div class="progress mt-3" style="height: 8px;">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 100%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Error Display -->
+            <div class="alert alert-danger" *ngIf="errorMessage">
+                <h6 class="alert-heading">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Parsing Error
+                </h6>
+                <p class="mb-0">{{ errorMessage }}</p>
+                <hr>
+                <button class="btn btn-outline-danger btn-sm" (click)="clearError()">
+                    <i class="fas fa-redo me-2"></i>
+                    Try Again
+                </button>
+            </div>
+
+            <!-- Parsing Results -->
+            <div class="card shadow-sm mb-4" *ngIf="parsedData && !isParsing">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-check-circle me-2"></i>
+                        PDF Parsed Successfully
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <!-- Summary Stats -->
+                    <div class="row mb-4">
+                        <div class="col-md-3 text-center">
+                            <div class="stat-box">
+                                <h4 class="text-primary">{{ parsedData.estimateData?.length || 0 }}</h4>
+                                <small class="text-muted">Areas Found</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <div class="stat-box">
+                                <h4 class="text-success">{{ getTotalLineItems() }}</h4>
+                                <small class="text-muted">Line Items</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <div class="stat-box">
+                                <h4 class="text-info">${{ parsedData.summary?.grandTotal?.toFixed(2) || '0.00' }}</h4>
+                                <small class="text-muted">Grand Total</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <div class="stat-box">
+                                <h4 class="text-warning">{{ parsedData.summary?.laborHours || 0 }}</h4>
+                                <small class="text-muted">Labor Hours</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Preview -->
+                    <div class="mb-4">
+                        <h6>Quick Preview:</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <strong>Customer:</strong> {{ parsedData.customerInfo?.name || 'N/A' }}<br>
+                                <strong>Vehicle:</strong> {{ getVehicleDescription() }}<br>
+                                <strong>Claim #:</strong> {{ parsedData.jobInfo?.claimNumber || 'N/A' }}
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Shop:</strong> {{ parsedData.shopInfo?.name || 'N/A' }}<br>
+                                <strong>Adjuster:</strong> {{ parsedData.jobInfo?.adjuster || 'N/A' }}<br>
+                                <strong>VIN:</strong> {{ parsedData.vehicleInfo?.vin || 'N/A' }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="text-center">
+                        <button class="btn btn-primary me-3" (click)="viewInInsuranceViewer()">
+                            <i class="fas fa-eye me-2"></i>
+                            View Full Estimate
+                        </button>
+                        <button class="btn btn-outline-primary me-3" (click)="downloadJSON()">
+                            <i class="fas fa-download me-2"></i>
+                            Download Data (JSON)
+                        </button>
+                        <button class="btn btn-outline-secondary" (click)="startOver()">
+                            <i class="fas fa-redo me-2"></i>
+                            Parse Another PDF
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Area Preview (Collapsible) -->
+            <div class="card shadow-sm" *ngIf="parsedData && !isParsing">
+                <div class="card-header" data-bs-toggle="collapse" data-bs-target="#areaPreview"
+                    style="cursor: pointer;">
+                    <h6 class="mb-0">
+                        <i class="fas fa-list me-2"></i>
+                        Extracted Areas & Line Items
+                        <i class="fas fa-chevron-down float-end"></i>
+                    </h6>
+                </div>
+                <div id="areaPreview" class="collapse">
+                    <div class="card-body">
+                        <div *ngFor="let area of parsedData.estimateData; let i = index" class="mb-3">
+                            <h6 class="text-primary">
+                                <i class="fas fa-wrench me-2"></i>
+                                {{ area.areaName }}
+                                <span class="badge bg-secondary ms-2">{{ area.claimItems.length }} items</span>
+                            </h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Line</th>
+                                            <th>Operation</th>
+                                            <th>Description</th>
+                                            <th>Part #</th>
+                                            <th>Price</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let item of area.claimItems">
+                                            <td>{{ item.lineNumber }}</td>
+                                            <td>{{ item.operation }}</td>
+                                            <td>{{ item.description }}</td>
+                                            <td>{{ item.partNumber }}</td>
+                                            <td>${{ item.extendedPrice?.toFixed(2) || '0.00' }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

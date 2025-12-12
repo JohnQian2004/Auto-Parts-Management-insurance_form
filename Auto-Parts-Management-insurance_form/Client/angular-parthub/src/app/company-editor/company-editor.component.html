@@ -1,0 +1,2163 @@
+<div class="col-md-12 nopadding" *ngIf="currentUser">
+    <div class="row">
+        <ng-container *ngIf="companies.length > 1">
+            <div class="callout callout-info col-6" *ngFor="let company of companies" (click)="getDetail(company)">
+                <div class="input-group">
+                    <div class="input-group-append">
+                        <img width="30px" height="30px" [src]="'data:image/jpeg;base64,'+ company.icon">
+                    </div>
+                    <div class="input-group-append">
+                        <h5>
+                            {{ company.id }} {{ company.name }}
+                        </h5>
+                    </div>
+                </div>
+                <div>{{ company.url }} {{ formatPhoneNumber(company.phone) }} {{ company.email }}</div>
+                <!-- <div style="text-align: right;">
+                    <a (click)="deleteCompany(company)">Delete</a>
+                </div> -->
+                <div><i class="bi-house"></i> {{ company.street }} {{ company.city }} {{ company.state }} {{ company.zip
+                    }}</div>
+            </div>
+        </ng-container>
+        <ng-container *ngIf="companies.length == 1">
+            <div class="col-md-12 mb-12">
+
+                <div class="callout callout-info col-md-12 p-1" *ngFor="let company of companies"
+                    (click)="getDetail(company)">
+                    <div class="input-group ">
+                        <div class="input-group-append">
+                            <img width="30px" height="30px" [src]="'data:image/jpeg;base64,'+ company.icon">
+                        </div>
+                        <div class="input-group-append">
+                            <h5>
+                                {{ company.id }} {{ company.name }}
+                            </h5>
+                        </div>
+                    </div>
+                    <div>{{ company.url }} {{ formatPhoneNumber(company.phone) }} {{ company.email }}</div>
+                    <!-- <div style="text-align: right;">
+                    <a (click)="deleteCompany(company)">Delete</a>
+                </div> -->
+                    <div>{{ company.street }} {{ company.city }} {{ company.state }} {{ company.zip }}</div>
+                </div>
+
+            </div>
+        </ng-container>
+    </div>
+    <!-- <div class="row">
+        <h6>Settings ></h6>
+    </div> -->
+
+    <div class="row">
+        <div class="col-md-3 mb-3 shadow">
+            <div class="form-group p-1">
+                <div class="card card-primary card-outline">
+                    <nav>
+                        <div class="nav nav-pills flex-sm-column flex-row flex-nowrap flex-shrink-1 flex-sm-grow-0 flex-grow-1 mb-sm-auto mb-0 justify-content-center align-items-center align-items-sm-start"
+                            id="nav-tab" role="tablist">
+
+                            <button class="nav-link active col-12" id="nav-home-tab" data-bs-toggle="tab"
+                                data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home"
+                                aria-selected="true">Profile</button>
+
+                            <button class="nav-link  col-12" id="nav-disclaimer-tab" data-bs-toggle="tab"
+                                data-bs-target="#nav-disclaimer" type="button" role="tab" aria-controls="nav-disclaimer"
+                                aria-selected="false">Disclaimers [{{disclaimers.length}}]</button>
+
+                            <button class="nav-link  col-12" id="nav-employee-role-tab" data-bs-toggle="tab"
+                                data-bs-target="#nav-employee-role" type="button" role="tab"
+                                aria-controls="nav-employee-role" aria-selected="false">Employee
+                                Roles[{{employeeRoles.length}}]</button>
+
+                            <button class="nav-link col-12" id="nav-loaner-tab" data-bs-toggle="tab"
+                                data-bs-target="#nav-loaner" type="button"
+                                *ngIf="currentUserUser.allowUpdateUser == true" role="tab" aria-controls="nav-loaner"
+                                aria-selected="false">Users[{{users.length}}]</button>
+
+                            <button class="nav-link col-12" id="nav-employee-tab" data-bs-toggle="tab"
+                                data-bs-target="#nav-employee" type="button"
+                                *ngIf="currentUserUser.allowUpdateUser == true" role="tab" aria-controls="nav-employee"
+                                aria-selected="false">Employees [{{employees.length}}]</button>
+
+                            <button class="nav-link" id="nav-in-take-way-tab" data-bs-toggle="tab"
+                                data-bs-target="#nav-in-take-way" type="button" role="tab"
+                                aria-controls="nav-in-take-way" aria-selected="false">Arrival Modes
+                                [{{inTakeWays.length}}]</button>
+
+                            <button class="nav-link  col-12" id="nav-approval-status-tab" data-bs-toggle="tab"
+                                data-bs-target="#nav-approval-status" type="button" role="tab"
+                                aria-controls="nav-approval-status" aria-selected="false">Vehicle
+                                Status[{{approvalStatuss.length}}]</button>
+
+                            <button class="nav-link col-12" id="nav-contact-tab" data-bs-toggle="tab"
+                                data-bs-target="#nav-contact" type="button" role="tab" aria-controls="nav-contact"
+                                aria-selected="false">Pre-defined
+                                Jobs[{{services.length}}]</button>
+
+                            <button class="nav-link col-12" id="nav-status-tab" data-bs-toggle="tab"
+                                data-bs-target="#nav-status" type="button" role="tab" aria-controls="nav-status"
+                                aria-selected="false">Job
+                                Status[{{statuss.length}}]</button>
+
+                            <button class="nav-link col-12" id="nav-location-tab" data-bs-toggle="tab"
+                                data-bs-target="#nav-location" type="button" role="tab" aria-controls="nav-location"
+                                aria-selected="false">Parking Locations[{{locations.length}}]</button>
+
+                            <button class="nav-link col-12" id="nav-insurancer-tab" data-bs-toggle="tab"
+                                data-bs-target="#nav-insurancer" type="button" role="tab" aria-controls="nav-insurancer"
+                                aria-selected="false">Insurance Companies[{{insurancers.length}}]</button>
+
+                            <button class="nav-link col-12" id="nav-vendor-tab" data-bs-toggle="tab"
+                                data-bs-target="#nav-vendor" type="button" role="tab" aria-controls="nav-vendor"
+                                aria-selected="false">Vendors[{{vendors.length}}]</button>
+
+                            <button class="nav-link col-12" id="nav-rental-tab" data-bs-toggle="tab"
+                                data-bs-target="#nav-rental" type="button" role="tab" aria-controls="nav-rental"
+                                aria-selected="false">Rental Companies[{{rentals.length}}]</button>
+
+                            <button class="nav-link col-12" id="nav-payment-status-tab" data-bs-toggle="tab"
+                                data-bs-target="#nav-payment-status" type="button" role="tab"
+                                aria-controls="nav-payment-status" aria-selected="false">Payment
+                                Status[{{paymentStatuss.length}}]</button>
+
+                            <button class="nav-link col-12" id="nav-payment-method-tab" data-bs-toggle="tab"
+                                data-bs-target="#nav-payment-method" type="button" role="tab"
+                                aria-controls="nav-payment-method" aria-selected="false">Payment
+                                Method[{{paymentMethods.length}}]</button>
+
+                            <button class="nav-link col-12" id="nav-payment-type-tab" data-bs-toggle="tab"
+                                data-bs-target="#nav-payment-type" type="button" role="tab"
+                                aria-controls="nav-payment-type" aria-selected="false">Paid In Categories
+                                [{{paymentTypes.length}}]</button>
+
+                            <button class="nav-link col-12" id="nav-job-request-type-tab" data-bs-toggle="tab"
+                                data-bs-target="#nav-job-request-type" type="button" role="tab"
+                                aria-controls="nav-job-request-type" aria-selected="false">Job Request
+                                Type[{{jobRequestTypes.length}}]</button>
+
+                            <button class="nav-link col-12" id="nav-customer-tab" data-bs-toggle="tab"
+                                (click)="getAllCustomerStartingPage(0, this.currantLetter, pageSize)"
+                                data-bs-target="#nav-customer" type="button" role="tab" aria-controls="nav-customer"
+                                aria-selected="false">Customers[{{totalCount}}]</button>
+
+                        </div>
+                    </nav>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            <div class="tab-content nav-border" id="nav-tabContent">
+                <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+
+                    <div class="form-group p-1">
+                        <div class="card card-primary card-outline">
+                            <div class="card-body">
+                                <div class="form-group nopadding">
+                                    <label for="name">Name</label>
+                                    <input trimText class="form-control" type="text" placeholder="name"
+                                        [(ngModel)]="company.name" />
+
+                                    <div class="form-group nopadding">
+                                        <label for="url">URL</label>
+                                        <div class="input-group">
+                                            <input trimText class="form-control" type="url" placeholder="url"
+                                                #url="ngModel" url [ngClass]="{ 'is-invalid': url.errors }" required
+                                                [(ngModel)]="company.url"
+                                                pattern="(http[s]?:\/\/){0,1}(www\.){0,1}[a-zA-Z0-9\.\-]+\.[a-zA-Z]{2,5}[\.]{0,1}" />
+                                            <div class="invalid-feedback" *ngIf="url.errors ">
+                                                <div *ngIf="url.errors['required']">URL is required</div>
+                                                <div *ngIf="url.errors['url']">
+                                                    URL must be a valid URL
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <label for="logo">logo (less than 400K)</label>
+                                    <div class="col-md-12">
+                                        <div class="input-group">
+                                            <img [src]="company.iconString" class="preview"
+                                                style="border: 3px solid #555;">
+                                            <input type='file' (change)="onSelectFile($event)">
+                                            <div class="col-md-12">
+                                                <h4>{{ message}}</h4>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <label>slogan [{{company.slogan?.length}}] (shall less than 1,000
+                                        characters)</label>
+                                    <angular-editor [(ngModel)]="company.slogan"
+                                        [config]="configSlogan"></angular-editor>
+
+                                    <div class="form-group nopadding">
+                                        <label for="Phone">Phone</label>
+                                        <div class="input-group">
+                                            <input type="text" name="phone" class="form-control" placeholder="Phone"
+                                                type="text" [(ngModel)]="company.phone" #phone="ngModel"
+                                                [ngClass]="{ 'is-invalid': phone.errors }"
+                                                pattern="^[-+()0-9]{10,12}(?:-\d+)?$" />
+                                        </div>
+                                    </div>
+                                    <label>email</label>
+                                    <input trimText class="form-control" type="email" name="email" placeholder="email"
+                                        [ngClass]="{ 'is-invalid': email.errors }" #email="ngModel" required
+                                        [(ngModel)]="company.email"
+                                        pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" />
+                                    <div class="invalid-feedback" *ngIf="email.errors ">
+                                        <div *ngIf="email.errors['required']">Email is required</div>
+                                        <div *ngIf="email.errors['email']">
+                                            Email must be a valid email address
+                                        </div>
+                                    </div>
+                                    <label>tax rate eg. 0.0875</label>
+                                    <input trimText class="form-control" type="text" name="taxRate"
+                                        placeholder="tax rate" [ngClass]="{ 'is-invalid': taxRate.errors }"
+                                        #taxRate="ngModel" required [(ngModel)]="company.taxRate"
+                                        pattern="/0\.\d{1,5}/" />
+                                    <div class="invalid-feedback" *ngIf="taxRate.errors ">
+                                        <div *ngIf="taxRate.errors['required']">taxRate is required</div>
+                                        <div *ngIf="taxRate.errors['taxRate']">
+                                            taxRate must be a valid
+                                        </div>
+                                    </div>
+                                    <label>Street</label>
+                                    <input trimText class="form-control" type="text" placeholder="street"
+                                        [(ngModel)]="company.street" />
+                                    <label>City</label>
+                                    <input trimText class="form-control" type="text" placeholder="city"
+                                        [(ngModel)]="company.city" />
+                                    <label for="state">state</label>
+                                    <select class="form-control" name="state" #state="ngModel" size="1" required
+                                        [(ngModel)]="company.state" [ngClass]="{ 'is-invalid': state.errors }">
+                                        <option value="AL">Alabama</option>
+                                        <option value="AK">Alaska</option>
+                                        <option value="AZ">Arizona</option>
+                                        <option value="AR">Arkansas</option>
+                                        <option value="CA">California</option>
+                                        <option value="CO">Colorado</option>
+                                        <option value="CT">Connecticut</option>
+                                        <option value="DE">Delaware</option>
+                                        <option value="DC">District Of Columbia</option>
+                                        <option value="FL">Florida</option>
+                                        <option value="GA">Georgia</option>
+                                        <option value="HI">Hawaii</option>
+                                        <option value="ID">Idaho</option>
+                                        <option value="IL">Illinois</option>
+                                        <option value="IN">Indiana</option>
+                                        <option value="IA">Iowa</option>
+                                        <option value="KS">Kansas</option>
+                                        <option value="KY">Kentucky</option>
+                                        <option value="LA">Louisiana</option>
+                                        <option value="ME">Maine</option>
+                                        <option value="MD">Maryland</option>
+                                        <option value="MA">Massachusetts</option>
+                                        <option value="MI">Michigan</option>
+                                        <option value="MN">Minnesota</option>
+                                        <option value="MS">Mississippi</option>
+                                        <option value="MO">Missouri</option>
+                                        <option value="MT">Montana</option>
+                                        <option value="NE">Nebraska</option>
+                                        <option value="NV">Nevada</option>
+                                        <option value="NH">New Hampshire</option>
+                                        <option value="NJ">New Jersey</option>
+                                        <option value="NM">New Mexico</option>
+                                        <option value="NY">New York</option>
+                                        <option value="NC">North Carolina</option>
+                                        <option value="ND">North Dakota</option>
+                                        <option value="OH">Ohio</option>
+                                        <option value="OK">Oklahoma</option>
+                                        <option value="OR">Oregon</option>
+                                        <option value="PA">Pennsylvania</option>
+                                        <option value="RI">Rhode Island</option>
+                                        <option value="SC">South Carolina</option>
+                                        <option value="SD">South Dakota</option>
+                                        <option value="TN">Tennessee</option>
+                                        <option value="TX">Texas</option>
+                                        <option value="UT">Utah</option>
+                                        <option value="VT">Vermont</option>
+                                        <option value="VA">Virginia</option>
+                                        <option value="WA">Washington</option>
+                                        <option value="WV">West Virginia</option>
+                                        <option value="WI">Wisconsin</option>
+                                        <option value="WY">Wyoming</option>
+                                    </select>
+                                    <div class="invalid-feedback" *ngIf="state.errors">
+                                        <div *ngIf="state.errors['required']">State is required</div>
+                                    </div>
+                                    <label>Zip</label>
+                                    <input trimText class="form-control" type="text" placeholder="zip"
+                                        [(ngModel)]="company.zip" />
+                                    <label>Notes</label>
+                                    <input trimText class="form-control" type="text" placeholder="notes"
+                                        [(ngModel)]="company.notes" />
+
+                                    <label></label>
+                                    <div class="alert alert-success" *ngIf="messageCompany !=''">
+                                        {{ messageCompany}}
+                                    </div>
+
+                                    <label>Actions</label>
+                                    <div class="input-group">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-outline-secondary" type="button" title="Save"
+                                                (click)="createCompany(company)">
+                                                <i class="bi-save"></i>
+                                            </button>
+                                        </div>
+                                        <div class="input-group-append">
+                                            <button class="btn btn-outline-secondary" type="button"
+                                                *ngIf="currentUserUser.allowAddCompany == true && user && (  user.roles[0].name == 'ROLE_ADMIN')"
+                                                (click)="addNew()">
+                                                <i class="bi-plus-lg"></i>
+                                            </button>
+                                        </div>
+                                        <div class="input-group-append">
+                                            <button class="btn btn-outline-secondary" type="button" *ngIf="user"
+                                                title="Resent Registration Link" (click)="resentRegistrationLink()">
+                                                <i class="bi-mailbox"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- </fieldset> -->
+                </div>
+                <div class="tab-pane fade" id="nav-disclaimer" role="tabpanel" aria-labelledby="nav-disclaimer-tab">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="callout callout-primary p-3"
+                                *ngFor="let disclaimer of disclaimers; let i=index; let even=even"
+                                [style.background-color]="i == cindex? 'lightyellow' : (even ? 'white' : 'white')"
+                                (click)="getDisclaimerDetail(disclaimer, i)">
+                                <div class="input-group">
+                                    <div class="input-group-append">
+                                        <h6>
+                                            <i class="bi-list-task"></i> {{ disclaimer.id }} {{ disclaimer.name}}
+                                        </h6>
+                                    </div>
+                                </div>
+                                <div>comments: {{ disclaimer.comments }} </div>
+                                <div></div>
+                                <div class="form-check">
+                                    <label class="form-check-label" style="color:red;">
+                                        <input trimText class="form-check-input" type="checkbox" disabled
+                                            [(ngModel)]="disclaimer.isDefault">
+                                        as default
+                                    </label>
+                                </div>
+                                <div [innerHTML]="disclaimer.text"></div>
+
+                                <div style="text-align: right;">
+
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group p-1 shadow">
+                                <div class="card card-primary card-outline">
+                                    <div class="card-body">
+                                        <div class="col-md-12">
+                                            <h4>{{ message}}</h4>
+                                        </div>
+                                        <label for="name">Disclaimer Name: eg. Invoice Disclaimer, Counter Invoice
+                                            Discalimer, etc</label>
+                                        <input trimText class="form-control" type="text" placeholder="Disclaimer name"
+                                            [(ngModel)]="disclaimer.name" />
+
+                                        <label for="name">Comments</label>
+                                        <input trimText class="form-control" type="text"
+                                            placeholder="Disclaimer comments" [(ngModel)]="disclaimer.comments" />
+
+                                        <label for="name">Default Disclaimer</label>
+                                        <div class="form-check">
+                                            <label class="form-check-label" style="color:red">
+                                                <input trimText class="form-check-input" type="checkbox"
+                                                    [(ngModel)]="disclaimer.isDefault">
+                                                set as default
+                                            </label>
+                                        </div>
+                                        <label for="name">Text [{{disclaimer.text?.length}}] (shall less than 7,000
+                                            characters)</label>
+                                        <angular-editor [(ngModel)]="disclaimer.text"
+                                            [config]="config"></angular-editor>
+
+
+
+                                        <label for="name"></label>
+                                        <div class="alert alert-success" *ngIf="messageDisclaimer !=''">
+                                            {{ messageDisclaimer}}
+                                        </div>
+                                        <label>Actions</label>
+                                        <div class="input-group">
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button" title="Save"
+                                                    (click)="createDisclaimer(disclaimer)">
+                                                    <i class="bi-save"></i>
+                                                </button>
+                                            </div>
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button" title="Add New"
+                                                    (click)="addNewDisclaimer()">
+                                                    <i class="bi-plus-lg"></i>
+                                                </button>
+                                            </div>
+                                            <div class="input-group-append" *ngIf="disclaimer.id> 0">
+                                                <button class="btn btn-outline-secondary" type="button" title="Delete"
+                                                    (click)="deleteDisclaimer()">
+                                                    <i class="bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="tab-pane fade" id="nav-in-take-way" role="tabpanel" aria-labelledby="nav-in-take-way-tab">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="callout callout-primary p-3"
+                                *ngFor="let inTakeWay of inTakeWays; let i=index; let even=even"
+                                [style.background-color]="i == cindex? 'lightyellow' : (even ? 'white' : 'white')"
+                                (click)="getInTakeWayDetail(inTakeWay, i)">
+                                <div class="input-group">
+                                    <div class="input-group-append">
+                                        <h6>
+                                            <i class="bi-list-task"></i> {{ inTakeWay.id }} {{ inTakeWay.name
+                                            }}
+                                        </h6>
+                                    </div>
+                                </div>
+                                <div>{{ inTakeWay.comments }} </div>
+                                <div style="text-align: right;">
+
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group p-1 shadow">
+                                <div class="card card-primary card-outline">
+                                    <div class="card-body">
+                                        <div class="col-md-12">
+                                            <h4>{{ message}}</h4>
+                                        </div>
+                                        <label for="name">Arrival Mode Name: eg. drive-in, towed in, pickup,
+                                            etc</label>
+                                        <input trimText class="form-control" type="text" placeholder="Arrival Mode name"
+                                            [(ngModel)]="inTakeWay.name" />
+
+                                        <label for="name">Comments</label>
+                                        <input trimText class="form-control" type="text"
+                                            placeholder="Arrival Mode comments" [(ngModel)]="inTakeWay.comments" />
+
+                                        <label for="name"></label>
+                                        <div class="alert alert-success" *ngIf="messageInTakeWay !=''">
+                                            {{ messageInTakeWay}}
+                                        </div>
+                                        <label>Actions</label>
+                                        <div class="input-group">
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button" title="Save"
+                                                    (click)="createInTakeWay(inTakeWay)">
+                                                    <i class="bi-save"></i>
+                                                </button>
+                                            </div>
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button" title="Add New"
+                                                    (click)="addNewInTakeWay()">
+                                                    <i class="bi-plus-lg"></i>
+                                                </button>
+                                            </div>
+                                            <div class="input-group-append" *ngIf="inTakeWay.id> 0">
+                                                <button class="btn btn-outline-secondary" type="button" title="Delete"
+                                                    (click)="deleteInTakeWay()">
+                                                    <i class="bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="tab-pane fade" id="nav-employee-role" role="tabpanel"
+                    aria-labelledby="nav-employee-role-tab">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="callout callout-primary"
+                                *ngFor="let employeeRole of employeeRoles; let i=index; let even=even"
+                                [style.background-color]="i == cindex? 'lightyellow' : (even ? 'white' : 'white')"
+                                (click)="getEmployeeRoleDetail(employeeRole, i)">
+                                <div class="input-group">
+                                    <div class="input-group-append">
+                                        <h6>
+                                            <i class="bi-list-task"></i> {{ employeeRole.id }} {{ employeeRole.name}}
+                                        </h6>
+                                    </div>
+                                </div>
+                                <div>{{ employeeRole.comments }} </div>
+                                <div style="text-align: right;">
+
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group p-1 shadow">
+                                <div class="card card-primary card-outline">
+                                    <div class="card-body">
+                                        <div class="col-md-12">
+                                            <h4>{{ message}}</h4>
+                                        </div>
+                                        <label for="name">Employer Role Name: eg. Service Manager, Writer,
+                                            Parts Manager,Floor Manager,Admin,Cashier,Body Man,Painter,Prep
+                                            Man,Mechanic,Lot manager,etc.
+                                        </label>
+                                        <input trimText class="form-control" type="text"
+                                            placeholder="employee role name" [(ngModel)]="employeeRole.name" />
+
+                                        <label for="name">Comments</label>
+                                        <input trimText class="form-control" type="text"
+                                            placeholder="employee role comments" [(ngModel)]="employeeRole.comments" />
+
+                                        <label for="name"></label>
+                                        <div class="alert alert-success" *ngIf="messageEmployeeRole !=''">
+                                            {{ messageEmployeeRole}}
+                                        </div>
+                                        <label>Actions</label>
+                                        <div class="input-group">
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button" title="Save"
+                                                    (click)="createEmployeeRole(employeeRole)">
+                                                    <i class="bi-save"></i>
+                                                </button>
+                                            </div>
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button" title="Add New"
+                                                    (click)="addNewEmployeeRole()">
+                                                    <i class="bi-plus-lg"></i>
+                                                </button>
+                                            </div>
+                                            <div class="input-group-append" *ngIf="employeeRole.id> 0">
+                                                <button class="btn btn-outline-secondary" type="button" title="Delete"
+                                                    (click)="deleteEmployeeRole()">
+                                                    <i class="bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="tab-pane fade" id="nav-employee" role="tabpanel" aria-labelledby="nav-employee-tab">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="callout callout-primary p-3"
+                                *ngFor="let employee of employees; let i=index; let even=even"
+                                [style.background-color]="i == cindex? 'lightyellow' : (even ? 'white' : 'white')"
+                                (click)="getEmployeeDetail(employee, i)">
+                                <div class="input-group">
+                                    <div class="input-group-append">
+                                        <h6>
+                                            <i class="bi-person"></i> {{ employee.id }} {{employee.firstName}}
+                                            {{employee.lastName}}
+                                        </h6>
+                                    </div>
+                                </div>
+                                <ng-container *ngFor="let employeeRole of employeeRoles">
+                                    <div *ngIf="employeeRole.id == employee.roleId">{{ employeeRole.name }}
+                                    </div>
+                                </ng-container>
+                                <div class="form-check">
+                                    <label class="form-check-label">
+                                        <input trimText class="form-check-input" type="checkbox" disabled
+                                            [(ngModel)]="employee.commissionBased">
+                                        Commission based
+                                    </label>
+                                </div>
+                                <div>{{ formatPhoneNumber(employee.phone) }} </div>
+                                <div>{{ employee.notes }} </div>
+                                <div style="text-align: right;">
+
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group p-1 shadow">
+                                <div class="card card-primary card-outline">
+                                    <div class="card-body">
+                                        <div class="col-md-12">
+                                            <h4>{{ message}}</h4>
+                                        </div>
+                                        <label for="name">Empployee First Name</label>
+                                        <input trimText class="form-control" type="text" placeholder="first name"
+                                            [(ngModel)]="employee.firstName" />
+
+                                        <label for="name">Empployee Last Name</label>
+                                        <input trimText class="form-control" type="text" placeholder="last name"
+                                            [(ngModel)]="employee.lastName" />
+
+                                        <label for="name">Employee Role</label>
+                                        <select class="form-control" [(ngModel)]="employee.roleId" placeholder="Type"
+                                            required>
+                                            <option *ngFor="let employeeRole of employeeRoles; let i=index"
+                                                [value]="employeeRole.id">{{employeeRole.name}}</option>
+                                        </select>
+
+                                        <label for="name"></label>
+                                        <div class="form-check">
+                                            <label class="form-check-label">
+                                                <input trimText class="form-check-input" type="checkbox"
+                                                    [(ngModel)]="employee.commissionBased">
+                                                Commission based
+                                            </label>
+                                        </div>
+
+                                        <label for="name">Email</label>
+                                        <input trimText class="form-control" type="text" placeholder="email"
+                                            [(ngModel)]="employee.email" />
+
+                                        <label for="name">Phone</label>
+                                        <input trimText class="form-control" type="text" placeholder="phone"
+                                            [(ngModel)]="employee.phone" />
+
+                                        <label for="name">Comments/Notes</label>
+                                        <input trimText class="form-control" type="text"
+                                            placeholder="Comments/Notes/Address" [(ngModel)]="employee.notes" />
+
+                                        <label for="name"></label>
+                                        <div class="alert alert-success" *ngIf="messageEmployee !=''">
+                                            {{ messageEmployee}}
+                                        </div>
+                                        <label>Actions</label>
+                                        <div class="input-group">
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button" title="Save"
+                                                    (click)="createEmployee(employee)">
+                                                    <i class="bi-save"></i>
+                                                </button>
+                                            </div>
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button" title="Add New"
+                                                    (click)="addNewEmployee()">
+                                                    <i class="bi-plus-lg"></i>
+                                                </button>
+                                            </div>
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button" title="Delete"
+                                                    *ngIf="employee.id> 0" (click)="deleteEmployee()">
+                                                    <i class="bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="tab-pane fade" id="nav-approval-status" role="tabpanel"
+                    aria-labelledby="nav-approval-status-tab">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="callout callout-primary p-3"
+                                *ngFor="let approvalStatus of approvalStatuss; let i=index; let even=even"
+                                [style.background-color]="i == cindex? 'lightyellow' : (even ? 'white' : 'white')"
+                                (click)="getApprovalStatusDetail(approvalStatus, i)">
+                                <div class="input-group">
+                                    <div class="input-group-append">
+                                        <h6>
+                                            <i class="bi-list-task"></i> {{ approvalStatus.id }} {{ approvalStatus.name
+                                            }}
+                                        </h6>
+                                    </div>
+                                </div>
+                                <div>{{ approvalStatus.comments }} </div>
+                                <div style="text-align: right;">
+
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group p-1 shadow">
+                                <div class="card card-primary card-outline">
+                                    <div class="card-body">
+                                        <div class="col-md-12">
+                                            <h4>{{ message}}</h4>
+                                        </div>
+                                        <label for="name">Approval Status Name: eg. Pending,Investgation,Approved, On
+                                            Hold,
+                                            etc</label>
+                                        <input trimText class="form-control" type="text"
+                                            placeholder="approval status name" [(ngModel)]="approvalStatus.name" />
+
+                                        <label for="name">Comments</label>
+                                        <input trimText class="form-control" type="text"
+                                            placeholder="approval status comments"
+                                            [(ngModel)]="approvalStatus.comments" />
+
+                                        <label for="name"></label>
+                                        <div class="alert alert-success" *ngIf="messageApprovalStatus !=''">
+                                            {{ messageApprovalStatus}}
+                                        </div>
+                                        <label>Actions</label>
+                                        <div class="input-group">
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button" title="Save"
+                                                    (click)="createApprovalStatus(approvalStatus)">
+                                                    <i class="bi-save"></i>
+                                                </button>
+                                            </div>
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button" title="Add New"
+                                                    (click)="addNewApprovalStatus()">
+                                                    <i class="bi-plus-lg"></i>
+                                                </button>
+                                            </div>
+                                            <div class="input-group-append" *ngIf="approvalStatus.id> 0">
+                                                <button class="btn btn-outline-secondary" type="button" title="Delete"
+                                                    (click)="deleteApprovalStatus()">
+                                                    <i class="bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="callout callout-primary p-3"
+                                *ngFor="let service of services; let i=index; let even=even"
+                                [style.background-color]="i == cindex? 'lightyellow' : (even ? 'white' : 'white')"
+                                (click)="getServiceDetail(service, i)">
+                                <div class="input-group">
+                                    <div class="input-group-append">
+                                        <h6>
+                                            <i class="bi-list-task"></i> {{ service.id }} {{ service.name }}
+                                        </h6>
+                                    </div>
+                                </div>
+                                <div>{{ service.comments }} </div>
+                                <div style="text-align: right;">
+                                    <!-- <a (click)="deleteCompany(company)">Delete</a> -->
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group p-1 shadow">
+                                <div class="card card-primary card-outline">
+                                    <div class="card-body">
+                                        <div class="col-md-12">
+                                            <h4>{{ message}}</h4>
+                                        </div>
+                                        <label for="name">Job Name</label>
+                                        <input trimText class="form-control" type="text" placeholder="Job name"
+                                            [(ngModel)]="service.name" />
+
+                                        <label for="name">Comments</label>
+                                        <input trimText class="form-control" type="text" placeholder="Job comments"
+                                            [(ngModel)]="service.comments" />
+
+                                        <label for="name"></label>
+                                        <div class="alert alert-success" *ngIf="messagePredefinedJobs !=''">
+                                            {{ messagePredefinedJobs}}
+                                        </div>
+                                        <label>Actions</label>
+                                        <div class="input-group">
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button" title="Save"
+                                                    (click)="createService(service)">
+                                                    <i class="bi-save"></i>
+                                                </button>
+                                            </div>
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button" title="Add New"
+                                                    (click)="addNewService()">
+                                                    <i class="bi-plus-lg"></i>
+                                                </button>
+                                            </div>
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button" title="Delete"
+                                                    *ngIf="service.id>0" (click)="deleteService()">
+                                                    <i class="bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="tab-pane fade" id="nav-status" role="tabpanel" aria-labelledby="nav-status-tab">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="callout callout-primary p-3"
+                                *ngFor="let status of statuss; let i=index; let even=even"
+                                [style.background-color]="i == cindex? 'lightyellow' : (even ? 'white' : 'white')"
+                                (click)="getStatusDetail(status, i)">
+                                <div class="input-group">
+                                    <div class="input-group-append">
+                                        <h6>
+                                            <i class="bi-list-task"></i> {{ status.id }} {{ status.name }}
+                                        </h6>
+                                    </div>
+                                </div>
+                                <div>{{ status.comments }} </div>
+                                <div style="text-align: right;">
+                                    <!-- <a (click)="deleteCompany(company)">Delete</a> -->
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group p-1 shadow">
+                                <div class="card card-primary card-outline">
+                                    <div class="card-body">
+                                        <div class="col-md-12">
+                                            <h4>{{ message}}</h4>
+                                        </div>
+                                        <label for="name">Vehicle Status Name: eg. Pending Estimate, Estimated,
+                                            Approved, Tear Down, Waiting Parts,
+                                            Mechanical, Frame, Body Work, In Painting, Cleaning, Ready, Supplement
+                                            Hold, Payment hold, Investigation, Salvaged, Lien etc</label>
+                                        <input trimText class="form-control" type="text"
+                                            placeholder="vehicle status name" [(ngModel)]="status.name" />
+
+                                        <label for="name">Comments</label>
+                                        <input trimText class="form-control" type="text" placeholder="status comments"
+                                            [(ngModel)]="status.comments" />
+
+                                        <label for="name"></label>
+                                        <div class="alert alert-success" *ngIf="messageVehicleStatus !=''">
+                                            {{ messageVehicleStatus}}
+                                        </div>
+
+                                        <label>Actions</label>
+                                        <div class="input-group">
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button" title="Save"
+                                                    (click)="createStatus(status)">
+                                                    <i class="bi-save"></i>
+                                                </button>
+                                            </div>
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button" title="Add New"
+                                                    (click)="addNewStatus()">
+                                                    <i class="bi-plus-lg"></i>
+                                                </button>
+                                            </div>
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button" title="Delete"
+                                                    *ngIf="status.id> 0" (click)="deleteStatus()">
+                                                    <i class="bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="tab-pane fade" id="nav-location" role="tabpanel" aria-labelledby="nav-location-tab">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="callout callout-primary p-3"
+                                *ngFor="let location of locations; let i=index; let even=even"
+                                [style.background-color]="i == cindex? 'lightyellow' : (even ? 'white' : 'white')"
+                                (click)="getLocationDetail(location, i)">
+                                <div class="input-group">
+                                    <div class="input-group-append">
+                                        <h6>
+                                            <i class="bi-list-task"></i> {{ location.id }} {{ location.name }}
+                                        </h6>
+                                    </div>
+                                </div>
+                                <div>{{ location.comments }} </div>
+                                <div style="text-align: right;">
+
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group p-1 shadow">
+                                <div class="card card-primary card-outline">
+                                    <div class="card-body">
+                                        <div class="col-md-12">
+                                            <h4>{{ message}}</h4>
+                                        </div>
+                                        <label for="name">Location Name</label>
+                                        <input trimText class="form-control" type="text" placeholder="location name"
+                                            [(ngModel)]="location.name" />
+
+                                        <label for="name">Comments</label>
+                                        <input trimText class="form-control" type="text" placeholder="location comments"
+                                            [(ngModel)]="location.comments" />
+
+                                        <label for="name"></label>
+                                        <div class="alert alert-success" *ngIf="messageVehicleLocation !=''">
+                                            {{ messageVehicleLocation}}
+                                        </div>
+                                        <label>Actions</label>
+                                        <div class="input-group">
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button" title="Save"
+                                                    (click)="createLocation(location)">
+                                                    <i class="bi-save"></i>
+                                                </button>
+                                            </div>
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button" title="Add New"
+                                                    (click)="addNewLocation()">
+                                                    <i class="bi-plus-lg"></i>
+                                                </button>
+                                            </div>
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button" title="Delete"
+                                                    *ngIf="location.id> 0" (click)="deleteLocation()">
+                                                    <i class="bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="tab-pane fade" id="nav-insurancer" role="tabpanel" aria-labelledby="nav-insurancer-tab">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="callout callout-primary p-3"
+                                *ngFor="let insurancer of insurancers; let i=index; let even=even"
+                                [style.background-color]="i == cindex? 'lightyellow' : (even ? 'white' : 'white')"
+                                (click)="getInsurancerDetail(insurancer, i)">
+                                <div class="input-group">
+                                    <div class="input-group-append">
+                                        <h6>
+                                            <i class="bi-list-task"></i> {{ insurancer.id }} {{ insurancer.name }}
+                                        </h6>
+                                    </div>
+                                </div>
+                                <div>{{ insurancer.contactFirstName }} {{ insurancer.contactLastName }}</div>
+                                <div>{{ formatPhoneNumber(insurancer.phone) }} {{ formatPhoneNumber(insurancer.phone2)}}
+                                    {{ formatPhoneNumber(insurancer.phone3) }}</div>
+                                <div>{{ insurancer.notes }} </div>
+                                <div style="text-align: right;">
+
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group p-1 shadow">
+                                <div class="card card-primary card-outline">
+                                    <div class="card-body">
+                                        <div class="col-md-12">
+                                            <h4>{{ message}}</h4>
+                                        </div>
+                                        <label for="name">Name: eg. CASH, AllState, Farmers, GEICO, NationWide,
+                                            Progressive, State Farm etc</label>
+                                        <input trimText class="form-control" type="text" placeholder="Company Name"
+                                            [(ngModel)]="insurancer.name" />
+
+                                        <label for="name">URL</label>
+                                        <input trimText class="form-control" type="text" placeholder="Company URL"
+                                            [(ngModel)]="insurancer.url" />
+
+                                        <label for="name">Contact First Name</label>
+                                        <input trimText class="form-control" type="text"
+                                            placeholder="Contact First Name"
+                                            [(ngModel)]="insurancer.contactFirstName" />
+
+                                        <label for="name">Contact Last Name</label>
+                                        <input trimText class="form-control" type="text" placeholder="Contact Last Name"
+                                            [(ngModel)]="insurancer.contactLastName" />
+
+                                        <label for="name">Contact Mobile Phone</label>
+                                        <input trimText class="form-control" type="text"
+                                            placeholder="Contact Mobile Phone" [(ngModel)]="insurancer.phone" />
+
+                                        <label for="name">Contact Phone 2</label>
+                                        <input trimText class="form-control" type="text" placeholder="Contact Phone 2"
+                                            [(ngModel)]="insurancer.phone2" />
+
+                                        <label for="name">Contact Phone 3</label>
+                                        <input trimText class="form-control" type="text" placeholder="Contact Phone 3"
+                                            [(ngModel)]="insurancer.phone3" />
+
+                                        <label for="name">Contact email</label>
+                                        <input trimText class="form-control" type="text" placeholder="Contact email"
+                                            [(ngModel)]="insurancer.email" />
+
+                                        <label for="name">Comments</label>
+                                        <input trimText class="form-control" type="text" placeholder="comments"
+                                            [(ngModel)]="insurancer.notes" />
+
+                                        <label for="name"></label>
+                                        <div class="alert alert-success" *ngIf="messageInsurancer !=''">
+                                            {{ messageInsurancer}}
+                                        </div>
+                                        <label>Actions</label>
+                                        <div class="input-group">
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button" title="Save"
+                                                    (click)="createInsurancer(insurancer)">
+                                                    <i class="bi-save"></i>
+                                                </button>
+                                            </div>
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button" title="Add New"
+                                                    (click)="addNewInsurancer()">
+                                                    <i class="bi-plus-lg"></i>
+                                                </button>
+                                            </div>
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button" title="Delete"
+                                                    *ngIf="insurancer.id> 0" (click)="deleteInsurancer()">
+                                                    <i class="bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="tab-pane fade" id="nav-vendor" role="tabpanel" aria-labelledby="nav-vendor-tab">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="callout callout-primary p-3"
+                                *ngFor="let vendor of vendors; let i=index; let even=even"
+                                [style.background-color]="i == cindex? 'lightyellow' : (even ? 'white' : 'white')"
+                                (click)="getVendorDetail(vendor, i)">
+                                <div class="input-group">
+                                    <div class="input-group-append">
+                                        <h6>
+                                            <i class="bi-list-task"></i> {{ vendor.id }} {{ vendor.name }}
+                                        </h6>
+                                    </div>
+                                </div>
+                                <div>{{ vendor.contactFirstName }} {{ vendor.contactLastName }}</div>
+                                <div>{{ formatPhoneNumber(vendor.phone) }} {{ formatPhoneNumber(vendor.phone2)
+                                    }} {{ formatPhoneNumber(vendor.phone3) }}</div>
+                                <div>{{ vendor.notes }} </div>
+                                <div style="text-align: right;">
+
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group p-1 shadow">
+                                <div class="card card-primary card-outline">
+                                    <div class="card-body">
+                                        <div class="col-md-12">
+                                            <h4>{{ message}}</h4>
+                                        </div>
+                                        <label for="name">Name: eg. Certifit, Thomeson, Jerry Toyota etc.</label>
+                                        <input trimText class="form-control" type="text" placeholder="Company Name"
+                                            [(ngModel)]="vendor.name" />
+
+                                        <label for="name">URL</label>
+                                        <input trimText class="form-control" type="text" placeholder="Company URL"
+                                            [(ngModel)]="vendor.url" />
+
+                                        <label for="name">Contact First Name</label>
+                                        <input trimText class="form-control" type="text"
+                                            placeholder="Contact First Name" [(ngModel)]="vendor.contactFirstName" />
+
+                                        <label for="name">Contact Last Name</label>
+                                        <input trimText class="form-control" type="text" placeholder="Contact Last Name"
+                                            [(ngModel)]="vendor.contactLastName" />
+
+                                        <label for="name">Contact Mobile Phone</label>
+                                        <input trimText class="form-control" type="text"
+                                            placeholder="Contact Mobile Phone" [(ngModel)]="vendor.phone" />
+
+                                        <label for="name">Contact Phone 2</label>
+                                        <input trimText class="form-control" type="text" placeholder="Contact Phone 2"
+                                            [(ngModel)]="vendor.phone2" />
+
+                                        <label for="name">Contact Phone 3</label>
+                                        <input trimText class="form-control" type="text" placeholder="Contact Phone 3"
+                                            [(ngModel)]="vendor.phone3" />
+
+                                        <label for="name">Contact email</label>
+                                        <input trimText class="form-control" type="text" placeholder="Contact email"
+                                            [(ngModel)]="vendor.email" />
+
+                                        <label for="name">Comments or Address</label>
+                                        <input trimText class="form-control" type="text" placeholder="comments"
+                                            [(ngModel)]="vendor.notes" />
+
+                                        <label for="name"></label>
+                                        <div class="alert alert-success" *ngIf="messageVendor !=''">
+                                            {{ messageVendor}}
+                                        </div>
+                                        <label>Actions</label>
+                                        <div class="input-group">
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button" title="Save"
+                                                    (click)="createVendor(vendor)">
+                                                    <i class="bi-save"></i>
+                                                </button>
+                                            </div>
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button" title="Add New"
+                                                    (click)="addNewVendor()">
+                                                    <i class="bi-plus-lg"></i>
+                                                </button>
+                                            </div>
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button" title="Delete"
+                                                    *ngIf="vendor.id> 0" (click)="deleteVendor()">
+                                                    <i class="bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="tab-pane fade" id="nav-rental" role="tabpanel" aria-labelledby="nav-rental-tab">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="callout callout-primary p-3"
+                                *ngFor="let rental of rentals; let i=index; let even=even"
+                                [style.background-color]="i == cindex? 'lightyellow' : (even ? 'white' : 'white')"
+                                (click)="getRentalDetail(rental, i)">
+                                <div class="input-group">
+                                    <div class="input-group-append">
+                                        <h6>
+                                            <i class="bi-list-task"></i> {{ rental.id }} {{ rental.name }}
+                                        </h6>
+                                    </div>
+                                </div>
+                                <div>{{ rental.contactFirstName }} {{ rental.contactLastName }}</div>
+                                <div>{{ formatPhoneNumber(rental.phone) }} {{ formatPhoneNumber(rental.phone2) }} {{
+                                    formatPhoneNumber(rental.phone3) }}</div>
+                                <div>{{ rental.notes }} </div>
+                                <div style="text-align: right;">
+
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group p-1 shadow">
+                                <div class="card card-primary card-outline">
+                                    <div class="card-body">
+                                        <div class="col-md-12">
+                                            <h4>{{ message}}</h4>
+                                        </div>
+                                        <label for="name">Name: eg. AutoPoint, Alamo, Budget, Enterprise, Hertz, NextCar
+                                            etc.</label>
+                                        <input trimText class="form-control" type="text" placeholder="Company Name"
+                                            [(ngModel)]="rental.name" />
+
+                                        <label for="name">URL</label>
+                                        <input trimText class="form-control" type="text" placeholder="Company URL"
+                                            [(ngModel)]="rental.url" />
+
+                                        <label for="name">Contact First Name</label>
+                                        <input trimText class="form-control" type="text"
+                                            placeholder="Contact First Name" [(ngModel)]="rental.contactFirstName" />
+
+                                        <label for="name">Contact Last Name</label>
+                                        <input trimText class="form-control" type="text" placeholder="Contact Last Name"
+                                            [(ngModel)]="rental.contactLastName" />
+
+                                        <label for="name">Contact Mobile Phone</label>
+                                        <input trimText class="form-control" type="text"
+                                            placeholder="Contact Mobile Phone" [(ngModel)]="rental.phone" />
+
+                                        <label for="name">Contact Phone 2</label>
+                                        <input trimText class="form-control" type="text" placeholder="Contact Phone 2"
+                                            [(ngModel)]="rental.phone2" />
+
+                                        <label for="name">Contact Phone 3</label>
+                                        <input trimText class="form-control" type="text" placeholder="Contact Phone 3"
+                                            [(ngModel)]="rental.phone3" />
+
+                                        <label for="name">Contact email</label>
+                                        <input trimText class="form-control" type="text" placeholder="Contact email"
+                                            [(ngModel)]="rental.email" />
+
+                                        <label for="name">Comments or Address</label>
+                                        <input trimText class="form-control" type="text"
+                                            placeholder="comments or address" [(ngModel)]="rental.notes" />
+
+                                        <label for="name"></label>
+                                        <div class="alert alert-success" *ngIf="messageInsurancer !=''">
+                                            {{ messageRental}}
+                                        </div>
+                                        <label>Actions</label>
+                                        <div class="input-group">
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button" title="Save"
+                                                    (click)="createRental(rental)">
+                                                    <i class="bi-save"></i>
+                                                </button>
+                                            </div>
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button" title="Add New"
+                                                    (click)="addNewRental()">
+                                                    <i class="bi-plus-lg"></i>
+                                                </button>
+                                            </div>
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button" title="Delete"
+                                                    *ngIf="rental.id> 0" (click)="deleteRental()">
+                                                    <i class="bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="tab-pane fade" id="nav-payment-status" role="tabpanel"
+                    aria-labelledby="nav-payment-status-tab">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="callout callout-primary p-3"
+                                *ngFor="let paymentStatus of paymentStatuss ;let i=index; let even=even"
+                                [style.background-color]="i == cindex? 'lightyellow' : (even ? 'white' : 'white')"
+                                (click)="getPaymentStatusDetail(paymentStatus, i)">
+                                <div class="input-group">
+                                    <div class="input-group-append">
+                                        <h6>
+                                            <i class="bi-list-task"></i> {{ paymentStatus.id }} {{
+                                            paymentStatus.name }}
+                                        </h6>
+                                    </div>
+                                </div>
+                                <div>{{ paymentStatus.comments }} </div>
+                                <div style="text-align: right;">
+
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group p-1 shadow">
+                                <div class="card card-primary card-outline">
+                                    <div class="card-body">
+                                        <div class="col-md-12">
+                                            <h4>{{ message}}</h4>
+                                        </div>
+                                        <label for="name">Payment Status Name: eg. Not Recieved, Recieved,Verified
+                                        </label>
+                                        <input trimText class="form-control" type="text"
+                                            placeholder="payment Status name" [(ngModel)]="paymentStatus.name" />
+
+                                        <label for="name">Comments</label>
+                                        <input trimText class="form-control" type="text"
+                                            placeholder="payment Status comments"
+                                            [(ngModel)]="paymentStatus.comments" />
+
+                                        <label for="name"></label>
+                                        <div class="alert alert-success" *ngIf="messagePaymentStatus !=''">
+                                            {{ messagePaymentStatus}}
+                                        </div>
+
+                                        <label>Actions</label>
+                                        <div class="input-group">
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button" title="Save"
+                                                    (click)="createPaymentStatus(paymentStatus)">
+                                                    <i class="bi-save"></i>
+                                                </button>
+                                            </div>
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button" title="Add New"
+                                                    (click)="addNewPaymentStatus()">
+                                                    <i class="bi-plus-lg"></i>
+                                                </button>
+                                            </div>
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button" title="Delete"
+                                                    *ngIf="paymentStatus.id> 0" (click)="deletePaymentStatus()">
+                                                    <i class="bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="tab-pane fade" id="nav-payment-method" role="tabpanel"
+                    aria-labelledby="nav-payment-method-tab">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="callout callout-primary p-3"
+                                *ngFor="let paymentMethod of paymentMethods; let i=index; let even=even"
+                                [style.background-color]="i == cindex? 'lightyellow' : (even ? 'white' : 'white')"
+                                (click)="getPaymentMethodDetail(paymentMethod, i)">
+                                <div class="input-group">
+                                    <div class="input-group-append">
+                                        <h6>
+                                            <i class="bi-list-task"></i> {{ paymentMethod.id }} {{
+                                            paymentMethod.name }}
+                                        </h6>
+                                    </div>
+                                </div>
+                                <div>{{ paymentMethod.comments }} </div>
+                                <div style="text-align: right;">
+
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group p-1 shadow">
+                                <div class="card card-primary card-outline">
+                                    <div class="card-body">
+                                        <div class="col-md-12">
+                                            <h4>{{ message}}</h4>
+                                        </div>
+                                        <label for="name">Payment Method Name: eg. cash,Warranty,Insurance</label>
+                                        <input trimText class="form-control" type="text"
+                                            placeholder="payment method name" [(ngModel)]="paymentMethod.name" />
+
+                                        <label for="name">Comments</label>
+                                        <input trimText class="form-control" type="text"
+                                            placeholder="payment method comments"
+                                            [(ngModel)]="paymentMethod.comments" />
+
+
+                                        <label for="name"></label>
+                                        <div class="alert alert-success" *ngIf="messagePaymentMethod !=''">
+                                            {{ messagePaymentMethod}}
+                                        </div>
+
+                                        <label>Actions</label>
+                                        <div class="input-group">
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button" title="Save"
+                                                    (click)="createPaymentMethod(paymentMethod)">
+                                                    <i class="bi-save"></i>
+                                                </button>
+                                            </div>
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button" title="Add New"
+                                                    (click)="addNewPaymentMethod()">
+                                                    <i class="bi-plus-lg"></i>
+                                                </button>
+                                            </div>
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button" title="Delete"
+                                                    *ngIf="paymentMethod.id> 0" (click)="deletePaymentMethod()">
+                                                    <i class="bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="tab-pane fade" id="nav-payment-type" role="tabpanel" aria-labelledby="nav-payment-type-tab">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="callout callout-primary p-3"
+                                *ngFor="let paymentType of paymentTypes; let i=index; let even=even"
+                                [style.background-color]="i == cindex? 'lightyellow' : (even ? 'white' : 'white')"
+                                (click)="getPaymentTypeDetail(paymentType, i)">
+                                <div class="input-group">
+                                    <div class="input-group-append">
+                                        <h6>
+                                            <i class="bi-list-task"></i> {{ paymentType.id }} {{
+                                            paymentType.name }}
+                                        </h6>
+                                    </div>
+                                </div>
+                                <div>{{ paymentType.comments }} </div>
+                                <div style="text-align: right;">
+
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group p-1 shadow">
+                                <div class="card card-primary card-outline">
+                                    <div class="card-body">
+                                        <label for="name">Paid In Category Name: eg. inital,remaining,final</label>
+                                        <input trimText class="form-control" type="text"
+                                            placeholder="Paid In Category Name" [(ngModel)]="paymentType.name" />
+
+                                        <label for="name">Comments</label>
+                                        <input trimText class="form-control" type="text" placeholder="comments"
+                                            [(ngModel)]="paymentType.comments" />
+
+
+                                        <label for="name"></label>
+                                        <div class="alert alert-success" *ngIf="messagePaymentType !=''">
+                                            {{ messagePaymentType}}
+                                        </div>
+
+
+                                        <label>Actions</label>
+                                        <div class="input-group">
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button" title="Save"
+                                                    (click)="createPaymentType(paymentType)">
+                                                    <i class="bi-save"></i>
+                                                </button>
+                                            </div>
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button" title="Add New"
+                                                    (click)="addNewPaymentType()">
+                                                    <i class="bi-plus-lg"></i>
+                                                </button>
+                                            </div>
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button" title="Delete"
+                                                    *ngIf="paymentType.id> 0" (click)="deletePaymentType()">
+                                                    <i class="bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="tab-pane fade" id="nav-job-request-type" role="tabpanel"
+                    aria-labelledby="nav-job-request-type-tab">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="callout callout-primary p-3"
+                                *ngFor="let jobRequestType of jobRequestTypes; let i=index; let even=even"
+                                [style.background-color]="i == cindex? 'lightyellow' : (even ? 'white' : 'white')"
+                                (click)="getJobRequestTypeDetail(jobRequestType, i)">
+                                <div class="input-group">
+                                    <div class="input-group-append">
+                                        <h6>
+                                            <i class="bi-list-task"></i> {{ jobRequestType.id }} {{
+                                            jobRequestType.name
+                                            }}
+                                        </h6>
+                                    </div>
+                                </div>
+                                <div>{{ jobRequestType.comments }} </div>
+                                <div style="text-align: right;">
+
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group p-1 shadow">
+                                <div class="card card-primary card-outline">
+                                    <div class="card-body">
+
+                                        <label for="name">Job Request Type Name: e.g Collision, Paint Only,
+                                            Mechanical,Come
+                                            Back, others
+                                        </label>
+                                        <input trimText class="form-control" type="text"
+                                            placeholder="job request type name" [(ngModel)]="jobRequestType.name" />
+
+                                        <label for="name">Comments</label>
+                                        <input trimText class="form-control" type="text"
+                                            placeholder="job request type comments"
+                                            [(ngModel)]="jobRequestType.comments" />
+
+
+                                        <label for="name"></label>
+                                        <div class="alert alert-success" *ngIf="messageJobRequestType !=''">
+                                            {{ messageJobRequestType}}
+                                        </div>
+
+                                        <label>Actions</label>
+                                        <div class="input-group">
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button" title="Save"
+                                                    (click)="createJobRequestType(jobRequestType)">
+                                                    <i class="bi-save"></i>
+                                                </button>
+                                            </div>
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button" title="Add New"
+                                                    (click)="addNewJobRequestType()">
+                                                    <i class="bi-plus-lg"></i>
+                                                </button>
+                                            </div>
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button" title="Delete"
+                                                    *ngIf="jobRequestType.id> 0" (click)="deleteJobRequestType()">
+                                                    <i class="bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+                <div class="tab-pane fade" id="nav-loaner" role="tabpanel" aria-labelledby="nav-loaner-tab">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="callout callout-primary p-3"
+                                *ngFor="let user of users; let i=index; let even=even"
+                                [style.background-color]="i == cindex? 'lightyellow' : (even ? 'white' : 'white')"
+                                (click)="getUserDetail(user, i)">
+                                <div class="input-group">
+                                    <div class="input-group-append">
+                                        <h6>
+                                            <i class="bi-person"></i> {{ user.id }} {{ user.email }}
+                                        </h6>
+                                    </div>
+                                </div>
+                                <div>{{ user.firstName }} {{ user.lastName }} </div>
+                                <div>{{ user.roles[0].name }} </div>
+                                <ng-container *ngFor="let employeeRole of employeeRoles">
+                                    <div *ngIf="employeeRole.id == user.employeeRoleId">{{ employeeRole.name }}
+                                    </div>
+                                </ng-container>
+                                <div><i class="bi-phone"></i> {{ formatPhoneNumber(user.phone) }} </div>
+                                <div style="text-align: right;">
+                                    <!-- <a (click)="deleteCompany(company)">Delete</a> -->
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group p-1 shadow" *ngIf="users.length>0">
+                                <div class="card card-primary card-outline">
+                                    <div class="card-body">
+                                        <label for="type">Type [#{{user.id}}]</label>
+                                        <select class="form-control" name="role" #type="ngModel" size="1" *ngIf="user"
+                                            [(ngModel)]="user.roles[0].name" required
+                                            [ngClass]="{ 'is-invalid': type.errors }">
+                                            <option value="ROLE_USER" selected>User</option>
+                                            <option value="ROLE_SHOP">Auto Body Shop Owner/Admin</option>
+                                            <option *ngIf="shallDisplay()" value="ROLE_ADMIN">Admin</option>
+                                        </select>
+                                        <label
+                                            *ngIf="user && ( user.roles[0].name == 'ROLE_SHOP' || user.roles[0].name == 'ROLE_USER' || user.roles[0].name == 'ROLE_RECYCLER')"
+                                            for="name">Shop Assigned</label>
+                                        <select class="form-control" name="role" #type="ngModel" size="1"
+                                            *ngIf="user && ( user.roles[0].name == 'ROLE_SHOP' || user.roles[0].name == 'ROLE_USER' || user.roles[0].name == 'ROLE_RECYCLER')"
+                                            [(ngModel)]="user.companyId" required
+                                            [ngClass]="{ 'is-invalid': type.errors }">
+                                            <option *ngFor="let company of companies; let i=index"
+                                                value="{{company.id}}">{{company.name}}</option>
+
+                                        </select>
+                                        <label for="name">Employee Role</label>
+                                        <select class="form-control" [(ngModel)]="user.employeeRoleId"
+                                            placeholder="Type" required>
+                                            <option *ngFor="let employeeRole of employeeRoles; let i=index"
+                                                [value]="employeeRole.id">{{employeeRole.name}}</option>
+                                        </select>
+                                        <label for="name">First Name</label>
+                                        <input trimText class="form-control" type="text" placeholder="first name"
+                                            [(ngModel)]="user.firstName" />
+                                        <label for="name">Last Name</label>
+                                        <input trimText class="form-control" type="text" placeholder="last name"
+                                            [(ngModel)]="user.lastName" />
+
+                                        <label for="name">UserName/Email</label>
+                                        <input trimText class="form-control" type="text" placeholder="email"
+                                            [(ngModel)]="user.email" />
+
+                                        <label for="name">Phone</label>
+                                        <input trimText class="form-control" type="text" placeholder="phone"
+                                            [(ngModel)]="user.phone" />
+
+                                        <label *ngIf="user.id==0" for="password">Password</label>
+                                        <input *ngIf="user.id==0" type="password" class="form-control" name="password"
+                                            [(ngModel)]="user.newPassword" required minlength="6" #password="ngModel"
+                                            [ngClass]="{ 'is-invalid':  password.errors }" />
+                                        <!-- <div class="invalid-feedback" *ngIf="password.errors">
+                                        <div *ngIf="password.errors['required']">Password is required</div>
+                                        <div *ngIf="password.errors['minlength']">
+                                            Password must be at least 6 characters
+                                        </div>
+                                    </div> -->
+                                        <label for="name">Street</label>
+                                        <input trimText class="form-control" type="text" placeholder="street"
+                                            [(ngModel)]="user.addresses[0].street" />
+                                        <label for="name">city</label>
+                                        <input trimText class="form-control" type="text" placeholder="city"
+                                            [(ngModel)]="user.addresses[0].city" />
+                                        <label for="name">state</label>
+                                        <select class="form-control" name="state" #state="ngModel" size="1" required
+                                            [(ngModel)]="user.addresses[0].state">
+                                            <option value="AL">Alabama</option>
+                                            <option value="AK">Alaska</option>
+                                            <option value="AZ">Arizona</option>
+                                            <option value="AR">Arkansas</option>
+                                            <option value="CA">California</option>
+                                            <option value="CO">Colorado</option>
+                                            <option value="CT">Connecticut</option>
+                                            <option value="DE">Delaware</option>
+                                            <option value="DC">District Of Columbia</option>
+                                            <option value="FL">Florida</option>
+                                            <option value="GA">Georgia</option>
+                                            <option value="HI">Hawaii</option>
+                                            <option value="ID">Idaho</option>
+                                            <option value="IL">Illinois</option>
+                                            <option value="IN">Indiana</option>
+                                            <option value="IA">Iowa</option>
+                                            <option value="KS">Kansas</option>
+                                            <option value="KY">Kentucky</option>
+                                            <option value="LA">Louisiana</option>
+                                            <option value="ME">Maine</option>
+                                            <option value="MD">Maryland</option>
+                                            <option value="MA">Massachusetts</option>
+                                            <option value="MI">Michigan</option>
+                                            <option value="MN">Minnesota</option>
+                                            <option value="MS">Mississippi</option>
+                                            <option value="MO">Missouri</option>
+                                            <option value="MT">Montana</option>
+                                            <option value="NE">Nebraska</option>
+                                            <option value="NV">Nevada</option>
+                                            <option value="NH">New Hampshire</option>
+                                            <option value="NJ">New Jersey</option>
+                                            <option value="NM">New Mexico</option>
+                                            <option value="NY">New York</option>
+                                            <option value="NC">North Carolina</option>
+                                            <option value="ND">North Dakota</option>
+                                            <option value="OH">Ohio</option>
+                                            <option value="OK">Oklahoma</option>
+                                            <option value="OR">Oregon</option>
+                                            <option value="PA">Pennsylvania</option>
+                                            <option value="RI">Rhode Island</option>
+                                            <option value="SC">South Carolina</option>
+                                            <option value="SD">South Dakota</option>
+                                            <option value="TN">Tennessee</option>
+                                            <option value="TX">Texas</option>
+                                            <option value="UT">Utah</option>
+                                            <option value="VT">Vermont</option>
+                                            <option value="VA">Virginia</option>
+                                            <option value="WA">Washington</option>
+                                            <option value="WV">West Virginia</option>
+                                            <option value="WI">Wisconsin</option>
+                                            <option value="WY">Wyoming</option>
+                                        </select>
+                                        <label for="name">zip</label>
+                                        <input trimText class="form-control" type="text" placeholder="zip code"
+                                            [(ngModel)]="user.addresses[0].zip" />
+
+                                        <label *ngIf="user && (  user.roles[0].name == 'ROLE_ADMIN')" for="name">allow
+                                            Add
+                                            Company</label>
+
+                                        <input *ngIf="user && (  user.roles[0].name == 'ROLE_ADMIN')" type="checkbox"
+                                            placeholder="street" [(ngModel)]="user.allowAddCompany" />
+
+                                        <label for="name">Activation</label>
+
+                                        <div class="form-check">
+                                            <label class="form-check-label">
+                                                <input trimText class="form-check-input" type="checkbox"
+                                                    [(ngModel)]="user.activated">
+                                                Activated (update here is not recommented)
+                                            </label>
+                                        </div>
+
+                                        <label for="name">Permissions</label>
+
+                                        <div class="form-check">
+                                            <label class="form-check-label">
+                                                <input trimText class="form-check-input" type="checkbox"
+                                                    [(ngModel)]="user.allowAssignUser">
+                                                allow Assign Employee
+                                            </label>
+                                        </div>
+
+                                        <div class="form-check">
+                                            <label class="form-check-label">
+                                                <input trimText class="form-check-input" type="checkbox"
+                                                    [(ngModel)]="user.allowAddEmployee">
+                                                allow Add Employee
+                                            </label>
+                                        </div>
+
+                                        <div class="form-check">
+                                            <label class="form-check-label">
+                                                <input trimText class="form-check-input" type="checkbox"
+                                                    [(ngModel)]="user.allowAddService">
+                                                allow Add Pre-defined Jobs
+                                            </label>
+                                        </div>
+
+                                        <div class="form-check">
+                                            <label class="form-check-label">
+                                                <input trimText class="form-check-input" type="checkbox"
+                                                    [(ngModel)]="user.allowAddPayment">
+                                                allow Add Payment
+                                            </label>
+                                        </div>
+
+                                        <div class="form-check">
+                                            <label class="form-check-label">
+                                                <input trimText class="form-check-input" type="checkbox"
+                                                    [(ngModel)]="user.allowVerifyPayment">
+                                                allow Verify Payment
+                                            </label>
+                                        </div>
+
+
+
+                                        <div class="form-check">
+                                            <label class="form-check-label">
+                                                <input trimText class="form-check-input" type="checkbox"
+                                                    [(ngModel)]="user.allowAddReceipt">
+                                                allow Add Receipt
+                                            </label>
+                                        </div>
+
+
+                                        <div class="form-check">
+                                            <label class="form-check-label">
+                                                <input trimText class="form-check-input" type="checkbox"
+                                                    [(ngModel)]="user.allowAddCounterInvoice">
+                                                allow Add Counter Invoice
+                                            </label>
+                                        </div>
+
+                                        <div class="form-check">
+                                            <label class="form-check-label">
+                                                <input trimText class="form-check-input" type="checkbox"
+                                                    [(ngModel)]="user.allowAddUpdateAutopart">
+                                                allow Add and Update Auto Parts
+                                            </label>
+                                        </div>
+
+                                        <div class="form-check">
+                                            <label class="form-check-label">
+                                                <input trimText class="form-check-input" type="checkbox"
+                                                    [(ngModel)]="user.allowAddUpdatePurchaseOrder">
+                                                allow Add and Update Purchase Order
+                                            </label>
+                                        </div>
+
+                                        <div class="form-check">
+                                            <label class="form-check-label">
+                                                <input trimText class="form-check-input" type="checkbox"
+                                                    [(ngModel)]="user.allowApproveRejectPurchaseOrder">
+                                                allow Approve and Reject Purchase Order
+                                            </label>
+                                        </div>
+
+                                        <div class="form-check">
+                                            <label class="form-check-label">
+                                                <input trimText class="form-check-input" type="checkbox"
+                                                    [(ngModel)]="user.allowUpdateJobStatus">
+                                                allow Update Job Status
+                                            </label>
+                                        </div>
+
+                                        <div class="form-check">
+                                            <label class="form-check-label">
+                                                <input trimText class="form-check-input" type="checkbox"
+                                                    [(ngModel)]="user.allowUpdateUser">
+                                                allow Update User
+                                            </label>
+                                        </div>
+
+                                        <div class="form-check">
+                                            <label class="form-check-label">
+                                                <input trimText class="form-check-input" type="checkbox"
+                                                    [(ngModel)]="user.allowAddAndUpdateVehicle">
+                                                allow Add And Update Vehicle
+                                            </label>
+                                        </div>
+
+                                        <div class="form-check">
+                                            <label class="form-check-label">
+                                                <input trimText class="form-check-input" type="checkbox"
+                                                    [(ngModel)]="user.allowUpdateCustomerInfo">
+                                                allow Update Customer Info
+                                            </label>
+                                        </div>
+
+                                        <div class="form-check">
+                                            <label class="form-check-label">
+                                                <input trimText class="form-check-input" type="checkbox"
+                                                    [(ngModel)]="user.allowUpdateVehicleStatus">
+                                                allow Update Vehicle Status
+                                            </label>
+                                        </div>
+
+                                        <div class="form-check">
+                                            <label class="form-check-label">
+                                                <input trimText class="form-check-input" type="checkbox"
+                                                    [(ngModel)]="user.allowChangeJobTargetDate">
+                                                allow Change Job Target Date
+                                            </label>
+                                        </div>
+
+                                        <div class="form-check">
+                                            <label class="form-check-label">
+                                                <input trimText class="form-check-input" type="checkbox"
+                                                    [(ngModel)]="user.allowAddNotes">
+                                                allow Add Notes
+                                            </label>
+                                        </div>
+
+                                        <div class="alert alert-success" *ngIf="messageUser !=''">
+                                            {{ messageUser}}
+                                        </div>
+                                        <label>Actions</label>
+                                        <div class="input-group">
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button" title="Save"
+                                                    *ngIf="currentUserUser.allowUpdateUser==true"
+                                                    (click)="saveUser(user)">
+                                                    <i class="bi-save"></i>
+                                                </button>
+                                            </div>
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button" title="Add New"
+                                                    *ngIf="currentUserUser.allowAddEmployee==true"
+                                                    (click)="addNewUser()">
+                                                    <i class="bi-plus-lg"></i>
+                                                </button>
+                                            </div>
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button" title="Delete"
+                                                    *ngIf="user.id > 0 && currentUserUser.allowUpdateUser==true"
+                                                    (click)="deleteUser(user)">
+                                                    <i class="bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="tab-pane fade" id="nav-customer" role="tabpanel" aria-labelledby="nav-customer-tab">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="col-md-12">
+                                <label></label>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="input-group">
+                                <div class="input-group-append  px-1">
+                                    <input type="text" (input)="onSearchChangeCustomer($event)"
+                                        placeholder="Search last name">
+                                </div>
+                                <div class="input-group-append  px-1">
+                                    <div>
+                                        <a class="text-center" (click)="getAllCustomerStartingPage(0,letter, pageSize)"
+                                            *ngFor="let letter of optionsLetter; let i=index"
+                                            [style.background-color]="letter == currantLetter? 'lightgrey' : (false ? 'white' : 'white')"
+                                            style="TEXT-DECORATION: underline; padding: 5px;">{{letter}}</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="col-md-12">
+                                <label></label>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="input-group">
+                                <div class="input-group-append px-1">
+                                    <select [(ngModel)]="pageSize"
+                                        (change)="getAllCustomerStartingPage(0, this.currantLetter, pageSize)">
+                                        <option>10</option>
+                                        <option>20</option>
+                                        <option>30</option>
+                                        <option>40</option>
+                                        <option>50</option>
+                                        <option>60</option>
+                                        <option>70</option>
+                                        <option>80</option>
+                                        <option>90</option>
+                                        <option>100</option>
+                                        <option>200</option>
+                                    </select>
+                                </div>
+                                <div class="input-group-append  px-1">
+                                    <label>{{ messageCount}}</label>
+                                </div>
+                                <div class="input-group-append  px-1">
+                                    <div *ngIf="showSearchByNmberForm==false">
+                                        <a class="text-center"
+                                            (click)="getAllCustomerStartingPage(i,this.currantLetter, pageSize)"
+                                            *ngFor="let page of pagesArray; let i=index"
+                                            [style.background-color]="i == currantPageNumber? 'lightgrey' : (false ? 'white' : 'white')"
+                                            style="TEXT-DECORATION: underline; padding: 5px;">{{page}}</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group nopadding">
+                                <div class="card callout callout-primary  card-outline p-1"
+                                    *ngFor="let customer2 of customers; let i=index; let even=even"
+                                    [style.background-color]="i == cindex? 'lightyellow' : (even ? 'white' : 'white')"
+                                    (click)="getCustomerDetail(customer2, i)">
+
+                                    <div class="p-0 bg-secondary text-white"> #{{ customer2.id }} {{ customer2.title
+                                        }} {{ customer2.firstName }} {{
+                                        customer2.lastName }} </div>
+
+                                    <div><i class="bi-phone"></i>
+                                        {{ formatPhoneNumber(customer2.phone) }}
+                                        {{ formatPhoneNumber(customer2.phone2) }}
+                                        {{formatPhoneNumber(customer2.phone3) }}</div>
+                                    <div><i class="bi bi-mailbox"></i> {{ customer2.email }} </div>
+
+                                    <div><i class="bi-house"></i> {{customer2.street}}, {{customer2.city}},
+                                        {{customer2.state}} {{customer2.zip}}
+                                    </div>
+                                    <div><i class="bi bi-clock"></i> Since {{customer2.createdAt| date}}
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <!-- <a (click)="deleteCustomer(customer2)">Delete</a> -->
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group callout-primary p-1 shadow" *ngIf="customers.length>0">
+                                <div class="card card-primary card-outline">
+                                    <div class="card-body">
+                                        <label for="type">Title [#{{customer.id}}]</label>
+                                        <select class="form-control" name="title" #title="ngModel" size="1" required
+                                            [(ngModel)]="customer.title" [ngClass]="{ 'is-invalid': title.errors }">
+                                            <option *ngFor="let title of optionsTitle">{{ title}}</option>
+                                        </select>
+
+                                        <label for="firstname">First Name</label>
+                                        <input trimText class="form-control" type="text" name="firstName"
+                                            placeholder="first name" required minlength="2" maxlength="200"
+                                            #firstName="ngModel" [ngClass]="{ 'is-invalid': firstName.errors }"
+                                            [(ngModel)]="customer.firstName" />
+                                        <div class="invalid-feedback" *ngIf="firstName.errors">
+                                            <div *ngIf="firstName.errors['required']">first Name is required</div>
+                                            <div *ngIf="firstName.errors['minlength']">
+                                                First Name must be at least 2 characters
+                                            </div>
+                                            <div *ngIf="firstName.errors['maxlength']">
+                                                First Name must be at most 200 characters
+                                            </div>
+                                        </div>
+
+
+                                        <label>Last Name</label>
+                                        <div class="input-group">
+                                            <input trimText class="form-control" type="text" placeholder="last name"
+                                                [(ngModel)]="customer.lastName" />
+                                        </div>
+
+
+                                        <label for="Phone">Mobile Phone</label>
+                                        <div class="input-group">
+                                            <input type="text" name="phone" class="form-control" placeholder="Phone"
+                                                [(ngModel)]="customer.phone" #phone="ngModel"
+                                                [ngClass]="{ 'is-invalid': phone.errors }"
+                                                pattern="^[-+()0-9]{10,12}(?:-\d+)?$" />
+                                        </div>
+
+
+                                        <label for="homePhone">Home Phone</label>
+                                        <div class="input-group">
+                                            <input type="text" name="phone2" class="form-control"
+                                                placeholder="Home Phone" [(ngModel)]="customer.phone2" #phone2="ngModel"
+                                                [ngClass]="{ 'is-invalid': phone2.errors }"
+                                                pattern="^[-+()0-9]{10,12}(?:-\d+)?$" />
+
+                                            <div class="invalid-feedback" *ngIf="phone2.errors ">
+                                                <div *ngIf="phone2.errors['phone2']">
+                                                    Phone must be a valid phone number
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <label for="workPhone">Work Phone</label>
+                                        <div class="input-group">
+                                            <input type="text" name="phone3" class="form-control"
+                                                placeholder="Wrok Phone" [(ngModel)]="customer.phone3" #phone3="ngModel"
+                                                [ngClass]="{ 'is-invalid': phone3.errors }"
+                                                pattern="^[-+()0-9]{10,12}(?:-\d+)?$" />
+
+                                            <div class="invalid-feedback" *ngIf="phone3.errors ">
+                                                <div *ngIf="phone3.errors['phone3']">
+                                                    Phone must be a valid phone number
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <label>email</label>
+                                        <input trimText class="form-control" type="text" placeholder="email"
+                                            [(ngModel)]="customer.email" />
+
+                                        <label>Street</label>
+                                        <input trimText class="form-control" type="text" placeholder="street"
+                                            [(ngModel)]="customer.street" />
+
+                                        <label>City</label>
+                                        <input trimText class="form-control" type="text" placeholder="city"
+                                            [(ngModel)]="customer.city" />
+
+                                        <label>state</label>
+                                        <select class="form-control" name="state" #state="ngModel" size="1" required
+                                            [(ngModel)]="customer.state" [ngClass]="{ 'is-invalid': state.errors }">
+                                            <option value="AL">Alabama</option>
+                                            <option value="AK">Alaska</option>
+                                            <option value="AZ">Arizona</option>
+                                            <option value="AR">Arkansas</option>
+                                            <option value="CA">California</option>
+                                            <option value="CO">Colorado</option>
+                                            <option value="CT">Connecticut</option>
+                                            <option value="DE">Delaware</option>
+                                            <option value="DC">District Of Columbia</option>
+                                            <option value="FL">Florida</option>
+                                            <option value="GA">Georgia</option>
+                                            <option value="HI">Hawaii</option>
+                                            <option value="ID">Idaho</option>
+                                            <option value="IL">Illinois</option>
+                                            <option value="IN">Indiana</option>
+                                            <option value="IA">Iowa</option>
+                                            <option value="KS">Kansas</option>
+                                            <option value="KY">Kentucky</option>
+                                            <option value="LA">Louisiana</option>
+                                            <option value="ME">Maine</option>
+                                            <option value="MD">Maryland</option>
+                                            <option value="MA">Massachusetts</option>
+                                            <option value="MI">Michigan</option>
+                                            <option value="MN">Minnesota</option>
+                                            <option value="MS">Mississippi</option>
+                                            <option value="MO">Missouri</option>
+                                            <option value="MT">Montana</option>
+                                            <option value="NE">Nebraska</option>
+                                            <option value="NV">Nevada</option>
+                                            <option value="NH">New Hampshire</option>
+                                            <option value="NJ">New Jersey</option>
+                                            <option value="NM">New Mexico</option>
+                                            <option value="NY">New York</option>
+                                            <option value="NC">North Carolina</option>
+                                            <option value="ND">North Dakota</option>
+                                            <option value="OH">Ohio</option>
+                                            <option value="OK">Oklahoma</option>
+                                            <option value="OR">Oregon</option>
+                                            <option value="PA">Pennsylvania</option>
+                                            <option value="RI">Rhode Island</option>
+                                            <option value="SC">South Carolina</option>
+                                            <option value="SD">South Dakota</option>
+                                            <option value="TN">Tennessee</option>
+                                            <option value="TX">Texas</option>
+                                            <option value="UT">Utah</option>
+                                            <option value="VT">Vermont</option>
+                                            <option value="VA">Virginia</option>
+                                            <option value="WA">Washington</option>
+                                            <option value="WV">West Virginia</option>
+                                            <option value="WI">Wisconsin</option>
+                                            <option value="WY">Wyoming</option>
+                                        </select>
+
+
+                                        <label>Zip</label>
+                                        <input trimText class="form-control" type="text" placeholder="zip"
+                                            [(ngModel)]="customer.zip" />
+
+                                        <label>Notes</label>
+                                        <input trimText class="form-control" type="text" placeholder="notes"
+                                            [(ngModel)]="customer.notes" />
+
+                                        <label> </label>
+                                        <div class="alert alert-success" *ngIf="messageCustomer !=''">
+                                            {{ messageCustomer}}
+                                        </div>
+                                        <label>Actions</label>
+                                        <div class="input-group">
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button" title="Save"
+                                                    *ngIf="customer.id> 0 && currentUserUser.allowUpdateCustomerInfo==true"
+                                                    (click)="saveCustomer(customer)">
+                                                    <i class="bi-save"></i>
+                                                </button>
+                                            </div>
+                                            <!-- <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button"
+                                                    *ngIf="currentUserUser.allowUpdateCustomerInfo==true"
+                                                    (click)="addNewUser()">
+                                                    Reset
+                                                </button>
+                                            </div> -->
+                                            <div class="input-group-append">
+                                                <button class="btn btn-outline-secondary" type="button" title="Delete"
+                                                    *ngIf="customer.id > 0 && currentUserUser.allowUpdateCustomerInfo==true"
+                                                    (click)="deleteCustomer(customer)">
+                                                    <i class="bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

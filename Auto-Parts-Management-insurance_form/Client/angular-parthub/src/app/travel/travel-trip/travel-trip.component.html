@@ -1,0 +1,361 @@
+<!-- Trip Detail Modal -->
+<div *ngIf="showModal && trip" class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);" (click)="onModalOverlayClick($event)">
+  <div class="modal-dialog modal-xl" (click)="onModalContentClick($event)">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title h4 mb-0">{{ trip.name }}</h2>
+        <button type="button" class="btn-close" (click)="onCloseModal()"></button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Trip Header Info -->
+        <div class="row g-4">
+          <!-- Image Gallery -->
+          <div class="col-12 col-lg-8">
+            <div class="position-relative">
+              <!-- Main Image Display -->
+              <div class="position-relative">
+                <img [src]="getCurrentImage()" [alt]="trip.name" class="img-fluid rounded w-100" style="height: 400px; object-fit: cover;">
+                
+                <!-- Navigation Arrows -->
+                <button class="btn btn-light position-absolute top-50 start-0 translate-middle-y ms-2" 
+                        (click)="previousImage()" 
+                        *ngIf="getImageCount() > 1"
+                        style="z-index: 10;">
+                  ❮
+                </button>
+                <button class="btn btn-light position-absolute top-50 end-0 translate-middle-y me-2" 
+                        (click)="nextImage()" 
+                        *ngIf="getImageCount() > 1"
+                        style="z-index: 10;">
+                  ❯
+                </button>
+                
+                <!-- Image Counter -->
+                <div class="position-absolute top-0 end-0 m-2 bg-dark bg-opacity-75 text-white px-2 py-1 rounded" 
+                     *ngIf="getImageCount() > 1">
+                  {{ currentImageIndex + 1 }} / {{ getImageCount() }}
+                </div>
+              </div>
+              
+              <!-- Thumbnail Strip -->
+              <div class="d-flex flex-wrap gap-2 mt-3" *ngIf="getImageCount() > 1">
+                <div 
+                  *ngFor="let image of trip.images; let i = index" 
+                  class="thumbnail-container"
+                  [class.border-primary]="i === currentImageIndex"
+                  [class.border-3]="i === currentImageIndex"
+                  (click)="selectImage(i)"
+                  style="cursor: pointer;"
+                >
+                  <img [src]="image" 
+                       [alt]="trip.name + ' - Image ' + (i + 1)" 
+                       class="img-thumbnail"
+                       style="width: 80px; height: 60px; object-fit: cover;">
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-12 col-lg-4">
+            <div class="d-flex flex-column gap-3">
+              <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                  <h5 class="card-title mb-3">Trip Information</h5>
+                  <div class="d-flex flex-column gap-2">
+                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                      <span class="fw-medium">Destination:</span>
+                      <span class="text-muted">📍 {{ trip.destination }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                      <span class="fw-medium">Duration:</span>
+                      <span class="text-muted">⏱️ {{ trip.duration }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                      <span class="fw-medium">Category:</span>
+                      <span class="text-muted">{{ getTripCategoryName(trip) }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                      <span class="fw-medium">Price:</span>
+                      <span class="text-success fw-bold">${{ trip.basePrice }} per person</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                      <span class="fw-medium">Availability:</span>
+                      <span class="text-muted">
+                        {{ getTotalAvailableSpots() }} of {{ trip.maxCapacity }} spots available
+                      </span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                      <span class="fw-medium">Group Size:</span>
+                      <span class="text-muted">👥 {{ trip.groupSize.min }}-{{ trip.groupSize.max }} people</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Available Dates Table -->
+              <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                  <h6 class="card-title mb-3">Available Dates</h6>
+                  <div class="table-responsive">
+                    <table class="table table-sm">
+                      <thead class="table-light">
+                        <tr>
+                          <th>Date</th>
+                          <th>Availability</th>
+                          <th>Price</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let dateAvailability of getAvailableDates()">
+                          <td>{{ dateAvailability.date | date:'MMM dd, yyyy' }}</td>
+                          <td>{{ dateAvailability.available }}/{{ dateAvailability.maxCapacity }} spots</td>
+                          <td class="fw-bold">{{ formatPrice(dateAvailability.price || trip.basePrice) }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Trip Description -->
+              <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                  <h6 class="card-title mb-3">About This Trip</h6>
+                  <p class="card-text text-muted">{{ trip.description }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="mt-4">
+          <ul class="nav nav-tabs">
+            <li class="nav-item">
+              <button 
+                class="nav-link" 
+                [class.active]="activeTab === 'overview'"
+                (click)="setActiveTab('overview')"
+              >
+                Overview
+              </button>
+            </li>
+            <li class="nav-item">
+              <button 
+                class="nav-link" 
+                [class.active]="activeTab === 'itinerary'"
+                (click)="setActiveTab('itinerary')"
+              >
+                Itinerary
+              </button>
+            </li>
+            <li class="nav-item">
+              <button 
+                class="nav-link" 
+                [class.active]="activeTab === 'inclusions'"
+                (click)="setActiveTab('inclusions')"
+              >
+                What's Included
+              </button>
+            </li>
+            <li class="nav-item">
+              <button 
+                class="nav-link" 
+                [class.active]="activeTab === 'info'"
+                (click)="setActiveTab('info')"
+              >
+                Trip Info
+              </button>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="mt-4">
+          <!-- Overview Tab -->
+          <div *ngIf="activeTab === 'overview'">
+            <div class="row g-4">
+              <div class="col-12 col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                  <div class="card-body">
+                    <h5 class="card-title mb-3">⭐ Trip Highlights</h5>
+                    <ul class="list-unstyled">
+                      <li *ngFor="let highlight of trip.highlights" class="mb-2">
+                        <span class="badge bg-primary me-2">✓</span>
+                        {{ highlight }}
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="col-12 col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                  <div class="card-body">
+                    <h5 class="card-title mb-3">ℹ️ Quick Facts</h5>
+                    <div class="d-flex flex-column gap-2">
+                      <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                        <span class="fw-medium">Difficulty:</span>
+                        <span class="text-muted">{{ trip.difficulty }}</span>
+                      </div>
+                      <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                        <span class="fw-medium">Group Size:</span>
+                        <span class="text-muted">{{ trip.groupSize.min }}-{{ trip.groupSize.max }} people</span>
+                      </div>
+                      <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                        <span class="fw-medium">Best Time:</span>
+                        <span class="text-muted">{{ trip.bestTime }}</span>
+                      </div>
+                      <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                        <span class="fw-medium">Cancellation:</span>
+                        <span class="text-muted">{{ trip.cancellationPolicy }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Itinerary Tab -->
+          <div *ngIf="activeTab === 'itinerary'">
+            <div class="d-flex flex-column gap-4">
+              <div *ngFor="let day of trip.itinerary" class="card border-0 shadow-sm">
+                <div class="card-body">
+                  <div class="d-flex align-items-center mb-3">
+                    <span class="badge bg-primary me-3">Day {{ day.day }}</span>
+                    <h5 class="card-title mb-0">{{ day.title }}</h5>
+                  </div>
+                  <p class="card-text text-muted mb-3">{{ day.description }}</p>
+                  
+                  <div class="row g-3">
+                    <div class="col-12 col-md-6">
+                      <div class="card bg-light">
+                        <div class="card-body">
+                          <h6 class="card-title mb-2">Activities</h6>
+                          <ul class="list-unstyled">
+                            <li *ngFor="let activity of day.activities" class="mb-2">
+                              <div class="d-flex align-items-center">
+                                <span class="badge bg-secondary me-2">{{ activity.time }}</span>
+                                <span>{{ activity.description }}</span>
+                              </div>
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="col-12 col-md-6">
+                      <div class="card bg-light">
+                        <div class="card-body">
+                          <h6 class="card-title mb-2">Meals</h6>
+                          <ul class="list-unstyled">
+                            <li *ngFor="let meal of day.meals" class="mb-2">
+                              <div class="d-flex align-items-center">
+                                <span class="badge bg-success me-2">{{ meal.type }}</span>
+                                <span>{{ meal.description }}</span>
+                              </div>
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="col-12" *ngIf="day.accommodation">
+                      <div class="card bg-light">
+                        <div class="card-body">
+                          <h6 class="card-title mb-2">Accommodation</h6>
+                          <p class="card-text mb-0">{{ day.accommodation }}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Inclusions Tab -->
+          <div *ngIf="activeTab === 'inclusions'">
+            <div class="row g-4">
+              <div class="col-12 col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                  <div class="card-body">
+                    <h5 class="card-title mb-3 text-success">✅ What's Included</h5>
+                    <ul class="list-unstyled">
+                      <li *ngFor="let inclusion of trip.inclusions" class="mb-2">
+                        <span class="badge bg-success me-2">✓</span>
+                        {{ inclusion }}
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="col-12 col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                  <div class="card-body">
+                    <h5 class="card-title mb-3 text-danger">❌ What's Not Included</h5>
+                    <ul class="list-unstyled">
+                      <li *ngFor="let exclusion of trip.exclusions" class="mb-2">
+                        <span class="badge bg-danger me-2">✗</span>
+                        {{ exclusion }}
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Trip Info Tab -->
+          <div *ngIf="activeTab === 'info'">
+            <div class="card border-0 shadow-sm">
+              <div class="card-body">
+                <h5 class="card-title mb-3">Trip Details</h5>
+                <div class="row g-3">
+                  <div class="col-12 col-md-6">
+                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                      <span class="fw-medium">Difficulty:</span>
+                      <span class="text-muted">{{ trip.difficulty }}</span>
+                    </div>
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                      <span class="fw-medium">Group Size:</span>
+                      <span class="text-muted">{{ trip.groupSize.min }}-{{ trip.groupSize.max }} people</span>
+                    </div>
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                      <span class="fw-medium">Best Time:</span>
+                      <span class="text-muted">{{ trip.bestTime }}</span>
+                    </div>
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                      <span class="fw-medium">Cancellation:</span>
+                      <span class="text-muted">{{ trip.cancellationPolicy }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="onCloseModal()">Close</button>
+        <button 
+          class="btn btn-primary"
+          (click)="onBookTrip()"
+          [disabled]="!isTripAvailable()"
+        >
+          {{ !isTripAvailable() ? 'Fully Booked' : 'Book This Trip' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div> 

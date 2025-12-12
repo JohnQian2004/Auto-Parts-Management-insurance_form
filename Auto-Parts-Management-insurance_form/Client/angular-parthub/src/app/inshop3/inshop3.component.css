@@ -1,0 +1,331 @@
+.readonly {
+  pointer-events: none;
+  /* opacity: 0.5; */
+  /* Optional: to give a disabled look */
+}
+
+.scale-down {
+  object-fit: scale-down;
+}
+
+.carousel-inner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.carousel-item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-height: 300px;
+  text-align: center;
+}
+
+.carousel-caption h5 {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.carousel-caption p {
+  font-size: 1rem;
+  color: #888;
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+  z-index: 5;
+  /* Make sure controls are above the carousel items */
+}
+
+/* @media only screen and (min-width : 481px) {
+  .flex-row {
+      display: flex;
+      flex-wrap: wrap;
+  }
+  .flex-row > [class*='col-'] {
+      display: flex;
+      flex-direction: column;
+  }
+  .flex-row.row:after, 
+  .flex-row.row:before {
+      display: flex;
+  }
+} */
+
+/* .card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  word-wrap: break-word;
+  background-color: #fff;
+  background-clip: border-box;
+  border: 1px solid rgba(0, 0, 0, 0.125);
+  border-radius: 0.25rem;
+} */
+
+
+/* Initial image style */
+/* img {
+  width: 40px;  
+  height: 20px;
+  transition: transform 0.3s ease;
+} */
+
+/* Magnification effect when hovered */
+img.magnify4 {
+  transform: scale(4);
+  /* Adjust scale value for desired magnification */
+  z-index: 10000;
+}
+
+/* Magnification effect when hovered */
+img.magnify2 {
+  transform: scale(2);
+  /* Adjust scale value for desired magnification */
+  z-index: 10000;
+}
+
+/* Container holding the image and the text */
+.containerImage {
+  position: relative;
+  text-align: center;
+  color: white;
+}
+
+/* Bottom left text */
+.bottom-left {
+  position: absolute;
+  bottom: 8px;
+  left: 16px;
+}
+
+/* Top left text */
+.top-left {
+  position: absolute;
+  top: 8px;
+  left: 16px;
+}
+
+/* Top left text */
+.top-left-0 {
+  position: absolute;
+  top: 3px;
+  left: 0px;
+}
+
+.top-left-8 {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+}
+
+/* Top right text */
+
+.top-right-6 {
+  position: absolute;
+  top: 6px;
+  right: 16px;
+}
+
+.top-right {
+  position: absolute;
+  top: 8px;
+  right: 16px;
+}
+
+/* Bottom right text */
+.bottom-right {
+  position: absolute;
+  bottom: 8px;
+  right: 16px;
+}
+
+/* Bottom right text */
+.bottom-right-4 {
+  position: absolute;
+  bottom: 4px;
+  right: 8px;
+}
+
+.tooltipTest:hover::before {
+
+  position: absolute;
+  display: none;
+  color: black;
+  background-color: #FFC107;
+  padding: 10px;
+  border-radius: 3px;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+  min-width: 400px;
+  z-index: 1000;
+  display: block;
+
+}
+
+.tooltipTest:hover::after {
+  content: attr(id);
+  padding: 5px;
+  width: 250px;
+  border: 1px solid #000;
+  display: block;
+  position: absolute;
+  border-color: #FFC107;
+  color: black;
+  border-style: solid;
+  border-radius: 3px;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+  bottom: calc(100% + 5px);
+  transform: translateX(-50%);
+  left: 50%;
+  background-color: #FFC107;
+}
+
+
+select {}
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  word-wrap: break-word;
+  background-color: #fff;
+  background-clip: border-box;
+  border: 2px solid rgba(0, 0, 0, 0.125);
+  border-radius: 0.25rem;
+}
+
+.card2 {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  word-wrap: break-word;
+  background-color: #fff;
+  background-clip: border-box;
+  border: 1px solid gray;
+  border-radius: 0.25rem;
+}
+
+.card-primary.card-outline {
+  border-top: 3px solid #007bff;
+}
+
+.card-header {
+  padding: 0.3rem rem 1.25rem;
+  margin-bottom: 0;
+  background-color: rgba(0, 0, 0, 0.03);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.card.card-tabs .card-tools {
+  margin: .3rem .5rem;
+}
+
+.card-header>.card-tools {
+  float: right;
+  margin-right: -0.625rem;
+}
+
+.card-header>.card-tools .input-group,
+.card-header>.card-tools .nav,
+.card-header>.card-tools .pagination {
+  margin-bottom: -0.3rem;
+  margin-top: -0.3rem;
+}
+
+.card-header>.card-tools [data-toggle="tooltip"] {
+  position: relative;
+}
+
+.card-title {
+  float: left;
+  font-size: 1.1rem;
+  font-weight: 400;
+  margin: 0;
+}
+
+.card-text {
+  clear: both;
+}
+
+textarea {
+  display: block;
+  resize: vertical;
+  overflow: auto;
+  /* overflow: hidden; */
+}
+
+.card-tools {
+  margin: .3rem .5rem;
+}
+
+.badge-sm {
+  min-width: 1.8em;
+  padding: .05em !important;
+  margin-left: .1em;
+  margin-right: .1em;
+  margin-top: .1em;
+  margin-bottom: .1em;
+
+  /* color: white !important; */
+  cursor: pointer;
+}
+
+
+.blink {
+  animation: blinker 1s step-start infinite;
+}
+
+@keyframes blinker {
+  50% {
+    opacity: 0;
+  }
+}
+
+.hide {
+  display: none;
+}
+
+.inner-addon {
+  position: relative;
+}
+
+.inner-addon .far,
+.inner-addon .fas {
+  position: absolute;
+  padding: 10px 30px;
+  z-index: 100;
+  cursor: pointer;
+}
+
+.left-addon .far,
+.left-addon .fas {
+  left: 0px;
+}
+
+.right-addon .far,
+.right-addon .fas {
+  right: 0px;
+}
+
+.left-addon input {
+  padding-left: 30px;
+}
+
+.right-addon input {
+  padding-right: 30px;
+}
+
+/* .select without-icon {
+  appearance: none;
+  background-image: url('');
+} */
+
+.badge.badge-pill.badge-primary.pill-small {
+  padding: 2px;
+  font-size: .5rem;
+}

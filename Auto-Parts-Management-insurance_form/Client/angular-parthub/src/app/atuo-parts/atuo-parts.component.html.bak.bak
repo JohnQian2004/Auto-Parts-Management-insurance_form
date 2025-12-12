@@ -1,0 +1,1850 @@
+<div>
+  <div class="row nogot">
+    <div class="my-fluid-col main-content col mt-4 pt-2">
+      <div class="row px-2 position-sticky common-bar-top">
+        <nav class="navbar navbar-expand navbar-white bg-white border-radius-8 d-flex justify-content-between">
+          <button class="btn btn-primary-abs" [disabled]="this.user.partMarketOnly == true " (click)="toggleClass()"><i
+              class="fa fa-bars"></i></button>
+          <ul class="navbar-nav d-flex align-items-center gap-5">
+            <li class="search-bar">
+              <div class="position-relative">
+                <input type="text" class="form-control bg-light height-40 border-0" [(ngModel)]="partNumber"
+                  placeholder="Search part number ..." />
+                <button (click)="searchAllWithPage(0, pageSize, this.forArchived)"
+                  class="position-absolute end-0 top-0 mt-3 me-3 text-muted bg-none border-0"><i
+                    class="fa fa-search"></i></button>
+              </div>
+            </li>
+            <!-- <li class="nav-item dropdown">
+              <div class="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"> <a href="javascript:;"
+                  class="notification position-relative"><i class="fa fa-bell text-dark opacity-50 fs-20"></i> <span
+                    class="position-absolute top-0 start-100 translate-middle bg-danger rounded-circle text-white text-white text-center line-height-200">10</span></a>
+              </div>
+              <div class="dropdown-menu p-0 border-0 shadow border-radius-8 overflow-hidden w-100 notification-box">
+                <div class="d-flex align-items-center justify-content-between p-4 border-bottom"> <strong
+                    class="fs-14">Notifications <span class="text-muted">(10)</span></strong> <a href="javascript:;"
+                    class="fs-12">Mark All Read</a> </div>
+                <div class="notice-scroller"> <a href="javascript:;" class="w-100 d-block">
+                    <div class="d-flex gap-3 align-items-center p-4 border-bottom"> <i
+                        class="fa fa-car fs-18 text-primary-abs text-center"></i> <span class="text-muted pe-4">
+                        <p class="fs-13">Vehicle <b class="text-dark">Chevrolet</b> is due 28 days.</p>
+                        <small class="fs-12">2 Hours ago</small>
+                      </span> </div>
+                  </a> <a href="javascript:;" class="w-100 d-block">
+                    <div class="d-flex gap-3 align-items-center p-4 border-bottom"> <i
+                        class="fa fa-user-tie fs-18 text-primary-abs text-center"></i> <span class="text-muted pe-4">
+                        <p class="fs-13">New <b class="text-dark">Customer</b> has been added.</p>
+                        <small class="fs-12">1 Day ago</small>
+                      </span> </div>
+                  </a> <a href="javascript:;" class="w-100 d-block">
+                    <div class="d-flex gap-3 align-items-center p-4 border-bottom"> <i
+                        class="fa fa-car fs-18 text-primary-abs text-center"></i> <span class="text-muted pe-4">
+                        <p class="fs-13">Vehicle <b class="text-dark">Chevrolet</b> is due 28 days.</p>
+                        <small class="fs-12">2 Hours ago</small>
+                      </span> </div>
+                  </a> <a href="javascript:;" class="w-100 d-block">
+                    <div class="d-flex gap-3 align-items-center p-4 border-bottom"> <i
+                        class="fa fa-user-tie fs-18 text-primary-abs text-center"></i> <span class="text-muted pe-4">
+                        <p class="fs-13">New <b class="text-dark">Customer</b> has been added.</p>
+                        <small class="fs-12">1 Day ago</small>
+                      </span> </div>
+                  </a> <a href="javascript:;" class="w-100 d-block">
+                    <div class="d-flex gap-3 align-items-center p-4"> <i
+                        class="fa fa-car fs-18 text-primary-abs text-center"></i> <span class="text-muted pe-4">
+                        <p class="fs-13">Vehicle <b class="text-dark">Chevrolet</b> is due 28 days.</p>
+                        <small class="fs-12">2 Hours ago</small>
+                      </span> </div>
+                  </a> </div>
+                <a href="javascript:;" class="text-center mx-auto pt-3 fs-12 d-block border-top">See all
+                  notifications</a>
+              </div>
+            </li> -->
+            <li class="nav-item dropdown">
+              <div class="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                <div class="d-flex align-items-center gap-3"> <img width="40" height="40" class="border-radius-4"
+                    *ngIf="company.icon != null && company.icon.length > 0"
+                    [src]="'data:image/jpeg;base64,'+ company.icon" />
+                  <div class="user-details"> <strong class="fs-14 mb-1 d-block">{{user.firstName}}
+                      {{user.lastName}}</strong> <small
+                      class="fs-13 text-dark- opacity-50">{{this.company.name}}</small> </div>
+                  <i class="fa fa-angle-down opacity-50"></i>
+                </div>
+              </div>
+              <div class="dropdown-menu p-0 border-0 shadow border-radius-8 overflow-hidden w-100 mt-3">
+                <ul class="d-flex flex-column">
+                  <!-- <li class="d-block p-0"><a routerLink="/users" class="dropdown-item p-3 fs-12"><i
+                        class="fa fa-users text-primary-abs fs-15 me-2 ms-1"></i> Manage Users</a></li> -->
+                  <li class="d-block p-0"><button data-bs-toggle="modal" data-bs-target="#myAccount"
+                      class="dropdown-item p-3 fs-12"><i class="fa fa-user text-primary-abs fs-15 me-2 ms-1"></i> My
+                      Account</button></li>
+                  <li class="d-block p-0"><button data-bs-toggle="modal" data-bs-target="#resetPassword"
+                      class="dropdown-item p-3 fs-12"><i class="fa fa-key text-primary-abs fs-15 me-2 ms-1"></i> Reset
+                      Password</button></li>
+                  <li class="d-block p-0"><a routerLink="/login" class="dropdown-item p-3 fs-12" (click)="logout()"><i
+                        class="fa fa-power-off text-primary-abs fs-15 me-2 ms-1"></i> Logout</a></li>
+                </ul>
+              </div>
+            </li>
+          </ul>
+        </nav>
+      </div>
+      <div class="d-md-flex align-items-center justify-content-between px-2 my-4 pt-4">
+        <h2 class="heading-color fw-700 text-uppercase fs-18">Parts: {{this.message}}</h2>
+        <div class="d-flex justify-content-between gap-2">
+          <button class="btn btn-primary-abs fs-13 px-3 py-2 mt-15-mob" title="Listed auto parts"
+            (click)="applyFilter2('2', false, 0, this.pageSize); partNumber='' ">Listed
+            ({{userSatisticsResponse?.totalAutopartsPublished}})</button>
+          <button class="btn btn-secondary-abs fs-13 px-3 py-2 mt-15-mob" title="Archived auto parts"
+            (click)="applyFilter2('2', true, 0, this.pageSize); partNumber='' ">Archived
+            ({{userSatisticsResponse?.totalAutopartsArchieved}})</button>
+          <button class="btn btn-secondary fs-13 px-3 py-2 mt-15-mob" (click)="showSavedItemsListView()"
+            title="Show My Saved Items"><i class="fa fa-heart"></i></button>
+          <button class="btn btn-success fs-13 px-3 py-2 mt-15-mob" data-bs-toggle="modal" data-bs-target="#addNewPart"
+            (click)="AddNewAutopart()"><i class="fa fa-plus me-2"></i> Add Part</button>
+        </div>
+      </div>
+
+      <div class="row mx-n2">
+        <div class="col-12" [hidden]="detailSelected == true">
+          <div class="table-container shadow border-radius-8 border w-100 d-box">
+            <table class="table-bordered overflow-hidden border-radius-8" *ngIf="autopartsSearch.length >0">
+              <thead>
+                <tr>
+
+                  <th class="fs-14 text-center mw-100 mx-w100">Image</th>
+                  <th class="fs-14 text-center mw-100" (click)="sortList('year')" title="Sort By Year"><i
+                      class="fa fa-sort me-1 opacity-50"></i> Year/make/Model</th>
+                  <th class="fs-14 text-center mw-100 mxw-300" (click)="sortList('title')"><i
+                      class="fa fa-sort me-1 opacity-50"></i> Parts Name</th>
+                  <th class="fs-14 text-center mw-150 mxw-300" (click)="sortList('description')"><i
+                      class="fa fa-sort me-1 opacity-50"></i> Description</th>
+                  <th class="fs-14 text-center mw-120" (click)="sortList('stocknumber')"><i
+                      class="fa fa-sort me-1 opacity-50"></i> Stock #</th>
+                  <th class="fs-14 text-center mw-100" (click)="sortList('grade')"><i
+                      class="fa fa-sort me-1 opacity-50"></i> Grade</th>
+                  <th class="fs-14 text-center mw-100" (click)="sortList('salePrice')" title="Price"><i
+                      class="fa fa-sort me-1 opacity-50"></i> Price</th>
+                  <!-- <th class="fs-14 text-center mw-300" (click)="sortList('rentalCountDown')" title="Dealer Info"><i
+                      class="fa fa-sort me-1 opacity-50"></i> Dealer Info</th>
+                  <th class="fs-14 text-center mw-100" (click)="sortList('distance')"><i
+                      class="fa fa-sort me-1 opacity-50"></i> Distance</th> -->
+                  <th class="fs-14 text-center mw-150">Action</th>
+                </tr>
+              </thead>
+              <ng-container *ngFor="let autopart of autopartsSearch; let i = index;  let even=even">
+                <tr id="{{vehicle.id}}" (click)="editAutopart(autopart, i)" title=""
+                  [style.background-color]="i == cindex? '#eef5fb' : (even ? 'white' : 'white')">
+
+                  <td class="text-center fs-13 mx-w100" data-bs-toggle="modal" data-bs-target="#partDetails"
+                    (mouseover)="hover = vehicle" (mouseleave)="hover = null" title="Click to view details"
+                    (click)="toggleDivs(); editAutopart(autopart, i)">
+                    <div class="overflow-hidden hover-img transition rounded-1 border">
+                      <img *ngIf="autopart.imageModels.length> 0 && autopart.showInSearchImageId > 0"
+                        src="{{baseUrlResizeImage + '/' + autopart.showInSearchImageId}}" height="40" width="100"
+                        alt="Image" class="object-fill rounded-1 w-100" />
+                    </div>
+                  </td>
+                  <td class="text-center fs-13" data-bs-toggle="modal" data-bs-target="#partDetails"
+                    title="Click to view details" (click)="toggleDivs(); editAutopart(autopart, i)">
+                    {{autopart.year}} {{autopart.make}} {{autopart.model}}
+                  </td>
+                  <td class="fs-13 mw-150 mxw-300" data-bs-toggle="modal" data-bs-target="#partDetails"
+                    title="Click to view details" (click)="toggleDivs(); editAutopart(autopart, i)">
+                    <p class="fs-12 text-black opacity-75" style="display: inline-block; word-break: break-word;">{{autopart.title}}</p>
+                  </td>
+                  <td class="fs-13 mw-150 mxw-300" data-bs-toggle="modal" data-bs-target="#partDetails"
+                    title="Click to view details" (click)="toggleDivs(); editAutopart(autopart, i)">
+                    <p class="fs-12 text-black opacity-75" style="display: inline-block; word-break: break-word;"> {{autopart.description}}</p>
+                  </td>
+                  <td class="text-center fs-13" data-bs-toggle="modal" data-bs-target="#partDetails"
+                    title="Click to view details" (click)="toggleDivs(); editAutopart(autopart, i)">
+                    {{autopart.stocknumber }} </td>
+                  <td data-bs-toggle="modal" data-bs-target="#partDetails" title="Click to view details"
+                    (click)="toggleDivs(); editAutopart(autopart, i)"><select name="grade"
+                      class="form-select h-48 px-3 border-radius-8" size="1" disabled [(ngModel)]="autopart.grade">
+                      <option value="undefined" disabled selected>Select Grade</option>
+                      <option value="A">A</option>
+                      <option value="B">B</option>
+                      <option value="C">C</option>
+                      <option value="Used">Used</option>
+                      <option value="New">New</option>
+                      <option value="Insurance">Insurance</option>
+                    </select></td>
+                  <td class="text-center" data-bs-toggle="modal" data-bs-target="#partDetails"
+                    title="Click to view details" (click)="toggleDivs(); editAutopart(autopart, i)">
+                    ${{autopart.salePrice}} </td>
+                  <!-- <td data-bs-toggle="modal" data-bs-target="#partDetails" title="Click to view details"
+                    (click)="toggleDivs(); editAutopart(autopart, i)">
+                    <p class="fs-12 text-black opacity-75" style="display: inline-block; word-break: break-word;">
+                      <a *ngIf="(( autopart.bussinessName !=null  && autopart.bussinessName !='') && (autopart.bussinessUrl != null && autopart.bussinessUrl !='')) "
+                        target="_blank" href={{autopart.bussinessUrl}}><b>{{autopart.bussinessName |
+                          titlecase}}</b> </a>
+                      <b> </b> {{formatPhoneNumber( autopart.phone)}}
+                      <b>at:</b> {{ autopart.street}} {{autopart.city |
+                      titlecase}}, {{ autopart.state}} {{ autopart.zip}}
+                    </p>
+                  </td>
+                  <td class="text-center" data-bs-toggle="modal" data-bs-target="#partDetails"
+                    title="Click to view details" (click)="toggleDivs(); editAutopart(autopart, i)">
+                    <ng-container *ngIf="autopart.distance > 0">
+                      {{autopart.distance}} Mils.
+                    </ng-container>
+                  </td> -->
+                  <td class="text-center"> 
+                    <div class="d-flex gap-2">
+                      <button class="btn btn-danger btn-sm" (click)="editAutopart(autopart, i)"
+                      *ngIf="autopart.status==2" (click)="deleteAutopart(autopart, i)"><i class="fa fa-trash"></i>
+                    </button>
+                    <button class="btn btn-warning btn-sm" (click)="editAutopart(autopart, i)"
+                      *ngIf="autopart.status==2" data-bs-toggle="modal" data-bs-target="#editPart"><i
+                        class="fa fa-edit"></i>
+                    </button>
+                    <button class="btn btn-secondary-abs btn-sm" (click)="publishAutopart(autopart)"
+                      *ngIf="autopart.status==0">Upload</button>
+                    <button class="btn btn-secondary btn-sm" (click)="archiveAutopart(autopart, true)"
+                      *ngIf="autopart.status==2 && autopart.archived == false">Archive</button>
+                    <button class="btn btn-dark btn-sm" (click)="archiveAutopart(autopart, false)"
+                      *ngIf="autopart.status==2 && autopart.archived == true">Repost</button>
+                    </div>
+                  </td>
+                </tr>
+              </ng-container>
+            </table>
+          </div>
+          <div class="parts-box bg-white border-radius-8 py-4 px-3 mt-4 shadow-sm m-box" id="{{autopart.id}}"
+            [style.background-color]="i == cindex? '#1580da' : (even ? '#EEE' : '#EEE')"
+            *ngFor="let autopart of autopartsSearch; let i = index;  let even=even">
+            <div class="row mx-n2">
+              <div class="col-lg-2 col-md-4">
+                <img class="img-fluid w-100 border-radius-8"
+                  *ngIf="autopart.imageModels  && autopart.showInSearchImageId > 0 "
+                  src="{{baseUrlResizeImage + '/' + autopart.showInSearchImageId}}" alt="Image" />
+              </div>
+              <div class="col-lg-10 col-md-8 ps-md-1">
+                <div class="d-block">
+                  <div>
+                    <h2 class="fs-16 fw-700 py-1 line-height-150" style="display: inline-block; word-break: break-word;"><a *ngIf="currentUser"
+                        class="text-dark" target="_blank" href={{autopart.bussinessUrl}}>{{autopart.bussinessName |
+                        titlecase}}</a> - {{autopart.id}} - {{autopart.year }} - {{ autopart.make }} - {{ autopart.model
+                      }} - {{ autopart.grade}}</h2>
+                  </div>
+                </div>
+                <div class="d-block">
+                  <ul class="customers-details d-lg-flex gap-2 w-100">
+                    <li class="mt-1 pe-lg-2">
+                      <p class="fs-12 text-black opacity-75 line-height-150" style="display: inline-block; word-break: break-word;"><b>Part
+                          Name:</b> {{autopart.title }}</p>
+                    </li>
+                    <li class="mt-1 px-lg-2">
+                      <p class="fs-12 text-black opacity-75 line-height-150" style="display: inline-block; word-break: break-word;"><b>Part
+                          No.:</b> {{ autopart.partNumber }}
+                      </p>
+                    </li>
+                    <li class="mt-1 px-lg-2">
+                      <p class="fs-12 text-black opacity-75 line-height-150" style="display: inline-block; word-break: break-word;"><b>Stock
+                          No.:</b> {{ autopart.stocknumber }}
+                      </p>
+                    </li>
+                    <li class="mt-1 px-lg-2">
+                      <p class="fs-12 text-black opacity-75 line-height-150" style="display: inline-block; word-break: break-word;"><b>Mobile
+                          No.:</b> {{formatPhoneNumber(
+                        autopart.phone)}}</p>
+                    </li>
+                    <li class="mt-1 px-lg-2">
+                      <p class="fs-12 text-black opacity-75 line-height-150" style="display: inline-block; word-break: break-word;">
+                        <b>Address.:</b> {{ autopart.street}} {{autopart.city |
+                        titlecase}}, {{ autopart.state}} {{ autopart.zip}}
+                      </p>
+                    </li>
+                    <li class="mt-1 px-lg-2" *ngIf="autopart.distance !='0'">
+                      <p class="fs-12 text-black opacity-75 line-height-150"><b>Distance.:</b> {{autopart.distance}}
+                        Mil.</p>
+                    </li>
+                  </ul>
+                </div>
+                <p class="fs-12 opacity-75 text-dark d-block pt-2 line-height-130" style="display: inline-block; word-break: break-word;">{{
+                  autopart.comments }}</p>
+                <p class="fs-12 opacity-75 text-dark d-block pt-2 line-height-130" style="display: inline-block; word-break: break-word;">{{
+                  autopart.description }}</p>
+                <div class="d-flex align-items-center gap-2 pt-4">
+                  <button class="btn btn-primary-abs btn-sm" (click)="editAutopart(autopart, i)"
+                    *ngIf="autopart.status==2" data-bs-toggle="modal" data-bs-target="#partDetails">Details</button>
+                  <button class="btn btn-danger btn-sm" (click)="editAutopart(autopart, i)" *ngIf="autopart.status==2"
+                    (click)="deleteAutopart(autopart, i)"><i class="fa fa-trash"></i>
+                  </button>
+                  <button class="btn btn-warning btn-sm" (click)="editAutopart(autopart, i)" *ngIf="autopart.status==2"
+                    data-bs-toggle="modal" data-bs-target="#editPart"><i class="fa fa-edit"></i>
+                  </button>
+                  <button class="btn btn-secondary-abs btn-sm" (click)="publishAutopart(autopart)"
+                    *ngIf="autopart.status==0">Upload</button>
+                  <button class="btn btn-secondary btn-sm" (click)="archiveAutopart(autopart, true)"
+                    *ngIf="autopart.status==2 && autopart.archived == false">Archive</button>
+                  <button class="btn btn-dark btn-sm" (click)="archiveAutopart(autopart, false)"
+                    *ngIf="autopart.status==2 && autopart.archived == true">Repost</button>
+                  <h3 class="fs-20 fw-700 text-primary-abs mt-1 ps-2">${{autopart.salePrice}}</h3>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-12" [hidden]="showSavedItems == false && detailSelected == false ">
+          <!-- <div class="col-12 py-4 px-0" *ngIf="savedItems.length > 0">
+            <hr />
+          </div> -->
+          <!-- <h3 class="fw-700 fs-5 mb-4" *ngIf="savedItems.length > 0">Saved Items ({{savedItems.length}})</h3> -->
+          <div class="table-container shadow border-radius-8 border w-100 d-box">
+            <table class="table-bordered overflow-hidden border-radius-8" *ngIf="autopartsSearch.length >0">
+              <thead>
+                <tr>
+
+                  <th class="fs-14 text-center mw-100">Image</th>
+                  <th class="fs-14 text-center mw-100" (click)="sortListSavedItem('year')" title="Sort By Year"><i
+                      class="fa fa-sort me-1 opacity-50"></i> Year/make/Model</th>
+                  <th class="fs-14 text-center mw-100 mxw-300" (click)="sortListSavedItem('title')"><i
+                      class="fa fa-sort me-1 opacity-50"></i> Parts Name</th>
+                  <th class="fs-14 text-center mw-150 mxw-300" (click)="sortListSavedItem('description')"><i
+                      class="fa fa-sort me-1 opacity-50"></i> Description</th>
+                  <th class="fs-14 text-center mw-120" (click)="sortListSavedItem('stocknumber')"><i
+                      class="fa fa-sort me-1 opacity-50"></i> Stock #</th>
+                  <th class="fs-14 text-center mw-100" (click)="sortListSavedItem('grade')"><i
+                      class="fa fa-sort me-1 opacity-50"></i> Grade</th>
+                  <th class="fs-14 text-center mw-100" (click)="sortListSavedItem('salePrice')" title="Price"><i
+                      class="fa fa-sort me-1 opacity-50"></i> Price</th>
+                  <th class="fs-14 text-center mw-300" (click)="sortListSavedItem('rentalCountDown')"
+                    title="Dealer Info"><i class="fa fa-sort me-1 opacity-50"></i> Dealer Info</th>
+                  <th class="fs-14 text-center mw-100" (click)="sortListSavedItem('distance')"><i
+                      class="fa fa-sort me-1 opacity-50"></i> Distance</th>
+                  <th class="fs-14 text-center mw-150">Action</th>
+                </tr>
+              </thead>
+              <ng-container *ngFor="let autopart of savedItems; let i = index;  let even=even">
+                <tr id="{{vehicle.id}}" (click)="editAutopart(autopart, i)" title=""
+                  [style.background-color]="i == cindex? '#eef5fb' : (even ? 'white' : 'white')">
+
+                  <td class="text-center fs-13 mxw-300" data-bs-toggle="modal" data-bs-target="#partDetails"
+                    (mouseover)="hover = vehicle" (mouseleave)="hover = null" title="Click to view details"
+                    (click)="toggleDivs(); editAutopart(autopart, i)">
+                    <div class="overflow-hidden hover-img transition rounded-1 border">
+                      <img *ngIf="autopart.imageModels.length> 0 && autopart.showInSearchImageId > 0"
+                        src="{{baseUrlResizeImage + '/' + autopart.showInSearchImageId}}" height="40" width="100"
+                        alt="Image" class="object-fill rounded-1 w-100" />
+                    </div>
+                  </td>
+                  <td class="text-center fs-13" data-bs-toggle="modal" data-bs-target="#partDetails"
+                    title="Click to view details" (click)="toggleDivs(); editAutopart(autopart, i)">
+                    {{autopart.year}} {{autopart.make}} {{autopart.model}}
+                  </td>
+                  <td class="fs-13 mw-150 mxw-300" data-bs-toggle="modal" data-bs-target="#partDetails"
+                    title="Click to view details" (click)="toggleDivs(); editAutopart(autopart, i)">
+                    <p class="fs-12 text-black opacity-75" style="display: inline-block; word-break: break-word;">{{autopart.title}}</p>
+                  </td>
+                  <td class="fs-13 mw-150 mxw-300" data-bs-toggle="modal" data-bs-target="#partDetails"
+                    title="Click to view details" (click)="toggleDivs(); editAutopart(autopart, i)">
+                    <p class="fs-12 text-black opacity-75" style="display: inline-block; word-break: break-word;"> {{autopart.description}}</p>
+                  </td>
+                  <td class="text-center fs-13" data-bs-toggle="modal" data-bs-target="#partDetails"
+                    title="Click to view details" (click)="toggleDivs(); editAutopart(autopart, i)">
+                    {{autopart.stocknumber }} </td>
+                  <td data-bs-toggle="modal" data-bs-target="#partDetails" title="Click to view details"
+                    (click)="toggleDivs(); editAutopart(autopart, i)"><select name="grade"
+                      class="form-select h-48 px-3 border-radius-8" size="1" disabled [(ngModel)]="autopart.grade">
+                      <option value="undefined" disabled selected>Select Grade</option>
+                      <option value="A">A</option>
+                      <option value="B">B</option>
+                      <option value="C">C</option>
+                      <option value="Used">Used</option>
+                      <option value="New">New</option>
+                      <option value="Insurance">Insurance</option>
+                    </select></td>
+                  <td class="text-center" data-bs-toggle="modal" data-bs-target="#partDetails"
+                    title="Click to view details" (click)="toggleDivs(); editAutopart(autopart, i)">
+                    ${{autopart.salePrice}} </td>
+                  <td data-bs-toggle="modal" data-bs-target="#partDetails" title="Click to view details"
+                    (click)="toggleDivs(); editAutopart(autopart, i)">
+                    <p class="fs-12 text-black opacity-75" style="display: inline-block; word-break: break-word;">
+                      <a *ngIf="(( autopart.bussinessName !=null  && autopart.bussinessName !='') && (autopart.bussinessUrl != null && autopart.bussinessUrl !='')) "
+                        target="_blank" href={{autopart.bussinessUrl}}><b>{{autopart.bussinessName |
+                          titlecase}}</b> </a>
+                      <b> </b> {{formatPhoneNumber( autopart.phone)}}
+                      <b>at:</b> {{ autopart.street}} {{autopart.city |
+                      titlecase}}, {{ autopart.state}} {{ autopart.zip}}
+                    </p>
+                  </td>
+                  <td class="text-center" data-bs-toggle="modal" data-bs-target="#partDetails"
+                    title="Click to view details" (click)="toggleDivs(); editAutopart(autopart, i)">
+                    <ng-container *ngIf="autopart.distance > 0">
+                      {{autopart.distance}} Mils.
+                    </ng-container>
+                  </td>
+                  <td class="text-center"> <button class="btn btn-danger btn-sm" ttile="Remove from Saved Items"
+                      (click)="deleteSavedItem(null, autopart.id)"><i class="fa fa-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+              </ng-container>
+            </table>
+          </div>
+          <div class="parts-box bg-white border-radius-8 py-4 px-3 mt-4 shadow-sm m-box" id="{{autopart.id}}"
+            [style.background-color]="i == cindex? '#1580da' : (even ? '#EEE' : '#EEE')"
+            *ngFor="let autopart of savedItems; let i = index;  let even=even">
+            <div class="row mx-n2">
+              <div class="col-lg-1 col-md-2">
+                <img class="img-fluid w-100 border-radius-8"
+                  *ngIf="autopart.imageModels && autopart.showInSearchImageId > 0"
+                  src="{{baseUrlResizeImage + '/' + autopart.showInSearchImageId}}" alt="Image" />
+              </div>
+              <div class="col-lg-11 col-md-8 ps-md-10">
+                <div class="d-md-flex align-items-start justify-content-between">
+                  <div>
+                    <h2 class="fs-22 fw-700 py-1 line-height-150" *ngIf="currentUser"><a class="text-dark"
+                        target="_blank" href={{autopart.bussinessUrl}}>{{autopart.bussinessName | titlecase}}</a></h2>
+                    <h3 class="fs-17 text-dark opacity-50 fw-500 line-height-130 mb-0">{{ autopart.id}} - {{
+                      autopart.year }} - {{ autopart.make }} - {{ autopart.model }} - {{ autopart.grade}}</h3>
+                  </div>
+
+                  <div class="d-flex align-items-center gap-2 pt-2">
+                    <button class="btn btn-primary-abs btn-sm" data-bs-toggle="modal" data-bs-target="#partDetails"
+                      (click)=" editAutopart(autopart, i)">Details</button>
+                    <button class="btn btn-danger btn-sm" ttile="Remove from Saved Items"
+                      (click)="deleteSavedItem(null, selectedAutopart.id)"><i class="fa fa-trash"></i>
+                    </button>
+                  </div>
+                </div>
+                <div class="d-flex align-itmes-start justify-content-between">
+                  <ul class="customers-details mt-1 d-lg-flex gap-2 w-100">
+                    <li class="mt-2 pe-lg-2">
+                      <p class="fs-12 text-black opacity-75 line-height-150" style="display: inline-block; word-break: break-word;"><b>Part
+                          Name:</b> {{autopart.title }}</p>
+                    </li>
+                    <li class="mt-0 px-lg-2">
+                      <p class="fs-12 text-black opacity-75 line-height-150" style="display: inline-block; word-break: break-word;"><b>Part
+                          No.:</b> {{ autopart.partNumber }}
+                      </p>
+                    </li>
+                    <li class="mt-0 px-lg-2">
+                      <p class="fs-12 text-black opacity-75 line-height-150" style="display: inline-block; word-break: break-word;"><b>Stock
+                          No.:</b> {{ autopart.stocknumber }}
+                      </p>
+                    </li>
+                    <li class="mt-0 px-lg-2">
+                      <p class="fs-12 text-black opacity-75 line-height-150" style="display: inline-block; word-break: break-word;">
+                        <b>Description.:</b> {{ autopart.description }}
+                      </p>
+                    </li>
+                    <li class="mt-0 px-lg-2" *ngIf="currentUser != null">
+                      <p class="fs-12 text-black opacity-75 line-height-150" style="display: inline-block; word-break: break-word;"><b>Mobile
+                          No.:</b> {{formatPhoneNumber(
+                        autopart.phone)}}</p>
+                    </li>
+                    <li class="mt-0 px-lg-2">
+                      <p class="fs-12 text-black opacity-75 line-height-150" style="display: inline-block; word-break: break-word;">
+                        <b>Address.:</b> {{ autopart.street}} {{autopart.city |
+                        titlecase}}, {{ autopart.state}} {{ autopart.zip}}
+                      </p>
+                    </li>
+                    <li class="mt-0 px-lg-2" *ngIf="autopart.distance !='0'">
+                      <p class="fs-12 text-black opacity-75 line-height-150"><b>Distance.:</b> {{autopart.distance}}
+                        Mil.</p>
+                    </li>
+                  </ul>
+                  <h3 class="fs-25 fw-700 text-primary-abs mt-3 ps-md-2">${{autopart.salePrice}}</h3>
+                </div>
+                <p class="fs-12 opacity-75 text-dark d-block pt-3 line-height-130" style="display: inline-block; word-break: break-word;">{{
+                  autopart.comments }}</p>
+                <p class="fs-12 opacity-75 text-dark d-block pt-3 line-height-130" style="display: inline-block; word-break: break-word;">{{
+                  autopart.description }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="d-flex justify-content-between px-2 mt-4" *ngIf="detailSelected==false">
+        <div class="d-flex align-items-center gap-3 my-2"> <span>Showing</span>
+          <select class="form-select px-3" [(ngModel)]="pageSize" title="Page Size">
+            <option>10</option>
+            <option>20</option>
+            <option>30</option>
+            <option>40</option>
+            <option>50</option>
+            <option>60</option>
+            <option>70</option>
+            <option>80</option>
+            <option>90</option>
+            <option>100</option>
+          </select>
+          <span>of {{this.searchCount}} entries</span>
+          <input type="checkbox" class="ms-2" title="Remember My Page Size" [checked]="this.pageSize !=20 "
+            (change)="rememberMePageSize()" />
+
+        </div>
+        <div class="mt-4 paginations">
+          <nav class="paginations my-2" *ngIf="partNumber== null || partNumber ==''">
+            <ul class="pagination d-flex align-items-center gap-3">
+              <li class="page-item "> <a class="page-link bg-light border-radius-4 px-3 py-2 fw-bold"
+                  (click)="applyFilter2('2',this.forArchived, currantPageNumber-1, pageSize)"> Previous
+                </a> </li>
+              <li *ngFor="let page of pagesArray; let i=index" (click)="applyFilter2('2',this.forArchived, i, pageSize)"
+                class="page-item"><a
+                  [style.background-color]="i == currantPageNumber? '#1580da' : (false ? 'white' : 'white')"
+                  class="page-link  border-radius-4 px-3 py-2 text-white">{{page}}</a></li>
+
+              <li class="page-item"> <a class="page-link bg-light border-radius-4 px-3 py-2 fw-bold"
+                  (click)="applyFilter2('2',this.forArchived,currantPageNumber+1, pageSize)">
+                  Next </a> </li>
+            </ul>
+          </nav>
+
+          <nav class="paginations my-2" *ngIf="partNumber!= null && partNumber !=''">
+            <ul class="pagination d-flex align-items-center gap-3">
+              <li class="page-item "> <a class="page-link bg-light border-radius-4 px-3 py-2 fw-bold"
+                  (click)="searchAllWithPage(currantPageNumber-1, pageSize, this.forArchived)"> Previous
+                </a> </li>
+              <li *ngFor="let page of pagesArray; let i=index"
+                (click)="searchAllWithPage(i, pageSize, this.forArchived)" class="page-item"><a
+                  [style.background-color]="i == currantPageNumber? '#1580da' : (false ? 'white' : 'white')"
+                  class="page-link  border-radius-4 px-3 py-2 text-white">{{page}}</a></li>
+
+              <li class="page-item"> <a class="page-link bg-light border-radius-4 px-3 py-2 fw-bold"
+                  (click)="searchAllWithPage(currantPageNumber+1, pageSize, this.forArchived)">
+                  Next </a> </li>
+            </ul>
+          </nav>
+
+
+          <!-- <ng-container *ngIf="partNumber ==''">
+            <a class="page-link bg-light border-radius-4 px-3 py-2 text-decoration-none"
+              (click)="applyFilter2('2',this.forArchived, i, pageSize)" *ngFor="let page of pagesArray; let i=index"
+              [style.background-color]="i == currantPageNumber? '#1580da' : (false ? 'white' : 'white')"
+              style="TEXT-DECORATION: underline; padding: 6px;">{{page}}</a>
+          </ng-container> -->
+          <!-- <ng-container *ngIf="partNumber !=''">
+            <a class="page-link bg-light border-radius-4 px-3 py-2 text-decoration-none"
+              (click)="searchAllWithPage(i, pageSize, this.forArchived)" *ngFor="let page of pagesArray; let i=index"
+              [style.background-color]="i == currantPageNumber? '#1580da' : (false ? 'white' : 'white')"
+              style="TEXT-DECORATION: underline; padding: 6px;">{{page}}</a>
+          </ng-container> -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- <div class="modal fade" id="addNewPart" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+  aria-labelledby="addNewPartLabel" aria-hidden="true" [hidden]="detailSelected == false">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content border-radius-8">
+      <div class="modal-header p-4">
+        <h1 class="modal-title fs-20 fw-600 text-capitalize" id="addNewPartLabel">Add New Part</h1>
+        <button type="button" (click)="backToListing()" class="btn-close mt-1" data-bs-dismiss="modal"
+          aria-label="Close"></button>
+      </div>
+      <div class="modal-body px-2 submit-form" *ngIf="selectedAutopart != null && selectedAutopart.id == 0">
+        <div class="row">
+          <div class="col-md-4">
+            <div class="mt-4 pt-1 position-relative">
+              <label for="phone" class="form-label fs-14 fw-400 mb-3">Images / Photos</label>
+              <button name="btn" class="btn btn-secondary-abs py-3 px-3 w-100" (click)="fileInput.click()"><i
+                  class="fa fa-cloud-upload me-2"></i>
+                Upload Images <input #fileInput class="btn btn-primary" type='file' (change)="onSelectFileNew($event)"
+                  multiple style="display:none;"></button>
+            </div>
+            <h5 class="text-danger fw-700 mt-3">{{ message1}}</h5>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1 position-relative" *ngFor='let imageModel of imageModels; let i=index'>
+              <img *ngIf="imageModel.showInSearch ==false" alt="Image" [src]="imageModel.picByte"
+                (click)="setShowInSearch(i)" class="mt-3 preview img-fluid img-thumbnail me-3" width="100" />
+              <img *ngIf="imageModel.showInSearch ==true" alt="Image" [src]="imageModel.picByte"
+                (click)="setShowInSearch(i)" class="mt-3 preview img-fluid img-thumbnail me-3" width="100" />
+            </div>
+          </div>
+          <div class="col-md-4" *ngIf="imageModels.length > 0 ">
+            <div class="mt-4 pt-1 position-relative">
+              <img class="image w-100 img-fluid img-thumbnail" *ngIf="imageUrl && selectedImage.showInSearch==false"
+                [src]="imageUrl" alt="Image" />
+              <img class="image w-100 img-fluid img-thumbnail" *ngIf="imageUrl && selectedImage.showInSearch==true"
+                [src]="imageUrl" alt="Image" />
+              <div class="bottom-right mt-3">
+                <button *ngIf="selectedImage.showInSearch==false"
+                  (click)="setImageForSearch(selectedAutopart.id, selectedImage)" class="btn btn-primary  mr-1"
+                  for="title">Set for Search</button>
+                <button (click)="deleteImage(selectedAutopart.id, selectedImage)" class="btn btn-danger mr-1"><i
+                    class="fa fa-trash"></i></button>
+                <button class="btn btn-primary-abs mr-1" (click)="fileInput.click()"><i class="fa fa-plus"></i><input
+                    #fileInput class="btn btn-primary-abs d-none" type='file' (change)="onSelectFileNew($event)"
+                    multiple /></button>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="year" class="form-label fs-14 fw-400 mb-3">Year</label>
+              <select class="form-select h-48 px-3 border-radius-8" [(ngModel)]="selectedAutopart.year">
+                <option [value]="option" *ngFor="let option of optionsYear;let i=index;">{{option}}</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="make" class="form-label fs-14 fw-400 mb-3">Make</label>
+              <select class="form-select h-48 px-3 border-radius-8" #device [(ngModel)]="selectedAutopart.make"
+                (change)="onChange($event, device.value)">
+                <option *ngFor="let obj of optionsMake;let i=index;">{{obj}}</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="model" class="form-label fs-14 fw-400 mb-3">Model</label>
+              <select class="form-select h-48 px-3 border-radius-8" [(ngModel)]="selectedAutopart.model">
+                <option *ngFor="let obj2 of optionsModel;let i=index;">{{obj2}}</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="title" class="form-label fs-14 fw-400 mb-3">Parts Name</label>
+              <input trimText class="form-control h-48 px-3 border-radius-8" type="text" placeholder="Enter Parts Name"
+                id="title" required [(ngModel)]="selectedAutopart.title" name="title" />
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="partInfo" class="form-label fs-14 fw-400 mb-3">Parts Number</label>
+              <input trimText class="form-control h-48 px-3 border-radius-8" type="text" placeholder="Enter Parts Number"
+                required [(ngModel)]="selectedAutopart.partNumber" name="partInfo" />
+            </div>
+          </div>
+          <div class="col-md-12">
+            <div class="mt-4 pt-1">
+              <label for="description" class="form-label fs-14 fw-400 mb-3">Description</label>
+              <input trimText class="form-control h-48 px-3 border-radius-8" type="text" placeholder="Enter Description"
+                 required [(ngModel)]="selectedAutopart.description" name="description" />
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="shipping" class="form-label fs-14 fw-400 mb-3">Shipping</label>
+              <select name="shipping" class="form-select h-48 px-3 border-radius-8" size="1"
+                [(ngModel)]="selectedAutopart.shipping">
+                <option selected="selected">-- Select Shipping --</option>
+                <option value="FLP">Free Local Pickup</option>
+                <option value="LD">Local Delivery</option>
+                <option value="SGS">Standard Ground Shipping</option>
+                <option value="FS">Fast Shipping</option>
+                <option value="CFDI">Call for Delivery Instructions</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="warranty" class="form-label fs-14 fw-400 mb-3">Warranty</label>
+              <select name="warranty" class="form-select h-48 px-3 border-radius-8" size="1"
+                [(ngModel)]="selectedAutopart.warranty">
+                <option selected="selected">-- Select Warranty --</option>
+                <option value="7D">7 days</option>
+                <option value="30D">15 days</option>
+                <option value="30D">30 days</option>
+                <option value="SAI">sold as is</option>
+                <option value="BWFP">Buy Warranty from PARTHUT</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="grade" class="form-label fs-14 fw-400 mb-3">Grade</label>
+              <select name="grade" class="form-select h-48 px-3 border-radius-8" size="1"
+                [(ngModel)]="selectedAutopart.grade">
+                <option selected="selected">Select Grade</option>
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+                <option value="Used">Used</option>
+                <option value="New">New</option>
+                <option value="Insurance">Insurance</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="price" class="form-label fs-14 fw-400 mb-3">Price</label>
+              <input trimText class="form-control h-48 px-3 border-radius-8" type="text" placeholder="Enter Price"
+                 required [(ngModel)]="selectedAutopart.salePrice" name="price" />
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="stocknumber" class="form-label fs-14 fw-400 mb-3">Stock No.</label>
+              <input trimText class="form-control h-48 px-3 border-radius-8" type="text" placeholder="Enter Stock Number"
+                id="stocknumber" [(ngModel)]="selectedAutopart.stocknumber" name="stocknumber" />
+            </div>
+          </div>
+          <div class="col-md-12">
+            <div class="mt-4 pt-1">
+              <button class="btn btn-primary-abs h-45 px-4 rounded-4 fs-14 fw-600 me-3" data-bs-dismiss="modal"
+                *ngIf="selectedAutopart.id ==0" (click)="createNewAutopart()">Post Part</button>
+              <button class="btn btn-dark h-45 px-4 rounded-4 fs-14 fw-600 me-3" data-bs-dismiss="modal"
+                *ngIf="selectedAutopart.status==2 && selectedAutopart.archived == true"
+                (click)="archiveAutopart( selectedAutopart, false)">Repost</button>
+              <button class="btn btn-secondary-abs h-45 px-4 rounded-4 fs-14 fw-600 me-3" data-bs-dismiss="modal"
+                (click)="backToListing()">Back</button>
+              <button class="btn btn-secondary h-45 px-4 rounded-4 fs-14 fw-600 me-3" data-bs-dismiss="modal"
+                *ngIf="selectedAutopart.status ==2 && selectedAutopart.archived ==false"
+                (click)="archiveAutopart( selectedAutopart, true)">Archive</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> -->
+
+<div class="modal fade" id="addNewPart" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+  aria-labelledby="addNewPartLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content border-radius-8">
+      <div class="modal-header p-4">
+        <h1 class="modal-title fs-20 fw-600 text-capitalize" id="addNewPartLabel">Add New Part</h1>
+        <button type="button" (click)="backToListing()" class="btn-close mt-1" data-bs-dismiss="modal"
+          aria-label="Close"></button>
+      </div>
+      <div class="modal-body px-2 submit-form" *ngIf="currentUser">
+        <div class="row">
+          <div class="col-md-4">
+            <div class="mt-4 pt-1 position-relative">
+              <label for="phone" class="form-label fs-14 fw-400 mb-3">Images / Photos</label>
+              <button name="btn" class="btn btn-secondary-abs py-3 px-3 w-100"><i class="fa fa-cloud-upload me-2"></i>
+                Upload Images</button>
+              <input type='file' class="form-control h-48 ps-5 border-radius-8 mt-5 opacity-0 top-0 position-absolute"
+                (change)="onSelectFileNew($event)" multiple />
+            </div>
+            <h5 class="text-danger fw-700 mt-3">{{ message1}}</h5>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-2 pt-1 position-relative">
+              <img *ngFor='let imageModel of imageModels;let i=index' (click)="setShowInSearch(i)"
+                [src]="imageModel.picByte" class="mt-3 preview img-fluid img-thumbnail me-3" width="100" />
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1 position-relative">
+              <div class="containerImage" *ngIf="imageModels.length> 0">
+                <img *ngIf="imageUrl" [src]="imageUrl" class="image w-100 img-fluid img-thumbnail" />
+                <label *ngIf="imageUrl" class="top-left" for="title">Will Show This During Search</label>
+                <label *ngIf="imageUrl" class="bottom-left" for="title">Will Show This During Search</label>
+                <div class="bottom-right py-2">
+                  <button data-toggle="tooltip" data-placement="top" title="Remove this image" *ngIf="imageUrl"
+                    (click)="deleteCurerntImage()" class="btn btn-danger mt-3 btn-sm" for="title">
+                    <i class="bi-trash"></i>
+                  </button>
+
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-12">
+            <div class="mt-4 pt-1">
+              <label for="createdBy" class="form-label fs-14 fw-400 mb-3">Donor Vehicle VIN Number</label>
+              <div class="input-group">
+                <input type="text" class="form-control" placeholder="Please Search by VIN" [(ngModel)]="vin" />
+                <div class="input-group-append">
+                  <button class="btn btn-outline-secondary" type="button" (click)="searchVin()">Decode VIN</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="year" class="form-label fs-14 fw-400 mb-3">Year</label>
+              <select class="form-select h-48 px-3 border-radius-8" required size="1" #year="ngModel"
+                [ngClass]="{ 'is-invalid': year.errors }" [(ngModel)]="selectedAutopart.year">
+                <option value="undefined" disabled selected>Select Year</option>
+                <option [value]="option" *ngFor="let option of optionsYear;let i=index;">{{option}}</option>
+              </select>
+              <div class="invalid-feedback d-block" *ngIf="year.errors ">
+                <span *ngIf="year.errors['required']">Year is required</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="make" class="form-label fs-14 fw-400 mb-3">Make</label>
+              <select class="form-select h-48 px-3 border-radius-8" #device required size="1" #make="ngModel"
+                [ngClass]="{ 'is-invalid': make.errors }" [(ngModel)]="selectedAutopart.make"
+                (change)="onChange($event, device.value)">
+                <option value="undefined" disabled selected>Select Make</option>
+                <option *ngFor="let obj of optionsMake;let i=index;">{{obj}}</option>
+              </select>
+              <div class="invalid-feedback" *ngIf="make.errors ">
+                <span *ngIf="make.errors['required']">Make is required</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="model" class="form-label fs-14 fw-400 mb-3">Model</label>
+              <select class="form-select h-48 px-3 border-radius-8" required size="1" #model="ngModel"
+                [ngClass]="{ 'is-invalid': model.errors }" [(ngModel)]="selectedAutopart.model">
+                <option value="undefined" disabled selected>Select Model</option>
+                <option *ngFor="let obj2 of optionsModel;let i=index;">{{obj2}}</option>
+              </select>
+              <div class="invalid-feedback" *ngIf="model.errors ">
+                <span *ngIf="model.errors['required']">Model is required</span>
+              </div>
+            </div>
+          </div>
+          <!-- <div class="col-md-4" *ngIf="showPostForm == false">
+            <div class="mt-4 pt-1">
+              <label for="amount" class="form-label fs-14 fw-400 mb-3">Amount</label>
+              <div class="input-group">
+                <input type="text" class="form-control h-48 px-3 border-radius-8"  required
+                  [(ngModel)]="selectedAutopart.title" pleaseholder="part name" name="title" />
+                <div class="input-group-append">
+                  <button *ngIf="!showPostForm" class="btn btn-success" type="button"
+                    (click)="searchPartWithPage(0, pageSize, 2, false)">Search</button>
+                </div>
+              </div>
+            </div>
+          </div> -->
+          <div class="col-md-12">
+            <div class="mt-4 pt-1">
+              <label for="title" class="form-label fs-14 fw-400 mb-3">Parts Name</label>
+              <!-- <input trimText class="form-control h-48 px-3 border-radius-8" type="text" placeholder="Enter Parts Name"
+                #partName="ngModel" [ngClass]="{ 'is-invalid': partName.errors }" minlength="2" maxlength="200" required
+                [(ngModel)]="selectedAutopart.title" name="title" /> -->
+              <select class="form-select h-48 px-3 border-radius-8" required size="1" #partName="ngModel"
+                [ngClass]="{ 'is-invalid': partName.errors }" [(ngModel)]="selectedAutopart.title">
+                <option value="undefined" disabled selected>Select Parts Name</option>
+                <option *ngFor="let obj of optionsAutoparts;let i=index;">{{obj}}</option>
+              </select>
+              <div class="invalid-feedback" *ngIf="partName.errors ">
+                <span *ngIf="partName.errors['required']">Parts Name is required</span>
+                <span *ngIf="partName.errors['minlength']">Parts Name must be at least 2 characters</span>
+                <span *ngIf="partName.errors['maxlength']">Parts Name must be at most 200 characters</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="partInfo" class="form-label fs-14 fw-400 mb-3">Parts Number</label>
+              <input trimText class="form-control h-48 px-3 border-radius-8" type="text" placeholder="Enter Parts Number"
+                #partNumber="ngModel" [ngClass]="{ 'is-invalid': partNumber.errors }" minlength="2" maxlength="50"
+                [(ngModel)]="selectedAutopart.partNumber" name="partInfo" />
+              <div class="invalid-feedback" *ngIf="partNumber.errors ">
+                <span *ngIf="partNumber.errors['required']">Parts Number is required</span>
+                <span *ngIf="partNumber.errors['minlength']">Parts Number must be at least 2 characters</span>
+                <span *ngIf="partNumber.errors['maxlength']">Parts Number must be at most 50 characters</span>
+              </div>
+            </div>
+          </div> -->
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="partInfo" class="form-label fs-14 fw-400 mb-3">Parts Number</label>
+              <div class="input-group">
+                <input trimText class="form-control h-48 px-3 border-radius-0" type="text"
+                  placeholder="Enter Parts Number" #partNumber="ngModel"
+                  [ngClass]="{ 'is-invalid': partNumber.errors }" minlength="2" maxlength="50"
+                  [(ngModel)]="selectedAutopart.partNumber" name="partInfo" />
+                <div class="input-group-append">
+                  <button class="btn btn-outline-secondary" type="button" title="AI Search"
+                    (click)="aiSearchPartNumber(selectedAutopart )"><i class="fa fa-search"></i></button>
+                </div>
+              </div>
+              <div class="invalid-feedback" *ngIf="partNumber.errors ">
+                <span *ngIf="partNumber.errors['required']">Parts Number is required</span>
+                <span *ngIf="partNumber.errors['minlength']">Parts Number must be at least 2 characters</span>
+                <span *ngIf="partNumber.errors['maxlength']">Parts Number must be at most 50 characters</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-8">
+            <div class="mt-4 pt-1">
+              <label for="partInfo" class="form-label fs-14 fw-400 mb-3">Vehicle Comments</label>
+              <input trimText class="form-control h-48 px-3 border-radius-8" type="text"
+                placeholder="Enter Vehicle Comments" #comments="ngModel"
+                [ngClass]="{ 'is-invalid': comments.errors }" minlength="2" maxlength="50"
+                [(ngModel)]="selectedAutopart.comments" name="comments" />
+              <div class="invalid-feedback" *ngIf="comments.errors ">
+                <!-- <span *ngIf="partNumber.errors['required']">Parts Number is required</span> -->
+                <span *ngIf="comments.errors['minlength']">Vehicle Comments must be at least 2 characters</span>
+                <span *ngIf="comments.errors['maxlength']">Vehicle Comments must be at most 500 characters</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-12">
+            <div class="mt-4 pt-1">
+              <label for="description" class="form-label fs-14 fw-400 mb-3">Parts Description</label>
+              <textarea class="form-control h-48 px-3 border-radius-8" type="text"
+                placeholder="Enter Description" #description="ngModel"
+                [ngClass]="{ 'is-invalid': description.errors }" minlength="2" rows="3" maxlength="2000" required
+                [(ngModel)]="selectedAutopart.description" name="description"></textarea>
+              <div class="invalid-feedback" *ngIf="description.errors ">
+                <span *ngIf="description.errors['required']">Part Description is required</span>
+                <span *ngIf="description.errors['minlength']">Part Description must be at least 2 characters</span>
+                <span *ngIf="description.errors['maxlength']">Part Descripton must be at most 2000 characters</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-12"
+            *ngIf="selectedAutopart.partNumber != null && selectedAutopart.partNumber != '' && selectedAutopart.year > 0 && selectedAutopart.make !='' && selectedAutopart.model != '' ">
+            <div class="mt-4 pt-1 ">
+              <label for="description" class="form-label fs-14 fw-400 mb-3">Fitments/Compatibilities Check</label>
+              <input type="checkbox" title="Check fitment/Compatibility" style="width:20px; height:20px"
+                (change)="onChangeFitment(selectedAutopart)" id="fitmented" [(ngModel)]="selectedAutopart.fitmented"
+                name="fitmented" />
+            </div>
+            <div class="row"
+              *ngIf="selectedAutopart.fitmented == true && selectedAutopart.fitments != null && selectedAutopart.fitments.length > 0">
+              <div class="col-12 table-responsive">
+                <label for="fitment" class="form-label fs-14 fw-400 mb-3"> Fitments/Compatibilities:</label>
+                <table class="table">
+                  <tr>
+                    <th>#</th>
+                    <th>year</th>
+                    <th>make</th>
+                    <th>model</th>
+                    <th>trim</th>
+                    <th>engine</th>
+                    <!-- <th>action</th> -->
+                  </tr>
+                  <tr *ngFor="let fitment of selectedAutopart.fitments; let i=index">
+                    <td>{{i+1}}</td>
+                    <td>{{ fitment.year }}</td>
+                    <td>{{ fitment.make }}</td>
+                    <td>{{ fitment.model }}</td>
+                    <td>{{ fitment.trim }}</td>
+                    <td>{{ fitment.engine }}</td>
+                    <!-- <td>Place Holder</td> -->
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="shipping" class="form-label fs-14 fw-400 mb-3">Shipping</label>
+              <select name="shipping" class="form-select h-48 px-3 border-radius-8" size="1" required
+                #shipping="ngModel" [ngClass]="{ 'is-invalid': shipping.errors }" placeHolder="Please select shipping"
+                [(ngModel)]="selectedAutopart.shipping">
+                <option value="undefined" disabled selected>Select Shipping</option>
+                <option value="FLP">Free Local Pickup</option>
+                <option value="LD">Local Delivery</option>
+                <option value="SGS">Standard Ground Shipping</option>
+                <option value="FS">Fast Shipping</option>
+                <option value="CFDI">Call for Delivery Instructions</option>
+              </select>
+              <div class="invalid-feedback" *ngIf="shipping.errors ">
+                <span *ngIf="shipping.errors['required']">Shipping is required</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="warranty" class="form-label fs-14 fw-400 mb-3">Warranty</label>
+              <select name="warranty" class="form-select h-48 px-3 border-radius-8" size="1" required
+                #warrenty="ngModel" [ngClass]="{ 'is-invalid': warrenty.errors }"
+                [(ngModel)]="selectedAutopart.warranty">
+                <option value="undefined" disabled selected>Select Warranty</option>
+                <option value="7D">7 days</option>
+                <option value="30D">15 days</option>
+                <option value="30D">30 days</option>
+                <option value="SAI">sold as is</option>
+                <option value="BWFP">Buy Warranty from PARTHUT</option>
+              </select>
+              <div class="invalid-feedback" *ngIf="warrenty.errors ">
+                <span *ngIf="warrenty.errors['required']">Warranty is required</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="grade" class="form-label fs-14 fw-400 mb-3">Grade</label>
+              <select name="grade" class="form-select h-48 px-3 border-radius-8" size="1"
+                [(ngModel)]="selectedAutopart.grade" required #grade="ngModel"
+                [ngClass]="{ 'is-invalid': grade.errors }">
+                <option value="undefined" disabled selected>Select Grade</option>
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+                <option value="Used">Used</option>
+                <option value="New">New</option>
+                <option value="Insurance">Insurance</option>
+              </select>
+              <div class="invalid-feedback" *ngIf="grade.errors ">
+                <span *ngIf="grade.errors['required']">Grade is required</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="price" class="form-label fs-14 fw-400 mb-3">Price ($)</label>
+              <input trimText class="form-control h-48 px-3 border-radius-8" type="number"
+                placeholder="Enter Price" #salePrice="ngModel" [ngClass]="{ 'is-invalid': salePrice.errors }"
+                minlength="1" maxlength="10" onKeyPress="if(this.value.length==10) return false" maxlength="10" required
+                oninput="if(this.value<0)this.value=this.value * -1" [(ngModel)]="selectedAutopart.salePrice"
+                name="price" />
+              <div class="invalid-feedback" *ngIf="salePrice.errors ">
+                <span *ngIf="salePrice.errors['required']">Price is required</span>
+                <span *ngIf="salePrice.errors['minlength']">Price must be at least 1 characters</span>
+                <span *ngIf="salePrice.errors['maxlength']">Price must be at most 10 characters</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="stocknumber" class="form-label fs-14 fw-400 mb-3">Stock No.</label>
+              <input trimText class="form-control h-48 px-3 border-radius-8" type="text" #stocknumber="ngModel"
+                [ngClass]="{ 'is-invalid': stocknumber.errors }" minlength="2" maxlength="50" required
+                name="stocknumber" placeholder="Enter Stock Number" id="stocknumber"
+                [(ngModel)]="selectedAutopart.stocknumber" name="stocknumber" />
+            </div>
+            <div class="invalid-feedback" *ngIf="stocknumber.errors ">
+              <!-- <span *ngIf="stocknumber.errors['required']">Stock Number is required</span> -->
+              <span *ngIf="stocknumber.errors['minlength']">Stock Number must be at least 1 characters</span>
+              <span *ngIf="stocknumber.errors['maxlength']">Stock Number must be at most 10 characters</span>
+            </div>
+          </div>
+          <div class="col-md-12" *ngIf="errorMessage !=''">
+            <div class="alert alert-danger mt-4">{{ errorMessage}}</div>
+          </div>
+          <div class="col-md-12">
+            <div class="mt-4 pt-1">
+              <button class="btn btn-primary-abs h-45 px-4 rounded-4 fs-14 fw-600" (click)="createNewAutopart()">
+                Post Part</button>
+
+              <button *ngIf="selectedAutopart.id> 0" class="btn btn-primary-abs h-45 px-4 rounded-4 fs-14 fw-600"
+                data-bs-toggle="modal" data-bs-target="#partDetails" (click)="editAutopart(selectedAutopart, 0)">
+                Details</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="editPart" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+  aria-labelledby="editPartLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl" *ngIf="selectedAutopart">
+    <div class="modal-content border-radius-8">
+      <div class="modal-header p-4">
+        <h1 class="modal-title fs-20 fw-600 text-capitalize" id="editPartLabel" style="display: inline-block; word-break: break-word;">{{
+          selectedAutopart.id }} {{
+          selectedAutopart.year }} {{ selectedAutopart.make }} {{selectedAutopart.model }} {{selectedAutopart.title
+          }}</h1>
+        <button type="button" (click)="backToListing()" class="btn-close mt-1" data-bs-dismiss="modal"
+          aria-label="Close"></button>
+      </div>
+      <div class="modal-body px-2 submit-form" *ngIf="currentUser">
+        <div class="row">
+          <div class="col-md-4">
+            <div class="mt-4 pt-1 position-relative">
+              <button name="btn" class="btn btn-secondary-abs py-3 px-3 w-100" (click)="fileInput.click()"><i
+                  class="fa fa-cloud-upload me-2"></i> Upload Images</button>
+              <input type='file' class="form-control h-48 ps-5 border-radius-8 mt-5 opacity-0 top-0 position-absolute"
+                #fileInput (change)="onSelectFileEditor($event)" multiple />
+            </div>
+            <!-- <div class="mt-4 pt-1 position-relative">
+              <button (click)="deleteImage(selectedAutopart.id, selectedImage)" class="btn btn-danger mt-3 btn-sm"
+                title="Remove Current Image"><i class="fa fa-trash"></i></button>
+            </div> -->
+          </div>
+          <div class="col-md-4">
+            <div class="mt-2 pt-1 position-relative">
+              <div *ngFor='let imageModel of selectedAutopart.imageModels; let i=index' class="d-inline-block me-2">
+                <img class="mt-3 preview img-fluid img-thumbnail me-3" width="100"
+                  *ngIf="selectedAutopart.showInSearchImageId != imageModel.id"
+                  src="{{baseUrlResizeImage + '/' + imageModel.id}}" (click)="setImage(i)"
+                  style="border: 3px solid #555;">
+                <img class="mt-3 preview img-fluid img-thumbnail me-3" width="100"
+                  *ngIf="selectedAutopart.showInSearchImageId == imageModel.id"
+                  src="{{baseUrlResizeImage + '/' + imageModel.id}}" (click)="setImage(i)" title="Show in search"
+                  style="border: 3px solid lightcoral;">
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1 position-relative">
+              <div class="containerImage" *ngIf="selectedAutopart.imageModels.length> 0">
+                <img
+                  *ngIf="selectedImage != null && selectedImage != 0 &&  selectedAutopart.showInSearchImageId != selectedImage"
+                  class="image w-100 img-fluid img-thumbnail" src="{{baseUrlImage + '/' + selectedImage}}"
+                  alt="Image" />
+                <img
+                  *ngIf="selectedImage != null && selectedImage != 0 &&  selectedAutopart.showInSearchImageId == selectedImage"
+                  class="image w-100 img-fluid img-thumbnail" src="{{baseUrlImage + '/' + selectedImage}}"
+                  alt="Image" />
+                <label *ngIf="selectedImage == selectedAutopart.showInSearchImageId" class="top-left" for="title">Will
+                  Show This During Search</label>
+                <div class="bottom-right py-2">
+                  <button *ngIf="selectedImage != selectedAutopart.showInSearchImageId"
+                    title="As index image during search" (click)="setImageForSearch(selectedAutopart.id, selectedImage)"
+                    class="btn btn-primary mt-3 btn-sm" for="title">Set for Search</button>
+                  <button (click)="deleteImage(selectedAutopart.id, selectedImage)" data-toggle="tooltip"
+                    data-placement="top" title="Remove this image" class="btn btn-danger mt-3 btn-sm" for="title">
+                    <i class="bi-trash"></i>
+                  </button>
+
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="year" class="form-label fs-14 fw-400 mb-3">Year</label>
+              <select class="form-select h-48 px-3 border-radius-8" required size="1" #year="ngModel"
+                [ngClass]="{ 'is-invalid': year.errors }" [(ngModel)]="selectedAutopart.year">
+                <option value="undefined" disabled selected>Select Year</option>
+                <option [value]="option" *ngFor="let option of optionsYear;let i=index;">{{option}}</option>
+              </select>
+              <div class="invalid-feedback d-block" *ngIf="year.errors ">
+                <span *ngIf="year.errors['required']">Year is required</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="make" class="form-label fs-14 fw-400 mb-3">Make</label>
+              <select class="form-select h-48 px-3 border-radius-8" #device required size="1" #make="ngModel"
+                [ngClass]="{ 'is-invalid': make.errors }" [(ngModel)]="selectedAutopart.make"
+                (change)="onChange($event, device.value)">
+                <option value="undefined" disabled selected>Select Make</option>
+                <option *ngFor="let obj of optionsMake;let i=index;">{{obj}}</option>
+              </select>
+              <div class="invalid-feedback" *ngIf="make.errors ">
+                <span *ngIf="make.errors['required']">Make is required</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="model" class="form-label fs-14 fw-400 mb-3">Model</label>
+              <select class="form-select h-48 px-3 border-radius-8" required size="1" #model="ngModel"
+                [ngClass]="{ 'is-invalid': model.errors }" [(ngModel)]="selectedAutopart.model">
+                <option value="undefined" disabled selected>Select Model</option>
+                <option *ngFor="let obj2 of optionsModel;let i=index;">{{obj2}}</option>
+              </select>
+              <div class="invalid-feedback" *ngIf="model.errors ">
+                <span *ngIf="model.errors['required']">Model is required</span>
+              </div>
+            </div>
+          </div>
+          <!-- <div class="col-md-4" *ngIf="showPostForm == false">
+            <div class="mt-4 pt-1">
+              <label for="amount" class="form-label fs-14 fw-400 mb-3">Search</label>
+              <div class="input-group">
+                <input type="text" class="form-control h-48 px-3 border-radius-8" id="title" required
+                  [(ngModel)]="selectedAutopart.title" pleaseholder="part name" name="title" />
+                <div class="input-group-append">
+                  <button *ngIf="!showPostForm" class="btn btn-success" type="button"
+                    (click)="searchPartWithPage(0, pageSize, 2, false)">Search</button>
+                </div>
+              </div>
+            </div>
+          </div> -->
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="title" class="form-label fs-14 fw-400 mb-3">Parts Name</label>
+              <!-- <input trimText class="form-control h-48 px-3 border-radius-8" type="text" placeholder="Enter Parts Name"
+                #partName="ngModel" [ngClass]="{ 'is-invalid': partName.errors }" minlength="2" maxlength="200" required
+                [(ngModel)]="selectedAutopart.title" name="title" /> -->
+              <select class="form-select h-48 px-3 border-radius-8" required size="1" #partName="ngModel"
+                [ngClass]="{ 'is-invalid': partName.errors }" [(ngModel)]="selectedAutopart.title">
+                <option value="undefined" disabled selected>Select Parts Name</option>
+                <option *ngFor="let obj of optionsAutoparts;let i=index;">{{obj}}</option>
+              </select>
+              <div class="invalid-feedback" *ngIf="partName.errors ">
+                <span *ngIf="partName.errors['required']">Parts Name is required</span>
+                <span *ngIf="partName.errors['minlength']">Parts Name must be at least 2 characters</span>
+                <span *ngIf="partName.errors['maxlength']">Parts Name must be at most 200 characters</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="partInfo" class="form-label fs-14 fw-400 mb-3">Parts Number</label>
+              <input trimText class="form-control h-48 px-3 border-radius-8" type="text"
+                placeholder="Enter Parts Number" #partNumber="ngModel"
+                [ngClass]="{ 'is-invalid': partNumber.errors }" minlength="2" maxlength="50"
+                [(ngModel)]="selectedAutopart.partNumber" name="partInfo" />
+              <div class="invalid-feedback" *ngIf="partNumber.errors ">
+                <span *ngIf="partNumber.errors['required']">Parts Number is required</span>
+                <span *ngIf="partNumber.errors['minlength']">Parts Number must be at least 2 characters</span>
+                <span *ngIf="partNumber.errors['maxlength']">Parts Number must be at most 50 characters</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="partInfo" class="form-label fs-14 fw-400 mb-3">Vehicle Comments</label>
+              <input trimText class="form-control h-48 px-3 border-radius-8" type="text"
+                placeholder="Enter Vehicle Comments" #comments="ngModel"
+                [ngClass]="{ 'is-invalid': comments.errors }" minlength="2" maxlength="50"
+                [(ngModel)]="selectedAutopart.comments" name="comments" />
+              <div class="invalid-feedback" *ngIf="comments.errors ">
+                <!-- <span *ngIf="partNumber.errors['required']">Parts Number is required</span> -->
+                <span *ngIf="comments.errors['minlength']">Vehicle Comments must be at least 2 characters</span>
+                <span *ngIf="comments.errors['maxlength']">Vehicle Comments must be at most 500 characters</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-12">
+            <div class="mt-4 pt-1">
+              <label for="description" class="form-label fs-14 fw-400 mb-3">Description</label>
+              <textarea class="form-control h-48 px-3 border-radius-8" type="text"
+                placeholder="Enter Description" #description="ngModel"
+                [ngClass]="{ 'is-invalid': description.errors }" minlength="2" rows="3" maxlength="2000" required
+                [(ngModel)]="selectedAutopart.description" name="description"></textarea>
+              <div class="invalid-feedback" *ngIf="description.errors ">
+                <span *ngIf="description.errors['required']">Description is required</span>
+                <span *ngIf="description.errors['minlength']">Description must be at least 2 characters</span>
+                <span *ngIf="description.errors['maxlength']">Descripton must be at most 2000 characters</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-12 p-0" *ngIf="selectedAutopart.fitmented == true">
+            <div class="mt-4 pt-1">
+
+              <div class="row"
+                *ngIf="selectedAutopart.fitmented == true && selectedAutopart.fitments != null && selectedAutopart.fitments.length > 0">
+                <div class="col-12 table-responsive">
+                  <label for="fitment" class="form-label fs-14 fw-400 mb-3"> Fitments/Compatibilities:</label>
+                  <table class="table">
+                    <tr>
+                      <th>#</th>
+                      <th>year</th>
+                      <th>make</th>
+                      <th>model</th>
+                      <th>trim</th>
+                      <th>engine</th>
+                      <!-- <th>action</th> -->
+                    </tr>
+                    <tr *ngFor="let fitment of selectedAutopart.fitments; let i=index">
+                      <td>{{i+1}}</td>
+                      <td>{{ fitment.year }}</td>
+                      <td>{{ fitment.make }}</td>
+                      <td>{{ fitment.model }}</td>
+                      <td>{{ fitment.trim }}</td>
+                      <td>{{ fitment.engine }}</td>
+                      <!-- <td>Place Holder</td> -->
+                    </tr>
+                  </table>
+                </div>
+
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="shipping" class="form-label fs-14 fw-400 mb-3">Shipping</label>
+              <select name="shipping" class="form-select h-48 px-3 border-radius-8" size="1" required
+                #shipping="ngModel" [ngClass]="{ 'is-invalid': shipping.errors }" placeHolder="Please select shipping"
+                [(ngModel)]="selectedAutopart.shipping">
+                <option value="undefined" disabled selected>Select Shipping</option>
+                <option value="FLP">Free Local Pickup</option>
+                <option value="LD">Local Delivery</option>
+                <option value="SGS">Standard Ground Shipping</option>
+                <option value="FS">Fast Shipping</option>
+                <option value="CFDI">Call for Delivery Instructions</option>
+              </select>
+              <div class="invalid-feedback" *ngIf="shipping.errors ">
+                <span *ngIf="shipping.errors['required']">Shipping is required</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="warranty" class="form-label fs-14 fw-400 mb-3">Warranty</label>
+              <select name="warranty" class="form-select h-48 px-3 border-radius-8" size="1" required
+                #warrenty="ngModel" [ngClass]="{ 'is-invalid': warrenty.errors }"
+                [(ngModel)]="selectedAutopart.warranty">
+                <option value="undefined" disabled selected>Select Warrenty</option>
+                <option value="7D">7 days</option>
+                <option value="30D">15 days</option>
+                <option value="30D">30 days</option>
+                <option value="SAI">sold as is</option>
+                <option value="BWFP">Buy Warranty from PARTHUT</option>
+              </select>
+              <div class="invalid-feedback" *ngIf="warrenty.errors ">
+                <span *ngIf="warrenty.errors['required']">Warranty is required</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="grade" class="form-label fs-14 fw-400 mb-3">Grade</label>
+              <select name="grade" class="form-select h-48 px-3 border-radius-8" size="1"
+                [(ngModel)]="selectedAutopart.grade" required #grade="ngModel"
+                [ngClass]="{ 'is-invalid': grade.errors }">
+                <option value="undefined" disabled selected>Select Grade</option>
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+                <option value="Used">Used</option>
+                <option value="New">New</option>
+                <option value="Insurance">Insurance</option>
+              </select>
+              <div class="invalid-feedback" *ngIf="grade.errors ">
+                <span *ngIf="grade.errors['required']">Grade is required</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="price" class="form-label fs-14 fw-400 mb-3">Price ($)</label>
+              <input trimText class="form-control h-48 px-3 border-radius-8" type="text"
+                placeholder="Enter Price" #salePrice="ngModel" [ngClass]="{ 'is-invalid': salePrice.errors }"
+                minlength="1" maxlength="10" onKeyPress="if(this.value.length==10) return false" maxlength="10" required
+                oninput="if(this.value<0)this.value=this.value * -1" [(ngModel)]="selectedAutopart.salePrice"
+                name="price" />
+              <div class="invalid-feedback" *ngIf="salePrice.errors ">
+                <span *ngIf="salePrice.errors['required']">Price is required</span>
+                <span *ngIf="salePrice.errors['minlength']">Price must be at least 1 characters</span>
+                <span *ngIf="salePrice.errors['maxlength']">Price must be at most 10 characters</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mt-4 pt-1">
+              <label for="stocknumber" class="form-label fs-14 fw-400 mb-3">Stock No.</label>
+              <input trimText class="form-control h-48 px-3 border-radius-8" type="text" #stocknumber="ngModel"
+                [ngClass]="{ 'is-invalid': stocknumber.errors }" minlength="2" maxlength="50" required
+                name="stocknumber" placeholder="Enter Stock Number" id="stocknumber"
+                [(ngModel)]="selectedAutopart.stocknumber" name="stocknumber" />
+            </div>
+            <div class="invalid-feedback" *ngIf="stocknumber.errors ">
+              <!-- <span *ngIf="stocknumber.errors['required']">Stock Number is required</span> -->
+              <span *ngIf="stocknumber.errors['minlength']">Stock Number must be at least 1 characters</span>
+              <span *ngIf="stocknumber.errors['maxlength']">Stock Number must be at most 10 characters</span>
+            </div>
+          </div>
+          <div class="col-md-12">
+            <h5 class="text-success fw-700 my-3">{{ message1}}</h5>
+            <div class="pt-1 d-flex gap-3">
+              <button class="btn btn-primary-abs h-45 px-4 rounded-4 fs-14 fw-600 mt-4 " (click)="saveAutopartEditor()"
+                *ngIf="selectedAutopart.status ==2">Save Info</button>
+              <button class="btn btn-secondary-abs h-45 px-4 rounded-4 fs-14 fw-600 mt-4 "
+                (click)="addSavedItem(selectedAutopart.id)" *ngIf="selectedAutopart.showSavedButton==true">Save to
+                List</button>
+              <button class="btn btn-secondary h-45 px-4 rounded-4 fs-14 fw-600 mt-4 "
+                (click)=" backToListing();archiveAutopart( selectedAutopart, true); "
+                *ngIf="selectedAutopart.archived ==false">Archive</button>
+              <button class="btn btn-secondary h-45 px-4 rounded-4 fs-14 fw-600 mt-4 "
+                (click)=" backToListing(); archiveAutopart( selectedAutopart, false); "
+                *ngIf="selectedAutopart.archived ==true">Repost</button>
+              <button class="btn btn-success h-45 px-4 rounded-4 fs-14 fw-600 mt-4 " (click)="backToListing()"
+                data-bs-dismiss="modal">Back</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="modal fade" [hidden]="detailSelected == false" id="partDetails" data-bs-backdrop="static"
+  data-bs-keyboard="false" tabindex="-1" aria-labelledby="partDetailsLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl" *ngIf="selectedAutopart">
+    <div class="modal-content border-radius-8">
+      <div class="modal-header p-4">
+        <h1 class="modal-title fs-20 fw-600 text-capitalize" id="partDetailsLabel" style="display: inline-block; word-break: break-word;">{{
+          selectedAutopart.id }} {{
+          selectedAutopart.year }} {{ selectedAutopart.make }} {{selectedAutopart.model }} {{selectedAutopart.title
+          }}</h1>
+        <button type="button" (click)="backToListing()" class="btn-close mt-1" data-bs-dismiss="modal"
+          aria-label="Close"></button>
+      </div>
+      <div class="modal-body px-2 submit-form">
+        <div class="row">
+          <div class="col-md-4">
+            <div class="mt-4 pt-1 position-relative">
+              <div *ngFor='let imageModel of selectedAutopart.imageModels; let i=index' class="d-inline-block me-2">
+                <img class="mt-3 preview img-fluid img-thumbnail me-3" width="100"
+                  *ngIf="selectedAutopart.showInSearchImageId != imageModel.id"
+                  src="{{baseUrlResizeImage + '/' + imageModel.id}}" (click)="setImage(i)"
+                  style="border: 3px solid #555;">
+                <img class="mt-3 preview img-fluid img-thumbnail me-3" width="100"
+                  *ngIf="selectedAutopart.showInSearchImageId == imageModel.id"
+                  src="{{baseUrlResizeImage + '/' + imageModel.id}}" (click)="setImage(i)" title="Show in search"
+                  style="border: 3px solid lightcoral;">
+              </div>
+            </div>
+          </div>
+          <div class="col-md-8">
+            <div class="mt-4 pt-1 position-relative">
+              <div class="containerImage py-3">
+                <img
+                  *ngIf="selectedImage != null && selectedImage != 0  && selectedAutopart.showInSearchImageId != selectedImage"
+                  class="image w-100 img-fluid img-thumbnail" src="{{baseUrlImage + '/' + selectedImage}}"
+                  alt="Image" />
+                <img
+                  *ngIf="selectedImage != null && selectedImage != 0  &&  selectedAutopart.showInSearchImageId == selectedImage"
+                  class="image w-100 img-fluid img-thumbnail" src="{{baseUrlImage + '/' + selectedImage}}"
+                  alt="Image" />
+              </div>
+            </div>
+          </div>
+          <div class="col-md-12">
+            <div class="mt-4 pt-1">
+              <p class="py-2 fs-13 line-height-130" style="display: inline-block; word-break: break-word;">{{ selectedAutopart.comments }}</p>
+              <p class="py-2 fs-13 line-height-130" style="display: inline-block; word-break: break-word;">{{ selectedAutopart.description }}</p>
+              <div class="clearfix"></div>
+              <p class="py-2 fs-13 line-height-130 w-50 d-inline-block" style="display: inline-block; word-break: break-word;"><b>Part No.: </b>
+                {{ selectedAutopart.partNumber }}</p>
+              <p class="py-2 fs-13 line-height-130 w-50 d-inline-block" style="display: inline-block; word-break: break-word;"><b>Stock No.: </b>
+                {{ selectedAutopart.stocknumber }}</p>
+              <p class="py-2 fs-13 line-height-130 w-50 d-inline-block"><b>Grade: </b> {{ selectedAutopart.grade }}</p>
+              <p class="py-2 fs-13 line-height-130 w-50 d-inline-block"><b>Sales Price: </b> $ {{
+                selectedAutopart.salePrice }}</p>
+              <p *ngIf="currentUser != null && selectedAutopart.bussinessUrl && selectedAutopart.bussinessName "
+                class="py-2 fs-13 line-height-130 w-50 d-inline-block" style="display: inline-block; word-break: break-word;"><b>Dealer Info: </b>
+                <a target="_blank" href={{selectedAutopart.bussinessUrl}}>{{selectedAutopart.bussinessName |
+                  titlecase}}</a>
+              </p>
+              <p *ngIf="currentUser != null" class="py-2 fs-13 line-height-130 w-50 d-inline-block"
+                style="display: inline-block; word-break: break-word;"><b>Phone: </b> {{
+                formatPhoneNumber(
+                selectedAutopart.phone) }}</p>
+              <p class="py-2 fs-13 line-height-13 w-50 d-inline-block" style="display: inline-block; word-break: break-word;"><b>Address: </b>
+                {{ selectedAutopart.street}} {{selectedAutopart.city |
+                titlecase}}, {{ selectedAutopart.state}} {{ selectedAutopart.zip}} </p>
+              <p class="py-2 fs-13 line-height-130 w-50 d-inline-block" *ngIf="selectedAutopart.distance !='0' ">
+                <b>Distance: </b> {{ selectedAutopart.distance }} Mil.
+              </p>
+            </div>
+          </div>
+          <div class="col-md-12 p-0">
+            <div class="row"
+              *ngIf="selectedAutopart.fitmented == true && selectedAutopart.fitments != null && selectedAutopart.fitments.length > 0">
+              <div class="col-12 table-responsive">
+                <label for="fitment" class="form-label fs-14 fw-400 mb-3"> Fitments/Compatibilities:</label>
+                <table class="table">
+                  <tr>
+                    <th>#</th>
+                    <th>year</th>
+                    <th>make</th>
+                    <th>model</th>
+                    <th>trim</th>
+                    <th>engine</th>
+                    <!-- <th>action</th> -->
+                  </tr>
+                  <tr *ngFor="let fitment of selectedAutopart.fitments; let i=index">
+                    <td>{{i+1}}</td>
+                    <td>{{ fitment.year }}</td>
+                    <td>{{ fitment.make }}</td>
+                    <td>{{ fitment.model }}</td>
+                    <td>{{ fitment.trim }}</td>
+                    <td>{{ fitment.engine }}</td>
+                    <!-- <td>Place Holder</td> -->
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-12">
+            <h5 class="text-success fw-700 my-3">{{ message1}}</h5>
+            <div class="d-flex gap-3" *ngIf="currentUser != null">
+              <button class="btn btn-secondary-abs h-45 px-4 rounded-4 fs-14 fw-600 mt-4 "
+                (click)="addSavedItem(selectedAutopart.id)"
+                *ngIf="selectedAutopart.showSavedButton==true && selectedAutopart.archived == false ">Save to
+                List</button>
+              <button class="btn btn-secondary h-45 px-4 rounded-4 fs-14 fw-600 mt-4 "
+                (click)="deleteSavedItem(null, selectedAutopart.id)"
+                *ngIf="selectedAutopart.showSavedButton==false">Remove From List</button>
+            </div>
+          </div>
+          <div class="col-12" [hidden]="showSavedItems == false && detailSelected == false ">
+            <div class="col-12 py-4 px-0" *ngIf="savedItems.length > 0">
+              <hr />
+            </div>
+            <h3 class="fw-700 fs-5 mb-4" *ngIf="savedItems.length > 0">Saved Items ({{savedItems.length}})</h3>
+            <div class="parts-box bg-white border-radius-8 py-4 px-3 mt-4 shadow-sm" id="{{autopart.id}}"
+              [style.background-color]="i == cindex? '#1580da' : (even ? '#EEE' : '#EEE')"
+              *ngFor="let autopart of savedItems; let i = index;  let even=even">
+              <div class="row mx-n2">
+                <div class="col-lg-4">
+                  <img class="img-fluid w-100 border-radius-8" *ngIf="autopart.showInSearchImageId"
+                    src="{{baseUrlResizeImage + '/' + autopart.showInSearchImageId}}" alt="Image" />
+                </div>
+                <div class="col-lg-8 ps-lg-1">
+                  <div class="d-md-flex aling-itmes-start justify-content-between">
+                    <div>
+                      <h2 class="fs-22 fw-700 py-2 line-height-150" *ngIf="currentUser"><a class="text-dark"
+                          target="_blank" href={{autopart.bussinessUrl}}>{{autopart.bussinessName | titlecase}}</a></h2>
+                      <h3 class="fs-17 text-dark opacity-50 fw-500 line-height-130" style="display: inline-block; word-break: break-word;">{{
+                        autopart.id}} - {{ autopart.year
+                        }} - {{ autopart.make }} - {{ autopart.model }} - {{ autopart.grade}}</h3>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                      <!-- <button class="btn btn-primary-abs btn-sm" (click)=" backToListing(); editAutopart(autopart, i)"
+                        data-bs-toggle="modal" data-bs-target="#partDetails">Details</button> -->
+                      <button class="btn btn-primary-abs btn-sm" (click)=" editAutopart(autopart, i)">Details</button>
+                      <button class="btn btn-danger btn-sm" (click)="deleteSavedItem(null, autopart.id)"><i
+                          class="fa fa-trash"></i></button>
+                    </div>
+                  </div>
+                  <div class="d-flex align-itmes-start justify-content-between">
+                    <ul class="customers-details mt-2">
+                      <li class="d-flex gap-3 align-items-center mt-3"><i
+                          class="fa fa-screwdriver-wrench text-primary-abs border-radius-4 text-center"></i>
+                        <p class="fs-12 text-black opacity-75 line-height-150" style="display: inline-block; word-break: break-word;"><b>Part
+                            Name:</b> {{autopart.title }}</p>
+                      </li>
+                      <li class="d-flex gap-3 align-items-center mt-3"><i
+                          class="fa fa-barcode text-primary-abs border-radius-4 text-center "></i>
+                        <p class="fs-12 text-black opacity-75 line-height-150" style="display: inline-block; word-break: break-word;"><b>Part
+                            No.:</b> {{ autopart.partNumber
+                          }}</p>
+                      </li>
+                      <li class="d-flex gap-3 align-items-center mt-3"><i
+                          class="fa fa-barcode text-primary-abs border-radius-4 text-center "></i>
+                        <p class="fs-12 text-black opacity-75 line-height-150" style="display: inline-block; word-break: break-word;"><b>Stcok
+                            No.:</b> {{ autopart.stocknumber
+                          }}</p>
+                      </li>
+                      <li class="d-flex gap-3 align-items-center mt-3" *ngIf="currentUser != null"><i
+                          class="fa fa-mobile text-primary-abs border-radius-4 text-center "></i>
+                        <p class="fs-12 text-black opacity-75 line-height-150"><b>Phone.:</b> {{formatPhoneNumber(
+                          autopart.phone)}}</p>
+                      </li>
+                      <li class="d-flex gap-3 align-items-center mt-3"><i
+                          class="fa fa-map-marker-alt text-primary-abs border-radius-4 text-center "></i>
+                        <p class="fs-12 text-black opacity-75 line-height-150" style="display: inline-block; word-break: break-word;">
+                          <b>Address.:</b> {{ autopart.street}} {{autopart.city |
+                          titlecase}}, {{ autopart.state}} {{ autopart.zip}}
+                        </p>
+                      </li>
+                    </ul>
+                    <h3 class="fs-30 fw-700 text-primary-abs mt-4">${{autopart.salePrice}}</h3>
+                  </div>
+                  <p class="fs-12 opacity-75 text-dark d-block pt-3 line-height-130" style="display: inline-block; word-break: break-word;">{{
+                    autopart.comments }}</p>
+                  <p class="fs-12 opacity-75 text-dark d-block pt-3 line-height-130" style="display: inline-block; word-break: break-word;">{{
+                    autopart.description }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <br /><br />
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="myAccount" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+  aria-labelledby="myAccountLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content border-radius-8">
+      <div class="modal-header p-4">
+        <h1 class="modal-title fs-20 fw-600 text-capitalize" id="myAccountLabel">My Account</h1>
+        <button type="button" class="btn-close mt-1" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body px-2" *ngIf="currentUser">
+        <form *ngIf="!isSuccessful" name="form" (ngSubmit)="f.form.valid && onSubmit()" #f="ngForm" novalidate>
+          <div class="row">
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="title" class="form-label fs-14 fw-400 mb-3">Account Type</label>
+                <select class="form-select h-48 px-3 border-radius-8" name="role" #type="ngModel" size="1" style=" appearance: none;
+                background-image: url('');" [(ngModel)]="form.role" required disabled
+                  [ngClass]="{ 'is-invalid': f.submitted && type.errors }">
+                  <option value="ROLE_USER" selected>Indivisual</option>
+                  <option value="ROLE_SHOP">Auto Shop</option>
+                  <option value="ROLE_RECYCLER">Recycler/Shop</option>
+                  <option value="ROLE_ADMIN">Admin</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-4" *ngIf="form.role == 'ROLE_SHOP' || form.role == 'ROLE_RECYCLER' ">
+              <div class="mt-4 pt-1">
+                <label for="bussnessName" class="form-label fs-14 fw-400 mb-3">Business/Company Name</label>
+                <input trimText class="form-control h-48 px-3 border-radius-8" name="bussinessname"
+                  [(ngModel)]="form.bussinessname" required minlength="5" maxlength="200" #bussinessname="ngModel"
+                  placeHolder="Enter Business/Company Name"
+                  [ngClass]="{ 'is-invalid': f.submitted && bussinessname.errors }" />
+                <div class="invalid-feedback" *ngIf="bussinessname.errors && f.submitted">
+                  <span *ngIf="bussinessname.errors['required']">Business Name is required</span>
+                  <span *ngIf="bussinessname.errors['minlength']">Business Name must be at least 5 characters</span>
+                  <span *ngIf="bussinessname.errors['maxlength']">Business Name must be at most 200 characters</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="firstName" class="form-label fs-14 fw-400 mb-3">First Name</label>
+                <input trimText class="form-control h-48 px-3 border-radius-8" type="text" name="firstName"
+                  [(ngModel)]="form.firstName" required minlength="2" maxlength="20" #firstName="ngModel"
+                  [ngClass]="{ 'is-invalid': f.submitted && firstName.errors }"
+                  placeholder="Enter Your First Name" />
+                <div class="invalid-feedback" *ngIf="firstName.errors && f.submitted">
+                  <span *ngIf="firstName.errors['required']">First Name is required</span>
+                  <span *ngIf="firstName.errors['minlength']">First Name must be at least 2 characters</span>
+                  <span *ngIf="firstName.errors['maxlength']">First Name must be at most 20 characters</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="lastName" class="form-label fs-14 fw-400 mb-3">Last Name</label>
+                <input trimText class="form-control h-48 px-3 border-radius-8" type="text" name="lastName"
+                  [(ngModel)]="form.lastName" required minlength="2" maxlength="20" #lastName="ngModel"
+                  [ngClass]="{ 'is-invalid': f.submitted && lastName.errors }"
+                  placeholder="Enter Your Last Name" />
+                <div class="invalid-feedback" *ngIf="lastName.errors && f.submitted">
+                  <span *ngIf="lastName.errors['required']">Last Name is required</span>
+                  <span *ngIf="lastName.errors['minlength']">Last Name must be at least 2 characters</span>
+                  <span *ngIf="lastName.errors['maxlength']">Last Name must be at most 20 characters</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="email" class="form-label fs-14 fw-400 mb-3">Email Address</label>
+                <input trimText class="form-control h-48 px-3 border-radius-8" name="email" [(ngModel)]="form.email"
+                  required email #email="ngModel" [ngClass]="{ 'is-invalid': f.submitted && email.errors }"
+                  maxlength="100" placeholder="Enter Your Email Address" />
+                <div class="invalid-feedback" *ngIf="email.errors && f.submitted">
+                  <span *ngIf="email.errors['required']">Email is required</span>
+                  <span *ngIf="email.errors['email']">Email must be a valid email address</span>
+                  <span *ngIf="email.errors['maxlength']">Email must be at most 100 characters</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="phone" class="form-label fs-14 fw-400 mb-3">Phone</label>
+                <input trimText class="form-control h-48 px-3 border-radius-8" name="phone" [(ngModel)]="form.phone"
+                  required maxlength="20" #phone="ngModel" [ngClass]="{ 'is-invalid': f.submitted && phone.errors }"
+                  pattern="^[-+()0-9]{10,12}(?:-\d+)?$" placeholder="Enter Your Phone Number" />
+                <div class="invalid-feedback" *ngIf="phone.errors && f.submitted">
+                  <span *ngIf="phone.errors['required']">Phone is required</span>
+                  <span *ngIf="phone.errors['pattern']">Phone must be a valid phone number</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="street" class="form-label fs-14 fw-400 mb-3">Street</label>
+                <input trimText class="form-control h-48 px-3 border-radius-8" name="street" [(ngModel)]="form.street"
+                  required minlength="2" maxlength="200" #street="ngModel"
+                  [ngClass]="{ 'is-invalid': f.submitted && street.errors }" placeholder="Enter Your Street" />
+                <div class="invalid-feedback" *ngIf="street.errors && f.submitted">
+                  <span *ngIf="street.errors['required']">Street is required</span>
+                  <span *ngIf="street.errors['minlength']">Street must be at least 2 characters</span>
+                  <span *ngIf="street.errors['maxlength']">Street must be at most 200 characters</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="city" class="form-label fs-14 fw-400 mb-3">City</label>
+                <input trimText class="form-control h-48 px-3 border-radius-8" name="city" [(ngModel)]="form.city"
+                  required minlength="2" maxlength="200" #city="ngModel"
+                  [ngClass]="{ 'is-invalid': f.submitted && city.errors }" placeholder="Enter Your City" />
+                <div class="invalid-feedback" *ngIf="city.errors && f.submitted">
+                  <span *ngIf="city.errors['required']">City is required</span>
+                  <span *ngIf="city.errors['minlength']">City must be at least 2 characters</span>
+                  <span *ngIf="city.errors['maxlength']">City must be at most 200 characters</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="state" class="form-label fs-14 fw-400 mb-3">State</label>
+                <select class="form-select h-48 px-3 border-radius-8" name="state" #state="ngModel" size="1" required
+                  [(ngModel)]="form.state" [ngClass]="{ 'is-invalid': f.submitted && state.errors }">
+                  <option *ngFor="let state of this.config.optionsStates" value="{{state.code}}">{{state.name}}</option>
+                  <!-- <option value="AL">Alabama</option>
+                  <option value="AK">Alaska</option>
+                  <option value="AZ">Arizona</option>
+                  <option value="AR">Arkansas</option>
+                  <option value="CA">California</option>
+                  <option value="CO">Colorado</option>
+                  <option value="CT">Connecticut</option>
+                  <option value="DE">Delaware</option>
+                  <option value="DC">District Of Columbia</option>
+                  <option value="FL">Florida</option>
+                  <option value="GA">Georgia</option>
+                  <option value="HI">Hawaii</option>
+                  <option value="ID">Idaho</option>
+                  <option value="IL">Illinois</option>
+                  <option value="IN">Indiana</option>
+                  <option value="IA">Iowa</option>
+                  <option value="KS">Kansas</option>
+                  <option value="KY">Kentucky</option>
+                  <option value="LA">Louisiana</option>
+                  <option value="ME">Maine</option>
+                  <option value="MD">Maryland</option>
+                  <option value="MA">Massachusetts</option>
+                  <option value="MI">Michigan</option>
+                  <option value="MN">Minnesota</option>
+                  <option value="MS">Mississippi</option>
+                  <option value="MO">Missouri</option>
+                  <option value="MT">Montana</option>
+                  <option value="NE">Nebraska</option>
+                  <option value="NV">Nevada</option>
+                  <option value="NH">New Hampshire</option>
+                  <option value="NJ">New Jersey</option>
+                  <option value="NM">New Mexico</option>
+                  <option value="NY">New York</option>
+                  <option value="NC">North Carolina</option>
+                  <option value="ND">North Dakota</option>
+                  <option value="OH">Ohio</option>
+                  <option value="OK">Oklahoma</option>
+                  <option value="OR">Oregon</option>
+                  <option value="PA">Pennsylvania</option>
+                  <option value="RI">Rhode Island</option>
+                  <option value="SC">South Carolina</option>
+                  <option value="SD">South Dakota</option>
+                  <option value="TN">Tennessee</option>
+                  <option value="TX">Texas</option>
+                  <option value="UT">Utah</option>
+                  <option value="VT">Vermont</option>
+                  <option value="VA">Virginia</option>
+                  <option value="WA">Washington</option>
+                  <option value="WV">West Virginia</option>
+                  <option value="WI">Wisconsin</option>
+                  <option value="WY">Wyoming</option> -->
+                </select>
+                <div class="invalid-feedback d-block" *ngIf="state.errors && f.submitted">
+                  <span *ngIf="state.errors['required']">State is required</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="zip" class="form-label fs-14 fw-400 mb-3">Zip Code</label>
+                <input trimText class="form-control h-48 px-3 border-radius-8" pattern="[0-9]*" name="zip"
+                  [(ngModel)]="form.zip" maxlength="20" required minlength="5" maxlength="20" #zip="ngModel"
+                  [ngClass]="{ 'is-invalid': f.submitted && zip.errors }" placeholder="Enter Your Zip Code" />
+                <div class="invalid-feedback" *ngIf="zip.errors && f.submitted">
+                  <span *ngIf="zip.errors['required']">Zip Code is required</span>
+                  <span *ngIf="zip.errors['pattern']">Must be a valid Zip Code</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-12 mt-4">
+              <div *ngIf="f.submitted && isUpdateFailed">
+                <span *ngIf="errorMessageProfile" class="alert alert-danger" role="alert">Update failed: {{
+                  errorMessageProfile
+                  }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="d-flex align-items-center gap-3 mt-5 px-3" *ngIf="currentUser">
+            <button class="btn btn-primary-abs h-45 px-4 rounded-4 fs-14 fw-600">Update Account</button>
+          </div>
+        </form>
+        <div *ngIf="isSuccessful" class="p-4">
+          <span class="alert alert-success" role="alert">Your update is successful! <button
+              class="btn btn-sm btn-primary-abs ms-3" (click)="reload()">Ok</button></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="resetPassword" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+  aria-labelledby="resetPasswordLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content border-radius-8">
+      <div class="modal-header p-4">
+        <h1 class="modal-title fs-20 fw-600 text-capitalize" id="resetPasswordLabel">Reset Password</h1>
+        <button type="button" class="btn-close mt-1" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body px-2" *ngIf="currentUser">
+        <form name="form" (ngSubmit)="f.form.valid && changePasswordRequest()" #f="ngForm" novalidate>
+          <div class="row">
+            <div class="col-md-4" *ngIf="form.role == 'ROLE_SHOP' || form.role == 'ROLE_RECYCLER' ">
+              <div class="mt-4 pt-1">
+                <label for="password" class="form-label fs-14 fw-400 mb-3">Old Password</label>
+                <div class="input-group">
+                  <input trimText class="form-control h-48 px-3" [type]="showPassword ? 'text' : 'password'"
+                    name="password" [(ngModel)]="form.password" required minlength="6" #password="ngModel"
+                    maxlength="30" [ngClass]="{ 'is-invalid': f.submitted && password.errors }"
+                    placeholder="Enter Your Old Password" />
+                  <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button"> <i alt="show" class="far fa-eye eye-show"
+                        (click)="showPassword = !showPassword" [class.hide]="showPassword"></i>
+                      <i alt="hide" class="far fa-eye-slash eye-hide" (click)="showPassword = !showPassword"
+                        [class.hide]="!showPassword"></i></button>
+                  </div>
+                </div>
+                <div class="invalid-feedback" *ngIf="password.errors && f.submitted">
+                  <span *ngIf="password.errors['required']">Password is required</span>
+                  <span *ngIf="password.errors['minlength']">Password must be at least 6 characters</span>
+                  <span *ngIf="password.errors['maxlength']">Password must be at most 30 characters</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="newPassword" class="form-label fs-14 fw-400 mb-3">New Password</label>
+                <div class="input-group">
+                  <input trimText class="form-control h-48 px-3" [type]="showPasswordNew ? 'text' : 'password'"
+                    name="newPassword" [(ngModel)]="form.newPassword" required minlength="6" #newPassword="ngModel"
+                    maxlength="30" [ngClass]="{ 'is-invalid': f.submitted && newPassword.errors }"
+                    placeholder="Enter Your New Password" />
+                  <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button"> <i alt="show" class="far fa-eye eye-show"
+                        (click)="showPasswordNew = !showPasswordNew" [class.hide]="showPasswordNew"></i>
+                      <i alt="hide" class="far fa-eye-slash eye-hide" (click)="showPasswordNew = !showPasswordNew"
+                        [class.hide]="!showPasswordNew"></i></button>
+                  </div>
+                </div>
+                <div class="invalid-feedback" *ngIf="newPassword.errors && f.submitted">
+                  <span *ngIf="newPassword.errors['required']">New Password is required</span>
+                  <span *ngIf="newPassword.errors['minlength']">New Password must be at least 6 characters</span>
+                  <span *ngIf="newPassword.errors['maxlength']">New Password must be at most 30 characters</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mt-4 pt-1">
+                <label for="newPasswordComfirmed" class="form-label fs-14 fw-400 mb-3">Confirm New Password</label>
+                <div class="input-group">
+                  <input trimText class="form-control h-48 px-3" [type]="showPaswordNewConfirmed ? 'text' : 'password'"
+                    name="passwordNew" [(ngModel)]="form.newPasswordComfirmed" required minlength="6"
+                    #newPasswordComfirmed="ngModel" maxlength="30"
+                    [ngClass]="{ 'is-invalid': f.submitted && newPasswordComfirmed.errors }"
+                    placeholder="Please Re-Type Your New Password" />
+                  <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button"> <i alt="show" class="far fa-eye eye-show"
+                        (click)="showPaswordNewConfirmed = !showPaswordNewConfirmed"
+                        [class.hide]="showPaswordNewConfirmed"></i>
+                      <i alt="hide" class="far fa-eye-slash eye-hide"
+                        (click)="showPaswordNewConfirmed = !showPaswordNewConfirmed"
+                        [class.hide]="!showPaswordNewConfirmed"></i></button>
+                  </div>
+                </div>
+                <div class="invalid-feedback" *ngIf="newPasswordComfirmed.errors && f.submitted">
+                  <span *ngIf="newPasswordComfirmed.errors['required']">Confirm New Password is required</span>
+                  <span *ngIf="newPasswordComfirmed.errors['minlength']">Confirm New Password must be at least 6
+                    characters</span>
+                  <span *ngIf="newPasswordComfirmed.errors['maxlength']">Confirm New Password must be at most 30
+                    characters</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-12 py-4 mt-4" *ngIf="errorMessageResetPassword != ''">
+              <span class="alert alert-success line-height-150" role="alert">{{errorMessageResetPassword}}</span>
+            </div>
+          </div>
+          <div class="d-flex align-items-center gap-3 mt-4 px-3" *ngIf="currentUser">
+            <button class="btn btn-primary-abs h-45 px-4 rounded-4 fs-14 fw-600">Reset Password</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

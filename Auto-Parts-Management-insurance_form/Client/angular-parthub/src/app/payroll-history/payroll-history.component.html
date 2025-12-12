@@ -1,0 +1,1401 @@
+<div>
+  <div class="row nogot dashboard">
+    <div class="my-fluid-col main-content col mt-4 pt-2">
+      <div class="row px-2 position-sticky common-bar-top">
+        <nav class="navbar navbar-expand navbar-white bg-white border-radius-8 d-flex justify-content-between">
+          <button class="btn btn-primary-abs" (click)="toggleClass()"><i class="fa fa-bars"></i></button>
+          <ul class="navbar-nav d-flex align-items-center gap-5">
+            <li class="search-bar">
+              <div class="position-relative">
+                <input type="text" class="form-control bg-light height-40 border-0" [(ngModel)]="searchInput"
+                  (keyup.enter)="onSearchJobId($event)" placeholder="Search job number ..." />
+                <a (click)="searchJobId(searchInput)" title="Search Job with Job Number"
+                  class="position-absolute end-0 top-0 mt-3 me-3 text-muted"><i class="fa fa-search"></i></a>
+              </div>
+            </li>
+
+            <li class="nav-item dropdown">
+              <div class="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                <div class="d-flex align-items-center gap-3"> <img width="40" height="40" class="border-radius-4"
+                    *ngIf="company.icon != null && company.icon.length > 0"
+                    [src]="'data:image/jpeg;base64,'+ company.icon" />
+                  <div class="user-details"> <strong class="fs-14 mb-1 d-block">{{user.firstName}}
+                      {{user.lastName}}</strong> <small
+                      class="fs-13 text-dark- opacity-50">{{this.company.name}}</small> </div>
+                  <i class="fa fa-angle-down opacity-50"></i>
+                </div>
+              </div>
+              <div class="dropdown-menu p-0 border-0 shadow border-radius-8 overflow-hidden w-100 mt-3">
+                <ul class="d-flex flex-column">
+                  <li class="d-block p-0"><a routerLink="/users" class="dropdown-item p-3 fs-12"><i
+                        class="fa fa-users text-primary-abs fs-15 me-2 ms-1"></i> Manage Users</a></li>
+                  <li class="d-block p-0"><button data-bs-toggle="modal" data-bs-target="#myAccount"
+                      class="dropdown-item p-3 fs-12"><i class="fa fa-user text-primary-abs fs-15 me-2 ms-1"></i> My
+                      Account</button></li>
+                  <li class="d-block p-0"><button data-bs-toggle="modal" data-bs-target="#resetPassword"
+                      class="dropdown-item p-3 fs-12"><i class="fa fa-key text-primary-abs fs-15 me-2 ms-1"></i> Reset
+                      Password</button></li>
+                  <li class="d-block p-0"><a routerLink="/login" class="dropdown-item p-3 fs-12" (click)="logout()"><i
+                        class="fa fa-power-off text-primary-abs fs-15 me-2 ms-1"></i> Logout</a></li>
+                </ul>
+              </div>
+            </li>
+          </ul>
+        </nav>
+      </div>
+
+      <div class="d-sm-flex justify-content-between gap-3 align-items-center p-2">
+        <h4 class="fs-18 fw-bold py-4">Payroll Manager <span class="fs-14 fw-400" title="Total Employees"
+            *ngIf="this.users.length > 0"> Employees: <b
+              class="d-inline-block p-1 rounded-1 bg-primary-abs text-white">{{this.users.length}}</b> </span></h4>
+        <h4 class="fs-18 fw-bold py-4 d-flex gap-2 align-items-center">Current Week: <span class="fs-14 fw-400"><b
+              class="d-inline-block p-1 rounded-1 bg-success text-white">{{this.week}}</b> </span></h4>
+      </div>
+
+
+      <div class="row">
+        <ng-container>
+          <ng-container>
+            <div class="col-md-12 py-4 mt-4" *ngIf="errorMessagePayrollHistory != ''">
+              <span class="alert alert-success line-height-150" role="alert">{{errorMessagePayrollHistory}}</span>
+            </div>
+          </ng-container>
+          <ng-container *ngIf="payrollHistory.vehicle && payrollHistory.vehicle.id> 0 &&  payrollHistory.job.id> 0">
+            <ng-container *ngIf="payrollHistory.vehicle">
+              <div class="col-12 px-0">
+                <div class="d-lg-flex align-items-center justify-content-between">
+                  <h2 class="heading-color fw-500 text-uppercase px-2 pt-4 fs-18 d-flex gap-2 align-items-center">
+                    <ng-container *ngFor="let employee of this.users">
+                      <ng-container *ngFor="let employeeRole of this.employeeRoles">
+                        <strong
+                          *ngIf="payrollHistory.job?.employeeId == employee.id && employee.roleId == employeeRole.id">{{employee.firstName
+                          }} {{employee.lastName }} ( {{employeeRole.name }} ):</strong>
+                      </ng-container>
+                    </ng-container>
+                    <span class="fs-13 d-flex overflow-hidden rounded-2" *ngIf="payrollHistory.job.id> 0"><span
+                        title="Job No."
+                        class="btn btn-secondary-abs fs-12 rounded-0">{{payrollHistory.job.id}}</span><span
+                        title="Created At"
+                        class="btn btn-secondary-abs fs-12 rounded-0">{{payrollHistory.job.createdAt|date}}</span><span
+                        class="fs-13" *ngIf="payrollHistory.job.id> 0  && payrollHistory.week > 0"><span title="Week"
+                          class="btn btn-secondary-abs fs-12 rounded-0">{{payrollHistory.week}}</span></span></span>
+                  </h2>
+                  <div class="d-lg-flex align-items-center px-2 mt-2 tw-btns">
+                    <a *ngIf="user.allowAddReceipt == true && payrollHistory.id > 0 && this.week==this.weekSet"
+                      (click)="removeFromPayroll(payrollHistory)"
+                      class="h-40 fs-14 mt-2 btn btn-danger px-4 border-radius-4"><i class="fa fa-money me-2"></i>Remove
+                      From Payroll</a>
+                    <a *ngIf="user.allowAddReceipt == true && payrollHistory.id ==0"
+                      (click)="addToPayroll(payrollHistory)"
+                      class="h-40 fs-14 mt-2 btn btn-primary-abs px-4 border-radius-4 ms-md-3"><i
+                        class="fa fa-money me-2"></i> Add To Payroll</a>
+                  </div>
+                </div>
+                <div class="bg-white border px-2 shadow-sm mx-2 mt-4 rounded-3 mb-4"
+                  (click)="getDetail(payrollHistory.vehicle, 0 )">
+                  <div class="row align-items-center">
+                    <div class="col-lg-6 my-4">
+                      <ul class="bg-light rounded-2 o-4 px-3 py-1">
+                        <li class="d-flex gap-2 align-items-center py-3 fs-14"><i
+                            class="fa fa-car text-primary-abs"></i> <span>Vehicle:</span>
+                          <strong>{{payrollHistory.vehicle.year}} {{payrollHistory.vehicle.make}}
+                            {{payrollHistory.vehicle.model}} {{payrollHistory.vehicle.color}} -
+                            ({{payrollHistory.vehicle.description}})</strong>
+                        </li>
+                        <li class="d-flex gap-2 align-items-center py-3 fs-14"><i
+                            class="fa fa-car-on text-primary-abs"></i> <span>Job Type:</span> <strong><ng-container
+                              *ngFor="let jobRequestType of jobRequestTypes; let i=index"><ng-container
+                                *ngIf="payrollHistory.vehicle.jobRequestType==jobRequestType.id">{{jobRequestType.name}}</ng-container></ng-container></strong>
+                        </li>
+                        <li class="d-flex gap-2 align-items-center py-3 fs-14"><i
+                            class="fa fa-screwdriver-wrench text-primary-abs"></i> <span>Work Request:</span>
+                          <strong>{{payrollHistory.vehicle.workRequest}}</strong>
+                        </li>
+                        <li class="d-flex gap-2 align-items-center py-3 fs-14"><i
+                            class="fa fa-cogs text-primary-abs"></i> <span>Status:</span> <strong><ng-container
+                              *ngFor="let option of statuss; let i=index"><span
+                                *ngIf="payrollHistory.vehicle.status==option.id">{{option.name}}</span></ng-container></strong>
+                        </li>
+                      </ul>
+                    </div>
+                    <div class="col-lg-6 px-0 my-2" *ngIf="payrollHistory.job">
+                      <div class="row">
+                        <div class="col-md-6 mt-3">
+                          <div class="position-relative">
+                            <label class="form-label mb-3 fw-400 fs-14">Job No.{{ payrollHistory.job.id}} Name</label>
+                            <input type="text" class="form-control fs-13" placeholder="Enter Job Name"
+                              [disabled]=" this.week!=this.weekSet" [(ngModel)]="payrollHistory.job.name" maxlength="50"
+                              (keyup.enter)="onEnterPayrollHistory('job name',payrollHistory.job)" />
+                          </div>
+                        </div>
+                        <div class="col-md-6 mt-3">
+                          <div class="position-relative">
+                            <label class="form-label mb-3 fw-400 fs-14">Value $</label>
+                            <input trimText [disabled]=" this.week!=this.weekSet" placeholder="Enter Job Value"
+                              [(ngModel)]="payrollHistory.job.price" maxlength="50"
+                              (keyup.enter)="onEnterJobPrice('job price',payrollHistory )" type="number"
+                              class="form-control fs-13" />
+                          </div>
+                        </div>
+                        <div class="col-12 mt-3">
+                          <div class="position-relative">
+                            <label class="form-label mb-3 fw-400 fs-14">Instruction</label>
+                            <textarea [disabled]=" this.week!=this.weekSet" type="text"
+                              [(ngModel)]="payrollHistory.job.notes" class="form-control fs-13" maxlength="200"
+                              (keyup.enter)="onEnterPayrollHistory('job notes',payrollHistory.job)" rows="2"
+                              title="Job Instruction"
+                              oninput='this.style.height = "";this.style.height = this.scrollHeight + "px"'></textarea>
+                          </div>
+                        </div>
+                        <div class="col-md-6 mt-3">
+                          <div class="position-relative">
+                            <label class="form-label mb-3 fw-400 fs-14">Start Date</label>
+                            <input *ngIf="payrollHistory.job.employeeId > 0" [disabled]=" this.week!=this.weekSet"
+                              (change)="onChangeCalendarStartDate($event, payrollHistory.job)"
+                              [ngModel]="payrollHistory.job.startDate |  date:'yyyy-MM-dd'" title="State Date"
+                              type="date" class="form-control fs-13" />
+                          </div>
+                        </div>
+                        <div class="col-md-6 mt-3">
+                          <div class="position-relative">
+                            <label class="form-label mb-3 fw-400 fs-14">Target Date</label>
+                            <input *ngIf="payrollHistory.job.employeeId > 0" [disabled]=" this.week!=this.weekSet"
+                              (change)="onChangeCalendar($event, payrollHistory.job)"
+                              [ngModel]="payrollHistory.job.targetDate |  date:'yyyy-MM-dd'" title="Job Target Date"
+                              type="date" class="form-control fs-13" />
+                          </div>
+                        </div>
+                        <div class="col-md-6 mt-3">
+                          <div class="position-relative">
+                            <label class="form-label mb-3 fw-400 fs-14">End Date</label>
+                            <input *ngIf="payrollHistory.job.employeeId > 0" [disabled]=" this.week!=this.weekSet"
+                              (change)="onChangeCalendarEndDate($event, payrollHistory.job)"
+                              [ngModel]="payrollHistory.job.endDate |  date:'yyyy-MM-dd'" title="Finish Date"
+                              type="date" class="form-control form-control-sm h-40 border-radius-4">
+                          </div>
+                        </div>
+                        <div class="col-md-6 mt-3">
+                          <div class="position-relative">
+                            <label class="form-label mb-3 fw-400 fs-14">Job Status</label>
+                            <div class="form-check form-switch d-flex text-start" (click)="setJobId(job.id)">
+                              <label class="form-check-label fs-12 fw-600 mt-1text-start text-success fw-bold"
+                                for="payment2" *ngIf="payrollHistory.job.status==1">Completed</label>
+                              <div class="d-flex align-items-center ms-4"
+                                *ngIf="payrollHistory.job && payrollHistory.job.employeeId > 0 && payrollHistory.job.targetDate != null">
+                                <label
+                                  class="form-check-label fs-12 fw-600 mt-1 text-start text-danger fw-bold ps-4 ms-0"
+                                  for="payment2" *ngIf="payrollHistory.job.status==0">Not Complete</label>
+                                <input trimText class="form-check-input mt-0" type="checkbox"
+                                  [disabled]=" this.week!=this.weekSet" role="switch" id="payment2"
+                                  [checked]="isJobChecked(payrollHistory.job)"
+                                  (change)="updateJobStatus(payrollHistory.job)" />
+                              </div>
+
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-12 mt-3">
+                          <div class="d-flex align-items-center justifyc-ntent-center gap-2 mb-4">
+                            <button class="btn btn-danger btn-sm" title="Remove from Payroll"
+                              *ngIf="user.allowAddReceipt == true && payrollHistory.id > 0 && this.week==this.weekSet"
+                              (click)="removeFromPayroll(payrollHistory)"><i class="fa fa-trash"></i></button>
+                            <button class="btn btn-primary-abs btn-sm" title="Add to Payroll"
+                              *ngIf="user.allowAddReceipt == true && payrollHistory.id ==0"
+                              (click)="addToPayroll(payrollHistory)"><i class="fa fa-plus"></i></button>
+                            <button class="btn btn-secondary-abs btn-sm" title="Save"
+                              *ngIf="user.allowAddReceipt == true  && this.week==this.weekSet"
+                              (click)="onEnterJobPrice('save', payrollHistory)"><i class="fa fa-save"></i></button>
+                            <button class="btn btn-dark btn-sm" title="Print" (click)="setJobId(job.id)"
+                              (click)="printPageJob('print-content-job', 'jobs', payrollHistory.job, payrollHistory.vehicle)"><i
+                                class="fa fa-print"></i></button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+          </ng-container>
+        </ng-container>
+        <br /><br />
+        <div class="px-2">
+          <div class="bg-white border-radius-8 shadow-sm px-4">
+            <div class="d-md-flex gap-3 justify-content-between">
+              <div class="d-flex gap-2 align-items-center my-3">
+                <strong class="fs-16">Week: <span class="fs-14 fw-700 bg-primary-abs rounded-1 p-1 text-white">
+                    {{this.weekSet}} </span></strong>
+                <strong class="fs-16" *ngIf="this.payrollHistories"> Jobs: <span
+                    class="fs-14 fw-700 bg-primary-abs rounded-1 p-1 text-white">{{
+                    this.payrollHistories.length}}</span></strong>
+                <strong class="fs-16">Total: <span
+                    class="fs-14 fw-700 bg-primary-abs rounded-1 p-1 text-white">${{getTotalPayAll()}}</span></strong>
+                <button class="btn btn-dark btn-sm" title="Print Payrolls"
+                  (click)="printPage('print-content-payroll-histories', 'Payroll')"><i class="fa fa-print"></i></button>
+              </div>
+              <input trimText class="form-control w-150 my-3" type="week" (change)="setWeek($event)" />
+            </div>
+          </div>
+
+          <div class="bg-white border-radius-8 shadow mt-4">
+            <div class="table-container shadow border-radius-8 border w-100 d-box ss-table">
+              <table class="table-bordered border-radius-8 w-100">
+                <thead>
+                  <tr class="bg-info text-white v-align-middle">
+                    <th class="fs-14 text-center mxw-50" style="width:80px"> </th>
+                    <th class="fs-14 text-center mxw-200" (click)="navigateTo('employees')">
+                      <i class="fa fa-user"></i>
+                    </th>
+                    <th class="fs-14 text-center mxw-50 " style="width:50px"> # </th>
+                    <th class="fs-14 text-center v-align-middle "> [ {{
+                      this.employeeJobCarrier.length }} ] employees with total of [{{ totalUnPaidJob}}] jobs Not PAID
+                      <!--  <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                        <label class="btn btn-secondary">
+                          <input type="radio" name="options" id="option1" autocomplete="off" checked> Finished
+                        </label>
+                        <label class="btn btn-secondary">
+                          <input type="radio" name="options" id="option2" autocomplete="off"> Not Finished
+                        </label>
+                        <label class="btn btn-secondary">
+                          <input type="radio" name="options" id="option3" autocomplete="off"> Both
+                        </label>
+                      </div> -->
+                    </th>
+                    <th class="fs-14 text-center v-align-middle "> [ {{
+                      this.employeeJobCarrier.length }} ] employees with total of [{{
+                      getPaidUnPaidJobTotalCounts(true)}}] jobs PAID
+                      <!--  <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                        <label class="btn btn-secondary">
+                          <input type="radio" name="options" id="option1" autocomplete="off" checked> Finished
+                        </label>
+                        <label class="btn btn-secondary">
+                          <input type="radio" name="options" id="option2" autocomplete="off"> Not Finished
+                        </label>
+                        <label class="btn btn-secondary">
+                          <input type="radio" name="options" id="option3" autocomplete="off"> Both
+                        </label>
+                      </div> -->
+                    </th>
+                    <th class="fs-14 text-center mw-100"> Jobs Paid</th>
+                    <th class="fs-14 text-center mw-100"> $</th>
+                  </tr>
+                </thead>
+                <ng-container *ngFor="let employee of employeeJobCarrier; let i = index;  let even=even">
+                  <tr id="{{employee.id}}" title=""
+                    [style.background-color]="i == cindex? '#eef5fb' : (even ? 'white' : 'white')">
+
+                    <td class="text-center fs-13" data-bs-toggle="modal" data-bs-target="#partDetails"
+                      title="Click to view details">
+                      {{i+1}}
+                    </td>
+                    <td class="text-center fs-13"><strong>{{employee.firstName }} {{employee.lastName }}</strong>
+                      <ng-container *ngFor="let employeeRole of this.employeeRoles">
+                        <span *ngIf="employee.roleId == employeeRole.id">
+                          ({{employeeRole.name }})
+                        </span>
+                      </ng-container>
+                    </td>
+                    <!-- <td class="text-center fs-13" data-bs-toggle="modal" data-bs-target="#partDetails"
+                      title="{{employee.firstName + ' ' + employee.lastName}}">
+                      <a style="word-break:break-all" target="_blank">{{(employee.firstName
+                        + ' ' + employee.lastName)}}</a>
+                    </td> -->
+                    <td class="fs-13 text-center fw-700" data-bs-toggle="modal" data-bs-target="#partDetails">
+                      <span *ngIf="employee.jobs" title="number of jobs">{{ employee.jobs.length}}</span>/<span
+                        title="number of jobs PAID">{{getTotalJobCounts(employee.id)}}</span>
+                    </td>
+
+                    <!-- <td>Jobs</td> -->
+                    <td>
+                      <ng-container *ngFor="let vehicle of filterJobs2(employee, false); let i=index">
+                        <div class="table-container w-100 d-box ss-table mt-1 mb-1" *ngIf="vehicle.jobs2!.length > 0">
+                          <table class="table w-100 mb-1">
+                            <thead>
+                              <tr>
+                                <td class="fs-14 text-center w-25">
+                                  <a class="btn btn-light d-flex gap-2 align-items-center white-space my-1 border p-1 shadow "
+                                    data-toggle="tooltip" data-placement="bottom"
+                                    title="{{vehicle.customer.title}} {{vehicle.customer.firstName}} {{vehicle.customer.lastName }} "
+                                    [style.background-color]="vehicle.id == currentIndex? '#EEE' : (true ? 'white' : 'white')"
+                                    (click)="getDetail(vehicle, vehicle.id)">
+
+                                    <span [ngClass]="{'text-danger': vehicle.special ==true}" title="{{vehicle.make}}"
+                                      class="car-{{ vehicle.make| lowercase }} fs-30"></span>
+
+                                    <span class="d-block text-start">
+                                      <strong class="fs-12 fw-500 d-flex gap-2 align-items-center"
+                                        title="Click to view vehicle details" data-bs-toggle="modal"
+                                        data-bs-target="#editVehicle"
+                                        (click)="this.showVehicleListing = false; getDetail(vehicle, vehicle.id)"
+                                        [style.color]="vehicle.id == currentIndex? 'black' : (true ? 'black' : 'black')">
+                                        <i class="fa-solid fa-square border border-radius-1"
+                                          style="color: {{vehicle.color}}"></i>
+                                        <small>{{
+                                          vehicle.year }} {{ vehicle.make }} {{ vehicle.model }}</small>
+                                        <!-- <strong class="fw-700 fs-11 py-1 line-height-150 text-secondary"
+                                          [ngClass]="{'blink text-success': vehicle.jobsDone == true}">Jobs:
+                                          {{getJobStatusCount(vehicle,vehicle.jobs)}}/{{ vehicle.jobs.length
+                                          }}</strong> -->
+                                        <strong class="badge badge-success ms-1"
+                                          (click)="changePaidStatus(vehicle, false)" title="Paid"
+                                          *ngIf="vehicle.paid==true"><i class="fa-solid fa-dollar-sign"></i></strong>
+                                      </strong>
+                                    </span>
+
+                                  </a>
+                                  <!-- <a *ngFor="let job of vehicle.jobs2" title="{{getJobTitle(job)}}"
+                                    class="btn btn-light d-flex gap-2 align-items-center white-space my-1 border p-1 shadow">
+
+                                    <div class="d-flex">
+
+                                      <strong class="fs-12 fw-500 d-flex gap-2 align-items-center overflow-hidden"
+                                        title="Click to view vehicle details" data-bs-toggle="modal"
+                                        data-bs-target="#editVehicle"
+                                        (click)="this.showVehicleListing = false; getDetailJob(job.id)"
+                                        [style.color]="vehicle.id == currentIndex? 'black' : (true ? 'black' : 'black')">
+                                        <i *ngIf="job.status==1"
+                                          class="fa-solid fa-square border border-radius-1 text-success"></i>
+                                        <i *ngIf="job.status==0"
+                                          class="fa-solid fa-square border border-radius-1 text-danger"></i>
+                                        <small><span>{{job.id}}. </span> <strong class="badge badge-success ms-1"
+                                            *ngIf="job.paidWeek > 0"><i
+                                              class="fa-solid fa-dollar-sign opacity-50"></i></strong>
+                                          {{ job.name }} </small>:<small>{{
+                                          job.notes }} </small>
+                                        <span class="text-danger">${{job.price}}</span><i *ngIf="job.targetDate != null"
+                                          class="fas fa-bullseye opacity-50"></i><span>
+                                          {{job.targetDate | date:
+                                          'MM/dd/yyyy' }}</span> <span title="Created At"><i
+                                            class="fa-solid fa-clock opacity-50"></i> {{job.createdAt | date:
+                                          'MM/dd/yyyy'
+                                          }}</span>
+
+                                        <span>By <i class="fa-solid fa-user opacity-50"></i>
+                                          <ng-container *ngFor="let user of users;let i=index;">
+                                            <span *ngIf="user.id == job.userId">
+                                              {{(user.firstName + " " + user.lastName) | shortName:2}}
+                                            </span>
+                                          </ng-container>
+                                        </span>
+
+                                      </strong>
+                                      <span class="ml-auto" *ngIf="job.paidWeek == 0 "
+                                        (click)="searchJobIdAndAddToPayroll(job.id)" title="Add To Payroll"><i
+                                          class="fa-solid fa-plus"></i>
+                                      </span>
+                                    </div>
+
+                                  </a> -->
+
+                                  <div
+                                    class="btn btn-light d-flex gap-2 align-items-center white-space my-1 border p-1 shadow"
+                                    *ngFor="let job of vehicle.jobs2" title="{{getJobTitle(job)}}">
+                                    <div class="">
+                                      <strong class="fs-12 fw-500 d-flex gap-2 align-items-center overflow-hidden"
+                                        title="Job Instructions:{{job.notes}}" data-bs-toggle="modal"
+                                        data-bs-target="#editVehicle"
+                                        (click)="this.showVehicleListing = false; getDetailJob(job.id)"
+                                        [style.color]="vehicle.id == currentIndex? 'black' : (true ? 'black' : 'black')">
+                                        <i *ngIf="job.status==1"
+                                          class="fa-solid fa-square border border-radius-1 text-success"></i>
+                                        <i *ngIf="job.status==0"
+                                          class="fa-solid fa-square border border-radius-1 text-danger"></i>
+                                        <small><span>{{job.id}}. </span> <strong class="badge badge-success ms-1"
+                                            *ngIf="job.paidWeek > 0"><i
+                                              class="fa-solid fa-dollar-sign opacity-50"></i></strong>
+                                          {{ job.name }} </small>
+                                        <!-- :<small>{{
+                                          job.notes }} </small> -->
+                                        <span *ngIf="job.hours > 0" class="text-primary">{{job.hours}}H </span>
+                                        <span class="text-danger">${{job.price}}</span><i *ngIf="job.targetDate != null"
+                                          class="fas fa-bullseye opacity-50"></i><span>
+                                          {{job.targetDate | date:
+                                          'MM/dd/yyyy' }}</span> <span title="Created At"><i
+                                            class="fa-solid fa-clock opacity-50"></i> {{job.createdAt | date:
+                                          'MM/dd/yyyy'
+                                          }}</span>
+
+                                        <span>By <i class="fa-solid fa-user opacity-50"></i>
+                                          <ng-container *ngFor="let user of users;let i=index;">
+                                            <span *ngIf="user.id == job.userId">
+                                              {{(user.firstName + " " + user.lastName) | shortName:2}}
+                                            </span>
+                                          </ng-container>
+                                        </span>
+
+                                      </strong>
+                                    </div>
+
+                                    <div class="ml-auto" *ngIf="job.paidWeek == 0 "
+                                      (click)="searchJobIdAndAddToPayroll(job.id)" title="Add To Payroll"><i
+                                        class="fa-solid fa-plus"></i></div>
+                                  </div>
+                                </td>
+                                <!-- <td class="fs-14 text-center w-75">
+                                  <a *ngFor="let job of vehicle.jobs2" title="{{getJobTitle(job)}}"
+                                    class="btn btn-light d-flex gap-2 align-items-center white-space my-1 border p-1 shadow">
+                                    <span class="d-block text-start">
+
+                                      <strong class="fs-12 fw-500 d-flex gap-2 align-items-center overflow-hidden"
+                                        title="Click to view vehicle details" data-bs-toggle="modal"
+                                        data-bs-target="#editVehicle"
+                                        (click)="this.showVehicleListing = false; getDetail(vehicle, vehicle.id)"
+                                        [style.color]="vehicle.id == currentIndex? 'black' : (true ? 'black' : 'black')">
+                                        <i *ngIf="job.status==1"
+                                          class="fa-solid fa-square border border-radius-1 text-success"></i>
+                                        <i *ngIf="job.status==0"
+                                          class="fa-solid fa-square border border-radius-1 text-danger"></i>
+                                        <small><span>{{job.id}}. </span> <strong class="badge badge-success ms-1"
+                                            *ngIf="job.paidWeek > 0"><i
+                                              class="fa-solid fa-dollar-sign opacity-50"></i></strong>
+                                          {{ job.name }} </small>:<small>{{
+                                          job.notes }} </small>
+                                        <span class="text-danger">${{job.price}}</span><i *ngIf="job.targetDate != null"
+                                          class="fas fa-bullseye opacity-50"></i><span>
+                                          {{job.targetDate | date: 'MM/dd/yyyy' }}</span> <span>created <i
+                                            class="fa-solid fa-clock opacity-50"></i>{{job.createdAt | date:
+                                          'MM/dd/yyyy'
+                                          }}</span>
+
+                                        <span>By <i class="fa-solid fa-user opacity-50"></i>
+                                          <ng-container *ngFor="let user of users;let i=index;">
+                                            <span *ngIf="user.id == job.userId">
+                                              {{(user.firstName + " " + user.lastName) | shortName:2}}
+                                            </span>
+                                          </ng-container>
+
+                                        </span>
+                                        <span *ngIf="job.paidWeek == 0 " (click)="searchJobIdAndAddToPayroll(job.id)"
+                                          title="Add To Payroll"><i class="fa-solid fa-dollar-sign opacity-50"></i>
+                                        </span>
+
+                                      </strong>
+                                    </span>
+                                  </a>
+                                </td> -->
+                              </tr>
+                            </thead>
+                          </table>
+                        </div>
+                      </ng-container>
+                    </td>
+                    <td>
+                      <ng-container *ngFor="let vehicle of filterJobs2(employee, true); let i=index">
+                        <div class="table-container w-100 d-box ss-table mt-1 mb-1" *ngIf="vehicle.jobs3!.length > 0">
+                          <table class="table w-100 mb-1">
+                            <thead>
+                              <tr>
+                                <td class="fs-14 text-center w-25">
+                                  <a class="btn btn-light d-flex gap-2 align-items-center white-space my-1 border p-1 shadow "
+                                    data-toggle="tooltip" data-placement="bottom"
+                                    title="{{vehicle.customer.title}} {{vehicle.customer.firstName}} {{vehicle.customer.lastName }} "
+                                    [style.background-color]="vehicle.id == currentIndex? '#EEE' : (true ? 'white' : 'white')"
+                                    (click)="getDetail(vehicle, vehicle.id)">
+
+                                    <span [ngClass]="{'text-danger': vehicle.special ==true}" title="{{vehicle.make}}"
+                                      class="car-{{ vehicle.make| lowercase }} fs-30"></span>
+
+                                    <span class="d-block text-start">
+                                      <strong class="fs-12 fw-500 d-flex align-items-center" data-bs-toggle="modal"
+                                        data-bs-target="#editVehicle"
+                                        (click)="this.showVehicleListing = false; getDetail(vehicle, vehicle.id)"
+                                        [style.color]="vehicle.id == currentIndex? 'black' : (true ? 'black' : 'black')">
+                                        <i class="fa-solid fa-square border border-radius-1"
+                                          style="color: {{vehicle.color}}"></i>
+                                        <small>{{
+                                          vehicle.year }} {{ vehicle.make }} {{ vehicle.model }}</small>
+                                        <!-- <strong class="fw-700 fs-11 py-1 line-height-150 text-secondary"
+                                          [ngClass]="{'blink text-success': vehicle.jobsDone == true}">Jobs:
+                                          {{getJobStatusCount(vehicle,vehicle.jobs)}}/{{ vehicle.jobs.length
+                                          }}</strong> -->
+                                        <strong class="badge badge-success ms-1"
+                                          (click)="changePaidStatus(vehicle, false)" title="Paid"
+                                          *ngIf="vehicle.paid==true"><i class="fa-solid fa-dollar-sign"></i></strong>
+                                      </strong>
+                                    </span>
+                                  </a>
+                                  <div *ngFor="let job of vehicle.jobs3" title="{{getJobTitle(job)}}"
+                                    class="btn btn-light d-flex gap-2 align-items-center white-space my-1 border p-1 shadow">
+                                    <div class="">
+
+                                      <strong class="fs-12 fw-500 d-flex gap-2 align-items-center"
+                                        title="Job Instructions:{{job.notes}}" data-bs-toggle="modal"
+                                        data-bs-target="#editVehicle"
+                                        (click)="this.showVehicleListing = false; getDetailJob(job.id)"
+                                        [style.color]="vehicle.id == currentIndex? 'black' : (true ? 'black' : 'black')">
+                                        <i *ngIf="job.status==1"
+                                          class="fa-solid fa-square border border-radius-1 text-success"></i>
+                                        <i *ngIf="job.status==0"
+                                          class="fa-solid fa-square border border-radius-1 text-danger"></i>
+                                        <small><span>{{job.id}}. </span> <strong class="badge badge-success ms-1"
+                                            *ngIf="job.paidWeek > 0"><i
+                                              class="fa-solid fa-dollar-sign opacity-50"></i></strong>
+                                          {{ job.name }} </small>
+                                        <!-- :<small>{{
+                                          job.notes }} </small> -->
+                                        <span class="text-danger">${{job.price}}</span><i *ngIf="job.targetDate != null"
+                                          class="fas fa-bullseye opacity-50"></i><span> {{job.targetDate | date:
+                                          'MM/dd/yyyy' }}</span> <span title="Created At"><i
+                                            class="fa-solid fa-clock opacity-50"></i> {{job.createdAt | date:
+                                          'MM/dd/yyyy'
+                                          }}</span>
+
+                                        <span>By <i class="fa-solid fa-user opacity-50"></i>
+                                          <ng-container *ngFor="let user of users;let i=index;">
+                                            <span *ngIf="user.id == job.userId">
+                                              {{(user.firstName + " " + user.lastName) | shortName:2}}
+                                            </span>
+                                          </ng-container>
+
+                                        </span>
+                                      </strong>
+
+                                    </div>
+                                    <div class="ml-auto" title="Remove From Payroll"
+                                      (click)="searchJobIdAndRemoveFromPayroll(job.id)"><i
+                                        class="fa-solid fa-trash"></i>
+                                    </div>
+
+                                  </div>
+                                </td>
+                                <!-- <td class="fs-14 text-center w-75">
+                                  <a *ngFor="let job of vehicle.jobs3" title="{{getJobTitle(job)}}"
+                                    class="btn btn-light d-flex gap-2 align-items-center white-space my-1 border p-1 shadow">
+                                    <span class="d-block text-start">
+
+                                      <strong class="fs-12 fw-500 d-flex gap-2 align-items-center overflow-hidden"
+                                        title="Click to view vehicle details" data-bs-toggle="modal"
+                                        data-bs-target="#editVehicle"
+                                        (click)="this.showVehicleListing = false; getDetail(vehicle, vehicle.id)"
+                                        [style.color]="vehicle.id == currentIndex? 'black' : (true ? 'black' : 'black')">
+                                        <i *ngIf="job.status==1"
+                                          class="fa-solid fa-square border border-radius-1 text-success"></i>
+                                        <i *ngIf="job.status==0"
+                                          class="fa-solid fa-square border border-radius-1 text-danger"></i>
+                                        <small><span>{{job.id}}. </span> <strong class="badge badge-success ms-1"
+                                            *ngIf="job.paidWeek > 0"><i
+                                              class="fa-solid fa-dollar-sign opacity-50"></i></strong>
+                                          {{ job.name }} </small>:<small>{{
+                                          job.notes }} </small>
+                                        <span class="text-danger">${{job.price}}</span><i *ngIf="job.targetDate != null"
+                                          class="fas fa-bullseye opacity-50"></i><span>
+                                          {{job.targetDate | date: 'MM/dd/yyyy' }}</span> <span>created <i
+                                            class="fa-solid fa-clock opacity-50"></i>{{job.createdAt | date:
+                                          'MM/dd/yyyy'
+                                          }}</span>
+
+                                        <span>By <i class="fa-solid fa-user opacity-50"></i>
+                                          <ng-container *ngFor="let user of users;let i=index;">
+                                            <span *ngIf="user.id == job.userId">
+                                              {{(user.firstName + " " + user.lastName) | shortName:2}}
+                                            </span>
+                                          </ng-container>
+
+                                        </span>
+                                        <span title="Remove From Payroll"
+                                          (click)="searchJobIdAndRemoveFromPayroll(job.id)"><i
+                                            class="fa-solid fa-trash opacity-50"></i>
+                                        </span>
+
+
+                                      </strong>
+                                    </span>
+                                  </a>
+                                </td> -->
+                              </tr>
+                            </thead>
+                          </table>
+                        </div>
+                      </ng-container>
+                    </td>
+                    <td class="text-center fs-13"><span
+                        *ngIf="getTotalJobCounts(employee.id) > 0">{{getTotalJobCounts(employee.id)}}</span></td>
+                    <td class="text-center"><span class="bg-danger rounded-1 p-1 fw-bold text-white fs-12"
+                        *ngIf="getTotalPay(employee.id) > 0">${{getTotalPay(employee.id)}}</span> </td>
+                  </tr>
+
+                </ng-container>
+              </table>
+            </div>
+          </div>
+
+          <!-- <div class="bg-white border-radius-8 shadow mt-4">
+            <div class="table-container ss-table">
+              <table class="table-bordered overflow-hidden border-radius-8 w-100">
+                <thead>
+                  <tr>
+                    <th class="fs-14 text-center mw-100"> #</th>
+                    <th class="fs-14 text-center mw-100"> Technician (Role)</th>
+                    <th class="fs-14 text-center mw-100"> Contact</th>
+                    <th class="fs-14 text-center mw-100"> Jobs Assigned</th>
+                    <th class="fs-14 text-center mw-100"> Value $</th>
+                  </tr>
+                </thead>
+                <tr *ngFor="let employeeLoop of this.users; let i=index">
+                  <td class="text-center fs-13">{{i+1}}</td>
+                  <th class="text-center fs-13"><strong>{{employeeLoop.firstName }} {{employeeLoop.lastName }}</strong>
+                    <ng-container *ngFor="let employeeRole of this.employeeRoles">
+                      <span *ngIf="employeeLoop.roleId == employeeRole.id">
+                        ({{employeeRole.name }})
+                      </span>
+                    </ng-container>
+                  </th>
+                  <td class="text-center fs-13">{{ formatPhoneNumber( employeeLoop.phone) }}</td>
+                  <td class="text-center fs-13"><span
+                      *ngIf="getTotalJobCounts(employeeLoop.id) > 0">{{getTotalJobCounts(employeeLoop.id)}}</span></td>
+                  <td class="text-center"><span class="bg-danger rounded-1 p-1 fw-bold text-white fs-12"
+                      *ngIf="getTotalPay(employeeLoop.id) > 0">${{getTotalPay(employeeLoop.id)}}</span> </td>
+                </tr>
+              </table>
+            </div>
+          </div> -->
+          <div class="bg-white shadow-sm p-4 mt-4 rounded-2" *ngFor="let employeeLoop of this.users; let i=index">
+            <div class="d-flex gap-4 align-items-center">
+              <i class="fa fa-user-tie fa-3x heading-color"></i>
+              <div class="">
+                <strong class="d-block fs-16 text-primary-abs mb-1">{{employeeLoop.firstName }} {{employeeLoop.lastName
+                  }}</strong>
+                <span>
+                  <ng-container *ngFor="let employeeRole of this.employeeRoles">
+                    <strong *ngIf="employeeLoop.roleId == employeeRole.id">
+                      {{employeeRole.name }}
+                    </strong>
+                  </ng-container>
+                </span>
+              </div>
+              <div class="d-flex gap-1 flex-column">
+                <span *ngIf="getTotalJobCounts(employeeLoop.id) > 0">Job: {{getTotalJobCounts(employeeLoop.id)}}</span>
+                <span *ngIf="getTotalPay(employeeLoop.id) > 0" class="fs-14 fw-bold text-danger">Value:
+                  ${{getTotalPay(employeeLoop.id)}}</span>
+              </div>
+            </div>
+            <ng-container *ngFor="let payrollHistory of this.payrollHistories; let i=index">
+              <ng-container
+                *ngIf=" payrollHistory.vehicle && payrollHistory.vehicle.id> 0 &&  payrollHistory.job.id> 0 && employeeLoop.id == payrollHistory.job.employeeId ">
+                <ng-container *ngIf="payrollHistory.vehicle">
+                  <div class="bg-white border px-2 shadow-sm mt-4 rounded-3 mb-4"
+                    (click)="getPayrollHistoryDetail(payrollHistory, i )">
+                    <div class="row align-items-center">
+                      <div class="col-lg-6 my-4">
+                        <ul class="bg-light rounded-2 o-4 px-3 py-1">
+                          <li class="d-flex gap-2 align-items-center py-3 fs-14"><i
+                              class="fa fa-car text-primary-abs"></i> <span>Vehicle:</span>
+                            <strong>{{payrollHistory.vehicle.year}} {{payrollHistory.vehicle.make}}
+                              {{payrollHistory.vehicle.model}} {{payrollHistory.vehicle.color}} -
+                              ({{payrollHistory.vehicle.description}})</strong>
+                          </li>
+                          <li class="d-flex gap-2 align-items-center py-3 fs-14"><i
+                              class="fa fa-car-on text-primary-abs"></i> <span>Job Type:</span> <strong><ng-container
+                                *ngFor="let jobRequestType of jobRequestTypes; let i=index"><ng-container
+                                  *ngIf="payrollHistory.vehicle.jobRequestType==jobRequestType.id">{{jobRequestType.name}}</ng-container></ng-container></strong>
+                          </li>
+                          <li class="d-flex gap-2 align-items-center py-3 fs-14"><i
+                              class="fa fa-screwdriver-wrench text-primary-abs"></i> <span>Work Request:</span>
+                            <strong>{{payrollHistory.vehicle.workRequest}}</strong>
+                          </li>
+                          <li class="d-flex gap-2 align-items-center py-3 fs-14"><i
+                              class="fa fa-cogs text-primary-abs"></i> <span>Status:</span> <strong><ng-container
+                                *ngFor="let option of statuss; let i=index"><span
+                                  *ngIf="payrollHistory.vehicle.status==option.id">{{option.name}}</span></ng-container></strong>
+                          </li>
+                        </ul>
+                      </div>
+                      <div class="col-lg-6 px-0 my-2" *ngIf="payrollHistory.job">
+                        <div class="row">
+                          <div class="col-12 mt-3">
+                            <div class="position-relative">
+                              <label class="form-label mb-3 fw-400 fs-14">Value $</label>
+                              <input trimText placeholder="Enter Job Value" [(ngModel)]="payrollHistory.job.price"
+                                [disabled]=" this.week!=this.weekSet" maxlength="50"
+                                (keyup.enter)="onEnterJobPrice('job price',payrollHistory )" type="number"
+                                class="form-control fs-13" />
+                            </div>
+                          </div>
+                          <div class="col-lg-6 mt-3">
+                            <div class="position-relative">
+                              <label class="form-label mb-3 fw-400 fs-14">Job No.<strong class="fs-14">{{
+                                  payrollHistory.job.id}}</strong> Name:</label>
+                              <strong class="fs-14">{{payrollHistory.job.name}}</strong>
+                            </div>
+                          </div>
+                          <div class="col-lg-6 mt-3">
+                            <div class="position-relative" (click)="setJobId(payrollHistory.job.id)"
+                              [class.active]="payrollHistory.job.id == currentJobId">
+                              <label class="form-label mb-3 fw-400 fs-14">Description:</label>
+                              <strong class="fs-14">{{payrollHistory.job.notes}}</strong>
+                            </div>
+                          </div>
+                          <div class="col-lg-6 mt-3">
+                            <div class="position-relative">
+                              <label class="form-label mb-3 fw-400 fs-14">Start Date:</label>
+                              <strong class="fs-14">{{payrollHistory.job.startDate| date}}</strong>
+                            </div>
+                          </div>
+                          <div class="col-lg-6 mt-3">
+                            <div class="position-relative">
+                              <label class="form-label mb-3 fw-400 fs-14">Target Date:</label>
+                              <strong class="fs-14">{{payrollHistory.job.targetDate| date}}</strong>
+                            </div>
+                          </div>
+                          <div class="col-lg-6 mt-3">
+                            <div class="position-relative">
+                              <label class="form-label mb-3 fw-400 fs-14">End Date:</label>
+                              <strong class="fs-14">{{payrollHistory.job.endDate| date}}</strong>
+                            </div>
+                          </div>
+                          <div class="col-lg-6 mt-3">
+                            <div class="position-relative d-flex gap-1 align-items-center">
+                              <label class="form-label mb-1 fw-400 fs-14">Job Status:</label>
+                              <div class="form-check form-switch d-flex text-start" (click)="setJobId(job.id)">
+                                <label class="form-check-label fs-12 fw-600 mt-1text-start text-success fw-bold"
+                                  for="payment2" *ngIf="payrollHistory.job.status==1">Completed</label>
+                                <div class="d-flex align-items-center ms-4"
+                                  *ngIf="payrollHistory.job && payrollHistory.job.employeeId > 0 && payrollHistory.job.targetDate != null">
+                                  <label
+                                    class="form-check-label fs-12 fw-600 mt-1 text-start text-danger fw-bold ps-4 ms-0"
+                                    for="payment2" *ngIf="payrollHistory.job.status==0">Not Complete</label>
+                                  <input trimText class="form-check-input mt-0" type="checkbox"
+                                    [disabled]=" this.week!=this.weekSet" role="switch" id="payment2"
+                                    [checked]="isJobChecked(payrollHistory.job)"
+                                    (change)="updateJobStatus(payrollHistory.job)" />
+                                </div>
+
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-12 mt-3">
+                            <div class="d-flex align-items-center justifyc-ntent-center gap-2 mb-4">
+                              <button class="btn btn-danger btn-sm" title="Remove from Payroll"
+                                *ngIf="user.allowAddReceipt == true && payrollHistory.id > 0 && this.week==this.weekSet"
+                                (click)="removeFromPayroll(payrollHistory)"><i class="fa fa-trash"></i></button>
+                              <button class="btn btn-primary-abs btn-sm" title="Add to Payroll"
+                                *ngIf="user.allowAddReceipt == true && payrollHistory.id ==0"
+                                (click)="addToPayroll(payrollHistory)"><i class="fa fa-plus"></i></button>
+                              <button class="btn btn-secondary-abs btn-sm" title="Save"
+                                *ngIf="user.allowAddReceipt == true  && this.week==this.weekSet"
+                                (click)="onEnterJobPrice('save', payrollHistory)"><i class="fa fa-save"></i></button>
+                              <button class="btn btn-dark btn-sm" title="Print" (click)="setJobId(job.id)"
+                                (click)="printPageJob('print-content-job', 'jobs', payrollHistory.job, payrollHistory.vehicle)"><i
+                                  class="fa fa-print"></i></button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                </ng-container>
+              </ng-container>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+<div class="modal fade" id="staticBackdropLive" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+  aria-labelledby="staticBackdropLiveLabel" aria-hidden="true" style="display: none;">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="staticBackdropLiveLabel">Repair Order</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"> </button>
+      </div>
+      <div class="modal-body">
+
+        <div id="print-content-payroll-histories">
+          <div id="componentID1" class="container-fluid">
+            <div class="container-fluid">
+              <div id="componentID2" class="container-fluid">
+                <div class="row">
+                  <div class="col-lg-5 col-md-6 col-sm-6 mt-3"></div>
+                  <!-- <div class="col-lg-5 col-md-6 col-sm-6 mt-3">
+                    <div class="d-flex align-items-center gap-3">
+                      <img [src]="company.iconString" class="img-fluid rounded" alt="Company Logo"
+                        width="120" />
+                      <h3 class="fs-20 fw-300 line-height-150">{{this.company.name}}, Inc.<br /><span
+                          class="fs-13" [innerHtml]="company.slogan"></span></h3>
+                    </div>
+                  </div> -->
+                  <div class="col-lg-4 col-md-2 col-sm-2"></div>
+                  <div class="col-lg-3 col-md-4 col-sm-4 mt-3">
+                    <span class="d-block bg-primary-abs pt-3 pe-3 pb-3 ps-5 text-white fw-700 fs-16 left-pill">Printed
+                      on Date:
+                      {{currentDate|date}}</span>
+                  </div>
+                  <div class="col-12 mt-3">
+                    <hr />
+                  </div>
+                  <div class="col-md-6 col-sm-6 mb-4">
+                    <p class="fs-15 d-block my-3"> </p>
+
+
+                  </div>
+                  <div class="col-md-6 col-sm-6 mb-4 text-end">
+                    <p class="fs-15 d-block my-3"></p>
+                    <h2 class="fs-17, fw-700">Payroll Summary</h2>
+                    <h2 class="fs-17, fw-700">Week ({{this.weekSet}})</h2>
+                    <!-- <p class="fs-15 d-block my-3 fw-700">Repair Order for Vehicle #{{vehicleJob.id}}</p> -->
+                    <p class="fs-15 d-block my-3">Printed By:
+                      <strong>{{user.firstName}} {{user.lastName}}</strong>
+                      <br>
+                    </p>
+                    <!-- <p class="fs-15 d-block my-3 fw-700"><b>Vehicle Due Day:</b> <span
+                        class="text-danger">{{vehicleJob.targetDate| date}}</span></p> -->
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-12 table-responsive">
+                    <div class="table-container ss-table bg-white shadow-sm rounded-2">
+                      <table class="table-bordered overflow-hidden border-radius-8 w-100">
+                        <thead>
+                          <tr>
+                            <td class="fs-13 fw-700"> #</td>
+                            <td class="fs-13 fw-700"> Technician (Role)</td>
+                            <td class="fs-13 fw-700"> Contact</td>
+                            <td class="fs-13 fw-700"> Jobs Assigned</td>
+                            <td class="fs-13 fw-700"> Value $</td>
+                          </tr>
+                        </thead>
+                        <tr *ngFor="let employeeLoop of this.users; let i=index">
+                          <td class="fs-13 " width="5%">{{i+1}}</td>
+                          <td class="fs-13 "><strong>{{employeeLoop.firstName }}
+                              {{employeeLoop.lastName
+                              }}</strong>
+
+                            <ng-container *ngFor="let employeeRole of this.employeeRoles">
+                              <span *ngIf="employeeLoop.roleId == employeeRole.id">
+                                ({{employeeRole.name }})
+                              </span>
+                            </ng-container>
+
+                          </td>
+                          <td class="fs-13 ">
+
+                            {{ formatPhoneNumber( employeeLoop.phone) }}
+                          </td>
+                          <td class="fs-13 "><span *ngIf="getTotalJobCounts(employeeLoop.id) > 0">{{
+                              getTotalJobCounts(employeeLoop.id)}}</span></td>
+                          <td class="fs-13 "><span *ngIf="getTotalPay(employeeLoop.id) > 0" style="color:red">${{
+                              getTotalPay(employeeLoop.id)}}</span> </td>
+                        </tr>
+                      </table>
+                    </div>
+
+                  </div>
+                </div>
+
+                <p class="col-lg-7 col-md-7 col-sm-7 col-xs-7"></p>
+                <p class="col-lg-5 col-md-5 col-sm-5 col-xs-5"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="print-content-job">
+          <div id="componentID" class="container-fluid">
+            <div class="container-fluid">
+              <div id="componentID2" class="container-fluid">
+                <div class="row">
+                  <div class="col-lg-5 col-md-6 col-sm-6 mt-3"></div>
+                  <!-- <div class="col-lg-5 col-md-6 col-sm-6 mt-3">
+                    <div class="d-flex align-items-center gap-3">
+                      <img [src]="company.iconString" class="img-fluid rounded" alt="Company Logo"
+                        width="120" />
+                      <h3 class="fs-20 fw-300 line-height-150">{{this.company.name}}, Inc.<br /><span
+                          class="fs-13" [innerHtml]="company.slogan"></span></h3>
+                    </div>
+                  </div> -->
+                  <div class="col-lg-4 col-md-2 col-sm-2"></div>
+                  <div class="col-lg-3 col-md-4 col-sm-4 mt-3">
+                    <span class="d-block bg-primary-abs pt-3 pe-3 pb-3 ps-5 text-white fw-700 fs-16 left-pill">Printed
+                      on Date:
+                      {{currentDate|date}}</span>
+                  </div>
+                  <div class="col-12 mt-3">
+                    <hr />
+                  </div>
+                  <div class="col-md-6 col-sm-6 mb-4">
+                    <p class="fs-15 d-block my-3"> </p>
+
+
+                  </div>
+                  <div class="col-md-6 col-sm-6 mb-4 text-end">
+                    <p class="fs-15 d-block my-3"></p>
+                    <h2 class="fs-17, fw-700">JOB ORDER</h2>
+
+                    <!-- <p class="fs-15 d-block my-3 fw-700">Repair Order for Vehicle #{{vehicleJob.id}}</p> -->
+                    <p class="fs-15 d-block my-3">Issued By:
+                      <strong>{{user.firstName}} {{user.lastName}}</strong>
+                      <br>
+                    </p>
+                    <!-- <p class="fs-15 d-block my-3 fw-700"><b>Vehicle Due Day:</b> <span
+                        class="text-danger">{{vehicleJob.targetDate| date}}</span></p> -->
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-12">
+                    <div class="table-container ss-table bg-white shadow-sm rounded-2">
+                      <table class="table-bordered overflow-hidden border-radius-8 w-100">
+                        <!-- <thead class="bg-navy">
+                        <tr class="bg-navy">
+                          <th class="bg-navy mw-100 fs-14 text-black py-3"> Item</th>
+                          <th class="bg-navy mw-100 fs-14 text-black py-3"> Info</th>
+                        </tr>
+                      </thead> -->
+                        <tbody>
+                          <tr>
+                            <td class="fs-17 py-3"><strong>Vehicle</strong></td>
+                            <td class="fs-17 py-3 "><strong>{{vehicleJob.year}} {{vehicleJob.make}}
+                                {{vehicleJob.model}}
+                                {{vehicleJob.color}} </strong></td>
+                          </tr>
+                          <!-- <tr>
+                          <td class="fs-13 py-3"><strong>Specification</strong></td>
+                          <td class="fs-13 py-3">
+                            {{vehicleJob.description}}</td>
+                        </tr>
+                        <tr *ngIf="vehicleJob.vin != ''">
+                          <td class="fs-13 py-3"><strong>VIN</strong></td>
+                          <td class="fs-13 py-3"> {{vehicleJob.vin}} </td>
+                        </tr>
+                        <tr *ngIf="vehicleJob.plate != ''">
+                          <td class="fs-13 py-3"><strong>License Plate</strong></td>
+                          <td class="fs-13 py-3"> {{vehicleJob.plate}} </td>
+                        </tr>
+                        <tr *ngIf="vehicleJob.priorDamage != ''">
+                          <td class="fs-13 py-3"><strong>Prior Damanages</strong></td>
+                          <td class="fs-13 py-3"> {{vehicleJob.priorDamage}} </td>
+                        </tr> -->
+                          <tr>
+                            <td class="fs-13 py-3"><strong>Job Type</strong></td>
+                            <ng-container *ngFor="let jobRequestType of this.jobRequestTypes">
+                              <td class="fs-13 py-3" *ngIf="jobRequestType.id == vehicleJob.jobRequestType">
+                                {{jobRequestType.name}}
+                              </td>
+                            </ng-container>
+                          </tr>
+                          <tr>
+                            <td class="fs-13 py-3"><strong>Work Request</strong></td>
+                            <td class="fs-13 py-3">
+                              {{vehicleJob.workRequest}} </td>
+                          </tr>
+                          <tr>
+                            <td class="fs-13 py-3"><strong>Vehicle Due day</strong></td>
+                            <td class="fs-13 py-3">
+                              {{vehicleJob.targetDate | date}} </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+                <div class="row" *ngIf="this.job.id> 0">
+                  <div class="col-12 mt-3">
+                    <div class="table-container ss-table bg-white shadow-sm rounded-2">
+                      <table class="table-bordered overflow-hidden border-radius-8 w-100">
+                        <!-- <thead class="bg-navy">
+                        <tr class="bg-navy">
+                          <th class="bg-navy mw-100 fs-14 text-black py-3"> #</th>
+                          <th class="bg-navy mw-100 fs-14 text-black py-3"> Job Item</th>
+                          <th class="bg-navy mw-130 fs-14 text-black py-3"> Instructions</th>
+                          <th class="bg-navy mw-130 fs-14 text-black py-3"> Assigned To</th>
+                          <th class="bg-navy mw-100 fs-14 text-black py-3"> Value $</th>
+                          <th class="bg-navy mw-100 fs-14 text-black py-3"> Deadline</th>
+                          <th class="bg-navy mw-100 fs-14 text-black py-3"> Status</th>
+                        </tr>
+                      </thead> -->
+                        <tbody>
+                          <tr>
+                            <td class="fs-13 py-3"><strong>Job # </strong></td>
+                            <td class="fs-13 py-3">
+                              <strong>{{this.job.id}}</strong>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td class="fs-13 py-3"><strong>Job Name</strong></td>
+                            <td class="fs-13 py-3"> {{this.job.name}}</td>
+                          </tr>
+                          <tr>
+                            <td class="fs-13 py-3"><strong>Description</strong></td>
+                            <td class="fs-13 py-3"> {{this.job.notes}}</td>
+                          </tr>
+                          <tr>
+                          <tr>
+                            <td class="fs-13 py-3" style="background-color:lightgray">
+                              <strong>Technician</strong>
+                            </td>
+                            <td class="fs-13 py-3"> <ng-container *ngFor="let employee of this.users">
+                                <ng-container *ngIf="employee.id==this.job.employeeId">
+                                  <ng-container *ngFor="let role of this.employeeRoles">
+                                    <ng-container *ngIf="role.id==employee.roleId">
+                                      <strong>{{employee.firstName}}
+                                        {{employee.lastName}}</strong>
+                                      <small> {{role.name}}</small>
+                                      <br>
+                                    </ng-container>
+                                  </ng-container>
+                                </ng-container>
+                              </ng-container></td>
+                          </tr>
+                          <tr>
+                            <td class="fs-13 py-3"><strong>Value $</strong></td>
+                            <td class="fs-13 py-3"> {{this.job.price}}</td>
+                          </tr>
+                          <tr>
+                            <td class="fs-13 py-3"><strong>Start Date</strong></td>
+                            <td class="fs-13 py-3"> {{this.job.startDate | date}}</td>
+                          </tr>
+                          <tr>
+                            <td class="fs-13 py-3"><strong>Target</strong></td>
+                            <td class="fs-13 py-3"> {{this.job.targetDate | date}}</td>
+                          </tr>
+                          <tr>
+                            <td class="fs-13 py-3"><strong>Finish Date</strong></td>
+                            <td class="fs-13 py-3"> {{this.job.endDate | date}}</td>
+                          </tr>
+                          <tr>
+                            <td class="fs-13 py-3"><strong>Status</strong></td>
+                            <ng-container *ngIf="this.job.status ==0">
+                              <td class="fs-13 py-3"> Not Completed</td>
+                            </ng-container>
+                            <ng-container *ngIf="this.job.status ==1">
+                              <td class="fs-13 py-3"> Completed</td>
+                            </ng-container>
+                          </tr>
+
+                          <tr>
+                            <td class="fs-13 py-3"><strong>Authorized By </strong></td>
+                            <td class="fs-13 py-3"> </td>
+                          </tr>
+
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                  <p class="col-lg-7 col-md-7 col-sm-7 col-xs-7"></p>
+                  <p class="col-lg-5 col-md-5 col-sm-5 col-xs-5"></p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="modal fade" id="myAccount" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="myAccountLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content border-radius-8">
+        <div class="modal-header p-4">
+          <h1 class="modal-title fs-20 fw-600 text-capitalize" id="myAccountLabel">My Account</h1>
+          <button type="button" class="btn-close mt-1" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body px-2" *ngIf="currentUser">
+          <form *ngIf="!isSuccessful" name="form" (ngSubmit)="f.form.valid && onSubmit()" #f="ngForm" novalidate>
+            <div class="row">
+              <div class="col-md-4">
+                <div class="mt-4 pt-1">
+                  <label for="title" class="form-label fs-14 fw-400 mb-3">Account Type</label>
+                  <select class="form-select h-48 px-3 border-radius-8" name="role" #type="ngModel" size="1" style=" appearance: none;
+                background-image: url('');" [(ngModel)]="form.role" required disabled
+                    [ngClass]="{ 'is-invalid': f.submitted && type.errors }">
+                    <option value="ROLE_USER" selected>Employee</option>
+                    <option value="ROLE_SHOP">Auto Shop</option>
+                    <option value="ROLE_ADMIN">Admin</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-4" *ngIf="form.role == 'ROLE_SHOP' || form.role == 'ROLE_RECYCLER' ">
+                <div class="mt-4 pt-1">
+                  <label for="bussnessName" class="form-label fs-14 fw-400 mb-3">Business/Company Name</label>
+                  <input trimText class="form-control h-48 px-3 border-radius-8" name="bussinessname"
+                    [(ngModel)]="form.bussinessname" required minlength="5" maxlength="200" #bussinessname="ngModel"
+                    placeHolder="Enter Business/Company Name"
+                    [ngClass]="{ 'is-invalid': f.submitted && bussinessname.errors }" />
+                  <div class="invalid-feedback" *ngIf="bussinessname.errors && f.submitted">
+                    <span *ngIf="bussinessname.errors['required']">Business Name is required</span>
+                    <span *ngIf="bussinessname.errors['minlength']">Business Name must be at least 5 characters</span>
+                    <span *ngIf="bussinessname.errors['maxlength']">Business Name must be at most 200 characters</span>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mt-4 pt-1">
+                  <label for="firstName" class="form-label fs-14 fw-400 mb-3">First Name</label>
+                  <input trimText class="form-control h-48 px-3 border-radius-8" type="text" name="firstName"
+                    [(ngModel)]="form.firstName" required minlength="2" maxlength="20" #firstName="ngModel"
+                    [ngClass]="{ 'is-invalid': f.submitted && firstName.errors }" placeholder="Enter Your First Name" />
+                  <div class="invalid-feedback" *ngIf="firstName.errors && f.submitted">
+                    <span *ngIf="firstName.errors['required']">First Name is required</span>
+                    <span *ngIf="firstName.errors['minlength']">First Name must be at least 2 characters</span>
+                    <span *ngIf="firstName.errors['maxlength']">First Name must be at most 20 characters</span>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mt-4 pt-1">
+                  <label for="lastName" class="form-label fs-14 fw-400 mb-3">Last Name</label>
+                  <input trimText class="form-control h-48 px-3 border-radius-8" type="text" name="lastName"
+                    [(ngModel)]="form.lastName" required minlength="2" maxlength="20" #lastName="ngModel"
+                    [ngClass]="{ 'is-invalid': f.submitted && lastName.errors }" placeholder="Enter Your Last Name" />
+                  <div class="invalid-feedback" *ngIf="lastName.errors && f.submitted">
+                    <span *ngIf="lastName.errors['required']">Last Name is required</span>
+                    <span *ngIf="lastName.errors['minlength']">Last Name must be at least 2 characters</span>
+                    <span *ngIf="lastName.errors['maxlength']">Last Name must be at most 20 characters</span>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mt-4 pt-1">
+                  <label for="email" class="form-label fs-14 fw-400 mb-3">Email Address</label>
+                  <input trimText class="form-control h-48 px-3 border-radius-8" name="email" [(ngModel)]="form.email"
+                    required email #email="ngModel" [ngClass]="{ 'is-invalid': f.submitted && email.errors }"
+                    maxlength="100" placeholder="Enter Your Email Address" />
+                  <div class="invalid-feedback" *ngIf="email.errors && f.submitted">
+                    <span *ngIf="email.errors['required']">Email is required</span>
+                    <span *ngIf="email.errors['email']">Email must be a valid email address</span>
+                    <span *ngIf="email.errors['maxlength']">Email must be at most 100 characters</span>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mt-4 pt-1">
+                  <label for="phone" class="form-label fs-14 fw-400 mb-3">Phone</label>
+                  <input trimText class="form-control h-48 px-3 border-radius-8" name="phone" [(ngModel)]="form.phone"
+                    required maxlength="20" #phone="ngModel" [ngClass]="{ 'is-invalid': f.submitted && phone.errors }"
+                    pattern="^[-+()0-9]{10,12}(?:-\d+)?$" placeholder="Enter Your Phone Number" />
+                  <div class="invalid-feedback" *ngIf="phone.errors && f.submitted">
+                    <span *ngIf="phone.errors['required']">Phone is required</span>
+                    <span *ngIf="phone.errors['pattern']">Phone must be a valid phone number</span>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mt-4 pt-1">
+                  <label for="street" class="form-label fs-14 fw-400 mb-3">Street</label>
+                  <input trimText class="form-control h-48 px-3 border-radius-8" name="street" [(ngModel)]="form.street"
+                    required minlength="2" maxlength="200" #street="ngModel"
+                    [ngClass]="{ 'is-invalid': f.submitted && street.errors }" placeholder="Enter Your Street" />
+                  <div class="invalid-feedback" *ngIf="street.errors && f.submitted">
+                    <span *ngIf="street.errors['required']">Street is required</span>
+                    <span *ngIf="street.errors['minlength']">Street must be at least 2 characters</span>
+                    <span *ngIf="street.errors['maxlength']">Street must be at most 200 characters</span>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mt-4 pt-1">
+                  <label for="city" class="form-label fs-14 fw-400 mb-3">City</label>
+                  <input trimText class="form-control h-48 px-3 border-radius-8" name="city" [(ngModel)]="form.city"
+                    required minlength="2" maxlength="200" #city="ngModel"
+                    [ngClass]="{ 'is-invalid': f.submitted && city.errors }" placeholder="Enter Your City" />
+                  <div class="invalid-feedback" *ngIf="city.errors && f.submitted">
+                    <span *ngIf="city.errors['required']">City is required</span>
+                    <span *ngIf="city.errors['minlength']">City must be at least 2 characters</span>
+                    <span *ngIf="city.errors['maxlength']">City must be at most 200 characters</span>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mt-4 pt-1">
+                  <label for="state" class="form-label fs-14 fw-400 mb-3">State</label>
+                  <select class="form-select h-48 px-3 border-radius-8" name="state" #state="ngModel" size="1" required
+                    [(ngModel)]="form.state" [ngClass]="{ 'is-invalid': f.submitted && state.errors }">
+                    <option value="AL">Alabama</option>
+                    <option value="AK">Alaska</option>
+                    <option value="AZ">Arizona</option>
+                    <option value="AR">Arkansas</option>
+                    <option value="CA">California</option>
+                    <option value="CO">Colorado</option>
+                    <option value="CT">Connecticut</option>
+                    <option value="DE">Delaware</option>
+                    <option value="DC">District Of Columbia</option>
+                    <option value="FL">Florida</option>
+                    <option value="GA">Georgia</option>
+                    <option value="HI">Hawaii</option>
+                    <option value="ID">Idaho</option>
+                    <option value="IL">Illinois</option>
+                    <option value="IN">Indiana</option>
+                    <option value="IA">Iowa</option>
+                    <option value="KS">Kansas</option>
+                    <option value="KY">Kentucky</option>
+                    <option value="LA">Louisiana</option>
+                    <option value="ME">Maine</option>
+                    <option value="MD">Maryland</option>
+                    <option value="MA">Massachusetts</option>
+                    <option value="MI">Michigan</option>
+                    <option value="MN">Minnesota</option>
+                    <option value="MS">Mississippi</option>
+                    <option value="MO">Missouri</option>
+                    <option value="MT">Montana</option>
+                    <option value="NE">Nebraska</option>
+                    <option value="NV">Nevada</option>
+                    <option value="NH">New Hampshire</option>
+                    <option value="NJ">New Jersey</option>
+                    <option value="NM">New Mexico</option>
+                    <option value="NY">New York</option>
+                    <option value="NC">North Carolina</option>
+                    <option value="ND">North Dakota</option>
+                    <option value="OH">Ohio</option>
+                    <option value="OK">Oklahoma</option>
+                    <option value="OR">Oregon</option>
+                    <option value="PA">Pennsylvania</option>
+                    <option value="RI">Rhode Island</option>
+                    <option value="SC">South Carolina</option>
+                    <option value="SD">South Dakota</option>
+                    <option value="TN">Tennessee</option>
+                    <option value="TX">Texas</option>
+                    <option value="UT">Utah</option>
+                    <option value="VT">Vermont</option>
+                    <option value="VA">Virginia</option>
+                    <option value="WA">Washington</option>
+                    <option value="WV">West Virginia</option>
+                    <option value="WI">Wisconsin</option>
+                    <option value="WY">Wyoming</option>
+                  </select>
+                  <div class="invalid-feedback d-block" *ngIf="state.errors && f.submitted">
+                    <span *ngIf="state.errors['required']">State is required</span>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mt-4 pt-1">
+                  <label for="zip" class="form-label fs-14 fw-400 mb-3">Zip Code</label>
+                  <input trimText class="form-control h-48 px-3 border-radius-8" pattern="[0-9]*" name="zip"
+                    [(ngModel)]="form.zip" maxlength="20" required minlength="5" maxlength="20" #zip="ngModel"
+                    [ngClass]="{ 'is-invalid': f.submitted && zip.errors }" placeholder="Enter Your Zip Code" />
+                  <div class="invalid-feedback" *ngIf="zip.errors && f.submitted">
+                    <span *ngIf="zip.errors['required']">Zip Code is required</span>
+                    <span *ngIf="zip.errors['pattern']">Must be a valid Zip Code</span>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-12 mt-4">
+                <div *ngIf="f.submitted && isUpdateFailed">
+                  <span *ngIf="errorMessageProfile" class="alert alert-danger" role="alert">Update failed: {{
+                    errorMessageProfile
+                    }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="d-flex align-items-center gap-3 mt-5 px-3" *ngIf="currentUser">
+              <button class="btn btn-primary-abs h-45 px-4 rounded-4 fs-14 fw-600">Update Account</button>
+            </div>
+          </form>
+          <div *ngIf="isSuccessful" class="p-4">
+            <span class="alert alert-success" role="alert">Your update is successful! <button
+                class="btn btn-sm btn-primary-abs ms-3" (click)="reload()">Ok</button></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="modal fade" id="resetPassword" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="resetPasswordLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content border-radius-8">
+        <div class="modal-header p-4">
+          <h1 class="modal-title fs-20 fw-600 text-capitalize" id="resetPasswordLabel">Reset Password</h1>
+          <button type="button" class="btn-close mt-1" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body px-2" *ngIf="currentUser">
+          <form name="form" (ngSubmit)="f.form.valid && changePasswordRequest()" #f="ngForm" novalidate>
+            <div class="row">
+              <div class="col-md-4" *ngIf="form.role == 'ROLE_SHOP' || form.role == 'ROLE_RECYCLER' ">
+                <div class="mt-4 pt-1">
+                  <label for="password" class="form-label fs-14 fw-400 mb-3">Old Password</label>
+                  <div class="input-group">
+                    <input trimText class="form-control h-48 px-3" [type]="showPassword ? 'text' : 'password'"
+                      name="password" [(ngModel)]="form.password" required minlength="6" #password="ngModel"
+                      maxlength="30" [ngClass]="{ 'is-invalid': f.submitted && password.errors }"
+                      placeholder="Enter Your Old Password" />
+                    <div class="input-group-append">
+                      <button class="btn btn-outline-secondary" type="button"> <i alt="show" class="far fa-eye eye-show"
+                          (click)="showPassword = !showPassword" [class.hide]="showPassword"></i>
+                        <i alt="hide" class="far fa-eye-slash eye-hide" (click)="showPassword = !showPassword"
+                          [class.hide]="!showPassword"></i></button>
+                    </div>
+                  </div>
+                  <div class="invalid-feedback" *ngIf="password.errors && f.submitted">
+                    <span *ngIf="password.errors['required']">Password is required</span>
+                    <span *ngIf="password.errors['minlength']">Password must be at least 6 characters</span>
+                    <span *ngIf="password.errors['maxlength']">Password must be at most 30 characters</span>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mt-4 pt-1">
+                  <label for="newPassword" class="form-label fs-14 fw-400 mb-3">New Password</label>
+                  <div class="input-group">
+                    <input trimText class="form-control h-48 px-3" [type]="showPasswordNew ? 'text' : 'password'"
+                      name="newPassword" [(ngModel)]="form.newPassword" required minlength="6" #newPassword="ngModel"
+                      maxlength="30" [ngClass]="{ 'is-invalid': f.submitted && newPassword.errors }"
+                      placeholder="Enter Your New Password" />
+                    <div class="input-group-append">
+                      <button class="btn btn-outline-secondary" type="button"> <i alt="show" class="far fa-eye eye-show"
+                          (click)="showPasswordNew = !showPasswordNew" [class.hide]="showPasswordNew"></i>
+                        <i alt="hide" class="far fa-eye-slash eye-hide" (click)="showPasswordNew = !showPasswordNew"
+                          [class.hide]="!showPasswordNew"></i></button>
+                    </div>
+                  </div>
+                  <div class="invalid-feedback" *ngIf="newPassword.errors && f.submitted">
+                    <span *ngIf="newPassword.errors['required']">New Password is required</span>
+                    <span *ngIf="newPassword.errors['minlength']">New Password must be at least 6 characters</span>
+                    <span *ngIf="newPassword.errors['maxlength']">New Password must be at most 30 characters</span>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mt-4 pt-1">
+                  <label for="newPasswordComfirmed" class="form-label fs-14 fw-400 mb-3">Confirm New Password</label>
+                  <div class="input-group">
+                    <input trimText class="form-control h-48 px-3"
+                      [type]="showPaswordNewConfirmed ? 'text' : 'password'" name="passwordNew"
+                      [(ngModel)]="form.newPasswordComfirmed" required minlength="6" #newPasswordComfirmed="ngModel"
+                      maxlength="30" [ngClass]="{ 'is-invalid': f.submitted && newPasswordComfirmed.errors }"
+                      placeholder="Please Re-Type Your New Password" />
+                    <div class="input-group-append">
+                      <button class="btn btn-outline-secondary" type="button"> <i alt="show" class="far fa-eye eye-show"
+                          (click)="showPaswordNewConfirmed = !showPaswordNewConfirmed"
+                          [class.hide]="showPaswordNewConfirmed"></i>
+                        <i alt="hide" class="far fa-eye-slash eye-hide"
+                          (click)="showPaswordNewConfirmed = !showPaswordNewConfirmed"
+                          [class.hide]="!showPaswordNewConfirmed"></i></button>
+                    </div>
+                  </div>
+                  <div class="invalid-feedback" *ngIf="newPasswordComfirmed.errors && f.submitted">
+                    <span *ngIf="newPasswordComfirmed.errors['required']">Confirm New Password is required</span>
+                    <span *ngIf="newPasswordComfirmed.errors['minlength']">Confirm New Password must be at least 6
+                      characters</span>
+                    <span *ngIf="newPasswordComfirmed.errors['maxlength']">Confirm New Password must be at most 30
+                      characters</span>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-12 py-4 mt-4" *ngIf="errorMessageResetPassword != ''">
+                <span class="alert alert-success line-height-150" role="alert">{{errorMessageResetPassword}}</span>
+              </div>
+            </div>
+            <div class="d-flex align-items-center gap-3 mt-4 px-3" *ngIf="currentUser">
+              <button class="btn btn-primary-abs h-45 px-4 rounded-4 fs-14 fw-600">Reset Password</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
