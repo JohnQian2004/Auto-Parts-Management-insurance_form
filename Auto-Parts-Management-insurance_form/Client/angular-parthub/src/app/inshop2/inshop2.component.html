@@ -1911,26 +1911,23 @@
       <div class="row py-3 mt-4 vehicles-overview"
         *ngIf="showVehicleListing && this.showColumnInfo== false && this.overviewTypeId== 1">
         <div class="col-xl-2 col-lg-2 col-md-3 col-sm-6 px-2 my-2" style="cursor: pointer;"
-          *ngFor="let groupBy of jobRequestTypeOverview; let i=index"
-          (click)="applyJobRequestTypefilter(groupBy.status); activeIndex = i" data-bs-toggle="tooltip"
+          *ngFor="let groupBy of paymentStatusOverview; let i=index"
+          (click)="applyPaymentStatusfilter(groupBy.status); activeIndex = i" data-bs-toggle="tooltip"
           data-bs-title="Click to view details" title="Click to view details">
           <div class="filters-boxes d-flex w-100 border-radius-8 gap-3 bg-white shadow-sm align-items-center px-3"
             [ngClass]="{'active': activeIndex === i}"> <i
               class="fa-solid fa-{{icons[i % icons.length]}} fs-4 text-center {{textColors[i % textColors.length]}} {{backgroundColors[i % backgroundColors.length]}} rounded-circle"></i>
             <span class="text-start"> <span class="fs-13 text-dark opacity50"
-                *ngIf="isInJobRequestTypes(groupBy.status) == false ">Without
-                Status</span>
-              <ng-container *ngFor="let status of jobRequestTypes; let j=index"> <span class="fs-13  opacity50"
-                  style="display: inline-block; word-break: break-word;" title="{{status.comments}}"
-                  *ngIf="groupBy.status > 0 && status.id == groupBy.status && status.name != '' ">{{status.name}}</span>
-              </ng-container>
+                *ngIf="groupBy.status == 'unpaid'">Not Paid</span>
+              <span class="fs-13 text-dark opacity50"
+                *ngIf="groupBy.status == 'paid'">Paid</span>
               <strong class="d-block fs-20 fw-700 mt-2">{{groupBy.count}} <small class="opacity-75 fs-13"
                   *ngIf="groupBy.totals > 0">
                   {{groupBy.totals | currency:'USD':'symbol':'1.0-0' }} </small></strong> </span>
           </div>
         </div>
         <div class="col-xl-2 col-lg-2 col-md-3 col-sm-6 px-2 my-2" style="cursor: pointer;"
-          (click)="applyJobRequestTypefilter('All'); activeIndex=null" data-bs-toggle="tooltip"
+          (click)="applyPaymentStatusfilter('All'); activeIndex=null" data-bs-toggle="tooltip"
           data-bs-title="Click to view details" title="Click to view details">
           <div class="filters-boxes d-flex w-100 border-radius-8 gap-3 bg-white shadow-sm align-items-center px-3"
             [ngClass]="{'active': activeIndex === null}"> <i

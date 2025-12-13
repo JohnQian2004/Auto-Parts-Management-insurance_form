@@ -65,3 +65,8 @@
 11:11:42.013 [https-jsse-nio-8444-exec-10] INFO  UserController[getUser:122] - johnq1@xoftex.com
 11:11:42.398 [https-jsse-nio-8444-exec-3] INFO  UserController[getCompany:298] - 1
 11:12:07.208 [https-jsse-nio-8444-exec-9] INFO  UserController[getUser:122] - johnq1@xoftex.com
+11:15:23.188 [https-jsse-nio-8444-exec-3] INFO  UserController[getUser:122] - johnq1@xoftex.com
+11:15:23.316 [https-jsse-nio-8444-exec-4] INFO  OverviewController[getVehicleJobRequestTypeOverview:175] - 1
+11:15:23.339 [https-jsse-nio-8444-exec-10] INFO  VehicleController[searchAllVehicles:792] - 2019 Lamborghini Urus black
+11:15:23.354 [https-jsse-nio-8444-exec-9] INFO  OverviewController[getVehicleAssignedToOverview:234] - 1
+11:15:23.417 [https-jsse-nio-8444-exec-4] INFO  OverviewController[getVehicleOverview:117] - 1
