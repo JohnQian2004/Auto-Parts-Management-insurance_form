@@ -88,12 +88,12 @@
       </div>
 
       <div class="d-md-flex align-items-center justify-content-between px-2 my-4 pt-4">
-        <h2 class="heading-color fw-700 text-uppercase fs-18">Job Request Types<span class="fs-14 fw-400"
+        <h2 class="heading-color fw-700 text-uppercase fs-18"> Payment Statuss<span class="fs-14 fw-400"
             title="Total Job Request Types" *ngIf="this.jobRequestTypes.length > 0"> ({{this.jobRequestTypes.length}})
           </span></h2>
         <button class="btn btn-primary-abs fs-13 px-3 py-2 mt-15-mob" data-bs-toggle="modal"
-          data-bs-target="#editJobRequestType" (click)="addNewJobRequestType()"><i class="fa fa-plus me-2"></i> Add Job
-          Request Type</button>
+          data-bs-target="#editJobRequestType" (click)="addNewJobRequestType()"><i class="fa fa-plus me-2"></i> Add Payment Status
+          </button>
       </div>
 
       <div class="row mx-negative align-items-stretch">
@@ -129,7 +129,7 @@
   <div class="modal-dialog modal-lg">
     <div class="modal-content border-radius-8">
       <div class="modal-header p-4">
-        <h1 class="modal-title fs-20 fw-600 text-capitalize" id="editJobRequestTypeLabel">Add / Edit Job Request Type
+        <h1 class="modal-title fs-20 fw-600 text-capitalize" id="editJobRequestTypeLabel">Add / Edit Payment Status
         </h1>
         <button type="button" class="btn-close mt-1" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
@@ -137,16 +137,16 @@
         <div class="row">
           <div class="col-md-6">
             <div class="mt-4 pt-1">
-              <label for="firstname" class="form-label fs-14 fw-400 mb-3">Job Request Type Name <i
+              <label for="firstname" class="form-label fs-14 fw-400 mb-3">Payment Status Name <i
                   class="fa fa-info-circle" data-bs-toggle="tooltip"
                   data-bs-title="e.g. Collision, Insurance, Mechnical, Come back etc."></i></label>
               <input trimText class="form-control h-48 px-3 border-radius-8" type="text"
                 [(ngModel)]="jobRequestType.name" #name="ngModel" [ngClass]="{ 'is-invalid': name.errors }"
-                minlength="2" maxlength="200" required placeholder="Enter Job Request Type Name" />
+                minlength="2" maxlength="200" required placeholder="Enter Payment Status Name" />
               <div class="invalid-feedback" *ngIf="name.errors ">
-                <span *ngIf="name.errors['required']">Job Request Type Name is required</span>
-                <span *ngIf="name.errors['minlength']">Job Request Type Name must be at least 2 characters</span>
-                <span *ngIf="name.errors['maxlength']">Job Request Type Name must be at most 200 characters</span>
+                <span *ngIf="name.errors['required']">Payment Status Name is required</span>
+                <span *ngIf="name.errors['minlength']">Payment Status Name must be at least 2 characters</span>
+                <span *ngIf="name.errors['maxlength']">Payment Status Name must be at most 200 characters</span>
               </div>
             </div>
           </div>

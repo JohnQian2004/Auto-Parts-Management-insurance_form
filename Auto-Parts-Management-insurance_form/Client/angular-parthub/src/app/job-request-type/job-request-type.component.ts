@@ -513,31 +513,31 @@ export class JobRequestTypeComponent implements OnInit, AfterViewInit {
 
     if (jobRequestType.name == null || jobRequestType.name == '') {
 
-      this.messageJobRequestType = "Job Request Type name is required";
+      this.messageJobRequestType = "Payment Status name is required";
       return;
     }
 
     if (jobRequestType.name != null && jobRequestType.name != '' && jobRequestType.name.length < 2) {
 
-      this.messageJobRequestType = "Job Request Type Name is too short";
+      this.messageJobRequestType = "Payment Status Name is too short";
       return;
     }
 
     if (jobRequestType.name != null && jobRequestType.name != '' && jobRequestType.name.length > 200) {
 
-      this.messageJobRequestType = "Job Request Type Name is too long";
+      this.messageJobRequestType = "Payment Status Name is too long";
       return;
     }
 
     if (jobRequestType.comments != null && jobRequestType.comments != '' && jobRequestType.comments.length > 200) {
 
-      this.messageJobRequestType = "Job Request Type Comments are too long";
+      this.messageJobRequestType = "Payment Status Comments are too long";
       return;
     }
 
     if (jobRequestType.comments != null && jobRequestType.comments != '' && jobRequestType.comments.length < 2) {
 
-      this.messageJobRequestType = "Job Request Type Comments are too short";
+      this.messageJobRequestType = "Payment Status Comments are too short";
       return;
     }
 

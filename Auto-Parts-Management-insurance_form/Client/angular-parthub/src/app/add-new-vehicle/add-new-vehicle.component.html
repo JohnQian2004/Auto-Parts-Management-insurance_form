@@ -21,7 +21,7 @@
 
 <div>
   <div class="row nogot">
-    <div class="my-fluid-col main-content col mt-4 pt-2">
+    <div class="my-fluid-col main-content col mt-100 pt-2">
 
       <div class="row px-2 position-sticky common-bar-top">
         <nav class="navbar navbar-expand navbar-white bg-white border-radius-8 d-flex justify-content-between">
@@ -362,13 +362,42 @@
         </div>
       </div>
 
-      <div class="row pt-3 mx-negative">
+      <div class="row pt-3 mx-negative mb-100">
         <div class="col-12">
           <h2 class="heading-color fw-700 text-uppercase pt-4 pb-5 fs-18" *ngIf="editModeCustomer==true">Add Vehicles
           </h2>
+        </div>
+        <!-- VIN Decoder - First Row -->
+        <div class="col-12">
+          <div class="mt-4 pt-1 form-group">
+            <div class="form-group">
+              <label for="VIN" class="form-label fs-14 fw-400 mb-3">VIN e.g. ZPBUA1ZL9KLA00848</label>
+              <div class="input-group mb-12 d-flex align-items-center gap-3">
+                <div class="flex-grow-1">
+                  <input type="text" class="form-control" placeholder="Enter VIN" maxlength="17" #vin="ngModel"
+                    [ngClass]="{ 'is-invalid': vin.errors }" [(ngModel)]="vehicle.vin" />
+                  <div class="invalid-feedback" *ngIf="vin.errors ">
+                    <span *ngIf="vin.errors['maxlength']">Vin must be at most 17 characteris</span>
+                  </div>
+                </div>
+                <div class="input-group-append">
+                  <button class="btn btn-primary-abs" type="button" (click)="searchVin()">Decode VIN</button>
+                </div>
+                <div class="input-group-append">
+                  <button class="btn btn-secondary" type="button" (click)="toggleShowForm()">
+                    <span *ngIf="!showFormFields">Show Form</span>
+                    <span *ngIf="showFormFields">Hide Form</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Rest of the form - conditionally shown -->
+        <div class="col-12 mt-4" *ngIf="showFormFields">
           <h3 class="fs-18 fw-500 text-dark">Information About Vehicle</h3>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4" *ngIf="showFormFields">
           <div class="mt-4 pt-1">
             <label for="year" class="form-label fs-14 fw-400 mb-3">Year</label>
             <select class="form-select h-48 px-3 border-radius-8" required size="1" #year="ngModel"
@@ -381,7 +410,7 @@
             </div>
           </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4" *ngIf="showFormFields">
           <div class="mt-4 pt-1">
             <label for="makeake" class="form-label fs-14 fw-400 mb-3">Make</label>
             <select class="form-select h-48 px-3 border-radius-8" #device required size="1" #make="ngModel"
@@ -395,7 +424,7 @@
             </div>
           </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4" *ngIf="showFormFields">
           <div class="mt-4 pt-1">
             <label for="model" class="form-label fs-14 fw-400 mb-3">Model</label>
             <select class="form-select h-48 px-3 border-radius-8" required size="1" #model="ngModel"
@@ -408,7 +437,7 @@
             </div>
           </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4" *ngIf="showFormFields">
           <div class="mt-4 pt-1">
             <label for="color" class="form-label fs-14 fw-400 mb-3">Color</label>
             <select class="form-select h-48 px-3 border-radius-8 text-capitalize "
@@ -424,7 +453,7 @@
             </div>
           </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4" *ngIf="showFormFields">
           <div class="mt-4 pt-1">
             <label for="miles" class="form-label fs-14 fw-400 mb-3">Miles</label>
             <input trimText class="form-control h-48 px-3 border-radius-8" type="text" placeholder="Enter Miles"
@@ -434,7 +463,7 @@
             </div>
           </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4" *ngIf="showFormFields">
           <div class="mt-4 pt-1">
             <label for="Description" class="form-label fs-14 fw-400 mb-3">Description</label>
             <input trimText class="form-control h-48 px-3 border-radius-8" type="text"
@@ -445,7 +474,7 @@
             </div>
           </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4" *ngIf="showFormFields">
           <div class="mt-4 pt-1">
             <label for="plate" class="form-label fs-14 fw-400 mb-3">License Plate</label>
             <input trimText class="form-control h-48 px-3 border-radius-8" type="text"
@@ -456,27 +485,10 @@
             <span *ngIf="plate.errors['maxlength']">License Plate must be at most 100 characteris</span>
           </div>
         </div>
-        <div class="col-md-8">
-          <div class="mt-4 pt-1 form-group">
-            <div class="form-group">
-              <label for="VIN" class="form-label fs-14 fw-400 mb-3">VIN e.g. ZPBUA1ZL9KLA00848</label>
-              <div class="input-group mb-12">
-                <input type="text" class="form-control" placeholder="Enter VIN" maxlength="17" #vin="ngModel"
-                  [ngClass]="{ 'is-invalid': vin.errors }" [(ngModel)]="vehicle.vin" />
-                <div class="input-group-append">
-                  <button class="btn btn-primary-abs" type="button" (click)="searchVin()">Decode VIN</button>
-                </div>
-                <div class="invalid-feedback" *ngIf="vin.errors ">
-                  <span *ngIf="vin.errors['maxlength']">Vin must be at most 17 characteris</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="col-12 pt-4 mt-2">
+        <div class="col-12 pt-4 mt-2" *ngIf="showFormFields">
           <h3 class="fs-18 fw-500 text-dark">Your Request</h3>
         </div>
-        <div class="col-md-12 pt-3">
+        <div class="col-md-12 pt-3" *ngIf="showFormFields">
           <div class="mt-4 pt-1">
             <label for="workRequest" class="form-label fs-14 fw-400 mb-3">Work Requests</label>
             <textarea class="form-control px-3 border-radius-8 pt-3" rows="4" [(ngModel)]="vehicle.workRequest" required
@@ -489,7 +501,7 @@
             </div>
           </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4" *ngIf="showFormFields">
           <div class="mt-4 pt-1">
             <label for="jobRequestType" data-bs-toggle="tooltip" data-bs-placement="top"
               data-bs-title="Click to go to Configuration" [routerLink]="'/job-request-type'"
@@ -507,7 +519,7 @@
             </div>
           </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4" *ngIf="showFormFields">
           <div class="mt-4 pt-1">
             <label for="claimNumber" class="form-label fs-14 fw-400 mb-3">Claim Number</label>
             <input trimText class="form-control h-48 px-3 border-radius-8" type="text" minlength="2" maxlength="200"
@@ -520,7 +532,7 @@
             </div>
           </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4" *ngIf="showFormFields">
           <div class="mt-4 pt-1">
             <label for="price" class="form-label fs-14 fw-400 mb-3">Price</label>
             <input trimText class="form-control h-48 px-3 border-radius-8" type="number" min="0"
@@ -532,7 +544,7 @@
             </div>
           </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4" *ngIf="showFormFields">
           <div class="mt-4 pt-1">
             <label for="supplymentPrice" class="form-label fs-14 fw-400 mb-3">Supplement Price</label>
             <input trimText class="form-control h-48 px-3 border-radius-8" type="number" min="0"
@@ -540,7 +552,7 @@
               placeholder="Enter Supplement Price" [(ngModel)]="vehicle.supplymentPrice" />
           </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4" *ngIf="showFormFields">
           <div class="mt-4 pt-1">
             <label for="arrivalMode" data-bs-toggle="tooltip" data-bs-placement="top"
               data-bs-title="Click to go to Configuration" [routerLink]="'/arrival-mode'"
@@ -552,7 +564,7 @@
             </select>
           </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4" *ngIf="showFormFields">
           <div class="mt-4 pt-1">
             <label for="paymentMethod" data-bs-toggle="tooltip" data-bs-title="Click to go to Configuration"
               [routerLink]="'/payment-method'" class="form-label fs-14 fw-400 mb-3">Payment Method</label>
@@ -564,7 +576,7 @@
             </select>
           </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4" *ngIf="showFormFields">
           <div class="mt-4 pt-1">
             <label for="insuranceCompany" data-bs-toggle="tooltip" data-bs-title="Click to go to Configuration"
               [routerLink]="'/insurance-companies'" class="form-label fs-14 fw-400 mb-3">Insurance Company</label>
@@ -576,7 +588,7 @@
             </select>
           </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4" *ngIf="showFormFields">
           <div class="mt-4 pt-1">
             <label for="approvalStatus" data-bs-toggle="tooltip" data-bs-title="Click to go to Configuration"
               [routerLink]="'/approval-status'" class="form-label fs-14 fw-400 mb-3">Approval Status</label>
@@ -588,7 +600,7 @@
             </select>
           </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4" *ngIf="showFormFields">
           <div class="mt-4 pt-1">
             <label for="Parking" data-bs-toggle="tooltip" data-bs-title="Click to go to Configuration"
               [routerLink]="'/parking-location'" class="form-label fs-14 fw-400 mb-3">Parking</label>
@@ -598,7 +610,7 @@
             </select>
           </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4" *ngIf="showFormFields">
           <div class="mt-4 pt-1">
             <label for="rentalCompany" data-bs-toggle="tooltip" data-bs-title="Click to go to Configuration"
               [routerLink]="'/rental-companies'" class="form-label fs-14 fw-400 mb-3">Rental Company</label>
@@ -609,7 +621,7 @@
             </select>
           </div>
         </div>
-        <div class="col-md-4" *ngIf="vehicle.loanerCarName !=  null && vehicle.loanerCarName !=''">
+        <div class="col-md-4" *ngIf="showFormFields && vehicle.loanerCarName !=  null && vehicle.loanerCarName !=''">
           <div class="mt-4 pt-1">
             <label for="rentalDueDate" class="form-label fs-14 fw-400 mb-3">Rental Due Date</label>
             <input trimText class="form-control h-48 px-3 border-radius-8" type="date" placeholder="Rental Due Date"
@@ -617,7 +629,7 @@
               [ngModel]="vehicle.rentalDate |  date:'yyyy-MM-dd'" />
           </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4" *ngIf="showFormFields">
           <div class="mt-4 pt-1">
             <label for="targetDate" class="form-label fs-14 fw-400 mb-3">Target Date</label>
             <input trimText class="form-control h-48 px-3 border-radius-8" type="date" placeholder="Target Date"
@@ -625,7 +637,7 @@
               [ngModel]="vehicle.targetDate |  date:'yyyy-MM-dd'" />
           </div>
         </div>
-        <div class="col-md-4" *ngIf="vehicle.targetDateChangeReason != null && vehicle.targetDateChangeReason != '' ">
+        <div class="col-md-4" *ngIf="showFormFields && vehicle.targetDateChangeReason != null && vehicle.targetDateChangeReason != '' ">
           <div class="mt-4 pt-1">
             <label for="reasonChnageDate" class="form-label fs-14 fw-400 mb-3">Reason for Target Date Change</label>
             <input trimText class="form-control h-48 px-3 border-radius-8" type="text"
@@ -633,7 +645,7 @@
           </div>
         </div>
 
-        <div class="col-md-4">
+        <div class="col-md-4" *ngIf="showFormFields">
           <div class="mt-4 pt-1">
             <label for="status" data-bs-toggle="tooltip" data-bs-title="Click to go to Configuration"
               [routerLink]="'/vehicle-status'" class="form-label fs-14 fw-400 mb-3">Status</label>
@@ -645,17 +657,17 @@
             </select>
           </div>
         </div>
-        <div class="col-md-12">
+        <div class="col-md-12" *ngIf="showFormFields">
           <div class="mt-4 pt-1">
             <label for="notesComment" class="form-label fs-14 fw-400 mb-3">Notes</label>
             <textarea trimText class="form-control h-48 px-3 border-radius-8" type="text" maxlength="2000" rows="2"
               style="line-height: 2;" placeholder="Enter Notes" [(ngModel)]="vehicle.comments"></textarea>
           </div>
         </div>
-        <div class="col-12 pt-4 mt-2">
+        <div class="col-12 pt-4 mt-2" *ngIf="showFormFields">
           <h3 class="fs-18 fw-500 text-dark">Prior Damage</h3>
         </div>
-        <div class="col-md-12">
+        <div class="col-md-12" *ngIf="showFormFields">
           <div class="mt-4 pt-1">
             <!-- <label for="priorDamages" class="form-label fs-14 fw-400 mb-3">Prior Damages {{getPriorDamageWordCount()}}
               <small>Words (500 Max)</small></label> -->

@@ -330,6 +330,7 @@ export class AddNewVehicleComponent implements OnInit {
   purchaseOrders: PurchaseOrder[] = new Array();
   purchaseOrder: PurchaseOrder = new PurchaseOrder();
   showSearchVin: boolean = false;
+  showFormFields: boolean = false;
   config: Config = new Config();
   baseUrlImage = this.config.baseUrl + '/getImage';
   baseUrlResizeImage = this.config.baseUrl + '/getResize';
@@ -1178,6 +1179,21 @@ export class AddNewVehicleComponent implements OnInit {
         this.vehicle.reason = "";
       }
     })
+  }
+
+  toggleShowForm(): void {
+    this.showFormFields = !this.showFormFields;
+    if (this.showFormFields) {
+      this.scrollToForm();
+    }
+  }
+
+  scrollToForm(): void {
+    // Scroll down 100px immediately
+    window.scrollBy({
+      top: 100,
+      behavior: 'smooth'
+    });
   }
 
   createVehicle(vehicle: Vehicle): void {
@@ -2957,50 +2973,75 @@ export class AddNewVehicleComponent implements OnInit {
   }
 
   searchVin(): void {
+    if (!this.vehicle.vin || this.vehicle.vin.trim() === '') {
+      this.errorMessageVehicle = "Please enter a VIN number";
+      return;
+    }
+
+    this.errorMessageVehicle = "";
+    this.successMessageVehicle = "";
 
     this.autopartService.getVin(this.vehicle.vin).subscribe({
       next: (res) => {
         console.log(res);
         this.autopart = res;
-        this.vehicle.year = this.autopart.year;
-        this.vehicle.make = this.autopart.make;
-        this.vehicle.model = this.autopart.model;
-        this.vehicle.description = this.autopart.description;
-
-        this.showSearchVin = false;
-
-        for (var i = 0; i < this.carListStringList.length; i++) {
-          if (this.carListStringList[i].brand == this.autopart.make) {
-            this.optionsModel = this.carListStringList[i].models;
+        
+        if (this.autopart && this.autopart.year) {
+          // VIN decode successful - populate vehicle fields
+          this.vehicle.year = this.autopart.year;
+          this.vehicle.make = this.autopart.make;
+          this.vehicle.model = this.autopart.model;
+          if (this.autopart.description) {
+            this.vehicle.description = this.autopart.description;
           }
 
-        }
+          this.showSearchVin = false;
 
-        var hasItMake = false;
-        for (let make of this.optionsMake) {
-          if (make == this.vehicle.make) {
-            hasItMake = true;
+          for (var i = 0; i < this.carListStringList.length; i++) {
+            if (this.carListStringList[i].brand == this.autopart.make) {
+              this.optionsModel = this.carListStringList[i].models;
+            }
           }
-        }
-        if (!hasItMake) {
-          this.optionsMake.push(this.vehicle.make);
-        }
 
-
-        var hasIt = false;
-        for (let model of this.optionsModel) {
-          if (model == this.vehicle.model) {
-            hasIt = true;
+          var hasItMake = false;
+          for (let make of this.optionsMake) {
+            if (make == this.vehicle.make) {
+              hasItMake = true;
+            }
           }
-        }
+          if (!hasItMake) {
+            this.optionsMake.push(this.vehicle.make);
+          }
 
-        if (!hasIt) {
-          this.optionsModel.push(this.vehicle.model);
-        }
-        // this.vinSearched = true;
+          var hasIt = false;
+          for (let model of this.optionsModel) {
+            if (model == this.vehicle.model) {
+              hasIt = true;
+            }
+          }
 
+          if (!hasIt) {
+            this.optionsModel.push(this.vehicle.model);
+          }
+          
+          this.successMessageVehicle = "VIN decoded successfully";
+          // Show form fields after successful decode
+          this.showFormFields = true;
+          this.scrollToForm();
+        } else {
+          // VIN decode failed but show form anyway
+          this.errorMessageVehicle = "VIN decode failed. You can still fill the form manually.";
+          this.showFormFields = true;
+          this.scrollToForm();
+        }
       },
-      error: (e) => console.error(e)
+      error: (e) => {
+        console.error("VIN decode error:", e);
+        // On error, still show the form
+        this.errorMessageVehicle = "VIN decode failed. You can still fill the form manually.";
+        this.showFormFields = true;
+        this.scrollToForm();
+      }
     });
   }
 
