@@ -4,7 +4,6 @@ import { Observable } from 'rxjs';
 import { ImageModel } from '../models/imageModel.model';
 import { AutopartService } from '../_services/autopart.service';
 import { AutoPart } from '../models/autopart.model';
-import { transition } from '@angular/animations';
 import * as jsonData from '../../assets/car-list.json';
 import { Brand } from '../models/brand.model';
 import { ScrollService } from '../_services/scroll.service';

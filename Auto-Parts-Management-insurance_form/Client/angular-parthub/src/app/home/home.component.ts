@@ -441,6 +441,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
         this.content = data;
         this.currentUser = this.storageService.getUser();
         this.getActiveBanner();
+        this.loadBanners(); // Load sidebar banners
         this.getServiceTypes();
         //this.searchPartWithPage(0, 20, 0, false);
         //this.searchPartWithPage(0, this.pageSize, 9, false);
@@ -3974,5 +3975,41 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
   }
 
+  // Sidebar banners for ads
+  leftBanners: Banner[] = [];
+  rightBanners: Banner[] = [];
+
+  /**
+   * Load banners for the current page (home)
+   * Fetches banners from backend based on domain and position
+   */
+  loadBanners(): void {
+    const domain = this.config.domainName === 'partslinks.com' ? 'partslinks' : 'baycounter';
+    const page = 'home';
+
+    // Load left sidebar banners
+    this.bannerService.getBannersByDomainPageAndPosition(domain, page, 'left').subscribe({
+      next: (result) => {
+        console.log('[HomeComponent] Loaded left banners:', result);
+        this.leftBanners = result;
+      },
+      error: (err) => {
+        console.error('[HomeComponent] Error loading left banners:', err);
+        this.leftBanners = [];
+      }
+    });
+
+    // Load right sidebar banners
+    this.bannerService.getBannersByDomainPageAndPosition(domain, page, 'right').subscribe({
+      next: (result) => {
+        console.log('[HomeComponent] Loaded right banners:', result);
+        this.rightBanners = result;
+      },
+      error: (err) => {
+        console.error('[HomeComponent] Error loading right banners:', err);
+        this.rightBanners = [];
+      }
+    });
+  }
 
 }
