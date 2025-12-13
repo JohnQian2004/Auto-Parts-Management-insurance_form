@@ -45,24 +45,74 @@
   </nav>
 
   <section class="banner py-4">
-    <div class="container">
-      <div class="row align-items-center justify-content-center">
-        <!-- <div class="col-xl-3 col-lg-4 my-4">
-          <img src="../../assets/images/tyre.png" alt="Logo" class="img-fluid" />
-        </div> -->
-        <div class="col-xl-8 col-lg-10 my-2">
-          <div class="px-xl-5 text-center">
-            <h3 class="fs-1 fw-light mb-4 pb-1">Auto Parts <b class="fw-bold text-primary-abs">Market</b></h3>
-            <p class="fs-5 line-height-150"><span class="text-primary-abs">Buy & Sell</span> Auto Parts.
-              <a [routerLink]="'/register'" class="text-primary-abs">Sign up for free</a></p>
+    <div class="container-fluid">
+      <div class="row">
+        <!-- LEFT SIDEBAR - Dynamic Banners -->
+        <div class="col-xl-4 col-lg-4 d-none d-lg-block">
+          <div class="sticky-top" style="top: 80px;">
+            <!-- Dynamic Banner Loop -->
+            <a *ngFor="let banner of leftBanners" [href]="banner.url" target="_blank"
+              class="d-block mb-3 ad-banner-home">
+              <div class="card border-0 shadow-sm hover-lift">
+                <div class="card-body p-0">
+                  <!-- Banner Header -->
+                  <div class="text-center py-3" [ngStyle]="{'background': banner.headerBackground || '#007bff'}"
+                    [attr.style]="banner.headerStyle">
+                    <h5 class="fw-bold mb-0">{{banner.companyName}}</h5>
+                    <small class="fs-10" *ngIf="banner.tagline">{{banner.tagline}}</small>
+                  </div>
+
+                  <!-- Banner Content -->
+                  <div class="p-3 bg-white">
+                    <!-- Products Grid (2x2) -->
+                    <div class="row g-2 mb-2" *ngIf="banner.products && banner.products.length > 0">
+                      <div class="col-6" *ngFor="let product of banner.products">
+                        <img [src]="product.imageUrl" [alt]="product.altText || product.name"
+                          class="img-fluid rounded shadow-sm" style="width: 100%; height: 120px; object-fit: cover;">
+                        <p class="fs-10 text-center mt-1 mb-0 fw-bold">{{product.name}}</p>
+                      </div>
+                    </div>
+
+                    <!-- Promotional Text -->
+                    <p class="fs-11 mb-2 fw-bold" *ngIf="banner.promotionalText">
+                      {{banner.promotionalText}}
+                    </p>
+
+                    <!-- Additional Text -->
+                    <p class="fs-10 text-muted mb-2" *ngIf="banner.additionalText">
+                      {{banner.additionalText}}
+                    </p>
+
+                    <!-- Call-to-Action Button -->
+                    <div class="badge w-100 py-2" [ngClass]="banner.buttonColor || 'bg-primary'">
+                      {{banner.buttonText || 'Learn More'}} →
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </a>
+
+            <!-- Fallback message if no banners -->
+            <div *ngIf="leftBanners.length === 0" class="text-center text-muted p-4">
+              <i class="fa fa-image fa-3x mb-3"></i>
+              <p>No banners available</p>
+            </div>
           </div>
         </div>
-        <!--<div class="col-xl-3 col-lg-4 my-4">
-           <img src="../../assets/images/brake.png" alt="Logo" class="img-fluid" />
-        </div> -->
-      </div>
-      <div class="row justify-content-center neww-sec">
-        <div class="col-xl-8 xol-lg-10">
+        <!-- END LEFT SIDEBAR -->
+
+        <!-- MIDDLE - Main Content -->
+        <div class="col-xl-4 col-lg-4 col-md-12">
+          <!-- Banner Title -->
+          <div class="text-center my-3">
+            <h3 class="fs-1 fw-light mb-4 pb-1">Auto Parts <b class="fw-bold text-primary-abs">Market</b></h3>
+            <p class="fs-5 line-height-150"><span class="text-primary-abs">Buy & Sell</span> Auto Parts.
+              <a [routerLink]="'/register'" class="text-primary-abs">Sign up for free</a>
+            </p>
+          </div>
+
+          <div class="row justify-content-center neww-sec">
+            <div class="col-xl-12 xol-lg-12">
           <ul class="nav nav-tabs landing-tabs bg-light-blue2 mt-4" id="myTab" role="tablist">
             <li class="nav-item" role="presentation">
               <button class="nav-link fs-13 px-4 py-3 rounded-2 border-0" id="home-tab" data-bs-toggle="tab"
@@ -1314,8 +1364,67 @@
             </div>
           </div>
         </div>
+            </div>
+          </div>
+        </div>
+        <!-- END MIDDLE CONTENT -->
 
+        <!-- RIGHT SIDEBAR - Dynamic Banners -->
+        <div class="col-xl-4 col-lg-4 d-none d-lg-block">
+          <div class="sticky-top" style="top: 80px;">
+            <!-- Dynamic Banner Loop -->
+            <a *ngFor="let banner of rightBanners" [href]="banner.url" target="_blank"
+              class="d-block mb-3 ad-banner-home">
+              <div class="card border-0 shadow-sm hover-lift">
+                <div class="card-body p-0">
+                  <!-- Banner Header -->
+                  <div class="text-center py-3" [ngStyle]="{'background': banner.headerBackground || '#007bff'}"
+                    [attr.style]="banner.headerStyle">
+                    <h5 class="fw-bold mb-0">{{banner.companyName}}</h5>
+                    <small class="fs-10" *ngIf="banner.tagline">{{banner.tagline}}</small>
+                  </div>
+
+                  <!-- Banner Content -->
+                  <div class="p-3 bg-white">
+                    <!-- Products Grid (2x2) -->
+                    <div class="row g-2 mb-2" *ngIf="banner.products && banner.products.length > 0">
+                      <div class="col-6" *ngFor="let product of banner.products">
+                        <img [src]="product.imageUrl" [alt]="product.altText || product.name"
+                          class="img-fluid rounded shadow-sm" style="width: 100%; height: 120px; object-fit: cover;">
+                        <p class="fs-10 text-center mt-1 mb-0 fw-bold">{{product.name}}</p>
+                      </div>
+                    </div>
+
+                    <!-- Promotional Text -->
+                    <p class="fs-11 mb-2 fw-bold" *ngIf="banner.promotionalText">
+                      {{banner.promotionalText}}
+                    </p>
+
+                    <!-- Additional Text -->
+                    <p class="fs-10 text-muted mb-2" *ngIf="banner.additionalText">
+                      {{banner.additionalText}}
+                    </p>
+
+                    <!-- Call-to-Action Button -->
+                    <div class="badge w-100 py-2" [ngClass]="banner.buttonColor || 'bg-primary'">
+                      {{banner.buttonText || 'Learn More'}} →
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </a>
+
+            <!-- Fallback message if no banners -->
+            <div *ngIf="rightBanners.length === 0" class="text-center text-muted p-4">
+              <i class="fa fa-image fa-3x mb-3"></i>
+              <p>No banners available</p>
+            </div>
+          </div>
+        </div>
+        <!-- END RIGHT SIDEBAR -->
       </div>
+    </div>
+  </section>
 
       <div *ngIf="this.autopartsSearch.length == 0 && this.autopartsSearchLanding.length >0" class="row mx-n2"
         id="listView">

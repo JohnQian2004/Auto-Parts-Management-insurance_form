@@ -432,6 +432,7 @@ export class Home2Component implements OnInit, AfterViewInit {
         this.currentUser = this.storageService.getUser();
         this.getServiceTypes();
         this.getActiveBanner();
+        this.loadBanners(); // Load sidebar banners
         //this.searchPartWithPage(0, 20, 0, false);
         // this.searchPartWithPage(0, this.pageSize, 9, false);
         //this.searchRequestPartWithPage(0, this.pageSize, 9, false);
@@ -4018,5 +4019,41 @@ export class Home2Component implements OnInit, AfterViewInit {
 
   }
 
+  // Sidebar banners for ads
+  leftBanners: Banner[] = [];
+  rightBanners: Banner[] = [];
+
+  /**
+   * Load banners for the current page (home2)
+   * Fetches banners from backend based on domain and position
+   */
+  loadBanners(): void {
+    const domain = this.config.domainName === 'partslinks.com' ? 'partslinks' : 'baycounter';
+    const page = 'home2';
+
+    // Load left sidebar banners
+    this.bannerService.getBannersByDomainPageAndPosition(domain, page, 'left').subscribe({
+      next: (result) => {
+        console.log('[Home2Component] Loaded left banners:', result);
+        this.leftBanners = result;
+      },
+      error: (err) => {
+        console.error('[Home2Component] Error loading left banners:', err);
+        this.leftBanners = [];
+      }
+    });
+
+    // Load right sidebar banners
+    this.bannerService.getBannersByDomainPageAndPosition(domain, page, 'right').subscribe({
+      next: (result) => {
+        console.log('[Home2Component] Loaded right banners:', result);
+        this.rightBanners = result;
+      },
+      error: (err) => {
+        console.error('[Home2Component] Error loading right banners:', err);
+        this.rightBanners = [];
+      }
+    });
+  }
 
 }
