@@ -260,6 +260,7 @@ export class Inshop2Component implements OnInit, AfterViewInit {
 
   statusOverview: GroupBy[] = new Array();
   jobRequestTypeOverview: GroupBy[] = new Array();
+  paymentStatusOverview: GroupBy[] = new Array();
   assignedToOverview: GroupBy[] = new Array();
   changeOverview: GroupBy[] = new Array();
   locationOverview: GroupBy[] = new Array();
@@ -11408,6 +11409,66 @@ export class Inshop2Component implements OnInit, AfterViewInit {
   }
 
   eventBusSub?: Subscription;
+
+  calculatePaymentStatusOverview(): void {
+    this.paymentStatusOverview = new Array();
+    
+    if (!this.vehiclesOriginal || this.vehiclesOriginal.length === 0) {
+      return;
+    }
+
+    const paidCount = this.vehiclesOriginal.filter(v => v.paid === true).length;
+    const unpaidCount = this.vehiclesOriginal.filter(v => v.paid === false || v.paid == null).length;
+    
+    const paidTotal = this.vehiclesOriginal
+      .filter(v => v.paid === true)
+      .reduce((sum, v) => sum + ((v.price || 0) + (v.supplymentPrice || 0)), 0);
+    
+    const unpaidTotal = this.vehiclesOriginal
+      .filter(v => v.paid === false || v.paid == null)
+      .reduce((sum, v) => sum + ((v.price || 0) + (v.supplymentPrice || 0)), 0);
+
+    if (paidCount > 0) {
+      const paidGroup: GroupBy = new GroupBy();
+      paidGroup.status = 1; // Using 1 to represent 'paid'
+      paidGroup.count = paidCount;
+      paidGroup.totals = paidTotal;
+      paidGroup.name = 'Paid';
+      this.paymentStatusOverview.push(paidGroup);
+    }
+
+    if (unpaidCount > 0) {
+      const unpaidGroup: GroupBy = new GroupBy();
+      unpaidGroup.status = 0; // Using 0 to represent 'unpaid'
+      unpaidGroup.count = unpaidCount;
+      unpaidGroup.totals = unpaidTotal;
+      unpaidGroup.name = 'Not Paid';
+      this.paymentStatusOverview.push(unpaidGroup);
+    }
+  }
+
+  applyPaymentStatusfilter(status: any): void {
+    if (status === 'All') {
+      this.vehicles = [...this.vehiclesOriginal];
+      this.searchCount = this.vehicles.length;
+      return;
+    }
+
+    // status will be 1 for paid, 0 for unpaid (from GroupBy.status)
+    const statusNum = typeof status === 'string' ? parseInt(status) : status;
+    
+    if (statusNum === 1) {
+      // Paid
+      this.vehicles = this.vehiclesOriginal.filter(v => v.paid === true);
+    } else if (statusNum === 0) {
+      // Unpaid
+      this.vehicles = this.vehiclesOriginal.filter(v => v.paid === false || v.paid == null);
+    } else {
+      this.vehicles = [...this.vehiclesOriginal];
+    }
+
+    this.searchCount = this.vehicles.length;
+  }
 
   changePasswordRequest(): void {
 
