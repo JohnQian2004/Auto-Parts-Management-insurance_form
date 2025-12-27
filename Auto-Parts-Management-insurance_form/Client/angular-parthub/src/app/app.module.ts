@@ -9,7 +9,7 @@ import { BoardAdminComponent } from './board-admin/board-admin.component';
 import { BoardAdminComponent2 } from './board-admin2/board-admin2.component';
 import { BoardModeratorComponent } from './board-moderator/board-moderator.component';
 import { BoardUserComponent } from './board-user/board-user.component';
-import { HomeComponent } from './home/home.component';
+//import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './login/login.component';
 import { ProfileComponent } from './profile/profile.component';
 import { RegisterComponent } from './register/register.component';
@@ -76,7 +76,7 @@ import { ApprovalStatusComponent } from './approval-status/approval-status.compo
 import { Detail2Component } from './detail2/detail2.component';
 import { EmployeeViewComponent } from './employee-view/employee-view.component';
 import { FeedbackComponent } from './feedback/feedback.component';
-import { Home2Component } from './home2/home2.component';
+//import { Home2Component } from './home2/home2.component';
 import { PaymentMethodComponent } from './payment-method/payment-method.component';
 import { ServiceTypeComponent } from './service-type/service-type.component';
 import { UsersPartsMarketComponent } from './users-parts-market/users-parts-market.component';
@@ -144,8 +144,8 @@ import { VehicleDetailTestComponent } from './vehicle-detail-test/vehicle-detail
     AppComponent,
     LoginComponent,
     RegisterComponent,
-    HomeComponent,
-    Home2Component,
+   // HomeComponent,
+   // Home2Component,
     ProfileComponent,
     BoardAdminComponent,
     BoardAdminComponent2,

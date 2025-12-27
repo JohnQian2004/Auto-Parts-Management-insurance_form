@@ -1918,9 +1918,12 @@
             [ngClass]="{'active': activeIndex === i}"> <i
               class="fa-solid fa-{{icons[i % icons.length]}} fs-4 text-center {{textColors[i % textColors.length]}} {{backgroundColors[i % backgroundColors.length]}} rounded-circle"></i>
             <span class="text-start"> <span class="fs-13 text-dark opacity50"
-                *ngIf="groupBy.status == 0">Not Paid</span>
-              <span class="fs-13 text-dark opacity50"
-                *ngIf="groupBy.status == 1">Paid</span>
+                *ngIf="isInJobRequestTypes(groupBy.status) == false ">Without
+                Payment Status Type</span>
+              <ng-container *ngFor="let jobRequestType of jobRequestTypes; let j=index"> <span class="fs-13  opacity50"
+                  style="display: inline-block; word-break: break-word;" title="{{jobRequestType.comments}}"
+                  *ngIf="groupBy.status > 0 && jobRequestType.id == groupBy.status && jobRequestType.name != '' ">{{jobRequestType.name}}</span>
+              </ng-container>
               <strong class="d-block fs-20 fw-700 mt-2">{{groupBy.count}} <small class="opacity-75 fs-13"
                   *ngIf="groupBy.totals > 0">
                   {{groupBy.totals | currency:'USD':'symbol':'1.0-0' }} </small></strong> </span>

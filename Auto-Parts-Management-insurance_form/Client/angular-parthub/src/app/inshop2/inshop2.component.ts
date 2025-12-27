@@ -10840,6 +10840,11 @@ export class Inshop2Component implements OnInit, AfterViewInit {
 
   showOverview(overviewTypeId: any): void {
     this.overviewTypeId = overviewTypeId;
+    // When showing payment status overview (overviewTypeId == 1), 
+    // ensure job request type overview data is used
+    if (overviewTypeId === 1) {
+      this.calculatePaymentStatusOverview();
+    }
   }
 
   getJobRequestTypeOverview(companyId: any): void {
@@ -11411,62 +11416,66 @@ export class Inshop2Component implements OnInit, AfterViewInit {
   eventBusSub?: Subscription;
 
   calculatePaymentStatusOverview(): void {
-    this.paymentStatusOverview = new Array();
+    // Use jobRequestTypeOverview data from backend (populated by getJobRequestTypeOverview)
+    // This follows the same pattern as production overview which uses statusOverview
+    this.paymentStatusOverview = [];
     
-    if (!this.vehiclesOriginal || this.vehiclesOriginal.length === 0) {
-      return;
-    }
-
-    const paidCount = this.vehiclesOriginal.filter(v => v.paid === true).length;
-    const unpaidCount = this.vehiclesOriginal.filter(v => v.paid === false || v.paid == null).length;
+    // Separate entries with valid job request types from those without
+    const withJobRequestType: GroupBy[] = [];
+    const withoutJobRequestType: GroupBy[] = [];
     
-    const paidTotal = this.vehiclesOriginal
-      .filter(v => v.paid === true)
-      .reduce((sum, v) => sum + ((v.price || 0) + (v.supplymentPrice || 0)), 0);
+    for (const item of this.jobRequestTypeOverview) {
+      if (this.isInJobRequestTypes(item.status)) {
+        withJobRequestType.push(item);
+      } else {
+        withoutJobRequestType.push(item);
+      }
+    }
     
-    const unpaidTotal = this.vehiclesOriginal
-      .filter(v => v.paid === false || v.paid == null)
-      .reduce((sum, v) => sum + ((v.price || 0) + (v.supplymentPrice || 0)), 0);
-
-    if (paidCount > 0) {
-      const paidGroup: GroupBy = new GroupBy();
-      paidGroup.status = 1; // Using 1 to represent 'paid'
-      paidGroup.count = paidCount;
-      paidGroup.totals = paidTotal;
-      paidGroup.name = 'Paid';
-      this.paymentStatusOverview.push(paidGroup);
+    // Group all "Without Payment Status Type" entries into a single entry
+    if (withoutJobRequestType.length > 0) {
+      const withoutGroup: GroupBy = new GroupBy();
+      withoutGroup.status = 0; // Use 0 to represent "Without Payment Status Type"
+      withoutGroup.count = withoutJobRequestType.reduce((sum, item) => sum + (item.count || 0), 0);
+      withoutGroup.totals = withoutJobRequestType.reduce((sum, item) => sum + (item.totals || 0), 0);
+      withoutGroup.name = 'Without Payment Status Type';
+      this.paymentStatusOverview.push(withoutGroup);
     }
-
-    if (unpaidCount > 0) {
-      const unpaidGroup: GroupBy = new GroupBy();
-      unpaidGroup.status = 0; // Using 0 to represent 'unpaid'
-      unpaidGroup.count = unpaidCount;
-      unpaidGroup.totals = unpaidTotal;
-      unpaidGroup.name = 'Not Paid';
-      this.paymentStatusOverview.push(unpaidGroup);
-    }
+    
+    // Add all valid job request type entries
+    this.paymentStatusOverview.push(...withJobRequestType);
+    
+    // Sort: "Without Payment Status Type" first, then others by count (descending)
+    this.paymentStatusOverview.sort((a, b) => {
+      const aIsWithout = !this.isInJobRequestTypes(a.status);
+      const bIsWithout = !this.isInJobRequestTypes(b.status);
+      
+      // If one is "Without" and the other isn't, "Without" comes first
+      if (aIsWithout && !bIsWithout) return -1;
+      if (!aIsWithout && bIsWithout) return 1;
+      
+      // If both are "Without" or both are not, sort by count (descending)
+      return b.count - a.count;
+    });
   }
 
-  applyPaymentStatusfilter(status: any): void {
-    if (status === 'All') {
+  applyPaymentStatusfilter(jobRequestTypeId: any): void {
+    if (jobRequestTypeId === 'All') {
       this.vehicles = [...this.vehiclesOriginal];
       this.searchCount = this.vehicles.length;
       return;
     }
 
-    // status will be 1 for paid, 0 for unpaid (from GroupBy.status)
-    const statusNum = typeof status === 'string' ? parseInt(status) : status;
+    // Filter by jobRequestType (status parameter is the jobRequestType id)
+    const id = typeof jobRequestTypeId === 'string' ? parseInt(jobRequestTypeId) : jobRequestTypeId;
     
-    if (statusNum === 1) {
-      // Paid
-      this.vehicles = this.vehiclesOriginal.filter(v => v.paid === true);
-    } else if (statusNum === 0) {
-      // Unpaid
-      this.vehicles = this.vehiclesOriginal.filter(v => v.paid === false || v.paid == null);
+    // If id is 0, it represents "Without Payment Status Type" - filter vehicles without valid job request type
+    if (id === 0) {
+      this.vehicles = this.vehiclesOriginal.filter(v => !this.isInJobRequestTypes(v.jobRequestType));
     } else {
-      this.vehicles = [...this.vehiclesOriginal];
+      this.vehicles = this.vehiclesOriginal.filter(v => v.jobRequestType === id);
     }
-
+    
     this.searchCount = this.vehicles.length;
   }
 

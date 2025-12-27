@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { HomeComponent } from './home/home.component';
+//import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 
@@ -35,7 +35,7 @@ import { EmployeeViewComponent } from './employee-view/employee-view.component';
 import { EmployeeView2Component } from './employee-view2/employee-view2.component';
 import { EmployeesComponent } from './employees/employees.component';
 import { FeedbackComponent } from './feedback/feedback.component';
-import { Home2Component } from './home2/home2.component';
+//import { Home2Component } from './home2/home2.component';
 import { InsuranceCompaniesComponent } from './insurance-companies/insurance-companies.component';
 import { InventoryComponent } from './inventory/inventory.component';
 import { InvoicesComponent } from './invoices/invoices.component';
@@ -163,8 +163,8 @@ const routes: Routes = [
   { path: 'vendors', component: VendorsComponent },
   // { path: 'home2', component: SearchPartComponent },
   // { path: 'market/:showPostForm', component: HomeComponent },
-  { path: 'autoparts', component: HomeComponent },
-  { path: 'requestparts', component: Home2Component },
+  //{ path: 'autoparts', component: HomeComponent },
+  //{ path: 'requestparts', component: Home2Component },
   { path: 'intake', component: IntakeHomeComponent },
   { path: 'intake2', component: IntakeHome2Component },
   { path: 'intake3', component: IntakeHome3Component },
