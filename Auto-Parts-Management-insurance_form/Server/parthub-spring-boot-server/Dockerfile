@@ -1,4 +1,4 @@
-FROM openjdk:17
+FROM openjdk:26-ea-trixie
 VOLUME /tmp
 EXPOSE 8443
 ARG JAR_FILE=target/Autoparts-jenkins-integration.jar

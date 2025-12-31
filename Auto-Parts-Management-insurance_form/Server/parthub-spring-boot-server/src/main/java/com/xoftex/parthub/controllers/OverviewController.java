@@ -2,6 +2,7 @@ package com.xoftex.parthub.controllers;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.DateTimeException;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -16,20 +17,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-
 import org.springframework.http.HttpStatus;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-
 import org.springframework.web.bind.annotation.CrossOrigin;
-
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-
 import org.springframework.web.bind.annotation.RestController;
 
 import com.xoftex.parthub.models.Expense;
@@ -52,8 +48,6 @@ import com.xoftex.parthub.repository.ReceiptRepository;
 import com.xoftex.parthub.repository.UserRepository;
 import com.xoftex.parthub.repository.VehicleHistoryRepository;
 import com.xoftex.parthub.repository.VehicleRepository;
-
-import com.xoftex.parthub.services.ActiveUserService;
 
 //for Angular Client (withCredentials)
 //@CrossOrigin(origins = "http://localhost:4200", maxAge = 3600, allowCredentials = "true")
@@ -581,7 +575,6 @@ public class OverviewController {
 
   }
 
-
   @PostMapping("/payment/{companyId}")
   @PreAuthorize("hasAnyRole('USER', 'MODERATOR','ADMIN','SHOP', 'RECYCLER')")
   public ResponseEntity<ReportCarrier> getVehiclePaymentReport(@PathVariable("companyId") long companyId,
@@ -602,8 +595,7 @@ public class OverviewController {
       // handle dec-jan transition
       int weekNumber = i;
       int yearNumber = year;
-      
-      
+
       if (i <= 0) {
         weekNumber = 52 + i;
         yearNumber = yearNumber - 1;
@@ -612,8 +604,10 @@ public class OverviewController {
       int yearWeek = yearNumber * 100 + weekNumber;
 
       try {
-        // Date from = this.asDate(this.getFirstDayOfWeek(yearNumber, weekNumber, Locale.US));
-        // Date to = this.asDate(this.getFirstDayOfWeek(yearNumber, weekNumber + 1, Locale.US));
+        // Date from = this.asDate(this.getFirstDayOfWeek(yearNumber, weekNumber,
+        // Locale.US));
+        // Date to = this.asDate(this.getFirstDayOfWeek(yearNumber, weekNumber + 1,
+        // Locale.US));
 
         report.data = new ArrayList<GroupBy>();
         report.label = "" + weekNumber;
@@ -656,10 +650,11 @@ public class OverviewController {
         yearNumber = yearNumber - 1;
       }
       try {
-        Date from = this.asDate(this.getFirstDayOfWeek(yearNumber, weekNumber, Locale.US));
-        // Date to = this.asDate(this.getFirstDayOfWeek(yearNumber, weekNumber + 1,
-        // Locale.US).minus(1, ChronoUnit.DAYS));
-        Date to = this.asDate(this.getFirstDayOfWeek(yearNumber, weekNumber + 1, Locale.US));
+        LocalDate fromDate = this.getFirstDayOfWeek(yearNumber, weekNumber, Locale.US);
+        Date from = this.asDate(fromDate);
+        // Add 7 days to get the first day of the next week, avoiding week number
+        // overflow
+        Date to = this.asDate(fromDate.plusWeeks(1));
 
         report.data = new ArrayList<GroupBy>();
         report.label = "" + weekNumber;
@@ -700,10 +695,11 @@ public class OverviewController {
         yearNumber = yearNumber - 1;
       }
       try {
-        Date from = this.asDate(this.getFirstDayOfWeek(yearNumber, weekNumber, Locale.US));
-        // Date to = this.asDate(this.getFirstDayOfWeek(yearNumber, weekNumber + 1,
-        // Locale.US).minus(1, ChronoUnit.DAYS));
-        Date to = this.asDate(this.getFirstDayOfWeek(yearNumber, weekNumber + 1, Locale.US));
+        LocalDate fromDate = this.getFirstDayOfWeek(yearNumber, weekNumber, Locale.US);
+        Date from = this.asDate(fromDate);
+        // Add 7 days to get the first day of the next week, avoiding week number
+        // overflow
+        Date to = this.asDate(fromDate.plusWeeks(1));
 
         report.data = new ArrayList<GroupBy>();
         report.label = "" + weekNumber;
@@ -744,10 +740,11 @@ public class OverviewController {
         yearNumber = yearNumber - 1;
       }
       try {
-        Date from = this.asDate(this.getFirstDayOfWeek(yearNumber, weekNumber, Locale.US));
-        // Date to = this.asDate(this.getFirstDayOfWeek(yearNumber, weekNumber + 1,
-        // Locale.US).minus(1, ChronoUnit.DAYS));
-        Date to = this.asDate(this.getFirstDayOfWeek(yearNumber, weekNumber + 1, Locale.US));
+        LocalDate fromDate = this.getFirstDayOfWeek(yearNumber, weekNumber, Locale.US);
+        Date from = this.asDate(fromDate);
+        // Add 7 days to get the first day of the next week, avoiding week number
+        // overflow
+        Date to = this.asDate(fromDate.plusWeeks(1));
 
         report.data = new ArrayList<GroupBy>();
         report.label = "" + weekNumber;
@@ -788,10 +785,11 @@ public class OverviewController {
         yearNumber = yearNumber - 1;
       }
       try {
-        Date from = this.asDate(this.getFirstDayOfWeek(yearNumber, weekNumber, Locale.US));
-        // Date to = this.asDate(this.getFirstDayOfWeek(yearNumber, weekNumber + 1,
-        // Locale.US).minus(1, ChronoUnit.DAYS));
-        Date to = this.asDate(this.getFirstDayOfWeek(yearNumber, weekNumber + 1, Locale.US));
+        LocalDate fromDate = this.getFirstDayOfWeek(yearNumber, weekNumber, Locale.US);
+        Date from = this.asDate(fromDate);
+        // Add 7 days to get the first day of the next week, avoiding week number
+        // overflow
+        Date to = this.asDate(fromDate.plusWeeks(1));
 
         report.data = new ArrayList<GroupBy>();
         report.label = "" + weekNumber;
@@ -832,10 +830,11 @@ public class OverviewController {
         yearNumber = yearNumber - 1;
       }
       try {
-        Date from = this.asDate(this.getFirstDayOfWeek(yearNumber, weekNumber, Locale.US));
-        // Date to = this.asDate(this.getFirstDayOfWeek(yearNumber, weekNumber + 1,
-        // Locale.US).minus(1, ChronoUnit.DAYS));
-        Date to = this.asDate(this.getFirstDayOfWeek(yearNumber, weekNumber + 1, Locale.US));
+        LocalDate fromDate = this.getFirstDayOfWeek(yearNumber, weekNumber, Locale.US);
+        Date from = this.asDate(fromDate);
+        // Add 7 days to get the first day of the next week, avoiding week number
+        // overflow
+        Date to = this.asDate(fromDate.plusWeeks(1));
 
         report.data = new ArrayList<GroupBy>();
         report.label = "" + weekNumber;
@@ -876,10 +875,11 @@ public class OverviewController {
         yearNumber = yearNumber - 1;
       }
       try {
-        Date from = this.asDate(this.getFirstDayOfWeek(yearNumber, weekNumber, Locale.US));
-        // Date to = this.asDate(this.getFirstDayOfWeek(yearNumber, weekNumber + 1,
-        // Locale.US).minus(1, ChronoUnit.DAYS));
-        Date to = this.asDate(this.getFirstDayOfWeek(yearNumber, weekNumber + 1, Locale.US));
+        LocalDate fromDate = this.getFirstDayOfWeek(yearNumber, weekNumber, Locale.US);
+        Date from = this.asDate(fromDate);
+        // Add 7 days to get the first day of the next week, avoiding week number
+        // overflow
+        Date to = this.asDate(fromDate.plusWeeks(1));
 
         report.data = new ArrayList<GroupBy>();
         report.label = "" + weekNumber;
@@ -920,10 +920,11 @@ public class OverviewController {
         yearNumber = yearNumber - 1;
       }
       try {
-        Date from = this.asDate(this.getFirstDayOfWeek(yearNumber, weekNumber, Locale.US));
-        // Date to = this.asDate(this.getFirstDayOfWeek(yearNumber, weekNumber + 1,
-        // Locale.US).minus(1, ChronoUnit.DAYS));
-        Date to = this.asDate(this.getFirstDayOfWeek(yearNumber, weekNumber + 1, Locale.US));
+        LocalDate fromDate = this.getFirstDayOfWeek(yearNumber, weekNumber, Locale.US);
+        Date from = this.asDate(fromDate);
+        // Add 7 days to get the first day of the next week, avoiding week number
+        // overflow
+        Date to = this.asDate(fromDate.plusWeeks(1));
 
         report.data = new ArrayList<GroupBy>();
         report.label = "" + weekNumber;
@@ -964,10 +965,11 @@ public class OverviewController {
         yearNumber = yearNumber - 1;
       }
       try {
-        Date from = this.asDate(this.getFirstDayOfWeek(yearNumber, weekNumber, Locale.US));
-        // Date to = this.asDate(this.getFirstDayOfWeek(yearNumber, weekNumber + 1,
-        // Locale.US).minus(1, ChronoUnit.DAYS));
-        Date to = this.asDate(this.getFirstDayOfWeek(yearNumber, weekNumber + 1, Locale.US));
+        LocalDate fromDate = this.getFirstDayOfWeek(yearNumber, weekNumber, Locale.US);
+        Date from = this.asDate(fromDate);
+        // Add 7 days to get the first day of the next week, avoiding week number
+        // overflow
+        Date to = this.asDate(fromDate.plusWeeks(1));
 
         report.data = new ArrayList<GroupBy>();
         report.label = "" + weekNumber;
@@ -1008,10 +1010,11 @@ public class OverviewController {
         yearNumber = yearNumber - 1;
       }
       try {
-        Date from = this.asDate(this.getFirstDayOfWeek(yearNumber, weekNumber, Locale.US));
-        // Date to = this.asDate(this.getFirstDayOfWeek(yearNumber, weekNumber + 1,
-        // Locale.US).minus(1, ChronoUnit.DAYS));
-        Date to = this.asDate(this.getFirstDayOfWeek(yearNumber, weekNumber + 1, Locale.US));
+        LocalDate fromDate = this.getFirstDayOfWeek(yearNumber, weekNumber, Locale.US);
+        Date from = this.asDate(fromDate);
+        // Add 7 days to get the first day of the next week, avoiding week number
+        // overflow
+        Date to = this.asDate(fromDate.plusWeeks(1));
 
         report.data = new ArrayList<GroupBy>();
         report.label = "" + weekNumber;
@@ -1052,10 +1055,11 @@ public class OverviewController {
         yearNumber = yearNumber - 1;
       }
       try {
-        Date from = this.asDate(this.getFirstDayOfWeek(yearNumber, weekNumber, Locale.US));
-        // Date to = this.asDate(this.getFirstDayOfWeek(yearNumber, weekNumber + 1,
-        // Locale.US).minus(1, ChronoUnit.DAYS));
-        Date to = this.asDate(this.getFirstDayOfWeek(yearNumber, weekNumber + 1, Locale.US));
+        LocalDate fromDate = this.getFirstDayOfWeek(yearNumber, weekNumber, Locale.US);
+        Date from = this.asDate(fromDate);
+        // Add 7 days to get the first day of the next week, avoiding week number
+        // overflow
+        Date to = this.asDate(fromDate.plusWeeks(1));
 
         report.data = new ArrayList<GroupBy>();
         report.label = "" + weekNumber;
@@ -1096,10 +1100,11 @@ public class OverviewController {
         yearNumber = yearNumber - 1;
       }
       try {
-        Date from = this.asDate(this.getFirstDayOfWeek(yearNumber, weekNumber, Locale.US));
-        // Date to = this.asDate(this.getFirstDayOfWeek(yearNumber, weekNumber + 1,
-        // Locale.US).minus(1, ChronoUnit.DAYS));
-        Date to = this.asDate(this.getFirstDayOfWeek(yearNumber, weekNumber + 1, Locale.US));
+        LocalDate fromDate = this.getFirstDayOfWeek(yearNumber, weekNumber, Locale.US);
+        Date from = this.asDate(fromDate);
+        // Add 7 days to get the first day of the next week, avoiding week number
+        // overflow
+        Date to = this.asDate(fromDate.plusWeeks(1));
         List<Expense> expenses = new ArrayList<>();
         report.data = new ArrayList<GroupBy>();
         report.label = "" + weekNumber;
@@ -1143,8 +1148,11 @@ public class OverviewController {
     int weekNumber = week;
     int yearNumber = year;
 
-    Date from = this.asDate(this.getFirstDayOfWeek(yearNumber, weekNumber, Locale.US));
-    Date to = this.asDate(this.getFirstDayOfWeek(yearNumber, weekNumber + 1, Locale.US));
+    LocalDate fromDate = this.getFirstDayOfWeek(yearNumber, weekNumber, Locale.US);
+    Date from = this.asDate(fromDate);
+    // Add 7 days to get the first day of the next week, avoiding week number
+    // overflow
+    Date to = this.asDate(fromDate.plusWeeks(1));
 
     List<GroupBy> groupBies = new ArrayList<GroupBy>();
 
@@ -1186,8 +1194,11 @@ public class OverviewController {
     int weekNumber = week;
     int yearNumber = year;
 
-    Date from = this.asDate(this.getFirstDayOfWeek(yearNumber, weekNumber, Locale.US));
-    Date to = this.asDate(this.getFirstDayOfWeek(yearNumber, weekNumber + 1, Locale.US));
+    LocalDate fromDate = this.getFirstDayOfWeek(yearNumber, weekNumber, Locale.US);
+    Date from = this.asDate(fromDate);
+    // Add 7 days to get the first day of the next week, avoiding week number
+    // overflow
+    Date to = this.asDate(fromDate.plusWeeks(1));
 
     List<GroupBy> groupBies = new ArrayList<GroupBy>();
 
@@ -1229,8 +1240,11 @@ public class OverviewController {
     int weekNumber = week;
     int yearNumber = year;
 
-    Date from = this.asDate(this.getFirstDayOfWeek(yearNumber, weekNumber, Locale.US));
-    Date to = this.asDate(this.getFirstDayOfWeek(yearNumber, weekNumber + 1, Locale.US));
+    LocalDate fromDate = this.getFirstDayOfWeek(yearNumber, weekNumber, Locale.US);
+    Date from = this.asDate(fromDate);
+    // Add 7 days to get the first day of the next week, avoiding week number
+    // overflow
+    Date to = this.asDate(fromDate.plusWeeks(1));
 
     List<GroupBy> groupBies = new ArrayList<GroupBy>();
 
@@ -1284,10 +1298,11 @@ public class OverviewController {
         yearNumber = yearNumber - 1;
       }
       try {
-        Date from = this.asDate(this.getFirstDayOfWeek(yearNumber, weekNumber, Locale.US));
-        // Date to = this.asDate(this.getFirstDayOfWeek(yearNumber, weekNumber + 1,
-        // Locale.US).minus(1, ChronoUnit.DAYS));
-        Date to = this.asDate(this.getFirstDayOfWeek(yearNumber, weekNumber + 1, Locale.US));
+        LocalDate fromDate = this.getFirstDayOfWeek(yearNumber, weekNumber, Locale.US);
+        Date from = this.asDate(fromDate);
+        // Add 7 days to get the first day of the next week, avoiding week number
+        // overflow
+        Date to = this.asDate(fromDate.plusWeeks(1));
 
         report.data = new ArrayList<GroupBy>();
         report.label = "" + weekNumber;
@@ -1373,10 +1388,11 @@ public class OverviewController {
         yearNumber = yearNumber - 1;
       }
       try {
-        Date from = this.asDate(this.getFirstDayOfWeek(yearNumber, weekNumber, Locale.US));
-        // Date to = this.asDate(this.getFirstDayOfWeek(yearNumber, weekNumber + 1,
-        // Locale.US).minus(1, ChronoUnit.DAYS));
-        Date to = this.asDate(this.getFirstDayOfWeek(yearNumber, weekNumber + 1, Locale.US));
+        LocalDate fromDate = this.getFirstDayOfWeek(yearNumber, weekNumber, Locale.US);
+        Date from = this.asDate(fromDate);
+        // Add 7 days to get the first day of the next week, avoiding week number
+        // overflow
+        Date to = this.asDate(fromDate.plusWeeks(1));
 
         report.data = new ArrayList<GroupBy>();
         report.label = "" + weekNumber;
@@ -1410,10 +1426,120 @@ public class OverviewController {
 
   // Locale.US
   private LocalDate getFirstDayOfWeek(int year, int weekNumber, Locale locale) {
-    return LocalDate
-        .of(year, 2, 1)
-        .with(WeekFields.of(locale).getFirstDayOfWeek())
-        .with(WeekFields.of(locale).weekOfWeekBasedYear(), weekNumber);
+    WeekFields weekFields = WeekFields.of(locale);
+    int adjustedYear = year;
+    int adjustedWeekNumber = weekNumber;
+
+    // Handle invalid week numbers by rolling over to next/previous year
+    if (weekNumber <= 0) {
+      // Roll back to previous year: week 0 becomes week 52/53 of previous year
+      adjustedWeekNumber = 52 + weekNumber;
+      adjustedYear = year - 1;
+      // Ensure adjusted week is valid
+      if (adjustedWeekNumber < 1) {
+        adjustedWeekNumber = 1;
+      }
+    } else {
+      // First, try to get the maximum week number for the given year
+      try {
+        LocalDate lastDayOfYear = LocalDate.of(year, 12, 31);
+        int maxWeekForYear = lastDayOfYear.get(weekFields.weekOfWeekBasedYear());
+
+        if (weekNumber > maxWeekForYear) {
+          // Roll over to next year: week exceeds max, becomes week 1+ of next year
+          int weeksOver = weekNumber - maxWeekForYear;
+          adjustedWeekNumber = weeksOver;
+          adjustedYear = year + 1;
+
+          // Validate the adjusted week for the next year
+          LocalDate lastDayOfNextYear = LocalDate.of(adjustedYear, 12, 31);
+          int maxWeekForNextYear = lastDayOfNextYear.get(weekFields.weekOfWeekBasedYear());
+          if (adjustedWeekNumber > maxWeekForNextYear) {
+            adjustedWeekNumber = maxWeekForNextYear;
+          }
+        }
+      } catch (Exception e) {
+        // If we can't determine max week, use simple fallback: clamp to 53
+        if (weekNumber > 53) {
+          adjustedWeekNumber = weekNumber - 53;
+          adjustedYear = year + 1;
+          if (adjustedWeekNumber > 53) {
+            adjustedWeekNumber = 53;
+          }
+        }
+      }
+    }
+
+    // Final validation: ensure week number is at least 1 and within valid range
+    if (adjustedWeekNumber < 1) {
+      adjustedWeekNumber = 1;
+    }
+
+    // Get the actual maximum week number for the adjusted year to ensure validity
+    try {
+      LocalDate lastDayOfAdjustedYear = LocalDate.of(adjustedYear, 12, 31);
+      int maxWeekForAdjustedYear = lastDayOfAdjustedYear.get(weekFields.weekOfWeekBasedYear());
+      if (adjustedWeekNumber > maxWeekForAdjustedYear) {
+        adjustedWeekNumber = maxWeekForAdjustedYear;
+      }
+    } catch (Exception e) {
+      // If we can't determine max week, clamp to 53 as a safe maximum
+      if (adjustedWeekNumber > 53) {
+        adjustedWeekNumber = 53;
+      }
+    }
+
+    // Final absolute safety check: NEVER pass a week number > 53 to .with()
+    // Get the actual maximum week for the adjusted year and clamp if necessary
+    int finalWeekNumber = adjustedWeekNumber;
+    try {
+      LocalDate lastDayOfFinalYear = LocalDate.of(adjustedYear, 12, 31);
+      int actualMaxWeek = lastDayOfFinalYear.get(weekFields.weekOfWeekBasedYear());
+      // Clamp to the actual maximum (which is at most 53)
+      finalWeekNumber = Math.min(adjustedWeekNumber, actualMaxWeek);
+      // Ensure it's at least 1
+      finalWeekNumber = Math.max(1, finalWeekNumber);
+    } catch (Exception ex) {
+      // If we can't determine max, use absolute maximum of 53
+      finalWeekNumber = Math.min(adjustedWeekNumber, 53);
+      finalWeekNumber = Math.max(1, finalWeekNumber);
+    }
+
+    // One more absolute check - this should NEVER be > 53
+    if (finalWeekNumber > 53) {
+      finalWeekNumber = 53;
+    }
+
+    // Try to create the date, with fallback if it still fails
+    try {
+      return LocalDate
+          .of(adjustedYear, 2, 1)
+          .with(weekFields.getFirstDayOfWeek())
+          .with(weekFields.weekOfWeekBasedYear(), finalWeekNumber);
+    } catch (DateTimeException e) {
+      // If it still fails, clamp to a safe value and try again
+      try {
+        LocalDate lastDayOfYear = LocalDate.of(adjustedYear, 12, 31);
+        int maxWeek = lastDayOfYear.get(weekFields.weekOfWeekBasedYear());
+        int safeWeek = Math.min(finalWeekNumber, maxWeek);
+        safeWeek = Math.max(1, safeWeek);
+        // One more absolute check
+        if (safeWeek > 53) {
+          safeWeek = 53;
+        }
+
+        return LocalDate
+            .of(adjustedYear, 2, 1)
+            .with(weekFields.getFirstDayOfWeek())
+            .with(weekFields.weekOfWeekBasedYear(), safeWeek);
+      } catch (Exception ex) {
+        // Ultimate fallback: use week 1
+        return LocalDate
+            .of(adjustedYear, 2, 1)
+            .with(weekFields.getFirstDayOfWeek())
+            .with(weekFields.weekOfWeekBasedYear(), 1);
+      }
+    }
   }
 
   private Date asDate(LocalDate localDate) {
