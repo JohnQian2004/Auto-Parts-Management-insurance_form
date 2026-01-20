@@ -115,6 +115,12 @@ public class Vehicle extends AuditModel {
     @Column(name = "supplyment_price")
     private float supplymentPrice = 0;
 
+    @Column(name = "markup_precentage")
+    private int markupPrecentage = 0;
+
+    @Column(name = "discount_percentage")
+    private int discountPercentage = 0;
+
     @Column(name = "comments")
     @Size(max = 2000)
     private String comments = "";
@@ -821,6 +827,22 @@ public class Vehicle extends AuditModel {
 
     public void setSupplymentPrice(float supplymentPrice) {
         this.supplymentPrice = supplymentPrice;
+    }
+
+    public int getMarkupPrecentage() {
+        return markupPrecentage;
+    }
+
+    public void setMarkupPrecentage(int markupPrecentage) {
+        this.markupPrecentage = markupPrecentage;
+    }
+
+    public int getDiscountPercentage() {
+        return discountPercentage;
+    }
+
+    public void setDiscountPercentage(int discountPercentage) {
+        this.discountPercentage = discountPercentage;
     }
 
     public void setClaimNumber(String claimNumber) {

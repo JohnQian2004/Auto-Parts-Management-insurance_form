@@ -47,6 +47,8 @@ export class Vehicle {
 
     price: number = 0;
     supplymentPrice: number = 0;
+    markupPrecentage: number = 0;
+    discountPercentage: number = 0;
 
     claimNumber?: string;
     currentJobNumber?: string;

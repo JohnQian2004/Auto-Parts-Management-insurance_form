@@ -430,7 +430,9 @@ export class Inshop2Component implements OnInit, AfterViewInit {
     picByte: "",
     comments: "",
     special: false,
-    customer: new Customer()
+    customer: new Customer(),
+    markupPrecentage: 0,
+    discountPercentage: 0
   };
 
   optionsYear: string[] = new Array();
@@ -447,6 +449,8 @@ export class Inshop2Component implements OnInit, AfterViewInit {
   optionsDamage: string[] = ["LFB", "RFB", "LHF", "LFT", "LRT", "LRQP", "LRD", "LFD"];
 
   optionsLocation: string[] = ["Lot 1", "Lot 2", "Front", "Back", "In Shop", "Yard", "Others"];
+
+  markupPercentageOptions: number[] = Array.from({ length: 51 }, (_, i) => i); // 0 to 50
 
   optionsTitle: string[] = ["Miss", "Mr", "Mrs.", "Ms", "Others"];
 
@@ -10241,6 +10245,26 @@ export class Inshop2Component implements OnInit, AfterViewInit {
     }
 
     return randomstring;
+  }
+
+  onMarkupPercentageChange(): void {
+    console.log('Markup percentage changed to:', this.vehicle.markupPrecentage);
+    if (this.vehicle.id > 0) {
+      this.vehicle.reason = "markup percentage";
+      this.vehicleService.createAndUpdateVehicle(this.currentUser.id, this.vehicle).subscribe({
+        next: result => {
+          console.log(result);
+          this.vehicle = result;
+          this.vehicle.reason = "";
+          // Trigger receipts update to recalculate prices
+          this.getAllVehicleReceipt(this.vehicle.id);
+        },
+        error: (e) => {
+          console.error(e);
+          this.vehicle.reason = "";
+        }
+      });
+    }
   }
 
   getReceiptSubTotal(receipt: any): any {

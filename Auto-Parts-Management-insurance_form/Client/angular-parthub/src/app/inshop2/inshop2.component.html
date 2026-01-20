@@ -4985,9 +4985,19 @@
                   </div>
                 </div>
               </h2>
-              <div class="d-lg-flex align-items-center px-2 mt-2" *ngIf="user.allowAddUpdateAutopart == true">
+              <div class="d-lg-flex align-items-center px-2 mt-2 mb-2" style="display: flex !important;">
+                <div class="me-3 d-flex align-items-center" style="display: flex !important;">
+                  <label class="form-label fs-13 mb-0 me-2 fw-semibold" style="display: block !important;">Markup Percentage:</label>
+                  <select class="form-select form-select-sm border-radius-4" 
+                    [(ngModel)]="vehicle.markupPrecentage" 
+                    (change)="onMarkupPercentageChange()"
+                    [disabled]="vehicle.id == 0"
+                    style="min-width: 120px; display: block !important; visibility: visible !important;">
+                    <option [value]="i" *ngFor="let i of markupPercentageOptions">{{i}}%</option>
+                  </select>
+                </div>
                 <button class="btn btn-success fs-13 px-3 py-2 mt-15-mob" data-bs-toggle="modal" title="Add Parts"
-                  *ngIf="this.vehicle.id> 0" data-bs-target="#addNewPart" (click)="addNewParts()"><i
+                  *ngIf="user.allowAddUpdateAutopart == true && this.vehicle.id> 0" data-bs-target="#addNewPart" (click)="addNewParts()"><i
                     class="fa fa-plus me-2"></i> Add Parts </button>
               </div>
             </div>
@@ -5027,6 +5037,8 @@
                         </th>
                         <th class="fs-14 text-center text-white mw-100" (click)="sortListAutoparts('salePrice')"
                           title="Sort By Price"> Price</th>
+                        <th class="fs-14 text-center text-white mw-100"
+                          title="Markup"> Markup</th>
                         <th class="fs-14 text-center text-white mw-100" (click)="sortListAutoparts('createdAt')"
                           title="Sort By Date"> <i class="fa-solid fa-clock"></i></th>
                         <th class="fs-14 text-center text-white mw-50"><i class="fa-solid fa-user"></i></th>
@@ -5136,6 +5148,10 @@
 
                         <td class="text-center fs-13" data-bs-toggle="modal" data-bs-target="#partDetails"
                           title="Click to view details" (click)=" editAutopart(autopart, i)"> ${{autopart.salePrice}}
+                        </td>
+                        <td class="text-center fs-13" data-bs-toggle="modal" data-bs-target="#partDetails"
+                          title="Click to view details [Markup: {{vehicle.markupPrecentage || 0}}%]" (click)=" editAutopart(autopart, i)"> 
+                          ${{getMarkupPrice(autopart.salePrice, vehicle.markupPrecentage)}}
                         </td>
                         <td class="text-center fs-13" data-bs-toggle="modal" data-bs-target="#partDetails"
                           title="Click to view details" (click)=" editAutopart(autopart, i)"> {{autopart.createdAt |

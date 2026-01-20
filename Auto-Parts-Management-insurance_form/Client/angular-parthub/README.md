@@ -4,6 +4,8 @@
  ng serve --host 0.0.0.0 --ssl true --ssl-key cert.key --ssl-cert cert.crt
  ng serve --host 0.0.0.0 --ssl true --ssl-key privkey.pem --ssl-cert fullchain.pem
  ng serve --disable-host-check --host 0.0.0.0 --ssl true --ssl-key baycounter.key --ssl-cert baycounter.crt
+ npx ng serve --disable-host-check --host 0.0.0.0 --ssl true --ssl-key baycounter.key --ssl-cert baycounter.crt
+ 
 4) cmd: ng build 
 5) cmd: docker build --no-cache -f Dockerfile_SSL -t angular-parthub_ssl .
 6) cmd: docker run -d -p 443:443 --name angular-parthub_ssl angular-parthub_ssl
