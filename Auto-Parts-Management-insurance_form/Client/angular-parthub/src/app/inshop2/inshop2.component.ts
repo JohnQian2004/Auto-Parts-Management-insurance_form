@@ -431,7 +431,7 @@ export class Inshop2Component implements OnInit, AfterViewInit {
     comments: "",
     special: false,
     customer: new Customer(),
-    markupPrecentage: 0,
+    markupPrecentage: 50,
     discountPercentage: 0
   };
 
@@ -450,7 +450,10 @@ export class Inshop2Component implements OnInit, AfterViewInit {
 
   optionsLocation: string[] = ["Lot 1", "Lot 2", "Front", "Back", "In Shop", "Yard", "Others"];
 
-  markupPercentageOptions: number[] = Array.from({ length: 51 }, (_, i) => i); // 0 to 50
+  markupPercentageOptions: number[] = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50];
+  
+  partsMarkupPercentageOptions: number[] = [];
+  discountPercentageOptions: number[] = [];
 
   optionsTitle: string[] = ["Miss", "Mr", "Mrs.", "Ms", "Others"];
 
@@ -1537,6 +1540,18 @@ export class Inshop2Component implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
+    // Initialize parts markup percentage options (0-200)
+    for (let i = 0; i <= 200; i++) {
+      this.partsMarkupPercentageOptions.push(i);
+    }
+    // Initialize discount percentage options (0-100)
+    for (let i = 0; i <= 100; i++) {
+      this.discountPercentageOptions.push(i);
+    }
+    // Set default markup percentage to 50% if not set
+    if (this.vehicle.markupPrecentage === undefined || this.vehicle.markupPrecentage === null) {
+      this.vehicle.markupPrecentage = 50;
+    }
 
     this.eventBusSub = this.eventBusService.on('display', (data: any) => {
       console.log(" app event " + data);
@@ -8026,8 +8041,35 @@ export class Inshop2Component implements OnInit, AfterViewInit {
     return +(this.getSubtotalClaimsLocked() + this.getTaxClaimLocked()).toFixed(2);
   }
 
+  getPartsMarkupSubtotal(): number {
+    var total: number = 0;
+    if (this.receipts.length > 0) {
+      const markupPercentage = this.vehicle.markupPrecentage || 50;
+      for (let receipt of this.receipts) {
+        if (receipt.autopartId > 0) {
+          const subtotal = receipt.quantity * receipt.amount;
+          const markupAmount = subtotal * (markupPercentage / 100);
+          total += markupAmount;
+        }
+      }
+      return +(total.toFixed(2));
+    }
+    return 0;
+  }
+
   getTotal(): number {
     return +(this.getSubtotal() + this.getTax()).toFixed(2);
+  }
+
+  getTotalWithDiscount(): number {
+    const subtotal = this.getSubtotal();
+    const partsMarkupSubtotal = this.getPartsMarkupSubtotal();
+    const tax = this.getTax();
+    const totalBeforeDiscount = subtotal + partsMarkupSubtotal + tax;
+    const discountPercentage = this.vehicle.discountPercentage || 0;
+    const discountAmount = totalBeforeDiscount * (discountPercentage / 100);
+    const finalTotal = totalBeforeDiscount - discountAmount;
+    return +(finalTotal.toFixed(2));
   }
 
   getTotalBallance(): number {
@@ -10258,6 +10300,50 @@ export class Inshop2Component implements OnInit, AfterViewInit {
           this.vehicle.reason = "";
           // Trigger receipts update to recalculate prices
           this.getAllVehicleReceipt(this.vehicle.id);
+        },
+        error: (e) => {
+          console.error(e);
+          this.vehicle.reason = "";
+        }
+      });
+    }
+  }
+
+  getMarkupPrice(salePrice: number, markupPercentage: number): number {
+    if (!salePrice || salePrice === 0) return 0;
+    if (!markupPercentage) markupPercentage = 0;
+    return +(salePrice + (salePrice * markupPercentage / 100)).toFixed(2);
+  }
+
+  onPartsMarkupPercentageChange(): void {
+    console.log('Parts markup percentage changed to:', this.vehicle.markupPrecentage);
+    if (this.vehicle.id > 0) {
+      this.vehicle.reason = "parts markup percentage";
+      this.vehicleService.createAndUpdateVehicle(this.currentUser.id, this.vehicle).subscribe({
+        next: result => {
+          console.log(result);
+          this.vehicle = result;
+          this.vehicle.reason = "";
+          // Trigger receipts update to recalculate prices
+          this.getAllVehicleReceipt(this.vehicle.id);
+        },
+        error: (e) => {
+          console.error(e);
+          this.vehicle.reason = "";
+        }
+      });
+    }
+  }
+
+  onDiscountPercentageChange(): void {
+    console.log('Discount percentage changed to:', this.vehicle.discountPercentage);
+    if (this.vehicle.id > 0) {
+      this.vehicle.reason = "discount percentage";
+      this.vehicleService.createAndUpdateVehicle(this.currentUser.id, this.vehicle).subscribe({
+        next: result => {
+          console.log(result);
+          this.vehicle = result;
+          this.vehicle.reason = "";
         },
         error: (e) => {
           console.error(e);

@@ -5151,7 +5151,7 @@
                         </td>
                         <td class="text-center fs-13" data-bs-toggle="modal" data-bs-target="#partDetails"
                           title="Click to view details [Markup: {{vehicle.markupPrecentage || 0}}%]" (click)=" editAutopart(autopart, i)"> 
-                          ${{getMarkupPrice(autopart.salePrice, vehicle.markupPrecentage)}}
+                          ${{((autopart.salePrice || 0) + ((autopart.salePrice || 0) * ((vehicle.markupPrecentage || 0) / 100))).toFixed(2)}}
                         </td>
                         <td class="text-center fs-13" data-bs-toggle="modal" data-bs-target="#partDetails"
                           title="Click to view details" (click)=" editAutopart(autopart, i)"> {{autopart.createdAt |
@@ -6315,7 +6315,7 @@
               </div>
             </div>
             <div class="d-lg-flex align-items-center justify-content-between px-1 mt-3">
-              <div class="d-flex align-items-center gap-3 w-80 v-receipt">
+              <div class="d-flex align-items-center gap-3 w-80 v-receipt flex-wrap">
                 <select class="form-select h-48 px-3 border-radius-8" [(ngModel)]="vehicle.paymentMethod" #paymentMethod
                   title="Payment Methods" (change)="onChangeVehiclePaymentMethod($event, paymentMethod.value)">
                   <option value="0" disabled selected>Select Payment Method</option>
@@ -6334,6 +6334,16 @@
                   <option [value]="warranty.id" [selected]="warranty.isDefault == true"
                     *ngFor="let warranty of warranties;let i=index;">
                     {{warranty.name}} <span *ngIf="warranty.isDefault ==true">(default)</span></option>
+                </select>
+                <select class="form-select h-48 px-3 border-radius-8" [(ngModel)]="vehicle.markupPrecentage" 
+                  title="Parts Markup Percentage" (change)="onPartsMarkupPercentageChange()"
+                  [disabled]="vehicle.id == 0">
+                  <option [value]="i" *ngFor="let i of partsMarkupPercentageOptions">{{i}}%</option>
+                </select>
+                <select class="form-select h-48 px-3 border-radius-8" [(ngModel)]="vehicle.discountPercentage" 
+                  title="Discount Percentage" (change)="onDiscountPercentageChange()"
+                  [disabled]="vehicle.id == 0">
+                  <option [value]="i" *ngFor="let i of discountPercentageOptions">{{i}}%</option>
                 </select>
                 <div class="form-check form-switch d-flex ms-3 mw-150">
                   <input class="form-check-input mt-0" type="checkbox" role="switch" id="tax"
@@ -6380,6 +6390,8 @@
 
                           <th class="bg-secondary p-4 fs-13 text-center text-white v-align-middle mw-100"
                             style="width: 100px;">Subtotal</th>
+                          <th class="bg-secondary p-4 fs-13 text-center text-white v-align-middle mw-100"
+                            style="width: 100px;">Markup</th>
                           <th class="bg-secondary p-4 fs-13 text-center text-white v-align-middle mw-50"><i
                               class="fa-solid fa-clock"></i>
                           </th>
@@ -6438,6 +6450,12 @@
 
                           <td class="fs-13 p-2 text-center v-align-middle">${{getReceiptSubTotal(receipt)}}</td>
                           <td class="fs-13 p-2 text-center v-align-middle">
+                            <span *ngIf="receipt.autopartId > 0">
+                              ${{(getReceiptSubTotal(receipt) * (1 + (vehicle.markupPrecentage || 25) / 100)).toFixed(2)}}
+                            </span>
+                            <span *ngIf="receipt.autopartId == 0 || !receipt.autopartId">-</span>
+                          </td>
+                          <td class="fs-13 p-2 text-center v-align-middle">
                             {{receipt.createdAt | date: 'MM/dd/yyyy HH:mm'}}
                           </td>
                           <td class="fs-13 p-2 text-center  v-align-middle">
@@ -6486,6 +6504,10 @@
                   <li class="d-flex justify-content-between my-4"><strong class="fs-15">Subtotal:</strong>
                     <p class="fs-15 text-black px-1 fw-700">${{getSubtotal()}}</p>
                   </li>
+                  <li class="d-flex justify-content-between my-4" *ngIf="getPartsMarkupSubtotal() > 0">
+                    <strong class="fs-15">Parts Markup Subtotal:</strong>
+                    <p class="fs-15 text-black px-1 fw-700">${{getPartsMarkupSubtotal()}}</p>
+                  </li>
                   <li class="d-flex justify-content-between my-4"><strong class="fs-15">Tax ({{company.taxRate
                       *100}}%):</strong>
                     <p class="fs-15 text-black  px-1 fw-700">${{getTax() }}</p>
@@ -6493,7 +6515,7 @@
                   <li
                     class="d-flex justify-content-between d-block bg-navy  pt-3 pb-3 ps-5 text-white fw-700 fs-16 left-pill my-2">
                     <strong class="fs-15">Total:</strong>
-                    <p class="fs-15 px-1">${{getTotal()}}</p>
+                    <p class="fs-15 px-1">${{getTotalWithDiscount()}}</p>
                   </li>
                   <!-- <li class="d-flex justify-content-between my-4 fw-700 text-black">
                     <strong class="fs-18 fw-700">Total Payments: </strong>
