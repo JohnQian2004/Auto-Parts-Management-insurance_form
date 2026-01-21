@@ -88,6 +88,18 @@ export class AddNewVehicleComponent implements OnInit {
   @HostListener('window:resize', ['$event'])
   onResize(event: any) {
     // console.log(event.target.innerWidth);
+    this.checkAndToggleForAndroidPad();
+  }
+
+  checkAndToggleForAndroidPad(): void {
+    const width = window.innerWidth;
+    // Android Pad screen sizes typically range from 768px to 1024px (portrait) or 1024px to 1366px (landscape)
+    // Common Android tablet breakpoints: 768px - 1366px
+    const isAndroidPad = width >= 768 && width <= 1366;
+    
+    if (isAndroidPad) {
+      this.toggleClass();
+    }
   }
 
   showPassword: boolean = false;
@@ -496,6 +508,11 @@ export class AddNewVehicleComponent implements OnInit {
     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
       return new bootstrap.Tooltip(tooltipTriggerEl)
     })
+    
+    // Check for Android Pad screen size after view is initialized
+    setTimeout(() => {
+      this.checkAndToggleForAndroidPad();
+    }, 100);
   }
 
   refresh(): void {
@@ -511,6 +528,7 @@ export class AddNewVehicleComponent implements OnInit {
 
 
     this.checkWindowWidth();
+    this.checkAndToggleForAndroidPad();
     this.userService.getPublicContent().subscribe({
       next: data => {
         // this.content = data;
