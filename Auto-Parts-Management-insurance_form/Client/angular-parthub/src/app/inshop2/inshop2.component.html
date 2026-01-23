@@ -1286,6 +1286,10 @@
                                     *100}}%):</strong>
                                   <p class="fs-20 text-black opacity-75 fw-700">${{getTax() }}</p>
                                 </li>
+                                <li class="d-flex justify-content-between my-4" *ngIf="getDiscountAmount() > 0">
+                                  <strong class="fs-20">Discount ({{vehicle.discountPercentage || 0}}%):</strong>
+                                  <p class="fs-20 text-black opacity-75 fw-700">-${{getDiscountAmount()}}</p>
+                                </li> 
                                 <li
                                   class="d-flex justify-content-between d-block bg-navy  pt-3 pb-3 ps-5 text-white fw-700 fs-16 left-pill my-2">
                                   <strong class="fs-20">Total:</strong>
@@ -6536,6 +6540,10 @@
                   <li class="d-flex justify-content-between my-4"><strong class="fs-15">Tax ({{company.taxRate
                       *100}}%):</strong>
                     <p class="fs-15 text-black  px-1 fw-700">${{getTax() }}</p>
+                  </li>
+                  <li class="d-flex justify-content-between my-4" *ngIf="getDiscountAmount() > 0">
+                    <strong class="fs-15">Discount ({{vehicle.discountPercentage || 0}}%):</strong>
+                    <p class="fs-15 text-black px-1 fw-700">-${{getDiscountAmount()}}</p>
                   </li>
                   <li
                     class="d-flex justify-content-between d-block bg-navy  pt-3 pb-3 ps-5 text-white fw-700 fs-16 left-pill my-2">
