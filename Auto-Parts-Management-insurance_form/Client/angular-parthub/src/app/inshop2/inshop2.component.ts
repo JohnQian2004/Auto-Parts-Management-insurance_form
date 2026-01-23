@@ -8061,6 +8061,16 @@ export class Inshop2Component implements OnInit, AfterViewInit {
     return +(this.getSubtotal() + this.getTax()).toFixed(2);
   }
 
+
+  getDiscountAmount(): number {
+    const subtotal = this.getSubtotal();
+    const partsMarkupSubtotal = this.getPartsMarkupSubtotal();
+    const tax = this.getTax();
+    const totalBeforeDiscount = subtotal + partsMarkupSubtotal + tax;
+    const discountPercentage = this.vehicle.discountPercentage || 0;
+    const discountAmount = totalBeforeDiscount * (discountPercentage / 100);
+    return +(discountAmount.toFixed(2));
+  }
   getTotalWithDiscount(): number {
     const subtotal = this.getSubtotal();
     const partsMarkupSubtotal = this.getPartsMarkupSubtotal();
