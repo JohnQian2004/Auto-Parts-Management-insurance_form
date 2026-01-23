@@ -3465,7 +3465,7 @@
                               class="fa-solid fa-user"></i></th>
                           <th class="bg-secondary p-4 fs-13 text-center text-white v-align-middle" style="width:100px;">
                             Action</th>
-                        </tr>
+                        </tr> 
 
 
                       </thead>
@@ -6399,7 +6399,8 @@
                     <table class="table table-bordered border-radius-8 w-100">
                       <thead>
                         <tr>
-
+                          <th class="bg-secondary p-4 fs-13 text-center text-white v-align-middle mw-100"
+                            style="width: 100px; border-right: 2px solid #6c757d;">Subtotal</th>
                           <th class="bg-secondary p-4 fs-13 text-center text-white v-align-middle mw-50"
                             style="width: 50px;">#
                           </th>
@@ -6416,9 +6417,6 @@
                             Quantity</th>
                           <th class="bg-secondary p-4 fs-13 text-center text-white v-align-middle mw-100"
                             style="width:100px"><i class="fa-solid fa-dollar-sign"></i></th>
-
-                          <th class="bg-secondary p-4 fs-13 text-center text-white v-align-middle mw-100"
-                            style="width: 100px;">Subtotal</th>
                           <th class="bg-secondary p-4 fs-13 text-center text-white v-align-middle mw-100"
                             style="width: 100px;">Markup</th>
                           <th class="bg-secondary p-4 fs-13 text-center text-white v-align-middle mw-50"><i
@@ -6438,7 +6436,7 @@
                         <tr class="alert-info" *ngFor="let receipt of receipts; let i=index"
                           (click)="setReceiptId(receipt.id)"
                           [style.background-color]="receipt.id == currentReceiptId? '#FFF3CD' : (true ? '#CFF4FC' : '#CFF4FC')">
-
+                          <td class="fs-13 p-2 text-center v-align-middle" style="border-right: 2px solid #6c757d;">${{getReceiptSubTotal(receipt)}}</td>
                           <td class="fs-13 p-2 text-center v-align-middle" [cdkDragDisabled]="isMobile==true" cdkDrag
                             title="Drag and drop index number to change the order">
                             {{i+1}}
@@ -6476,8 +6474,6 @@
                               [(ngModel)]="receipt.amount" onKeyPress="if(this.value.length==10) return false"
                               pattern="[0-9]" type="number" class="form-control form-control-sm h-40 border-radius-4" />
                           </td>
-
-                          <td class="fs-13 p-2 text-center v-align-middle">${{getReceiptSubTotal(receipt)}}</td>
                           <td class="fs-13 p-2 text-center v-align-middle">
                             <span *ngIf="receipt.autopartId > 0">
                               ${{(getReceiptSubTotal(receipt) * (1 + (vehicle.markupPrecentage || 25) / 100)).toFixed(2)}}
@@ -6505,6 +6501,15 @@
                                 title="Save" (click)="onEnterReceipt('update', receipt)"><i
                                   class="fa fa-save"></i></button>
                             </div>
+                          </td>
+                        </tr>
+                        <tr style="border-top: 2px solid #6c757d;">
+                          <td class="fs-15 p-3 text-center v-align-middle fw-700" style="border-right: 2px solid #6c757d; border-top: 2px solid #6c757d;">${{getSubtotal()}}</td>
+                          <td colspan="10" class="fs-15 p-3 text-end fw-700" style="border-top: 2px solid #6c757d;" *ngIf="hasEID()== false">
+                            Grand Total:
+                          </td>
+                          <td colspan="11" class="fs-15 p-3 text-end fw-700" style="border-top: 2px solid #6c757d;" *ngIf="hasEID()== true">
+                            Grand Total:
                           </td>
                         </tr>
                       </tbody>
