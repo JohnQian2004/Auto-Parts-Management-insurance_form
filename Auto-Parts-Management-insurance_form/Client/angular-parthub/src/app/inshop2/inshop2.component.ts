@@ -8087,6 +8087,12 @@ export class Inshop2Component implements OnInit, AfterViewInit {
   }
 
 
+
+  getTotalDue(): number {
+    const totalWithDiscount = this.getTotalWithDiscount();
+    const payments = this.getTotalPayments();
+    return +((totalWithDiscount - payments).toFixed(2));
+  }
   droppedReceipt(event: CdkDragDrop<string[]>) {
     moveItemInArray(
       this.receipts,
