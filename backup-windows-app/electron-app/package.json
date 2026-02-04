@@ -1,0 +1,68 @@
+{
+  "name": "backup-windows-app",
+  "version": "1.0.0",
+  "description": "Windows backup application for images and MySQL/MariaDB databases",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "electron .",
+    "dev": "concurrently \"tsc -w\" \"wait-on dist/main.js && electron .\"",
+    "build:win": "electron-builder --win",
+    "build:win:portable": "electron-builder --win portable"
+  },
+  "keywords": [
+    "backup",
+    "windows",
+    "mysql",
+    "mariadb",
+    "electron"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "node-cron": "^3.0.3",
+    "fs-extra": "^11.2.0",
+    "mysql2": "^3.6.5",
+    "winston": "^3.11.0",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.6",
+    "@types/fs-extra": "^11.0.4",
+    "@types/node-cron": "^3.0.11",
+    "typescript": "^5.3.3",
+    "electron": "^28.1.0",
+    "electron-builder": "^24.9.1",
+    "concurrently": "^8.2.2",
+    "wait-on": "^7.2.0"
+  },
+  "build": {
+    "appId": "com.backupapp.windows",
+    "productName": "Backup Windows App",
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        },
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "assets/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "files": [
+      "dist/**/*",
+      "renderer/**/*",
+      "assets/**/*",
+      "node_modules/**/*",
+      "!node_modules/**/*.{md,ts}",
+      "!**/*.map"
+    ]
+  }
+}

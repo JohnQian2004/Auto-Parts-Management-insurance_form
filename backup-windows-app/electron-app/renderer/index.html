@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backup Windows App</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔄 Backup Windows App</h1>
+            <div class="status-bar">
+                <span id="statusText" class="status-text">Ready</span>
+                <span id="nextBackup" class="next-backup">Next Backup: Calculating...</span>
+            </div>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-button active" data-tab="backup">Backup</button>
+            <button class="tab-button" data-tab="restore">Restore</button>
+            <button class="tab-button" data-tab="config">Configuration</button>
+            <button class="tab-button" data-tab="logs">Logs</button>
+        </div>
+
+        <!-- Backup Tab -->
+        <div id="backup-tab" class="tab-content active">
+            <div class="backup-controls">
+                <button id="btnBackupAll" class="btn btn-primary">Backup All Now</button>
+                <button id="btnBackupImages" class="btn btn-secondary">Backup Images</button>
+                <button id="btnBackupDatabase" class="btn btn-secondary">Backup Database</button>
+            </div>
+            <div class="progress-container">
+                <div id="progressBar" class="progress-bar">
+                    <div id="progressFill" class="progress-fill"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Restore Tab -->
+        <div id="restore-tab" class="tab-content">
+            <div class="restore-controls">
+                <div class="restore-section">
+                    <h3>Restore Database</h3>
+                    <select id="dbBackupList" class="backup-list"></select>
+                    <button id="btnRestoreDatabase" class="btn btn-primary">Restore Database</button>
+                </div>
+                <div class="restore-section">
+                    <h3>Restore Images</h3>
+                    <select id="imagesBackupList" class="backup-list"></select>
+                    <button id="btnRestoreImages" class="btn btn-primary">Restore Images</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Configuration Tab -->
+        <div id="config-tab" class="tab-content">
+            <form id="configForm" class="config-form">
+                <div class="form-group">
+                    <label>Database Host:</label>
+                    <input type="text" id="dbHost" required>
+                </div>
+                <div class="form-group">
+                    <label>Database Port:</label>
+                    <input type="number" id="dbPort" required>
+                </div>
+                <div class="form-group">
+                    <label>Database User:</label>
+                    <input type="text" id="dbUser" required>
+                </div>
+                <div class="form-group">
+                    <label>Database Password:</label>
+                    <input type="password" id="dbPassword" required>
+                </div>
+                <div class="form-group">
+                    <label>Database Name:</label>
+                    <input type="text" id="dbName" required>
+                </div>
+                <div class="form-group">
+                    <label>Images Source Path:</label>
+                    <div class="input-group">
+                        <input type="text" id="imagesPath" required>
+                        <button type="button" id="btnBrowseImages" class="btn btn-small">Browse</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Backup Base Path:</label>
+                    <div class="input-group">
+                        <input type="text" id="backupPath" required>
+                        <button type="button" id="btnBrowseBackup" class="btn btn-small">Browse</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Schedule Time:</label>
+                    <div class="schedule-inputs">
+                        <input type="number" id="scheduleHour" min="0" max="23" required>
+                        <span>:</span>
+                        <input type="number" id="scheduleMinute" min="0" max="59" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="autoBackup">
+                        Enable Auto Backup
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-primary">Save Configuration</button>
+            </form>
+        </div>
+
+        <!-- Logs Tab -->
+        <div id="logs-tab" class="tab-content">
+            <div class="log-controls">
+                <button id="btnClearLog" class="btn btn-small">Clear Log</button>
+            </div>
+            <div id="logContainer" class="log-container"></div>
+        </div>
+    </div>
+
+    <script src="renderer.js"></script>
+</body>
+</html>
+
