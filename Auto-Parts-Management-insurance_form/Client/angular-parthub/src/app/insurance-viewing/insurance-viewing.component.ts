@@ -4,6 +4,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 
 import { InsuranceService } from '../_services/insurance.service';
+import { ReceiptService } from '../_services/receipt.service';
+import { VehicleService } from '../_services/vehicle.service';
 import { EventBusService } from '../_shared/event-bus.service';
 import { EventData } from '../_shared/event.class';
 import { InsuranceClaim } from '../models/insurance.claim.model';
@@ -212,7 +214,9 @@ export class InsuranceViewingComponent implements OnInit, OnDestroy, AfterViewIn
     private router: Router,
     private fb: FormBuilder,
     private eventBusService: EventBusService,
-    private insuranceService: InsuranceService
+    private insuranceService: InsuranceService,
+    private vehicleService: VehicleService,
+    private receiptService: ReceiptService,
   ) {
     this.accessForm = this.fb.group({
       privateKey: ['', [Validators.required]]
@@ -323,8 +327,8 @@ export class InsuranceViewingComponent implements OnInit, OnDestroy, AfterViewIn
           });
         }
       } else {
-        // Load mock estimate data for normal demo purposes
-        this.loadMockEstimateData();
+        // Normal production path: estimate data will be built from real receipts
+        // after successful authentication and claim/vehicle load.
       }
     });
 
@@ -392,98 +396,9 @@ export class InsuranceViewingComponent implements OnInit, OnDestroy, AfterViewIn
 
     // Simulate API delay
     setTimeout(() => {
-      // Mock Vehicle Data
-      this.vehicle = {
-        id: 1,
-        year: 2020,
-        make: 'Toyota',
-        model: 'Camry',
-        color: 'Silver',
-        vin: '1HGBH41JXMN109186',
-        licensePlate: 'ABC-123',
-        mileage: 45000,
-        companyId: 1,
-        customerId: 1,
-        status: 'Active',
-        archived: false,
-        token: this.publicUuid,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      } as any;
-
-      // Mock Insurance Claims
-      this.insuranceClaims = [
-        {
-          id: 1,
-          companyUuid: this.companyCode,
-          publicUuid: this.publicUuid,
-          claimNumber: 'CLM-2025-001',
-          status: 'Pending',
-          estimatedCost: 2500.00,
-          actualCost: 0.00,
-          deductible: 500.00,
-          description: 'Left side collision damage from parking lot incident',
-          severity: 'Medium',
-          assignedAdjuster: 'John Smith',
-          notes: 'Vehicle sustained damage to left rocker panel, front door, and quarter panel. Estimate includes parts, labor, and paint.'
-        } as any
-      ];
-
-      // Mock Documents
-      this.documents = [
-        {
-          id: 1,
-          companyUuid: this.companyCode,
-          publicUuid: this.publicUuid,
-          vehicleId: 1,
-          fileName: 'accident_report.pdf',
-          description: 'Police accident report',
-          docTypeId: 1,
-          docTypeName: 'Accident Report',
-          sequenceNumber: 1,
-          token: 'mock-doc-token-1',
-          uploadedBy: 'Officer Smith',
-          createdAt: new Date('2025-01-16'),
-          lastModified: new Date('2025-01-16')
-        } as any,
-        {
-          id: 2,
-          companyUuid: this.companyCode,
-          publicUuid: this.publicUuid,
-          vehicleId: 1,
-          fileName: 'damage_photos.jpg',
-          description: 'Photos of vehicle damage',
-          docTypeId: 2,
-          docTypeName: 'Photos',
-          sequenceNumber: 2,
-          token: 'mock-doc-token-2',
-          uploadedBy: 'Claims Adjuster',
-          createdAt: new Date('2025-01-17'),
-          lastModified: new Date('2025-01-17')
-        } as any,
-        {
-          id: 3,
-          companyUuid: this.companyCode,
-          publicUuid: this.publicUuid,
-          vehicleId: 1,
-          fileName: 'repair_estimate.pdf',
-          description: 'Auto body shop repair estimate',
-          docTypeId: 3,
-          docTypeName: 'Estimate',
-          sequenceNumber: 3,
-          token: 'mock-doc-token-3',
-          uploadedBy: 'Auto Body Shop',
-          createdAt: new Date('2025-01-18'),
-          lastModified: new Date('2025-01-18')
-        } as any
-      ];
-
-      // Load mock estimate data
+      // For local/demo only: keep using mock estimate + images.
       this.loadMockEstimateData();
-
-      // Load mock collision images
       this.loadMockCollisionImages();
-
       this.isLoading = false;
       console.log('Mock data loaded successfully');
     }, 1000);
@@ -502,42 +417,73 @@ export class InsuranceViewingComponent implements OnInit, OnDestroy, AfterViewIn
     this.isLoading = true;
     this.errorMessage = '';
 
-    const privateKey = this.accessForm.get('privateKey')?.value;
+    const privateKey = this.accessForm.get('privateKey')?.value?.trim();
     console.log('Authentication attempt with key:', privateKey);
-    console.log('Key length:', privateKey?.length);
-    console.log('Key trimmed length:', privateKey?.trim().length);
 
-    // For demo purposes, accept any non-empty string
-    if (privateKey && privateKey.trim().length > 0) {
-      console.log('Authentication successful with key:', privateKey);
-      this.isAuthenticated = true;
-      this.showAccessForm = false;
-
-      // Ensure modal is closed
-      this.closeAccessModal();
-
-      // Load mock data instead of calling the service
-      console.log('Loading mock data...');
-      this.loadMockData();
-    } else {
+    if (!privateKey) {
       console.log('Authentication failed - empty or invalid key');
       this.isLoading = false;
       this.errorMessage = 'Please enter a private access key.';
+      return;
     }
+
+    // Validate access against real backend
+    this.insuranceService.validateAccess(this.companyCode, this.publicUuid, privateKey)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          console.log('Authentication successful with key:', privateKey);
+          this.isAuthenticated = true;
+          this.showAccessForm = false;
+
+          // Ensure modal is closed
+          this.closeAccessModal();
+
+          // Load real claim + vehicle + receipts data
+          this.loadClaimData(privateKey);
+        },
+        error: (error) => {
+          console.error('Authentication failed:', error);
+          this.isLoading = false;
+          this.errorMessage = 'Invalid or expired access key.';
+        }
+      });
   }
 
   private bypassAuthentication(): void {
     console.log('Bypassing authentication with access key:', this.accessKey);
-    this.isAuthenticated = true;
-    this.showAccessForm = false;
-    this.showAccessModal = false;
 
-    // Set the access key in the form for consistency
-    this.accessForm.patchValue({ privateKey: this.accessKey });
+    const privateKey = this.accessKey?.trim();
+    if (!privateKey) {
+      console.log('No access key provided for bypass, loading vehicle directly by UUID.');
+      // Load vehicle directly by UUID (no auth required)
+      this.loadVehicleDirectlyByUuid();
+      return;
+    }
 
-    // Load mock data directly
-    console.log('Loading mock data with bypass authentication...');
-    this.loadMockData();
+    this.isLoading = true;
+
+    this.insuranceService.validateAccess(this.companyCode, this.publicUuid, privateKey)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          console.log('Access key validated successfully.');
+          this.isAuthenticated = true;
+          this.showAccessForm = false;
+          this.showAccessModal = false;
+
+          // Set the access key in the form for consistency
+          this.accessForm.patchValue({ privateKey });
+
+          // Load real claim + vehicle + receipts data
+          this.loadClaimData(privateKey);
+        },
+        error: (error) => {
+          console.warn('Access key validation failed, attempting direct vehicle load by UUID:', error);
+          // Fallback: Load vehicle directly by UUID (no auth required)
+          this.loadVehicleDirectlyByUuid();
+        }
+      });
   }
 
   private loadClaimData(privateKey: string): void {
@@ -551,14 +497,195 @@ export class InsuranceViewingComponent implements OnInit, OnDestroy, AfterViewIn
           this.vehicle = response.vehicle || null;
           this.insuranceClaims = response.insuranceClaims || [];
           this.documents = response.documents || [];
+
+          // Build estimate data from counter receipts for this vehicle
+          this.buildEstimateDataFromReceipts();
+
+          // Optionally load collision images from the vehicle imageModels
+          this.loadCollisionImagesFromVehicle();
+
           this.isLoading = false;
         },
         error: (error) => {
-          this.isLoading = false;
-          this.errorMessage = 'Error loading claim data. Please try again.';
-          console.error('Error loading claim data:', error);
+          // If insurance claim endpoint fails, try loading vehicle directly by UUID
+          console.warn('Insurance claim endpoint failed, attempting direct vehicle load:', error);
+          this.loadVehicleDirectlyByUuid();
         }
       });
+  }
+
+  /**
+   * Load vehicle directly by UUID without insurance access validation.
+   * This works because /api/vehicles/search/vehicle/{uuid} doesn't require authentication.
+   * Then loads receipts and builds estimate data from counter receipts.
+   */
+  private loadVehicleDirectlyByUuid(): void {
+    this.isLoading = true;
+    this.isAuthenticated = true; // Mark as authenticated since we're loading data
+    this.showAccessForm = false;
+    this.closeAccessModal();
+
+    console.log('Loading vehicle directly by UUID:', this.publicUuid);
+
+    // Load vehicle by UUID (no auth required)
+    this.vehicleService.getByUuid(this.publicUuid)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (vehicle: Vehicle) => {
+          this.vehicle = vehicle;
+          console.log('Vehicle loaded successfully:', vehicle);
+
+          // Load receipts for this vehicle
+          this.receiptService.getAllVehicleReceipts(vehicle.id!)
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({
+              next: (receipts) => {
+                // Attach receipts to vehicle object
+                const vehicleAny: any = this.vehicle as any;
+                vehicleAny.receipts = receipts || [];
+                console.log('Receipts loaded:', receipts?.length || 0);
+
+                // Build estimate data from counter receipts
+                this.buildEstimateDataFromReceipts();
+
+                // Load collision images from vehicle
+                this.loadCollisionImagesFromVehicle();
+
+                this.isLoading = false;
+                this.addDebugLog('INFO', 'Vehicle Loaded', `Loaded vehicle and ${receipts?.length || 0} receipts directly by UUID (no insurance access validation).`);
+              },
+              error: (error) => {
+                console.error('Error loading receipts:', error);
+                // Still build estimate data even if receipts fail
+                this.buildEstimateDataFromReceipts();
+                this.loadCollisionImagesFromVehicle();
+                this.isLoading = false;
+              }
+            });
+        },
+        error: (error) => {
+          this.isLoading = false;
+          this.errorMessage = `Error loading vehicle: ${error.message || 'Vehicle not found'}`;
+          console.error('Error loading vehicle by UUID:', error);
+          // Fallback to mock data if vehicle load fails
+          this.loadMockData();
+        }
+      });
+  }
+
+  /**
+   * Build estimateData from real counter receipts associated with the vehicle.
+   * Uses vehicle.receipts (and vehicle.markupPrecentage if present) to populate
+   * a single estimate area that mirrors the counter receipt totals.
+   */
+  private buildEstimateDataFromReceipts(): void {
+    if (!this.vehicle) {
+      console.log('buildEstimateDataFromReceipts: no vehicle loaded.');
+      return;
+    }
+
+    const vehicleAny: any = this.vehicle as any;
+    const receipts: any[] = vehicleAny.receipts || [];
+
+    if (!receipts || receipts.length === 0) {
+      console.log('buildEstimateDataFromReceipts: no receipts found on vehicle, falling back to mock estimate data.');
+      // Keep existing behavior when no real data is available
+      if (!this.estimateData) {
+        this.loadMockEstimateData();
+      }
+      return;
+    }
+
+    const markupPercentage = (this.vehicle.markupPrecentage || 0);
+
+    const claimItems: EstimateClaimItem[] = receipts.map((r, index) => {
+      const qty = r.quantity != null ? Number(r.quantity) : 1;
+      const amount = r.amount != null ? Number(r.amount) : 0;
+      const baseSubtotal = +(qty * amount).toFixed(2);
+
+      // If markup is configured on the vehicle, apply it to mirror counter receipt totals
+      const extendedWithMarkup = markupPercentage
+        ? +(baseSubtotal * (1 + markupPercentage / 100)).toFixed(2)
+        : baseSubtotal;
+
+      return {
+        lineNumber: index + 1,
+        operation: 'PART', // Generic operation for counter items
+        description: r.notes || r.name || 'Counter Receipt Item',
+        partNumber: null,
+        quantity: qty,
+        extendedPrice: extendedWithMarkup,
+        laborHours: null,
+        paintHours: null,
+        note: r.comments || ''
+      };
+    });
+
+    const subtotal = claimItems.reduce((sum, item) => sum + (item.extendedPrice || 0), 0);
+
+    this.estimateData = {
+      shopInfo: {
+        name: this.vehicle.insuranceCompany || '',
+        address: '', // Can be filled from company details later
+        phone: '',
+        workfileId: this.vehicle.token || '',
+        partsShare: this.vehicle.token || '',
+        description: this.vehicle.description2 || this.vehicle.description || '',
+        invoiceType: 'Counter Receipts'
+      },
+      customerInfo: undefined,
+      jobInfo: undefined,
+      insuranceInfo: {
+        company: this.vehicle.insuranceCompany || '',
+        adjuster: ''
+      },
+      vehicleInfo: {
+        year: this.vehicle.year,
+        make: this.vehicle.make,
+        model: this.vehicle.model,
+        bodyStyle: '',
+        engine: this.vehicle.engineDesc || '',
+        color: this.vehicle.color,
+        vin: this.vehicle.vin || '',
+        interiorColor: '',
+        exteriorColor: this.vehicle.color,
+        mileageIn: this.vehicle.miles || '',
+        mileageOut: '',
+        vehicleOut: '',
+        license: this.vehicle.plate || '',
+        state: '',
+        productionDate: '',
+        condition: '',
+        jobNumber: this.vehicle.currentJobNumber || ''
+      },
+      repairFacility: undefined,
+      estimateData: [
+        {
+          areaName: 'Counter Receipts',
+          claimItems,
+          images: this.vehicle.imageModels || [],
+          description: 'Generated from counter receipts for this vehicle.'
+        }
+      ],
+      summary: {
+        subtotal,
+        laborHours: 0,
+        paintHours: 0
+      }
+    };
+
+    console.log('estimateData built from receipts:', this.estimateData);
+  }
+
+  /** Use real vehicle imageModels as collision images instead of mock ones when available. */
+  private loadCollisionImagesFromVehicle(): void {
+    if (this.vehicle && this.vehicle.imageModels && this.vehicle.imageModels.length > 0) {
+      this.collisionImages = this.vehicle.imageModels;
+      this.addDebugLog('INFO', 'Collision Images Loaded', `Loaded ${this.collisionImages.length} images from vehicle.`);
+    } else {
+      // Fallback to mock behavior if no images on the vehicle
+      this.loadMockCollisionImages();
+    }
   }
 
   onFileSelected(event: any): void {

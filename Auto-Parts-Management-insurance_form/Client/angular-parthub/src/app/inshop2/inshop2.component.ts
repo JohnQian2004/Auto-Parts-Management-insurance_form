@@ -3847,6 +3847,42 @@ export class Inshop2Component implements OnInit, AfterViewInit {
     })
   }
 
+  importAllFromAi(): void {
+    if (!this.estimateResponse || !this.estimateResponse.estimates) {
+      return;
+    }
+
+    const confirmed = window.confirm('Are you sure to import all estimates into our system?');
+    if (!confirmed) {
+      return;
+    }
+
+    for (const claim of this.estimateResponse.estimates) {
+      // Save claim (estimate) if not already persisted
+      if (!claim.id || claim.id <= 0) {
+        this.addClaimFromAi(claim);
+      }
+
+      // Save all AI parts for this claim
+      if (claim.autoparts && claim.autoparts.length > 0) {
+        for (const part of claim.autoparts) {
+          if (!part.id || part.id <= 0) {
+            this.addAutopartFromAi(part);
+          }
+        }
+      }
+
+      // Save all AI jobs for this claim
+      if (claim.jobs && claim.jobs.length > 0) {
+        for (const job of claim.jobs) {
+          if (!job.id || job.id <= 0) {
+            this.addJobFromAi(job);
+          }
+        }
+      }
+    }
+  }
+
   isInAiImageArray(imageIdIn: any): boolean {
     var hasIt = false;
     for (let i = 0; i < this.aiImages.length; i++) {

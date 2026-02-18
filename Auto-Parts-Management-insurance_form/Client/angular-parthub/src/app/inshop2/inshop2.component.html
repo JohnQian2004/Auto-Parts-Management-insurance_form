@@ -1289,7 +1289,7 @@
                                 <li class="d-flex justify-content-between my-4" *ngIf="getDiscountAmount() > 0">
                                   <strong class="fs-20">Discount ({{vehicle.discountPercentage || 0}}%):</strong>
                                   <p class="fs-20 text-black opacity-75 fw-700">-${{getDiscountAmount()}}</p>
-                                </li> 
+                                </li>
                                 <li
                                   class="d-flex justify-content-between d-block bg-navy  pt-3 pb-3 ps-5 text-white fw-700 fs-16 left-pill my-2">
                                   <strong class="fs-20">Total:</strong>
@@ -2044,8 +2044,9 @@
                   <button data-bs-toggle="tooltip" data-bs-title="Show production overview" (click)="showOverview(0)"
                     title="Show Production Overview" class="btn rounded-0 bg-white"><i class="fa fa-truck"></i></button>
 
-                  <button data-bs-toggle="tooltip" data-bs-title="Show Payment Status overview" (click)="showOverview(1)"
-                    title="Show Payment Status Overview" class="btn rounded-0 bg-white"><i class="fa fa-dollar text-danger bg-green"></i></button>
+                  <button data-bs-toggle="tooltip" data-bs-title="Show Payment Status overview"
+                    (click)="showOverview(1)" title="Show Payment Status Overview" class="btn rounded-0 bg-white"><i
+                      class="fa fa-dollar text-danger bg-green"></i></button>
 
                   <button data-bs-toggle="tooltip" data-bs-title="Show Assigned To overview" (click)="showOverview(2)"
                     title="Show Assigned To Overview" class="btn rounded-0 bg-white"><i class="fa fa-user"></i></button>
@@ -3270,15 +3271,22 @@
                   <div class="d-lg-flex justify-content-between px-1 mt-3">
                     <textarea rows="8" class="col-10" [(ngModel)]="vehicle.workRequest"></textarea>
                     <div class="col-2">
-                      <button class="h-40 w-100 fs-13 btn btn-secondary-abs border-radius-4 ms-md-2"
+                      <button class="h-40 w-100 fs-13 btn border-radius-4 ms-md-2"
+                        [ngClass]="disenabledGetAiEstimate ? 'btn-outline-secondary' : 'btn-secondary-abs'"
                         [disabled]="disenabledGetAiEstimate" (click)="getAiEstimate()">
-                        <i *ngIf="!disenabledGetAiEstimate" class="fa fa-check-square me-2"></i>
-                        <i *ngIf="disenabledGetAiEstimate" class="fa fa-circle-o-notch fa-spin me-2"
-                          style="animation-duration: 0.8s;"></i>
-                        <span *ngIf="!disenabledGetAiEstimate">Get Estimates</span>
-                        <span *ngIf="disenabledGetAiEstimate">Waiting for AI Response</span>
-                        <span *ngIf="aiImages.length > 0 && !disenabledGetAiEstimate">({{aiImages.length}})</span>
+                        <ng-container *ngIf="!disenabledGetAiEstimate; else aiLoading">
+                          <i class="fa fa-check-square me-2"></i>
+                          <span>Get Estimates</span>
+                          <span *ngIf="aiImages.length > 0">({{aiImages.length}})</span>
+                        </ng-container>
+                        <ng-template #aiLoading>
+                          <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                          <span>AI is processing...</span>
+                        </ng-template>
                       </button>
+                      <div *ngIf="disenabledGetAiEstimate" class="text-center mt-1 small text-muted">
+                        This can take a while, you can continue working in other sections.
+                      </div>
                       <button *ngIf="estimateResponse.estimates != null && estimateResponse.estimates.length > 0"
                         class="h-40 w-100 fs-13 btn btn-secondary-abs border-radius-4 ms-md-2 mt-1"
                         (click)="printPage('print-ai-estimate', 'Estimates')"><i class="fa fa-print me-2"></i> Print
@@ -3332,6 +3340,14 @@
             <div class="row mt-1">
               <div class="mt-4 pt-1 px-0">
                 <table class="col-12 w-100 px-1 border bg-white border-radius-8 shadow">
+                  <tr>
+                    <td colspan="10" class="text-end p-2">
+                      <button class="btn btn-success btn-sm" (click)="importAllFromAi()"
+                        [disabled]="!estimateResponse || !estimateResponse.estimates || estimateResponse.estimates.length === 0">
+                        Import All
+                      </button>
+                    </td>
+                  </tr>
                   <tr class="text-center h-40 bg-secondary text-white">
                     <th class="text-center v-align-middle mw-50"> # </th>
                     <th class="text-center v-align-middle mw-50"> Ind </th>
@@ -3470,7 +3486,7 @@
                               class="fa-solid fa-user"></i></th>
                           <th class="bg-secondary p-4 fs-13 text-center text-white v-align-middle" style="width:100px;">
                             Action</th>
-                        </tr> 
+                        </tr>
 
 
                       </thead>
@@ -5015,18 +5031,17 @@
               </h2>
               <div class="d-lg-flex align-items-center px-2 mt-2 mb-2" style="display: flex !important;">
                 <div class="me-3 d-flex align-items-center" style="display: flex !important;">
-                  <label class="form-label fs-13 mb-0 me-2 fw-semibold" style="display: block !important;">Markup Percentage:</label>
-                  <select class="form-select form-select-sm border-radius-4" 
-                    [(ngModel)]="vehicle.markupPrecentage" 
-                    (change)="onMarkupPercentageChange()"
-                    [disabled]="vehicle.id == 0"
+                  <label class="form-label fs-13 mb-0 me-2 fw-semibold" style="display: block !important;">Markup
+                    Percentage:</label>
+                  <select class="form-select form-select-sm border-radius-4" [(ngModel)]="vehicle.markupPrecentage"
+                    (change)="onMarkupPercentageChange()" [disabled]="vehicle.id == 0"
                     style="min-width: 120px; display: block !important; visibility: visible !important;">
                     <option [value]="i" *ngFor="let i of markupPercentageOptions">{{i}}%</option>
                   </select>
                 </div>
                 <button class="btn btn-success fs-13 px-3 py-2 mt-15-mob" data-bs-toggle="modal" title="Add Parts"
-                  *ngIf="user.allowAddUpdateAutopart == true && this.vehicle.id> 0" data-bs-target="#addNewPart" (click)="addNewParts()"><i
-                    class="fa fa-plus me-2"></i> Add Parts </button>
+                  *ngIf="user.allowAddUpdateAutopart == true && this.vehicle.id> 0" data-bs-target="#addNewPart"
+                  (click)="addNewParts()"><i class="fa fa-plus me-2"></i> Add Parts </button>
               </div>
             </div>
             <div class="row" cdkDropList (cdkDropListDropped)="droppedAutoprts($event)">
@@ -5065,8 +5080,7 @@
                         </th>
                         <th class="fs-14 text-center text-white mw-100" (click)="sortListAutoparts('salePrice')"
                           title="Sort By Price"> Price</th>
-                        <th class="fs-14 text-center text-white mw-100"
-                          title="Markup"> Markup</th>
+                        <th class="fs-14 text-center text-white mw-100" title="Markup"> Markup</th>
                         <th class="fs-14 text-center text-white mw-100" (click)="sortListAutoparts('createdAt')"
                           title="Sort By Date"> <i class="fa-solid fa-clock"></i></th>
                         <th class="fs-14 text-center text-white mw-50"><i class="fa-solid fa-user"></i></th>
@@ -5178,8 +5192,10 @@
                           title="Click to view details" (click)=" editAutopart(autopart, i)"> ${{autopart.salePrice}}
                         </td>
                         <td class="text-center fs-13" data-bs-toggle="modal" data-bs-target="#partDetails"
-                          title="Click to view details [Markup: {{vehicle.markupPrecentage || 0}}%]" (click)=" editAutopart(autopart, i)"> 
-                          ${{((autopart.salePrice || 0) + ((autopart.salePrice || 0) * ((vehicle.markupPrecentage || 0) / 100))).toFixed(2)}}
+                          title="Click to view details [Markup: {{vehicle.markupPrecentage || 0}}%]"
+                          (click)=" editAutopart(autopart, i)">
+                          ${{((autopart.salePrice || 0) + ((autopart.salePrice || 0) * ((vehicle.markupPrecentage || 0)
+                          / 100))).toFixed(2)}}
                         </td>
                         <td class="text-center fs-13" data-bs-toggle="modal" data-bs-target="#partDetails"
                           title="Click to view details" (click)=" editAutopart(autopart, i)"> {{autopart.createdAt |
@@ -6365,7 +6381,7 @@
                 </select>
                 <div class="d-flex align-items-center gap-2">
                   <label class="form-label fs-13 mb-0 me-2 fw-semibold">Parts Markup Percentage:</label>
-                  <select class="form-select h-48 px-3 border-radius-8" [(ngModel)]="vehicle.markupPrecentage" 
+                  <select class="form-select h-48 px-3 border-radius-8" [(ngModel)]="vehicle.markupPrecentage"
                     title="Parts Markup Percentage" (change)="onPartsMarkupPercentageChange()"
                     [disabled]="vehicle.id == 0">
                     <option [value]="i" *ngFor="let i of partsMarkupPercentageOptions">{{i}}%</option>
@@ -6373,9 +6389,8 @@
                 </div>
                 <div class="d-flex align-items-center gap-2">
                   <label class="form-label fs-13 mb-0 me-2 fw-semibold">Discount Percentage:</label>
-                  <select class="form-select h-48 px-3 border-radius-8" [(ngModel)]="vehicle.discountPercentage" 
-                    title="Discount Percentage" (change)="onDiscountPercentageChange()"
-                    [disabled]="vehicle.id == 0">
+                  <select class="form-select h-48 px-3 border-radius-8" [(ngModel)]="vehicle.discountPercentage"
+                    title="Discount Percentage" (change)="onDiscountPercentageChange()" [disabled]="vehicle.id == 0">
                     <option [value]="i" *ngFor="let i of discountPercentageOptions">{{i}}%</option>
                   </select>
                 </div>
@@ -6441,7 +6456,8 @@
                         <tr class="alert-info" *ngFor="let receipt of receipts; let i=index"
                           (click)="setReceiptId(receipt.id)"
                           [style.background-color]="receipt.id == currentReceiptId? '#FFF3CD' : (true ? '#CFF4FC' : '#CFF4FC')">
-                          <td class="fs-13 p-2 text-center v-align-middle" style="border-right: 2px solid #6c757d;">${{getReceiptSubTotal(receipt)}}</td>
+                          <td class="fs-13 p-2 text-center v-align-middle" style="border-right: 2px solid #6c757d;">
+                            ${{getReceiptSubTotal(receipt)}}</td>
                           <td class="fs-13 p-2 text-center v-align-middle" [cdkDragDisabled]="isMobile==true" cdkDrag
                             title="Drag and drop index number to change the order">
                             {{i+1}}
@@ -6481,7 +6497,8 @@
                           </td>
                           <td class="fs-13 p-2 text-center v-align-middle">
                             <span *ngIf="receipt.autopartId > 0">
-                              ${{(getReceiptSubTotal(receipt) * (1 + (vehicle.markupPrecentage || 25) / 100)).toFixed(2)}}
+                              ${{(getReceiptSubTotal(receipt) * (1 + (vehicle.markupPrecentage || 25) /
+                              100)).toFixed(2)}}
                             </span>
                             <span *ngIf="receipt.autopartId == 0 || !receipt.autopartId">-</span>
                           </td>
@@ -6509,11 +6526,15 @@
                           </td>
                         </tr>
                         <tr style="border-top: 2px solid #6c757d;">
-                          <td class="fs-15 p-3 text-center v-align-middle fw-700" style="border-right: 2px solid #6c757d; border-top: 2px solid #6c757d;">${{getSubtotal()}}</td>
-                          <td colspan="10" class="fs-15 p-3 text-end fw-700" style="border-top: 2px solid #6c757d;" *ngIf="hasEID()== false">
+                          <td class="fs-15 p-3 text-center v-align-middle fw-700"
+                            style="border-right: 2px solid #6c757d; border-top: 2px solid #6c757d;">${{getSubtotal()}}
+                          </td>
+                          <td colspan="10" class="fs-15 p-3 text-end fw-700" style="border-top: 2px solid #6c757d;"
+                            *ngIf="hasEID()== false">
                             Grand Total:
                           </td>
-                          <td colspan="11" class="fs-15 p-3 text-end fw-700" style="border-top: 2px solid #6c757d;" *ngIf="hasEID()== true">
+                          <td colspan="11" class="fs-15 p-3 text-end fw-700" style="border-top: 2px solid #6c757d;"
+                            *ngIf="hasEID()== true">
                             Grand Total:
                           </td>
                         </tr>
