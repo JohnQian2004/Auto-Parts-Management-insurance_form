@@ -1775,6 +1775,8 @@ public class VehicleController {
   }
 
   @GetMapping("/search/vehicle/{uuid}")
+  // Authentication removed to allow public access for insurance viewing
+  // This endpoint is used by the insurance viewing component to load vehicles by UUID
   public ResponseEntity<Vehicle> searchVehicleByUUID(@PathVariable("uuid") String uuid) {
 
     LOG.info(uuid);

@@ -12,6 +12,7 @@ import { InsuranceClaim } from '../models/insurance.claim.model';
 import { InsuranceClaimViewResponse } from '../models/insurance.claim.view.response.model';
 import { InsuranceDocument } from '../models/insurance.document.model';
 import { Vehicle } from '../models/vehicle.model';
+import { Config } from '../models/config.model';
 
 // Estimate Data Interfaces
 export interface EstimateClaimItem {
@@ -186,6 +187,12 @@ export class InsuranceViewingComponent implements OnInit, OnDestroy, AfterViewIn
   // Debug Logging
   debugLogs: any[] = [];
 
+  // Image URL Configuration (similar to inshop2 component)
+  // Use baycounter.com:8445 for public insurance viewing
+  config: Config = new Config();
+  baseUrlImage = this.config.baseUrl + '/vehicle/getImage';
+  baseUrlResizeImage = this.config.baseUrl + '/vehicle/getResize';
+
   // Estimate Data
   estimateData: EstimateData | null = null;
 
@@ -279,10 +286,15 @@ export class InsuranceViewingComponent implements OnInit, OnDestroy, AfterViewIn
         console.log('Both required parameters exist, validating...');
         this.validateRouteParams();
 
+        // DISABLED: Access key validation - allow direct access with just 2 UUIDs
         // If accessKey is provided, bypass authentication modal
         if (this.accessKey) {
-          console.log('Access key provided, bypassing authentication modal...');
+          console.log('Access key provided, bypassing authentication modal (validation disabled)...');
           this.bypassAuthentication();
+        } else {
+          // No access key provided - disable access key requirement and load directly
+          console.log('No access key provided, loading vehicle directly (access key validation disabled)...');
+          this.loadVehicleDirectlyByUuid();
         }
       } else {
         console.log('Missing route parameters - showing default view');
@@ -338,10 +350,11 @@ export class InsuranceViewingComponent implements OnInit, OnDestroy, AfterViewIn
     // Pre-fill the private key for demo purposes
     this.accessForm.patchValue({ privateKey: 'demo-access-key-2025' });
 
-    // Show authentication modal on component load only if no access key is provided
-    if (!this.accessKey) {
-      this.openAccessModal();
-    }
+    // DISABLED: Don't show authentication modal - access key validation is disabled
+    // Allow direct access with just 2 UUIDs (companyCode and publicUuid)
+    // if (!this.accessKey) {
+    //   this.openAccessModal();
+    // }
 
     // Initialize evidence images and debug log
     setTimeout(() => {
@@ -421,13 +434,28 @@ export class InsuranceViewingComponent implements OnInit, OnDestroy, AfterViewIn
     console.log('Authentication attempt with key:', privateKey);
 
     if (!privateKey) {
-      console.log('Authentication failed - empty or invalid key');
-      this.isLoading = false;
-      this.errorMessage = 'Please enter a private access key.';
+      console.log('No private key provided, loading vehicle directly by UUID.');
+      // Load vehicle directly by UUID (no auth required)
+      this.loadVehicleDirectlyByUuid();
       return;
     }
 
-    // Validate access against real backend
+    // DISABLED: Skip access key validation - allow direct access
+    // This allows the component to work with just 2 UUIDs (companyCode and publicUuid)
+    console.log('Access key validation DISABLED - allowing direct access');
+    this.isAuthenticated = true;
+    this.showAccessForm = false;
+    this.errorMessage = ''; // Clear any error messages
+
+    // Ensure modal is closed
+    this.closeAccessModal();
+
+    // Load vehicle directly by UUID (no auth required) - skip all API calls that require authentication
+    // This bypasses validateAccess and getClaim endpoints entirely
+    this.loadVehicleDirectlyByUuid();
+
+    // OLD CODE - Access key validation (now disabled)
+    /*
     this.insuranceService.validateAccess(this.companyCode, this.publicUuid, privateKey)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -435,11 +463,7 @@ export class InsuranceViewingComponent implements OnInit, OnDestroy, AfterViewIn
           console.log('Authentication successful with key:', privateKey);
           this.isAuthenticated = true;
           this.showAccessForm = false;
-
-          // Ensure modal is closed
           this.closeAccessModal();
-
-          // Load real claim + vehicle + receipts data
           this.loadClaimData(privateKey);
         },
         error: (error) => {
@@ -448,6 +472,7 @@ export class InsuranceViewingComponent implements OnInit, OnDestroy, AfterViewIn
           this.errorMessage = 'Invalid or expired access key.';
         }
       });
+    */
   }
 
   private bypassAuthentication(): void {
@@ -462,7 +487,26 @@ export class InsuranceViewingComponent implements OnInit, OnDestroy, AfterViewIn
     }
 
     this.isLoading = true;
+    this.errorMessage = ''; // Clear any previous error messages
 
+    // DISABLED: Skip validateAccess API call - allow direct access
+    // This allows the component to work with just 2 UUIDs (companyCode and publicUuid)
+    // We try getClaim first (backend may validate internally), then fallback to direct UUID load
+    console.log('Access key validation DISABLED - trying getClaim with fallback');
+    this.isAuthenticated = true;
+    this.showAccessForm = false;
+    this.showAccessModal = false;
+    this.errorMessage = ''; // Clear any error messages
+
+    // Set the access key in the form for consistency
+    this.accessForm.patchValue({ privateKey });
+
+    // Try to load claim data (backend may validate internally, but we don't call validateAccess from frontend)
+    // If it fails, fallback to direct vehicle load by UUID
+    this.loadClaimDataWithFallback(privateKey);
+
+    // OLD CODE - Access key validation (now disabled)
+    /*
     this.insuranceService.validateAccess(this.companyCode, this.publicUuid, privateKey)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -471,16 +515,53 @@ export class InsuranceViewingComponent implements OnInit, OnDestroy, AfterViewIn
           this.isAuthenticated = true;
           this.showAccessForm = false;
           this.showAccessModal = false;
+          this.errorMessage = '';
 
-          // Set the access key in the form for consistency
           this.accessForm.patchValue({ privateKey });
-
-          // Load real claim + vehicle + receipts data
           this.loadClaimData(privateKey);
         },
         error: (error) => {
-          console.warn('Access key validation failed, attempting direct vehicle load by UUID:', error);
-          // Fallback: Load vehicle directly by UUID (no auth required)
+          console.warn('Access key validation failed, allowing access via fallback:', error);
+          this.isAuthenticated = true;
+          this.showAccessForm = false;
+          this.showAccessModal = false;
+          this.errorMessage = '';
+          this.accessForm.patchValue({ privateKey });
+          this.loadClaimDataWithFallback(privateKey);
+        }
+      });
+    */
+  }
+
+  private loadClaimDataWithFallback(privateKey: string): void {
+    this.isLoading = true;
+
+    // NOTE: We do NOT call validateAccess() from the frontend - it's disabled
+    // The backend getClaim endpoint may validate internally, but we skip the frontend validateAccess call
+    // Try to load claim data with the access key (backend may validate internally)
+    this.insuranceService.getClaim(this.companyCode, this.publicUuid, privateKey)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response: InsuranceClaimViewResponse) => {
+          this.claimData = response;
+          this.vehicle = response.vehicle || null;
+          this.insuranceClaims = response.insuranceClaims || [];
+          this.documents = response.documents || [];
+
+          // Build estimate data from counter receipts for this vehicle
+          this.buildEstimateDataFromReceipts();
+
+          // Optionally load collision images from the vehicle imageModels
+          if (this.vehicle?.imageModels && this.vehicle.imageModels.length > 0) {
+            this.loadCollisionImagesFromVehicle();
+          }
+
+          this.isLoading = false;
+        },
+        error: (error) => {
+          console.warn('Failed to load claim data (backend may have validated and rejected), falling back to direct vehicle load by UUID:', error);
+          // Fallback to direct vehicle load by UUID if claim data load fails
+          // This bypasses all authentication and loads vehicle directly
           this.loadVehicleDirectlyByUuid();
         }
       });
@@ -544,6 +625,9 @@ export class InsuranceViewingComponent implements OnInit, OnDestroy, AfterViewIn
                 const vehicleAny: any = this.vehicle as any;
                 vehicleAny.receipts = receipts || [];
                 console.log('Receipts loaded:', receipts?.length || 0);
+
+                // Convert receipts to insurance claims for display
+                this.convertReceiptsToInsuranceClaims(receipts);
 
                 // Build estimate data from counter receipts
                 this.buildEstimateDataFromReceipts();
@@ -677,10 +761,87 @@ export class InsuranceViewingComponent implements OnInit, OnDestroy, AfterViewIn
     console.log('estimateData built from receipts:', this.estimateData);
   }
 
+  /**
+   * Convert counter receipts to insurance claims for display.
+   * Uses receipts from the vehicle to populate the insuranceClaims array.
+   */
+  private convertReceiptsToInsuranceClaims(receipts: any[]): void {
+    if (!receipts || receipts.length === 0) {
+      console.log('convertReceiptsToInsuranceClaims: no receipts to convert');
+      this.insuranceClaims = [];
+      return;
+    }
+
+    // Group receipts by claimId if they have one, otherwise create individual claims
+    const claimsMap = new Map<number, any>(); // Use 'any' to allow dynamic amount property
+    
+    receipts.forEach((receipt) => {
+      const claimId = receipt.claimId || 0;
+      // Calculate receipt total: amount * quantity
+      const receiptAmount = (receipt.amount || 0) * (receipt.quantity || 1);
+      
+      if (claimId > 0 && claimsMap.has(claimId)) {
+        // Update existing claim with receipt info
+        const existingClaim = claimsMap.get(claimId)!;
+        existingClaim.comments = (existingClaim.comments || '') + 
+          (receipt.notes ? `\nReceipt: ${receipt.notes}` : '');
+        // Sum up amounts when grouping receipts
+        existingClaim.amount = (existingClaim.amount || 0) + receiptAmount;
+      } else {
+        // Create new insurance claim from receipt
+        const claim: any = {
+          id: claimId > 0 ? claimId : receipt.id,
+          vehicleId: receipt.vehicleId || this.vehicle?.id,
+          companyUuid: this.companyCode,
+          publicUuid: this.publicUuid,
+          claimNumber: receipt.invoiceNumber || `RECEIPT-${receipt.id}`,
+          status: 'PENDING',
+          comments: receipt.notes || receipt.comments || '',
+          amount: receiptAmount, // Add amount: receipt.amount * receipt.quantity
+          claimDate: receipt.createdAt ? new Date(receipt.createdAt) : new Date(),
+          lastUpdated: receipt.updatedAt ? new Date(receipt.updatedAt) : new Date(),
+          isActive: true,
+          createdAt: receipt.createdAt ? new Date(receipt.createdAt) : new Date(),
+          updatedAt: receipt.updatedAt ? new Date(receipt.updatedAt) : new Date()
+        };
+        
+        if (claimId > 0) {
+          claimsMap.set(claimId, claim);
+        } else {
+          // If no claimId, add as individual claim
+          claimsMap.set(receipt.id || 0, claim);
+        }
+      }
+    });
+
+    // Convert map to array
+    this.insuranceClaims = Array.from(claimsMap.values());
+    
+    console.log(`Converted ${receipts.length} receipts to ${this.insuranceClaims.length} insurance claims`);
+    
+    // Also update claimData if it exists
+    if (this.claimData) {
+      this.claimData.insuranceClaims = this.insuranceClaims;
+    } else {
+      // Create a basic claimData structure if it doesn't exist
+      this.claimData = {
+        vehicle: this.vehicle || undefined,
+        insuranceClaims: this.insuranceClaims,
+        documents: this.documents || []
+      };
+    }
+  }
+
   /** Use real vehicle imageModels as collision images instead of mock ones when available. */
   private loadCollisionImagesFromVehicle(): void {
     if (this.vehicle && this.vehicle.imageModels && this.vehicle.imageModels.length > 0) {
-      this.collisionImages = this.vehicle.imageModels;
+      // Map vehicle imageModels to collisionImages format with thumbnailUrl
+      // Following the pattern from inshop2.component.ts: baseUrlResizeImage + '/' + imageModel.id
+      this.collisionImages = this.vehicle.imageModels.map((imageModel: any) => ({
+        ...imageModel,
+        thumbnailUrl: `${this.baseUrlResizeImage}/${imageModel.id}`,
+        imageUrl: `${this.baseUrlImage}/${imageModel.id}` // Full-size image URL
+      }));
       this.addDebugLog('INFO', 'Collision Images Loaded', `Loaded ${this.collisionImages.length} images from vehicle.`);
     } else {
       // Fallback to mock behavior if no images on the vehicle
@@ -4584,6 +4745,159 @@ export class InsuranceViewingComponent implements OnInit, OnDestroy, AfterViewIn
 
     console.log('Image saved with annotations');
     this.closeImageEditor();
+  }
+
+  /**
+   * Calculate total amount of all insurance claims
+   */
+  getTotalClaimsAmount(): number {
+    if (!this.insuranceClaims || this.insuranceClaims.length === 0) {
+      return 0;
+    }
+    return this.insuranceClaims.reduce((total, claim: any) => {
+      return total + ((claim as any).amount || 0);
+    }, 0);
+  }
+
+  /**
+   * Print all insurance claims
+   */
+  printInsuranceClaims(): void {
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      console.error('Failed to open print window');
+      return;
+    }
+
+    let html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Insurance Estimate Details - Print</title>
+        <style>
+          body { font-family: Arial, sans-serif; padding: 20px; }
+          h1 { color: #333; border-bottom: 2px solid #333; padding-bottom: 10px; }
+          table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+          th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+          th { background-color: #f2f2f2; font-weight: bold; }
+          .total-row { background-color: #f9f9f9; font-weight: bold; }
+          .badge { padding: 4px 8px; border-radius: 4px; }
+          .badge-PENDING { background-color: #ffc107; color: #000; }
+          .badge-APPROVED { background-color: #28a745; color: #fff; }
+          .badge-DENIED { background-color: #dc3545; color: #fff; }
+        </style>
+      </head>
+      <body>
+        <h1>Insurance Estimate Details</h1>
+        <p><strong>Vehicle:</strong> ${this.vehicle?.make || ''} ${this.vehicle?.model || ''} ${this.vehicle?.year || ''}</p>
+        <p><strong>VIN:</strong> ${this.vehicle?.vin || 'N/A'}</p>
+        <p><strong>Print Date:</strong> ${new Date().toLocaleString()}</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Status</th>
+              <th>Claim #</th>
+              <th>Date</th>
+              <th>Updated</th>
+              <th>Amount</th>
+              <th>Comments</th>
+            </tr>
+          </thead>
+          <tbody>
+    `;
+
+    this.insuranceClaims.forEach((claim: any) => {
+      html += `
+        <tr>
+          <td><span class="badge badge-${claim.status || 'UNKNOWN'}">${claim.status || 'UNKNOWN'}</span></td>
+          <td>${claim.claimNumber || 'N/A'}</td>
+          <td>${claim.claimDate ? new Date(claim.claimDate).toLocaleDateString() : 'N/A'}</td>
+          <td>${claim.lastUpdated ? new Date(claim.lastUpdated).toLocaleDateString() : 'N/A'}</td>
+          <td>$${((claim as any).amount || 0).toFixed(2)}</td>
+          <td>${claim.comments || '-'}</td>
+        </tr>
+      `;
+    });
+
+    html += `
+          </tbody>
+          <tfoot>
+            <tr class="total-row">
+              <td colspan="4" style="text-align: right;"><strong>Total:</strong></td>
+              <td><strong>$${this.getTotalClaimsAmount().toFixed(2)}</strong></td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+      </body>
+      </html>
+    `;
+
+    printWindow.document.write(html);
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => {
+      printWindow.print();
+    }, 250);
+  }
+
+
+  /**
+   * View claim details in a modal or expand view
+   */
+  viewClaimDetails(claim: any): void {
+    console.log('View claim details:', claim);
+    // You can implement a modal here to show full claim details
+    alert(`Claim Details:\n\nClaim #: ${claim.claimNumber || 'N/A'}\nStatus: ${claim.status || 'UNKNOWN'}\nDate: ${claim.claimDate ? new Date(claim.claimDate).toLocaleDateString() : 'N/A'}\nAmount: $${(claim.amount || 0).toFixed(2)}\n\nComments:\n${claim.comments || 'No comments'}`);
+  }
+
+  /**
+   * Print a single claim
+   */
+  printSingleClaim(claim: any): void {
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      console.error('Failed to open print window');
+      return;
+    }
+
+    let html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Claim ${claim.claimNumber || 'N/A'} - Print</title>
+        <style>
+          body { font-family: Arial, sans-serif; padding: 20px; }
+          h1 { color: #333; border-bottom: 2px solid #333; padding-bottom: 10px; }
+          .claim-detail { margin: 10px 0; }
+          .claim-detail strong { display: inline-block; width: 150px; }
+          .badge { padding: 4px 8px; border-radius: 4px; }
+          .badge-PENDING { background-color: #ffc107; color: #000; }
+          .badge-APPROVED { background-color: #28a745; color: #fff; }
+          .badge-DENIED { background-color: #dc3545; color: #fff; }
+        </style>
+      </head>
+      <body>
+        <h1>Insurance Claim Details</h1>
+        <div class="claim-detail"><strong>Vehicle:</strong> ${this.vehicle?.make || ''} ${this.vehicle?.model || ''} ${this.vehicle?.year || ''}</div>
+        <div class="claim-detail"><strong>VIN:</strong> ${this.vehicle?.vin || 'N/A'}</div>
+        <div class="claim-detail"><strong>Claim #:</strong> ${claim.claimNumber || 'N/A'}</div>
+        <div class="claim-detail"><strong>Status:</strong> <span class="badge badge-${claim.status || 'UNKNOWN'}">${claim.status || 'UNKNOWN'}</span></div>
+        <div class="claim-detail"><strong>Date:</strong> ${claim.claimDate ? new Date(claim.claimDate).toLocaleDateString() : 'N/A'}</div>
+        <div class="claim-detail"><strong>Updated:</strong> ${claim.lastUpdated ? new Date(claim.lastUpdated).toLocaleDateString() : 'N/A'}</div>
+        <div class="claim-detail"><strong>Amount:</strong> $${(claim.amount || 0).toFixed(2)}</div>
+        <div class="claim-detail"><strong>Comments:</strong><br>${claim.comments || 'No comments'}</div>
+        <div class="claim-detail"><strong>Print Date:</strong> ${new Date().toLocaleString()}</div>
+      </body>
+      </html>
+    `;
+
+    printWindow.document.write(html);
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => {
+      printWindow.print();
+    }, 250);
   }
 
 }

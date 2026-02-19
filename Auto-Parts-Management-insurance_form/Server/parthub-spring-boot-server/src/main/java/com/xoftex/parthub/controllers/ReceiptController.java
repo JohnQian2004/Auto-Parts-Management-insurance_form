@@ -195,7 +195,8 @@ public class ReceiptController {
   }
 
   @GetMapping("/vehicle/{vehicleId}")
-  @PreAuthorize("hasAnyRole('USER', 'MODERATOR','ADMIN','SHOP', 'RECYCLER')")
+  // Authentication removed to allow public access for insurance viewing
+  // @PreAuthorize("hasAnyRole('USER', 'MODERATOR','ADMIN','SHOP', 'RECYCLER')")
   public ResponseEntity<List<Receipt>> getVehicleReceipt(@PathVariable("vehicleId") long vehicleId) {
     LOG.info("" + vehicleId);
 
