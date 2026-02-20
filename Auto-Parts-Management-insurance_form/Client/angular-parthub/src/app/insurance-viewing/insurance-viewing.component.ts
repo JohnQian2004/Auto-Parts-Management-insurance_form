@@ -322,15 +322,16 @@ export class InsuranceViewingComponent implements OnInit, OnDestroy, AfterViewIn
         console.log('Both required parameters exist, validating...');
         this.validateRouteParams();
 
-        // DISABLED: Access key validation - allow direct access with just 2 UUIDs
-        // If accessKey is provided, bypass authentication modal
+        // ENABLED: Access key validation - validate access key matches vehicle year or customer phone
+        // If accessKey is provided, validate it against vehicle year or customer phone
         if (this.accessKey) {
-          console.log('Access key provided, bypassing authentication modal (validation disabled)...');
-          this.bypassAuthentication();
+          console.log('Access key provided, validating against vehicle year or customer phone:', this.accessKey);
+          this.validateAndLoadVehicle();
         } else {
-          // No access key provided - disable access key requirement and load directly
-          console.log('No access key provided, loading vehicle directly (access key validation disabled)...');
-          this.loadVehicleDirectlyByUuid();
+          // No access key provided - show access denied message
+          console.log('No access key provided, showing access denied message...');
+          this.errorMessage = 'Access denied. Missing access key.';
+          this.isLoading = false;
         }
       } else {
         console.log('Missing route parameters - showing default view');
@@ -2996,6 +2997,57 @@ export class InsuranceViewingComponent implements OnInit, OnDestroy, AfterViewIn
       const facilityText = pdf.splitTextToSize(`Facility: ${repairFacility?.name || ''}`, (pageWidth / 2) - 10);
       pdf.text(facilityText, rightCol, yPos);
       yPos += 8;
+    }
+
+    // Customer Information from Vehicle Object
+    if (this.vehicle && this.vehicle.customer) {
+      pdf.setFontSize(12);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('CUSTOMER FROM VEHICLE', margin, yPos);
+      yPos += 8;
+
+      pdf.setFontSize(9);
+      pdf.setFont('helvetica', 'normal');
+
+      const customer = this.vehicle.customer;
+      const leftCol = margin;
+      const rightCol = pageWidth / 2 + 5;
+
+      // Customer name
+      const customerName = `${customer.title || ''} ${customer.firstName || ''} ${customer.lastName || ''}`.trim();
+      pdf.text(`Name: ${customerName}`, leftCol, yPos);
+      
+      // Job number if available from vehicle info
+      if (this.estimateData?.vehicleInfo?.jobNumber) {
+        pdf.text(`Job #: ${this.estimateData.vehicleInfo.jobNumber}`, rightCol, yPos);
+      }
+      yPos += 4;
+
+      // Phone and email
+      if (customer.phone) {
+        pdf.text(`Phone: ${this.formatPhoneNumber(customer.phone)}`, leftCol, yPos);
+      }
+      if (customer.email) {
+        pdf.text(`Email: ${customer.email}`, rightCol, yPos);
+      }
+      yPos += 4;
+
+      // Address
+      const address = `${customer.street || ''}, ${customer.city || ''}, ${customer.state || ''} ${customer.zip || ''}`.trim();
+      if (address) {
+        const addressText = pdf.splitTextToSize(`Address: ${address}`, pageWidth - 2 * margin);
+        pdf.text(addressText, leftCol, yPos);
+        yPos += 4 + (addressText.length - 1) * 4; // Account for multiple lines
+      }
+
+      // Notes if available
+      if (customer.notes) {
+        const notesText = pdf.splitTextToSize(`Notes: ${customer.notes}`, pageWidth - 2 * margin);
+        pdf.text(notesText, leftCol, yPos);
+        yPos += 4 + (notesText.length - 1) * 4; // Account for multiple lines
+      }
+
+      yPos += 6; // Extra spacing before vehicle info
     }
 
     // Vehicle Information Section
@@ -5688,5 +5740,188 @@ export class InsuranceViewingComponent implements OnInit, OnDestroy, AfterViewIn
     // The history tracking happens on the backend when CRUD operations occur
     console.log('Job would be updated (backend handles history)', jobId, formData);
     this.addDebugLog('INFO', 'Job Updated (Backend History)', `Job ${jobId} updated via estimate - history tracked on backend`);
+  }
+
+  /**
+   * Format phone number for display
+   */
+  formatPhoneNumber(phoneNumberString: any): string {
+    const cleaned = ('' + phoneNumberString).replace(/\D/g, '');
+
+    // Check if the cleaned number has an extension
+    const hasExtension = cleaned.length > 10;
+
+    if (hasExtension) {
+      // Extract the main number and extension
+      const mainNumber = cleaned.slice(0, 10);
+      const extension = cleaned.slice(10);
+
+      // Format with extension
+      return `(${mainNumber.slice(0, 3)}) ${mainNumber.slice(3, 6)} ${mainNumber.slice(6)}-${extension}`;
+    } else {
+      // Format without extension
+      const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
+      if (match) {
+        return `(${match[1]}) ${match[2]}-${match[3]}`;
+      }
+    }
+
+    // Return an empty string if no valid format found
+    return '';
+  }
+
+  /**
+   * Validates access key against vehicle year or customer phone and loads vehicle
+   */
+  private validateAndLoadVehicle(): void {
+    console.log('Validating access key:', this.accessKey);
+
+    // Load vehicle by UUID first
+    this.vehicleService.getByUuid(this.publicUuid)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (vehicle: Vehicle) => {
+          this.vehicle = vehicle;
+          console.log('Vehicle loaded for access validation:', vehicle);
+
+          // Validate access key against vehicle year or customer phone
+          const isValid = this.validateAccessKey(vehicle);
+          
+          if (isValid) {
+            console.log('Access key validation successful.');
+            this.isAuthenticated = true;
+            this.showAccessForm = false;
+            this.errorMessage = '';
+            
+            // Load auto parts and jobs for this vehicle and build estimate from them
+            forkJoin({
+              autoparts: this.autopartService.getAutopartForVehicle(vehicle.id!),
+              jobs: this.jobService.getAllVehicleJobs2(vehicle.id!)
+            })
+              .pipe(takeUntil(this.destroy$))
+              .subscribe({
+                next: ({ autoparts, jobs }) => {
+                  console.log('Auto parts loaded:', (Array.isArray(autoparts) ? autoparts.length : 0));
+                  console.log('Jobs loaded:', (Array.isArray(jobs) ? jobs.length : 0));
+
+                  // Build claim data from auto parts and jobs (to simulate insurance claim data)
+                  this.buildClaimDataFromAutoPartsAndJobs(vehicle, autoparts, jobs);
+
+                  // Build estimate data from auto parts and jobs
+                  this.buildEstimateDataFromAutoPartsAndJobs();
+
+                  // Load collision images from vehicle
+                  this.loadCollisionImagesFromVehicle();
+
+                  this.isLoading = false;
+                  this.addDebugLog('INFO', 'Vehicle Loaded', `Loaded vehicle with ${Array.isArray(autoparts) ? autoparts.length : 0} auto parts and ${Array.isArray(jobs) ? jobs.length : 0} jobs with valid access key.`);
+                },
+                error: (error) => {
+                  console.error('Error loading auto parts or jobs:', error);
+                  // Still build estimate data even if parts/jobs fail
+                  this.buildEstimateDataFromAutoPartsAndJobs();
+                  this.loadCollisionImagesFromVehicle();
+                  this.isLoading = false;
+                }
+              });
+          } else {
+            console.log('Access key validation failed.');
+            this.isLoading = false;
+            this.errorMessage = 'Access denied. Invalid access key.';
+            this.isAuthenticated = false;
+            this.vehicle = null; // Clear the vehicle since access was denied
+          }
+        },
+        error: (error) => {
+          this.isLoading = false;
+          this.errorMessage = `Error loading vehicle: ${error.message || 'Vehicle not found'}`;
+          console.error('Error loading vehicle by UUID:', error);
+        }
+      });
+  }
+
+  /**
+   * Validates access key against vehicle year or customer phone
+   */
+  private validateAccessKey(vehicle: Vehicle): boolean {
+    if (!this.accessKey || !vehicle) {
+      return false;
+    }
+
+    // Check if access key matches vehicle year
+    const vehicleYear = vehicle.year?.toString();
+    if (vehicleYear && this.accessKey === vehicleYear) {
+      console.log('Access key matches vehicle year:', vehicleYear);
+      return true;
+    }
+
+    // Check if access key matches customer phone (without formatting)
+    if (vehicle.customer && vehicle.customer.phone) {
+      const cleanCustomerPhone = vehicle.customer.phone.replace(/\D/g, ''); // Remove non-digit characters
+      const cleanAccessKey = this.accessKey.replace(/\D/g, ''); // Remove non-digit characters for comparison
+      
+      if (cleanCustomerPhone && cleanAccessKey && cleanCustomerPhone.includes(cleanAccessKey)) {
+        console.log('Access key matches customer phone:', vehicle.customer.phone);
+        return true;
+      }
+    }
+
+    console.log('Access key does not match vehicle year or customer phone');
+    return false;
+  }
+
+  /**
+   * Builds claim data from auto parts and jobs to simulate insurance claim data
+   */
+  private buildClaimDataFromAutoPartsAndJobs(vehicle: Vehicle, autoparts: any[], jobs: any[]): void {
+    // Convert raw data to insurance claim format
+    const claimItems: InsuranceClaim[] = [];
+    
+    // Process auto parts to create claim items with OEM numbers
+    if (Array.isArray(autoparts)) {
+      for (const part of autoparts) {
+        const claimItem: InsuranceClaim = {
+          id: part.id || undefined,
+          vehicleId: vehicle.id,
+          claimNumber: `PART-${part.id || 'N/A'}`,
+          status: part.status || 'PENDING',
+          comments: part.notes || part.description || '',
+          claimDate: part.createdAt ? new Date(part.createdAt) : new Date(),
+          lastUpdated: part.updatedAt ? new Date(part.updatedAt) : new Date(),
+          isActive: true,
+          createdAt: part.createdAt ? new Date(part.createdAt) : new Date(),
+          updatedAt: part.updatedAt ? new Date(part.updatedAt) : new Date()
+        };
+        claimItems.push(claimItem);
+      }
+    }
+
+    // Process jobs to create claim items
+    if (Array.isArray(jobs)) {
+      for (const job of jobs) {
+        const claimItem: InsuranceClaim = {
+          id: job.id || undefined,
+          vehicleId: vehicle.id,
+          claimNumber: `JOB-${job.id || 'N/A'}`,
+          status: job.status || 'PENDING',
+          comments: job.notes || '',
+          claimDate: job.createdAt ? new Date(job.createdAt) : new Date(),
+          lastUpdated: job.updatedAt ? new Date(job.updatedAt) : new Date(),
+          isActive: true,
+          createdAt: job.createdAt ? new Date(job.createdAt) : new Date(),
+          updatedAt: job.updatedAt ? new Date(job.updatedAt) : new Date()
+        };
+        claimItems.push(claimItem);
+      }
+    }
+
+    // Create a simulated claim data response similar to what the API would return
+    this.claimData = {
+      vehicle: vehicle,
+      insuranceClaims: claimItems,
+      documents: [] // Could load from vehicle if needed
+    };
+
+    console.log('Claim data built from auto parts and jobs with OEM numbers:', this.claimData);
   }
 }

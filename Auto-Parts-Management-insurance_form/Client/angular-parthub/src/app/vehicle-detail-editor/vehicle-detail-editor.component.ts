@@ -7370,7 +7370,7 @@ export class VehicleDetailEditorComponent implements OnInit, OnDestroy, OnChange
         pdf.setFont('helvetica', 'bold');
         pdf.setFontSize(10);
 
-        const colWidths = [8, 12, 12, 15, 15, 20, 15, 12, 12, 10, 15, 15]; // Reduced column widths
+        const colWidths = [6, 8, 10, 10, 12, 16, 12, 10, 10, 8, 12, 12]; // Adjusted for portrait
         const headers = ['#', 'Year', 'Make', 'Model', 'Color', 'Customer', 'Phone', 'Job Type', 'Status', 'Paid', 'Estimate', 'Created'];
 
         // Draw table header
@@ -7506,11 +7506,11 @@ export class VehicleDetailEditorComponent implements OnInit, OnDestroy, OnChange
 
         const { jsPDF } = require('jspdf');
         const QRCode = require('qrcode');
-        const pdf = new jsPDF('landscape', 'mm', 'a4'); // Landscape for more columns
+        const pdf = new jsPDF('portrait', 'mm', 'a4'); // Changed to portrait as requested
 
         const pageWidth = pdf.internal.pageSize.getWidth();
         const pageHeight = pdf.internal.pageSize.getHeight();
-        const margin = 8; // Reduced margin for landscape
+        const margin = 10; // Standard margin for portrait
         let yPos = margin;
 
         // Report Header (company and range embedded in title)
@@ -7574,8 +7574,8 @@ export class VehicleDetailEditorComponent implements OnInit, OnDestroy, OnChange
         pdf.setFont('helvetica', 'bold');
         pdf.setFontSize(8);
 
-        // Define columns with added Date, more space for Phone, and new Paid column (22 entries)
-        const colWidths = [6, 12, 10, 12, 11, 16, 18, 18, 10, 12, 10, 14, 14, 14, 8, 8, 8, 12, 14, 16, 13, 12];
+        // Define columns with added Date, more space for Phone, and new Paid column - adjusted for portrait
+        const colWidths = [5, 8, 8, 10, 10, 12, 14, 14, 8, 10, 8, 10, 10, 10, 7, 7, 7, 10, 10, 10, 10, 8];
         const headers = ['#', 'Date', 'Year', 'Make', 'Model', 'Color', 'Customer', 'Phone', 'Job', 'Status', 'Paid', 'Estimate', 'Payment', 'Receipt', 'Supplement', 'Pay#', 'Rec#', 'Sup#', 'Total', 'Paid', 'Outstanding', 'Result'];
 
         // Draw table header
