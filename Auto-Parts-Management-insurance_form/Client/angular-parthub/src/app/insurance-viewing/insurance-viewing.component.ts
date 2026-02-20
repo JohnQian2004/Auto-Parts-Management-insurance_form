@@ -553,8 +553,8 @@ export class InsuranceViewingComponent implements OnInit, OnDestroy, AfterViewIn
           this.insuranceClaims = response.insuranceClaims || [];
           this.documents = response.documents || [];
 
-          // Build estimate data from counter receipts for this vehicle
-          this.buildEstimateDataFromReceipts();
+          // Build estimate data from auto parts and jobs for this vehicle
+          this.buildEstimateDataFromAutoPartsAndJobs();
 
           // Optionally load collision images from the vehicle imageModels
           if (this.vehicle?.imageModels && this.vehicle.imageModels.length > 0) {
@@ -584,8 +584,8 @@ export class InsuranceViewingComponent implements OnInit, OnDestroy, AfterViewIn
           this.insuranceClaims = response.insuranceClaims || [];
           this.documents = response.documents || [];
 
-          // Build estimate data from counter receipts for this vehicle
-          this.buildEstimateDataFromReceipts();
+          // Build estimate data from auto parts and jobs for this vehicle
+          this.buildEstimateDataFromAutoPartsAndJobs();
 
           // Optionally load collision images from the vehicle imageModels
           this.loadCollisionImagesFromVehicle();
@@ -621,32 +621,30 @@ export class InsuranceViewingComponent implements OnInit, OnDestroy, AfterViewIn
           this.vehicle = vehicle;
           console.log('Vehicle loaded successfully:', vehicle);
 
-          // Load receipts for this vehicle
-          this.receiptService.getAllVehicleReceipts(vehicle.id!)
+          // Load auto parts and jobs for this vehicle and build estimate from them
+          forkJoin({
+            autoparts: this.autopartService.getAutopartForVehicle(vehicle.id!),
+            jobs: this.jobService.getAllVehicleJobs2(vehicle.id!)
+          })
             .pipe(takeUntil(this.destroy$))
             .subscribe({
-              next: (receipts) => {
-                // Attach receipts to vehicle object
-                const vehicleAny: any = this.vehicle as any;
-                vehicleAny.receipts = receipts || [];
-                console.log('Receipts loaded:', receipts?.length || 0);
+              next: ({ autoparts, jobs }) => {
+                console.log('Auto parts loaded:', (Array.isArray(autoparts) ? autoparts.length : 0));
+                console.log('Jobs loaded:', (Array.isArray(jobs) ? jobs.length : 0));
 
-                // Convert receipts to insurance claims for display
-                this.convertReceiptsToInsuranceClaims(receipts);
-
-                // Build estimate data from counter receipts
-                this.buildEstimateDataFromReceipts();
+                // Build estimate data from auto parts and jobs
+                this.buildEstimateDataFromAutoPartsAndJobs();
 
                 // Load collision images from vehicle
                 this.loadCollisionImagesFromVehicle();
 
                 this.isLoading = false;
-                this.addDebugLog('INFO', 'Vehicle Loaded', `Loaded vehicle and ${receipts?.length || 0} receipts directly by UUID (no insurance access validation).`);
+                this.addDebugLog('INFO', 'Vehicle Loaded', `Loaded vehicle with ${Array.isArray(autoparts) ? autoparts.length : 0} auto parts and ${Array.isArray(jobs) ? jobs.length : 0} jobs directly by UUID (no insurance access validation).`);
               },
               error: (error) => {
-                console.error('Error loading receipts:', error);
-                // Still build estimate data even if receipts fail
-                this.buildEstimateDataFromReceipts();
+                console.error('Error loading auto parts or jobs:', error);
+                // Still build estimate data even if parts/jobs fail
+                this.buildEstimateDataFromAutoPartsAndJobs();
                 this.loadCollisionImagesFromVehicle();
                 this.isLoading = false;
               }
@@ -2758,7 +2756,6 @@ export class InsuranceViewingComponent implements OnInit, OnDestroy, AfterViewIn
             <th class="col-line">Line</th>
             <th class="col-operation">Operation</th>
             <th class="col-description">Description</th>
-            <th class="col-part">Part Number</th>
             <th class="col-oem">OEM Number</th>
             <th class="col-qty">Qty</th>
             <th class="col-extended">Extended</th>
@@ -2788,7 +2785,6 @@ export class InsuranceViewingComponent implements OnInit, OnDestroy, AfterViewIn
             <td>${lineCounter}</td>
             <td>${item.operation || ''}</td>
             <td>${item.description || ''}</td>
-            <td>${item.partNumber || ''}</td>
             <td>${item.oemNumber || ''}</td>
             <td>${item.quantity || ''}</td>
             <td>${item.extendedPrice ? '$' + item.extendedPrice.toFixed(2) : ''}</td>
@@ -3024,13 +3020,13 @@ export class InsuranceViewingComponent implements OnInit, OnDestroy, AfterViewIn
     pdf.setFontSize(9);
     pdf.setFont('helvetica', 'bold');
 
-    const colWidths = [12, 18, 60, 28, 28, 12, 18, 12, 12]; // Added OEM column and adjusted
+    const colWidths = [12, 18, 72, 32, 12, 22, 16, 16];
     const colPositions = [margin];
     for (let i = 0; i < colWidths.length - 1; i++) {
       colPositions.push(colPositions[i] + colWidths[i]);
     }
 
-    const headers = ['Line', 'Operation', 'Description', 'Part Number', 'OEM Number', 'Qty', 'Extended', 'Labor', 'Paint'];
+    const headers = ['Line', 'Operation', 'Description', 'OEM Number', 'Qty', 'Extended', 'Labor', 'Paint'];
 
     // Top separator line for header
     pdf.setDrawColor(120, 120, 120);
@@ -3125,7 +3121,6 @@ export class InsuranceViewingComponent implements OnInit, OnDestroy, AfterViewIn
             lineCounter.toString(),
             item.operation || '',
             item.description || '',
-            item.partNumber || '',
             item.oemNumber || '',
             item.quantity?.toString() || '',
             item.extendedPrice ? `$${item.extendedPrice.toFixed(2)}` : '',
@@ -3902,13 +3897,13 @@ export class InsuranceViewingComponent implements OnInit, OnDestroy, AfterViewIn
       pdf.setFontSize(8);
       pdf.setFont('helvetica', 'bold');
 
-      const colWidths = [12, 18, 60, 28, 28, 12, 18, 12, 12];
+      const colWidths = [12, 18, 72, 32, 12, 22, 16, 16];
       const colPositions = [margin];
       for (let i = 0; i < colWidths.length - 1; i++) {
         colPositions.push(colPositions[i] + colWidths[i]);
       }
 
-      const headers = ['Line', 'Operation', 'Description', 'Part Number', 'OEM Number', 'Qty', 'Extended', 'Labor', 'Paint'];
+      const headers = ['Line', 'Operation', 'Description', 'OEM Number', 'Qty', 'Extended', 'Labor', 'Paint'];
 
       // Draw header background
       pdf.setFillColor(240, 240, 240);
@@ -3989,7 +3984,6 @@ export class InsuranceViewingComponent implements OnInit, OnDestroy, AfterViewIn
               lineCounter.toString(),
               item.operation || '',
               item.description || '',
-              item.partNumber || '',
               item.oemNumber || '',
               item.quantity?.toString() || '',
               item.extendedPrice ? `$${item.extendedPrice.toFixed(2)}` : '',
@@ -4940,19 +4934,20 @@ export class InsuranceViewingComponent implements OnInit, OnDestroy, AfterViewIn
           description: part.title || part.name || part.partNumber || 'Auto Part',
           partNumber: part.partNumber || null,
           oemNumber: (() => {
-            const pool = [part?.oemNumber, part?.oem, part?.title, part?.name, part?.description, part?.notes]
+            // Prefer explicit OEM number, then partNumber (OEM numbers are part identifiers, not quality labels)
+            if (typeof part?.oemNumber === 'string' && part.oemNumber.trim()) {
+              return part.oemNumber.trim();
+            }
+            if (typeof part?.partNumber === 'string' && part.partNumber.trim()) {
+              return part.partNumber.trim();
+            }
+            // Fallback: try to extract a plausible part code from descriptive fields
+            const pool = [part?.title, part?.name, part?.description, part?.notes]
               .filter((v: any) => typeof v === 'string' && v.trim().length > 0)
               .join(' ');
             if (!pool) return null;
-            const regexes = [
-              /OEM\s*[#:]?\s*([A-Z0-9\-]{5,})/i,
-              /\b([A-Z0-9\-]{5,})\b(?=\s*OEM\b)/i
-            ];
-            for (const r of regexes) {
-              const m = pool.match(r);
-              if (m) return (m[1] || m[0]).trim();
-            }
-            return null;
+            const match = pool.match(/[A-Z0-9\-]{5,}/i);
+            return match ? match[0].trim() : null;
           })(),
           quantity: part.quantity || 1,
           extendedPrice: part.salePrice || part.price || 0,
