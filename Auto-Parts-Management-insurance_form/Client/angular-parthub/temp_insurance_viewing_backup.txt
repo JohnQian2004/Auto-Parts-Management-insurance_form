@@ -1,0 +1,5018 @@
+import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Subject, takeUntil, forkJoin } from 'rxjs';
+
+import { InsuranceService } from '../_services/insurance.service';
+import { ReceiptService } from '../_services/receipt.service';
+import { VehicleService } from '../_services/vehicle.service';
+import { EventBusService } from '../_shared/event-bus.service';
+import { AutopartService } from '../_services/autopart.service';
+import { JobService } from '../_services/job.service';
+import { EventData } from '../_shared/event.class';
+import { InsuranceClaim } from '../models/insurance.claim.model';
+import { InsuranceClaimViewResponse } from '../models/insurance.claim.view.response.model';
+import { InsuranceDocument } from '../models/insurance.document.model';
+import { Vehicle } from '../models/vehicle.model';
+import { Config } from '../models/config.model';
+
+// Estimate Data Interfaces
+export interface EstimateClaimItem {
+  lineNumber?: number;  // Made optional since it's calculated dynamically
+  operation: string;
+  description: string;
+  partNumber: string | null;
+  quantity: number | null;
+  extendedPrice: number | null;
+  laborHours: number | null;
+  paintHours: number | null;
+  note?: string;
+}
+
+export interface EstimateArea {
+  areaName: string;
+  claimItems: EstimateClaimItem[];
+  images?: any[]; // Optional array of evidence images for this area
+  description?: string; // Optional description for the area
+}
+
+export interface EstimateData {
+  // Shop/Company Information
+  shopInfo?: {
+    name: string;
+    address: string;
+    phone: string;
+    workfileId: string;
+    partsShare: string;
+    description: string;
+    invoiceType: string;
+  };
+
+  // Customer Information
+  customerInfo?: {
+    name: string;
+    phone: string;
+    phoneType: string;
+    address: string;
+    isOwner: boolean;
+    isInsured: boolean;
+  };
+
+  // Job Information
+  jobInfo?: {
+    jobNumber: string;
+    writtenBy: string;
+    adjuster: string;
+    policyNumber: string;
+    claimNumber: string;
+    typeOfLoss: string;
+    dateOfLoss: string;
+    daysToRepair: number;
+    pointOfImpact: string;
+    inspectionLocation: string;
+  };
+
+  // Insurance Information
+  insuranceInfo?: {
+    company: string;
+    adjuster: string;
+  };
+
+  // Vehicle Information
+  vehicleInfo?: {
+    year: number;
+    make: string;
+    model: string;
+    bodyStyle: string;
+    engine: string;
+    color: string;
+    vin: string;
+    interiorColor: string;
+    exteriorColor: string;
+    mileageIn: string;
+    mileageOut: string;
+    vehicleOut: string;
+    license: string;
+    state: string;
+    productionDate: string;
+    condition: string;
+    jobNumber: string;
+  };
+
+  // Repair Facility
+  repairFacility?: {
+    name: string;
+    address: string;
+    phone: string;
+    phoneType: string;
+  };
+
+  estimateData: EstimateArea[];
+  summary: {
+    subtotal: number;
+    laborHours: number;
+    paintHours: number;
+  };
+}
+
+@Component({
+  selector: 'app-insurance-viewing',
+  templateUrl: './insurance-viewing.component.html',
+  styleUrls: ['./insurance-viewing.component.css']
+})
+export class InsuranceViewingComponent implements OnInit, OnDestroy, AfterViewInit {
+
+  private destroy$ = new Subject<void>();
+
+  // ViewChild for canvas element and modal body
+  @ViewChild('imageCanvas', { static: false }) imageCanvas!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('imageEditorModalBody', { static: false }) imageEditorModalBody!: ElementRef<HTMLDivElement>;
+
+  // Route parameters
+  companyCode: string = '';
+  publicUuid: string = '';
+  accessKey: string = '';
+
+  // Forms
+  accessForm: FormGroup;
+
+  // Data
+  claimData: InsuranceClaimViewResponse | null = null;
+  vehicle: Vehicle | null = null;
+  insuranceClaims: InsuranceClaim[] = [];
+  documents: InsuranceDocument[] = [];
+
+  // Global line number counter for dynamic numbering
+  currentLineNumber: number = 1;
+
+  // UI States
+  isLoading: boolean = false;
+  isSubmitting: boolean = false;
+  isAuthenticated: boolean = false;
+  errorMessage: string = '';
+  showAccessForm: boolean = true;
+  showEditModal: boolean = false;
+  showImageModal: boolean = false;
+  showAccessModal: boolean = false;
+  showClaimsModal: boolean = false;
+  showVehicleModal: boolean = false;
+  selectedImage: any = null;
+  editingLine: any = null;
+  isEditingLine: boolean = false;
+
+  // Area editing properties
+  showAreaModal: boolean = false;
+  isEditingArea: boolean = false;
+  editingAreaIndex: number = -1;
+  isFormEditable: boolean = false;
+  isEstimateEditable: boolean = false;
+
+  // Document management
+  selectedFiles: File[] = [];
+  uploadProgress: number = 0;
+  isUploading: boolean = false;
+
+  // Claims Form
+  claimsForm!: FormGroup;
+
+  // Estimate CRUD
+  estimateLineForm!: FormGroup;
+  areaForm!: FormGroup;
+
+  // Image Gallery Properties
+  collisionImages: any[] = [];
+
+  // Evidence Gallery Properties
+  expandedRows = new Set<number>();
+  evidenceImages: Map<number, any[]> = new Map();
+
+  // Debug Logging
+  debugLogs: any[] = [];
+
+  // Image URL Configuration (similar to inshop2 component)
+  // Use baycounter.com:8445 for public insurance viewing
+  config: Config = new Config();
+  baseUrlImage = this.config.baseUrl + '/vehicle/getImage';
+  baseUrlResizeImage = this.config.baseUrl + '/vehicle/getResize';
+
+  // Estimate Data
+  estimateData: EstimateData | null = null;
+
+  // Image Editor Properties
+  showImageEditor: boolean = false;
+  currentEditingImage: any = null;
+  currentEditingAreaIndex: number = -1;
+  editorTool: string = 'select';
+  selectedColor: string = '#ff0000';
+  brushSize: number = 3;
+  textToAdd: string = '';
+  canvasWidth: number = 600;
+  canvasHeight: number = 400;
+  isDrawing: boolean = false;
+  lastX: number = 0;
+  lastY: number = 0;
+  isImageLoading: boolean = false;
+
+  editorColors: string[] = [
+    '#ff0000', '#00ff00', '#0000ff', '#ffff00',
+    '#ff00ff', '#00ffff', '#000000', '#ffffff'
+  ];
+
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private fb: FormBuilder,
+    private eventBusService: EventBusService,
+    private insuranceService: InsuranceService,
+    private vehicleService: VehicleService,
+    private autopartService: AutopartService,
+    private jobService: JobService,
+    private receiptService: ReceiptService,
+  ) {
+    this.accessForm = this.fb.group({
+      privateKey: ['', [Validators.required]]
+    });
+
+    // Initialize claims form
+    this.claimsForm = this.fb.group({
+      claimNumber: ['CLM-2025-001', Validators.required],
+      policyNumber: ['POL-2025-001', Validators.required],
+      incidentDate: ['2025-01-15', Validators.required],
+      reportedDate: ['2025-01-16', Validators.required],
+      make: ['Toyota', Validators.required],
+      model: ['Camry', Validators.required],
+      year: ['2020', Validators.required],
+      damageDescription: ['Front bumper damage from parking incident. Bumper completely detached and hanging loose. Additional damage to headlight assembly.', Validators.required],
+      estimatedCost: [2500, [Validators.required, Validators.min(0)]],
+      actualCost: [0, [Validators.required, Validators.min(0)]],
+      status: ['Pending', Validators.required],
+      priority: ['High', Validators.required],
+      adjusterNotes: ['Initial assessment completed. Awaiting body shop estimate. Photos and police report attached.']
+    });
+
+    // Initialize estimate line form
+    this.estimateLineForm = this.fb.group({
+      lineNumber: [0, Validators.required],
+      operation: ['', Validators.required],
+      description: ['', Validators.required],
+      partNumber: ['', Validators.required],
+      quantity: [0, [Validators.required, Validators.min(0)]],
+      extendedPrice: [0, [Validators.required, Validators.min(0)]],
+      laborHours: [0, [Validators.required, Validators.min(0)]],
+      paintHours: [0, [Validators.required, Validators.min(0)]],
+      area: ['', Validators.required]
+    });
+
+    // Initialize area form
+    this.areaForm = this.fb.group({
+      areaName: [''],
+      customAreaName: [''],
+      description: ['']
+    });
+  }
+
+  ngOnInit(): void {
+    // Extract route parameters
+    $('.reminders-box').addClass("reminders-toggle");
+    $('.main-content').removeClass("my-fluid-col");
+    this.eventBusService.emit(new EventData('noshow', "123"));
+    this.route.params.pipe(takeUntil(this.destroy$)).subscribe(params => {
+      console.log('Insurance viewing route parameters:', params);
+      this.companyCode = params['companyCode'] || '';
+      this.publicUuid = params['publicUuid'] || '';
+      this.accessKey = params['accessKey'] || '';
+      console.log('Extracted companyCode:', this.companyCode);
+      console.log('Extracted publicUuid:', this.publicUuid);
+      console.log('Extracted accessKey:', this.accessKey);
+
+      // Validate route parameters if they exist
+      if (this.companyCode && this.publicUuid) {
+        console.log('Both required parameters exist, validating...');
+        this.validateRouteParams();
+
+        // DISABLED: Access key validation - allow direct access with just 2 UUIDs
+        // If accessKey is provided, bypass authentication modal
+        if (this.accessKey) {
+          console.log('Access key provided, bypassing authentication modal (validation disabled)...');
+          this.bypassAuthentication();
+        } else {
+          // No access key provided - disable access key requirement and load directly
+          console.log('No access key provided, loading vehicle directly (access key validation disabled)...');
+          this.loadVehicleDirectlyByUuid();
+        }
+      } else {
+        console.log('Missing route parameters - showing default view');
+      }
+    });
+
+    // Check for parsed PDF data from session storage
+    this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(queryParams => {
+      if (queryParams['source'] === 'pdf-parser') {
+        const parsedData = sessionStorage.getItem('parsedEstimateData');
+        if (parsedData) {
+          try {
+            this.estimateData = JSON.parse(parsedData);
+            this.addDebugLog('INFO', 'PDF Data Loaded', 'Loaded estimate data from PDF parser');
+            // Clear session storage after loading
+            sessionStorage.removeItem('parsedEstimateData');
+          } catch (error) {
+            console.error('Error parsing session storage data:', error);
+            this.loadMockEstimateData();
+          }
+        } else {
+          this.loadMockEstimateData();
+        }
+
+        // Clear the query parameters after processing to prevent issues on refresh
+        // Preserve route parameters while clearing query parameters
+        const currentParams = this.route.snapshot.params;
+        if (currentParams['companyCode'] && currentParams['publicUuid']) {
+          const navigationPath = currentParams['accessKey']
+            ? ['/insurance-viewing', currentParams['companyCode'], currentParams['publicUuid'], currentParams['accessKey']]
+            : ['/insurance-viewing', currentParams['companyCode'], currentParams['publicUuid']];
+
+          this.router.navigate(navigationPath, {
+            queryParams: {},
+            replaceUrl: true
+          });
+        } else {
+          this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: {},
+            replaceUrl: true
+          });
+        }
+      } else {
+        // Normal production path: estimate data will be built from real receipts
+        // after successful authentication and claim/vehicle load.
+      }
+    });
+
+    // Load mock collision images
+    this.loadMockCollisionImages();
+
+    // Pre-fill the private key for demo purposes
+    this.accessForm.patchValue({ privateKey: 'demo-access-key-2025' });
+
+    // DISABLED: Don't show authentication modal - access key validation is disabled
+    // Allow direct access with just 2 UUIDs (companyCode and publicUuid)
+    // if (!this.accessKey) {
+    //   this.openAccessModal();
+    // }
+
+    // Initialize evidence images and debug log
+    setTimeout(() => {
+      this.addDebugLog('INFO', 'Component Initialized', 'Insurance viewing component loaded successfully');
+    }, 1000);
+  }
+
+  ngAfterViewInit(): void {
+    // This lifecycle hook is called after the view and child views are initialized
+    // We can use this to ensure ViewChild elements are available
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private validateRouteParams(): void {
+    console.log('Validating route parameters...');
+    console.log('companyCode:', this.companyCode);
+    console.log('publicUuid:', this.publicUuid);
+
+    if (!this.companyCode || !this.publicUuid) {
+      console.log('Missing required parameters');
+      this.errorMessage = 'Missing required parameters';
+      return;
+    }
+
+    // Validate UUID format
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+    if (!uuidRegex.test(this.companyCode)) {
+      console.log('Invalid company code format:', this.companyCode);
+      this.errorMessage = 'Invalid company code format';
+      return;
+    }
+
+    if (!uuidRegex.test(this.publicUuid)) {
+      console.log('Invalid vehicle identifier format:', this.publicUuid);
+      this.errorMessage = 'Invalid vehicle identifier format';
+      return;
+    }
+
+    console.log('Route parameters validation passed');
+  }
+
+  // MOCK DATA: Load mock data for testing without authentication
+  private loadMockData(): void {
+    this.isAuthenticated = true;
+    this.showAccessForm = false;
+    this.isLoading = true;
+
+    // Simulate API delay
+    setTimeout(() => {
+      // For local/demo only: keep using mock estimate + images.
+      this.loadMockEstimateData();
+      this.loadMockCollisionImages();
+      this.isLoading = false;
+      console.log('Mock data loaded successfully');
+    }, 1000);
+  }
+
+  onSubmit(): void {
+    if (this.accessForm.valid) {
+      console.log('Form submitted, authenticating...');
+      this.authenticate();
+      // Close the modal after successful authentication
+      this.closeAccessModal();
+    }
+  }
+
+  private authenticate(): void {
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    const privateKey = this.accessForm.get('privateKey')?.value?.trim();
+    console.log('Authentication attempt with key:', privateKey);
+
+    if (!privateKey) {
+      console.log('No private key provided, loading vehicle directly by UUID.');
+      // Load vehicle directly by UUID (no auth required)
+      this.loadVehicleDirectlyByUuid();
+      return;
+    }
+
+    // DISABLED: Skip access key validation - allow direct access
+    // This allows the component to work with just 2 UUIDs (companyCode and publicUuid)
+    console.log('Access key validation DISABLED - allowing direct access');
+    this.isAuthenticated = true;
+    this.showAccessForm = false;
+    this.errorMessage = ''; // Clear any error messages
+
+    // Ensure modal is closed
+    this.closeAccessModal();
+
+    // Load vehicle directly by UUID (no auth required) - skip all API calls that require authentication
+    // This bypasses validateAccess and getClaim endpoints entirely
+    this.loadVehicleDirectlyByUuid();
+
+    // OLD CODE - Access key validation (now disabled)
+    /*
+    this.insuranceService.validateAccess(this.companyCode, this.publicUuid, privateKey)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          console.log('Authentication successful with key:', privateKey);
+          this.isAuthenticated = true;
+          this.showAccessForm = false;
+          this.closeAccessModal();
+          this.loadClaimData(privateKey);
+        },
+        error: (error) => {
+          console.error('Authentication failed:', error);
+          this.isLoading = false;
+          this.errorMessage = 'Invalid or expired access key.';
+        }
+      });
+    */
+  }
+
+  private bypassAuthentication(): void {
+    console.log('Bypassing authentication with access key:', this.accessKey);
+
+    const privateKey = this.accessKey?.trim();
+    if (!privateKey) {
+      console.log('No access key provided for bypass, loading vehicle directly by UUID.');
+      // Load vehicle directly by UUID (no auth required)
+      this.loadVehicleDirectlyByUuid();
+      return;
+    }
+
+    this.isLoading = true;
+    this.errorMessage = ''; // Clear any previous error messages
+
+    // DISABLED: Skip validateAccess API call - allow direct access
+    // This allows the component to work with just 2 UUIDs (companyCode and publicUuid)
+    // We try getClaim first (backend may validate internally), then fallback to direct UUID load
+    console.log('Access key validation DISABLED - trying getClaim with fallback');
+    this.isAuthenticated = true;
+    this.showAccessForm = false;
+    this.showAccessModal = false;
+    this.errorMessage = ''; // Clear any error messages
+
+    // Set the access key in the form for consistency
+    this.accessForm.patchValue({ privateKey });
+
+    // Try to load claim data (backend may validate internally, but we don't call validateAccess from frontend)
+    // If it fails, fallback to direct vehicle load by UUID
+    this.loadClaimDataWithFallback(privateKey);
+
+    // OLD CODE - Access key validation (now disabled)
+    /*
+    this.insuranceService.validateAccess(this.companyCode, this.publicUuid, privateKey)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          console.log('Access key validated successfully.');
+          this.isAuthenticated = true;
+          this.showAccessForm = false;
+          this.showAccessModal = false;
+          this.errorMessage = '';
+
+          this.accessForm.patchValue({ privateKey });
+          this.loadClaimData(privateKey);
+        },
+        error: (error) => {
+          console.warn('Access key validation failed, allowing access via fallback:', error);
+          this.isAuthenticated = true;
+          this.showAccessForm = false;
+          this.showAccessModal = false;
+          this.errorMessage = '';
+          this.accessForm.patchValue({ privateKey });
+          this.loadClaimDataWithFallback(privateKey);
+        }
+      });
+    */
+  }
+
+  private loadClaimDataWithFallback(privateKey: string): void {
+    this.isLoading = true;
+
+    // NOTE: We do NOT call validateAccess() from the frontend - it's disabled
+    // The backend getClaim endpoint may validate internally, but we skip the frontend validateAccess call
+    // Try to load claim data with the access key (backend may validate internally)
+    this.insuranceService.getClaim(this.companyCode, this.publicUuid, privateKey)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response: InsuranceClaimViewResponse) => {
+          this.claimData = response;
+          this.vehicle = response.vehicle || null;
+          this.insuranceClaims = response.insuranceClaims || [];
+          this.documents = response.documents || [];
+
+          // Build estimate data from counter receipts for this vehicle
+          this.buildEstimateDataFromAutoPartsAndJobs();
+
+          // Optionally load collision images from the vehicle imageModels
+          if (this.vehicle?.imageModels && this.vehicle.imageModels.length > 0) {
+            this.loadCollisionImagesFromVehicle();
+          }
+
+          this.isLoading = false;
+        },
+        error: (error) => {
+          console.warn('Failed to load claim data (backend may have validated and rejected), falling back to direct vehicle load by UUID:', error);
+          // Fallback to direct vehicle load by UUID if claim data load fails
+          // This bypasses all authentication and loads vehicle directly
+          this.loadVehicleDirectlyByUuid();
+        }
+      });
+  }
+
+  private loadClaimData(privateKey: string): void {
+    this.isLoading = true;
+
+    this.insuranceService.getClaim(this.companyCode, this.publicUuid, privateKey)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response: InsuranceClaimViewResponse) => {
+          this.claimData = response;
+          this.vehicle = response.vehicle || null;
+          this.insuranceClaims = response.insuranceClaims || [];
+          this.documents = response.documents || [];
+
+          // Build estimate data from counter receipts for this vehicle
+          this.buildEstimateDataFromAutoPartsAndJobs();
+
+          // Optionally load collision images from the vehicle imageModels
+          this.loadCollisionImagesFromVehicle();
+
+          this.isLoading = false;
+        },
+        error: (error) => {
+          // If insurance claim endpoint fails, try loading vehicle directly by UUID
+          console.warn('Insurance claim endpoint failed, attempting direct vehicle load:', error);
+          this.loadVehicleDirectlyByUuid();
+        }
+      });
+  }
+
+  /**
+   * Load vehicle directly by UUID without insurance access validation.
+   * This works because /api/vehicles/search/vehicle/{uuid} doesn't require authentication.
+   * Then loads receipts and builds estimate data from counter receipts.
+   */
+  private loadVehicleDirectlyByUuid(): void {
+    this.isLoading = true;
+    this.isAuthenticated = true; // Mark as authenticated since we're loading data
+    this.showAccessForm = false;
+    this.closeAccessModal();
+
+    console.log('Loading vehicle directly by UUID:', this.publicUuid);
+
+    // Load vehicle by UUID (no auth required)
+    this.vehicleService.getByUuid(this.publicUuid)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (vehicle: Vehicle) => {
+          this.vehicle = vehicle;
+          console.log('Vehicle loaded successfully:', vehicle);
+
+          // Load receipts for this vehicle
+          this.receiptService.getAllVehicleReceipts(vehicle.id!)
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({
+              next: (receipts) => {
+                // Attach receipts to vehicle object
+                const vehicleAny: any = this.vehicle as any;
+                vehicleAny.receipts = receipts || [];
+                console.log('Receipts loaded:', receipts?.length || 0);
+
+                // Convert receipts to insurance claims for display
+                this.convertReceiptsToInsuranceClaims(receipts);
+
+                // Build estimate data from counter receipts
+                this.buildEstimateDataFromAutoPartsAndJobs();
+
+                // Load collision images from vehicle
+                this.loadCollisionImagesFromVehicle();
+
+                this.isLoading = false;
+                this.addDebugLog('INFO', 'Vehicle Loaded', `Loaded vehicle and ${receipts?.length || 0} receipts directly by UUID (no insurance access validation).`);
+              },
+              error: (error) => {
+                console.error('Error loading receipts:', error);
+                // Still build estimate data even if receipts fail
+                this.buildEstimateDataFromAutoPartsAndJobs();
+                this.loadCollisionImagesFromVehicle();
+                this.isLoading = false;
+              }
+            });
+        },
+        error: (error) => {
+          this.isLoading = false;
+          this.errorMessage = `Error loading vehicle: ${error.message || 'Vehicle not found'}`;
+          console.error('Error loading vehicle by UUID:', error);
+          // Fallback to mock data if vehicle load fails
+          this.loadMockData();
+        }
+      });
+  }
+
+  /**
+   * Build estimateData from real counter receipts associated with the vehicle.
+   * Uses vehicle.receipts (and vehicle.markupPrecentage if present) to populate
+   * a single estimate area that mirrors the counter receipt totals.
+   */
+  private buildEstimateDataFromAutoPartsAndJobs(): void {
+    if (!this.vehicle) {
+      console.log('buildEstimateDataFromReceipts: no vehicle loaded.');
+      return;
+    }
+
+    const vehicleAny: any = this.vehicle as any;
+    const receipts: any[] = vehicleAny.receipts || [];
+
+    if (!receipts || receipts.length === 0) {
+      console.log('buildEstimateDataFromReceipts: no receipts found on vehicle, falling back to mock estimate data.');
+      // Keep existing behavior when no real data is available
+      if (!this.estimateData) {
+        this.loadMockEstimateData();
+      }
+      return;
+    }
+
+    const markupPercentage = (this.vehicle.markupPrecentage || 0);
+
+    const claimItems: EstimateClaimItem[] = receipts.map((r, index) => {
+      const qty = r.quantity != null ? Number(r.quantity) : 1;
+      const amount = r.amount != null ? Number(r.amount) : 0;
+      const baseSubtotal = +(qty * amount).toFixed(2);
+
+      // If markup is configured on the vehicle, apply it to mirror counter receipt totals
+      const extendedWithMarkup = markupPercentage
+        ? +(baseSubtotal * (1 + markupPercentage / 100)).toFixed(2)
+        : baseSubtotal;
+
+      return {
+        lineNumber: index + 1,
+        operation: 'PART', // Generic operation for counter items
+        description: r.notes || r.name || 'Counter Receipt Item',
+        partNumber: null,
+        quantity: qty,
+        extendedPrice: extendedWithMarkup,
+        laborHours: null,
+        paintHours: null,
+        note: r.comments || ''
+      };
+    });
+
+    const subtotal = claimItems.reduce((sum, item) => sum + (item.extendedPrice || 0), 0);
+
+    this.estimateData = {
+      shopInfo: {
+        name: this.vehicle.insuranceCompany || '',
+        address: '', // Can be filled from company details later
+        phone: '',
+        workfileId: this.vehicle.token || '',
+        partsShare: this.vehicle.token || '',
+        description: this.vehicle.description2 || this.vehicle.description || '',
+        invoiceType: 'Counter Receipts'
+      },
+      customerInfo: undefined,
+      jobInfo: undefined,
+      insuranceInfo: {
+        company: this.vehicle.insuranceCompany || '',
+        adjuster: ''
+      },
+      vehicleInfo: {
+        year: this.vehicle.year,
+        make: this.vehicle.make,
+        model: this.vehicle.model,
+        bodyStyle: '',
+        engine: this.vehicle.engineDesc || '',
+        color: this.vehicle.color,
+        vin: this.vehicle.vin || '',
+        interiorColor: '',
+        exteriorColor: this.vehicle.color,
+        mileageIn: this.vehicle.miles || '',
+        mileageOut: '',
+        vehicleOut: '',
+        license: this.vehicle.plate || '',
+        state: '',
+        productionDate: '',
+        condition: '',
+        jobNumber: this.vehicle.currentJobNumber || ''
+      },
+      repairFacility: undefined,
+      estimateData: [
+        {
+          areaName: 'Counter Receipts',
+          claimItems,
+          images: this.vehicle.imageModels || [],
+          description: 'Generated from counter receipts for this vehicle.'
+        }
+      ],
+      summary: {
+        subtotal,
+        laborHours: 0,
+        paintHours: 0
+      }
+    };
+
+    console.log('estimateData built from receipts:', this.estimateData);
+  }
+
+  /**
+   * Convert counter receipts to insurance claims for display.
+   * Uses receipts from the vehicle to populate the insuranceClaims array.
+   */
+  private convertReceiptsToInsuranceClaims(receipts: any[]): void {
+    if (!receipts || receipts.length === 0) {
+      console.log('convertReceiptsToInsuranceClaims: no receipts to convert');
+      this.insuranceClaims = [];
+      return;
+    }
+
+    // Group receipts by claimId if they have one, otherwise create individual claims
+    const claimsMap = new Map<number, any>(); // Use 'any' to allow dynamic amount property
+    
+    receipts.forEach((receipt) => {
+      const claimId = receipt.claimId || 0;
+      // Calculate receipt total: amount * quantity
+      const receiptAmount = (receipt.amount || 0) * (receipt.quantity || 1);
+      
+      if (claimId > 0 && claimsMap.has(claimId)) {
+        // Update existing claim with receipt info
+        const existingClaim = claimsMap.get(claimId)!;
+        existingClaim.comments = (existingClaim.comments || '') + 
+          (receipt.notes ? `\nReceipt: ${receipt.notes}` : '');
+        // Sum up amounts when grouping receipts
+        existingClaim.amount = (existingClaim.amount || 0) + receiptAmount;
+      } else {
+        // Create new insurance claim from receipt
+        const claim: any = {
+          id: claimId > 0 ? claimId : receipt.id,
+          vehicleId: receipt.vehicleId || this.vehicle?.id,
+          companyUuid: this.companyCode,
+          publicUuid: this.publicUuid,
+          claimNumber: receipt.invoiceNumber || `RECEIPT-${receipt.id}`,
+          status: 'PENDING',
+          comments: receipt.notes || receipt.comments || '',
+          amount: receiptAmount, // Add amount: receipt.amount * receipt.quantity
+          claimDate: receipt.createdAt ? new Date(receipt.createdAt) : new Date(),
+          lastUpdated: receipt.updatedAt ? new Date(receipt.updatedAt) : new Date(),
+          isActive: true,
+          createdAt: receipt.createdAt ? new Date(receipt.createdAt) : new Date(),
+          updatedAt: receipt.updatedAt ? new Date(receipt.updatedAt) : new Date()
+        };
+        
+        if (claimId > 0) {
+          claimsMap.set(claimId, claim);
+        } else {
+          // If no claimId, add as individual claim
+          claimsMap.set(receipt.id || 0, claim);
+        }
+      }
+    });
+
+    // Convert map to array
+    this.insuranceClaims = Array.from(claimsMap.values());
+    
+    console.log(`Converted ${receipts.length} receipts to ${this.insuranceClaims.length} insurance claims`);
+    
+    // Also update claimData if it exists
+    if (this.claimData) {
+      this.claimData.insuranceClaims = this.insuranceClaims;
+    } else {
+      // Create a basic claimData structure if it doesn't exist
+      this.claimData = {
+        vehicle: this.vehicle || undefined,
+        insuranceClaims: this.insuranceClaims,
+        documents: this.documents || []
+      };
+    }
+  }
+
+  /** Use real vehicle imageModels as collision images instead of mock ones when available. */
+  private loadCollisionImagesFromVehicle(): void {
+    if (this.vehicle && this.vehicle.imageModels && this.vehicle.imageModels.length > 0) {
+      // Map vehicle imageModels to collisionImages format with thumbnailUrl
+      // Following the pattern from inshop2.component.ts: baseUrlResizeImage + '/' + imageModel.id
+      this.collisionImages = this.vehicle.imageModels.map((imageModel: any) => ({
+        ...imageModel,
+        thumbnailUrl: `${this.baseUrlResizeImage}/${imageModel.id}`,
+        imageUrl: `${this.baseUrlImage}/${imageModel.id}` // Full-size image URL
+      }));
+      this.addDebugLog('INFO', 'Collision Images Loaded', `Loaded ${this.collisionImages.length} images from vehicle.`);
+    } else {
+      // Fallback to mock behavior if no images on the vehicle
+      this.loadMockCollisionImages();
+    }
+  }
+
+  onFileSelected(event: any): void {
+    const files = event.target.files;
+    if (files) {
+      this.selectedFiles = Array.from(files);
+    }
+  }
+
+  uploadDocuments(): void {
+    if (this.selectedFiles.length === 0) return;
+
+    this.isUploading = true;
+    this.uploadProgress = 0;
+
+    // For now, we'll upload one by one
+    // TODO: Implement bulk upload
+    const file = this.selectedFiles[0];
+    const description = `Uploaded on ${new Date().toLocaleDateString()}`;
+    const docTypeId = '1'; // Default document type
+
+    this.insuranceService.uploadDocument(
+      this.companyCode,
+      this.publicUuid,
+      this.accessForm.get('privateKey')?.value,
+      description,
+      docTypeId,
+      file
+    ).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (document) => {
+        this.documents.push(document);
+        this.selectedFiles = [];
+        this.isUploading = false;
+        this.uploadProgress = 100;
+
+        // Reset progress after a delay
+        setTimeout(() => {
+          this.uploadProgress = 0;
+        }, 2000);
+      },
+      error: (error) => {
+        this.isUploading = false;
+        this.errorMessage = 'Error uploading document. Please try again.';
+        console.error('Upload error:', error);
+      }
+    });
+  }
+
+  downloadDocument(document: InsuranceDocument): void {
+    if (document.token) {
+      this.insuranceService.downloadDocument(document.token)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (blob) => {
+            const url = window.URL.createObjectURL(blob);
+            const link = window.document.createElement('a');
+            link.href = url;
+            link.download = document.fileName || 'document';
+            link.click();
+            window.URL.revokeObjectURL(url);
+          },
+          error: (error) => {
+            this.errorMessage = 'Error downloading document. Please try again.';
+            console.error('Download error:', error);
+          }
+        });
+    }
+  }
+
+  deleteDocument(document: InsuranceDocument): void {
+    if (confirm('Are you sure you want to delete this document?')) {
+      const privateKey = this.accessForm.get('privateKey')?.value;
+
+      this.insuranceService.deleteDocument(
+        this.companyCode,
+        document.id!,
+        privateKey
+      ).pipe(takeUntil(this.destroy$)).subscribe({
+        next: () => {
+          this.documents = this.documents.filter(d => d.id !== document.id);
+        },
+        error: (error) => {
+          this.errorMessage = 'Error deleting document. Please try again.';
+          console.error('Delete error:', error);
+        }
+      });
+    }
+  }
+
+  resetForm(): void {
+    this.accessForm.reset();
+    this.isAuthenticated = false;
+    this.showAccessForm = true;
+    this.claimData = null;
+    this.vehicle = null;
+    this.insuranceClaims = [];
+    this.documents = [];
+    this.errorMessage = '';
+  }
+
+  printPage(): void {
+    window.print();
+  }
+
+  getStatusClass(status: string): string {
+    switch (status?.toUpperCase()) {
+      case 'APPROVED': return 'status-approved';
+      case 'DENIED': return 'status-denied';
+      case 'PENDING': return 'status-pending';
+      case 'IN_REVIEW': return 'status-review';
+      default: return 'status-default';
+    }
+  }
+
+  // Image Gallery Methods
+  openImageModal(image: any): void {
+    this.selectedImage = image;
+    this.showImageModal = true;
+  }
+
+  closeImageModal(): void {
+    this.showImageModal = false;
+    this.selectedImage = null;
+  }
+
+  downloadDamageImage(): void {
+    if (!this.selectedImage?.imageUrl) {
+      console.error('No image selected for download');
+      return;
+    }
+
+    const link = document.createElement('a');
+    link.href = this.selectedImage.imageUrl;
+    link.download = this.selectedImage.fileName || `damage-${this.selectedImage.damageType}-${Date.now()}.jpg`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    console.log('Downloaded damage image:', this.selectedImage.fileName);
+  }
+
+  editGalleryImage(image: any): void {
+    console.log('Editing gallery image:', image);
+    // Use the existing image editor for gallery images
+    // Find the area index - for gallery images, we'll use -1 to indicate it's a gallery image
+    this.currentEditingImage = { ...image };
+    this.currentEditingAreaIndex = -1; // Special index for gallery images
+    this.showImageEditor = true;
+    this.editorTool = 'select';
+    this.isImageLoading = true;
+
+    // Use the same modal loading approach
+    this.waitForModalAndLoadImage();
+  }
+
+  deleteGalleryImage(image: any): void {
+    console.log('Deleting gallery image:', image);
+
+    if (confirm(`Are you sure you want to delete the image "${image.damageType}"?`)) {
+      const index = this.collisionImages.findIndex(img => img.id === image.id);
+      if (index > -1) {
+        this.collisionImages.splice(index, 1);
+        console.log('Gallery image deleted successfully');
+        this.addDebugLog('INFO', 'Gallery Image Deleted', `Removed ${image.damageType} from gallery`);
+      }
+    }
+  }
+
+  // Area Management Methods
+  addNewArea(): void {
+    console.log('Adding new area');
+
+    // Show modal immediately for better UX
+    this.isEditingArea = false;
+    this.editingAreaIndex = -1;
+    this.showAreaModal = true;
+
+    // Defer form setup to next tick to avoid blocking UI
+    setTimeout(() => {
+      // Reset form
+      this.areaForm.reset();
+
+      // Set validation for new area (customAreaName is required)
+      this.areaForm.get('customAreaName')?.setValidators([Validators.required]);
+      this.areaForm.get('areaName')?.clearValidators();
+
+      // Update validation
+      this.areaForm.get('customAreaName')?.updateValueAndValidity();
+      this.areaForm.get('areaName')?.updateValueAndValidity();
+
+      console.log('Form validation setup for new area completed');
+    }, 0);
+
+    this.addDebugLog('INFO', 'Add Area', 'Opening area editor for new area');
+  }
+
+  editArea(areaIndex: number): void {
+    console.log('Editing area at index:', areaIndex);
+    if (!this.estimateData?.estimateData || areaIndex >= this.estimateData.estimateData.length) {
+      console.error('Invalid area index:', areaIndex);
+      return;
+    }
+
+    const area = this.estimateData.estimateData[areaIndex];
+
+    // Show modal immediately
+    this.isEditingArea = true;
+    this.editingAreaIndex = areaIndex;
+    this.showAreaModal = true;
+
+    // Defer form setup to next tick
+    setTimeout(() => {
+      this.areaForm.patchValue({
+        areaName: area.areaName || '',
+        customAreaName: '',
+        description: area.description || ''
+      });
+
+      // Set validation for editing area (areaName is required)
+      this.areaForm.get('areaName')?.setValidators([Validators.required]);
+      this.areaForm.get('customAreaName')?.clearValidators();
+      this.areaForm.updateValueAndValidity();
+
+      console.log('Form setup for edit area completed');
+    }, 0);
+
+    this.addDebugLog('INFO', 'Edit Area', `Editing area: ${area.areaName}`);
+  }
+
+  closeAreaModal(): void {
+    this.showAreaModal = false;
+    this.isEditingArea = false;
+    this.editingAreaIndex = -1;
+    this.areaForm.reset();
+    this.addDebugLog('INFO', 'Modal Close', 'Area modal closed');
+  }
+
+  saveArea(): void {
+    console.log('saveArea called');
+    console.log('isEditingArea:', this.isEditingArea);
+    console.log('Form valid:', this.areaForm.valid);
+    console.log('Form value:', this.areaForm.value);
+    console.log('Form errors:', this.areaForm.errors);
+
+    // Debug each field
+    Object.keys(this.areaForm.controls).forEach(key => {
+      const control = this.areaForm.get(key);
+      console.log(`${key}: value="${control?.value}", valid=${control?.valid}, errors=`, control?.errors);
+    });
+
+    // Get form data regardless of validation state for better debugging
+    const formData = this.areaForm.value;
+
+    let finalAreaName: string;
+    let isFormDataValid = false;
+
+    if (this.isEditingArea) {
+      // When editing: Use custom area name if provided, otherwise use selected area name
+      finalAreaName = formData.customAreaName?.trim() || formData.areaName;
+      isFormDataValid = !!finalAreaName; // Valid if we have any area name
+    } else {
+      // When adding new: Use the custom area name
+      finalAreaName = formData.customAreaName?.trim();
+      isFormDataValid = !!finalAreaName; // Valid if custom area name is provided
+    }
+
+    console.log('Final area name:', finalAreaName);
+    console.log('Is form data valid:', isFormDataValid);
+
+    if (isFormDataValid && finalAreaName) {
+
+      const areaData: EstimateArea = {
+        areaName: finalAreaName,
+        description: formData.description || '',
+        claimItems: [],
+        images: []
+      };
+
+      if (this.isEditingArea && this.editingAreaIndex >= 0) {
+        // Update existing area
+        console.log('Updating existing area at index:', this.editingAreaIndex);
+        if (this.estimateData?.estimateData) {
+          // Preserve existing claim items and images
+          const existingArea = this.estimateData.estimateData[this.editingAreaIndex];
+          areaData.claimItems = existingArea.claimItems || [];
+          areaData.images = existingArea.images || [];
+
+          this.estimateData.estimateData[this.editingAreaIndex] = areaData;
+          this.addDebugLog('SUCCESS', 'Area Updated', `Updated area: ${finalAreaName}`);
+          alert(`Area "${finalAreaName}" has been updated successfully.`);
+        }
+      } else {
+        // Add new area
+        console.log('Adding new area:', finalAreaName);
+        if (this.estimateData?.estimateData) {
+          this.estimateData.estimateData.push(areaData);
+          this.addDebugLog('SUCCESS', 'Area Added', `Added new area: ${finalAreaName}`);
+          alert(`New area "${finalAreaName}" has been added successfully.`);
+        }
+      }
+
+      this.closeAreaModal();
+    } else {
+      console.log('Form data validation failed - missing area name');
+      const message = this.isEditingArea
+        ? 'Please select an area name or enter a custom area name.'
+        : 'Please enter a name for the new area.';
+      alert(message);
+    }
+  }
+
+  deleteArea(): void {
+    if (!this.isEditingArea || this.editingAreaIndex < 0 || !this.estimateData?.estimateData) {
+      return;
+    }
+
+    const area = this.estimateData.estimateData[this.editingAreaIndex];
+    const areaName = area.areaName;
+
+    if (confirm(`Are you sure you want to delete the area "${areaName}"? This will also delete all line items and images in this area.`)) {
+      this.estimateData.estimateData.splice(this.editingAreaIndex, 1);
+      this.addDebugLog('SUCCESS', 'Area Deleted', `Deleted area: ${areaName}`);
+      alert(`Area "${areaName}" has been deleted successfully.`);
+      this.closeAreaModal();
+    }
+  }
+
+  printDamageDetails(): void {
+    if (!this.selectedImage) {
+      console.error('No image selected for printing');
+      return;
+    }
+
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      console.error('Could not open print window');
+      return;
+    }
+
+    const printContent = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Damage Details - ${this.selectedImage.damageType}</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 20px; }
+            .header { text-align: center; margin-bottom: 30px; }
+            .image-container { text-align: center; margin: 20px 0; }
+            .image-container img { max-width: 100%; height: auto; border: 1px solid #ddd; }
+            .details { margin: 20px 0; }
+            .detail-item { margin: 10px 0; padding: 8px; border-left: 3px solid #007bff; }
+            .detail-label { font-weight: bold; color: #555; }
+            .detail-value { color: #333; }
+            .severity-high { color: #dc3545; }
+            .severity-medium { color: #ffc107; }
+            .severity-low { color: #28a745; }
+            @media print { body { margin: 0; } }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>Damage Details Report</h1>
+            <p>Generated on ${new Date().toLocaleDateString()}</p>
+          </div>
+          
+          <div class="image-container">
+            <img src="${this.selectedImage.imageUrl}" alt="${this.selectedImage.damageType}">
+          </div>
+          
+          <div class="details">
+            <div class="detail-item">
+              <div class="detail-label">Damage Type:</div>
+              <div class="detail-value">${this.selectedImage.damageType}</div>
+            </div>
+            
+            <div class="detail-item">
+              <div class="detail-label">Severity:</div>
+              <div class="detail-value severity-${this.selectedImage.severity?.toLowerCase()}">${this.selectedImage.severity}</div>
+            </div>
+            
+            <div class="detail-item">
+              <div class="detail-label">Location:</div>
+              <div class="detail-value">${this.selectedImage.location}</div>
+            </div>
+            
+            <div class="detail-item">
+              <div class="detail-label">Estimated Repair Cost:</div>
+              <div class="detail-value">$${this.selectedImage.estimatedRepairCost?.toLocaleString()}</div>
+            </div>
+            
+            <div class="detail-item">
+              <div class="detail-label">Incident Date:</div>
+              <div class="detail-value">${new Date(this.selectedImage.timestamp).toLocaleDateString()}</div>
+            </div>
+            
+            <div class="detail-item">
+              <div class="detail-label">Description:</div>
+              <div class="detail-value">${this.selectedImage.description}</div>
+            </div>
+            
+            <div class="detail-item">
+              <div class="detail-label">File Name:</div>
+              <div class="detail-value">${this.selectedImage.fileName}</div>
+            </div>
+          </div>
+        </body>
+      </html>
+    `;
+
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+
+    // Wait for image to load before printing
+    printWindow.onload = () => {
+      printWindow.print();
+      printWindow.close();
+    };
+
+    console.log('Printing damage details for:', this.selectedImage.damageType);
+  }
+
+  getSeverityClass(severity: string): string {
+    switch (severity?.toLowerCase()) {
+      case 'high': return 'severity-high';
+      case 'medium': return 'severity-medium';
+      case 'low': return 'severity-low';
+      default: return 'severity-default';
+    }
+  }
+
+  // Load mock collision images
+  private loadMockCollisionImages(): void {
+    this.collisionImages = [
+      {
+        id: 1,
+        damageType: 'Front Bumper Impact',
+        severity: 'High',
+        location: 'Front Center',
+        estimatedRepairCost: 2500,
+        timestamp: new Date('2025-01-15T10:30:00'),
+        imageUrl: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop&crop=center',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=200&h=150&fit=crop&crop=center',
+        description: 'Severe front bumper damage from collision impact'
+      },
+      {
+        id: 2,
+        damageType: 'Left Side Scratches',
+        severity: 'Medium',
+        location: 'Left Side Panel',
+        estimatedRepairCost: 800,
+        timestamp: new Date('2025-01-15T10:35:00'),
+        imageUrl: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=400&h=300&fit=crop&crop=center',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=200&h=150&fit=crop&crop=center',
+        description: 'Deep scratches along left side panel requiring paint work'
+      },
+      {
+        id: 3,
+        damageType: 'Rear Bumper Crack',
+        severity: 'High',
+        location: 'Rear Center',
+        estimatedRepairCost: 1200,
+        timestamp: new Date('2025-01-15T10:40:00'),
+        imageUrl: 'https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=400&h=300&fit=crop&crop=center',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=200&h=150&fit=crop&crop=center',
+        description: 'Cracked rear bumper with missing fragments'
+      },
+      {
+        id: 4,
+        damageType: 'Side Mirror Damage',
+        severity: 'Medium',
+        location: 'Left Side Mirror',
+        estimatedRepairCost: 450,
+        timestamp: new Date('2025-01-15T10:45:00'),
+        imageUrl: 'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=400&h=300&fit=crop&crop=center',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=200&h=150&fit=crop&crop=center',
+        description: 'Side mirror housing completely shattered'
+      },
+      {
+        id: 5,
+        damageType: 'Paint Chips',
+        severity: 'Low',
+        location: 'Quarter Panel',
+        estimatedRepairCost: 300,
+        timestamp: new Date('2025-01-15T10:50:00'),
+        imageUrl: 'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=400&h=300&fit=crop&crop=center',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=200&h=150&fit=crop&crop=center',
+        description: 'Paint chips and rust formation on quarter panel'
+      },
+      {
+        id: 6,
+        damageType: 'Headlight Assembly',
+        severity: 'Medium',
+        location: 'Front Left',
+        estimatedRepairCost: 600,
+        timestamp: new Date('2025-01-15T10:55:00'),
+        imageUrl: 'https://images.unsplash.com/photo-1502877338535-766e1452684a?w=400&h=300&fit=crop&crop=center',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1502877338535-766e1452684a?w=200&h=150&fit=crop&crop=center',
+        description: 'Headlight assembly cracked and non-functional'
+      },
+      {
+        id: 7,
+        damageType: 'Rear Quarter Dent',
+        severity: 'High',
+        location: 'Left Rear',
+        estimatedRepairCost: 1800,
+        timestamp: new Date('2025-01-15T11:00:00'),
+        imageUrl: 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=400&h=300&fit=crop&crop=center',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=200&h=150&fit=crop&crop=center',
+        description: 'Large dent in rear quarter panel affecting structural integrity'
+      },
+      {
+        id: 8,
+        damageType: 'Wheel and Tire',
+        severity: 'Medium',
+        location: 'Left Front',
+        estimatedRepairCost: 900,
+        timestamp: new Date('2025-01-15T11:05:00'),
+        imageUrl: 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=400&h=300&fit=crop&crop=center',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=200&h=150&fit=crop&crop=center',
+        description: 'Rim damage and tire puncture from collision impact'
+      }
+    ];
+  }
+
+  // Load mock estimate data
+  private loadMockEstimateData(): void {
+    this.estimateData = {
+      // Shop/Company Information
+      shopInfo: {
+        name: 'AUTO POINT COLLISION REPAIRS & CAR PAINT',
+        address: '5801 Belair Road, Baltimore, MD 21206',
+        phone: '(410) 488-4040',
+        workfileId: 'c9b42a0a',
+        partsShare: 'c9b42a0a',
+        description: 'We provide High quality work and service at low price.',
+        invoiceType: 'Pending Estimates'
+      },
+
+      // Customer Information
+      customerInfo: {
+        name: 'Buck, Carroll',
+        phone: '(202) 276-0123',
+        phoneType: 'Cell',
+        address: 'Baltimore, MD 21206',
+        isOwner: true,
+        isInsured: true
+      },
+
+      // Job Information
+      jobInfo: {
+        jobNumber: '',
+        writtenBy: 'S. Matthew',
+        adjuster: 'WILLIG, JONATHON',
+        policyNumber: '',
+        claimNumber: 'MD-805128-1',
+        typeOfLoss: '',
+        dateOfLoss: '',
+        daysToRepair: 0,
+        pointOfImpact: '',
+        inspectionLocation: 'AUTO POINT COLLISION REPAIRS & CAR PAINT'
+      },
+
+      // Insurance Information
+      insuranceInfo: {
+        company: 'MGA INSURANCE COMPANY, INC.',
+        adjuster: 'WILLIG, JONATHON'
+      },
+
+      // Vehicle Information
+      vehicleInfo: {
+        year: 2021,
+        make: 'GMC',
+        model: 'Terrain SLE FWD',
+        bodyStyle: '4D UTV',
+        engine: '4-1.5L Turbocharged Gasoline Direct Injection',
+        color: 'white',
+        vin: '3GKALMEV3ML317940',
+        interiorColor: '',
+        exteriorColor: 'white',
+        mileageIn: '',
+        mileageOut: '',
+        vehicleOut: '',
+        license: '',
+        state: 'MD',
+        productionDate: '',
+        condition: '',
+        jobNumber: ''
+      },
+
+      // Repair Facility
+      repairFacility: {
+        name: 'AUTO POINT COLLISION REPAIRS & CAR PAINT',
+        address: '5801 Belair Road, Baltimore, MD 21206',
+        phone: '(410) 488-4040',
+        phoneType: 'Business'
+      },
+
+      estimateData: [
+        {
+          areaName: "PILLARS, ROCKER & FLOOR",
+          images: this.getRandomEvidenceImages(0),
+          claimItems: [
+            {
+              lineNumber: 3,
+              operation: "R&I",
+              description: "LT Rocker molding",
+              partNumber: "DS7Z5410177A",
+              quantity: 0.7,
+              extendedPrice: null,
+              laborHours: 0.7,
+              paintHours: null
+            }
+          ]
+        },
+        {
+          areaName: "FRONT DOOR",
+          images: this.getRandomEvidenceImages(1),
+          claimItems: [
+            {
+              lineNumber: 5,
+              operation: "Blnd",
+              description: "LT Outer panel",
+              partNumber: "DS7Z5420201A",
+              quantity: 1.2,
+              extendedPrice: null,
+              laborHours: 1.2,
+              paintHours: null
+            },
+            {
+              lineNumber: 6,
+              operation: "R&I",
+              description: "LT Belt molding",
+              partNumber: "DS7Z5421453F",
+              quantity: 0.3,
+              extendedPrice: null,
+              laborHours: 0.3,
+              paintHours: null
+            },
+            {
+              lineNumber: 7,
+              operation: "R&I",
+              description: "LT R&I mirror",
+              partNumber: "FS7Z17683B",
+              quantity: 0.4,
+              extendedPrice: null,
+              laborHours: 0.4,
+              paintHours: null
+            },
+            {
+              lineNumber: 8,
+              operation: "R&I",
+              description: "LT Handle, outside w/o passive entry",
+              partNumber: "DS7Z5422405AAPTM",
+              quantity: 0.3,
+              extendedPrice: null,
+              laborHours: 0.3,
+              paintHours: null
+            },
+            {
+              lineNumber: 9,
+              operation: "R&I",
+              description: "LT R&I trim panel",
+              partNumber: "HS7Z5423943CD",
+              quantity: 0.5,
+              extendedPrice: null,
+              laborHours: 0.5,
+              paintHours: null
+            }
+          ]
+        },
+        {
+          areaName: "REAR DOOR",
+          images: this.getRandomEvidenceImages(2),
+          claimItems: [
+            {
+              lineNumber: 11,
+              operation: "Repl",
+              description: "LKQ LT door assy +25%",
+              partNumber: "20252581",
+              quantity: 1,
+              extendedPrice: 462.50,
+              laborHours: 1.5,
+              paintHours: 3.3
+            },
+            {
+              lineNumber: 12,
+              operation: "Add",
+              description: "for Clear Coat",
+              partNumber: null,
+              quantity: null,
+              extendedPrice: null,
+              laborHours: null,
+              paintHours: 1.3
+            },
+            {
+              lineNumber: 13,
+              operation: "LT",
+              description: "Transfer door glass fixed",
+              partNumber: null,
+              quantity: null,
+              extendedPrice: null,
+              laborHours: 0.6,
+              paintHours: null
+            },
+            {
+              lineNumber: 14,
+              operation: "LT",
+              description: "Transfer door glass moveable glass",
+              partNumber: null,
+              quantity: null,
+              extendedPrice: null,
+              laborHours: 0.5,
+              paintHours: null
+            },
+            {
+              lineNumber: 15,
+              operation: "R&I",
+              description: "LT Belt molding",
+              partNumber: "DS7Z5425861A",
+              quantity: null,
+              extendedPrice: null,
+              laborHours: 0.3,
+              paintHours: null
+            },
+            {
+              lineNumber: 16,
+              operation: "R&I",
+              description: "LT Handle, outside w/o passive entry",
+              partNumber: "DS7Z5422405AAPTM",
+              quantity: null,
+              extendedPrice: null,
+              laborHours: 0.3,
+              paintHours: null,
+              note: "PENDING INSPECTION - SHOP TO ADVISE CONDITION OF THE LT REAR DOOR HANDLE"
+            },
+            {
+              lineNumber: 17,
+              operation: "R&I",
+              description: "LT Applique front",
+              partNumber: "ES7Z54255A35CA",
+              quantity: null,
+              extendedPrice: null,
+              laborHours: 0.2,
+              paintHours: null
+            },
+            {
+              lineNumber: 18,
+              operation: "R&I",
+              description: "LT Applique rear",
+              partNumber: "ES7Z54255A63CB",
+              quantity: null,
+              extendedPrice: null,
+              laborHours: 0.2,
+              paintHours: null
+            }
+          ]
+        },
+        {
+          areaName: "QUARTER PANEL",
+          images: this.getRandomEvidenceImages(3),
+          claimItems: [
+            {
+              lineNumber: 20,
+              operation: "Blnd",
+              description: "LT Quarter panel",
+              partNumber: "HS7Z5427841A",
+              quantity: null,
+              extendedPrice: null,
+              laborHours: 1.1,
+              paintHours: null
+            },
+            {
+              lineNumber: 21,
+              operation: "R&I",
+              description: "LT Wheelhouse liner w/o 2.7 liter turbo",
+              partNumber: "DS7Z58278B51B",
+              quantity: null,
+              extendedPrice: null,
+              laborHours: 0.4,
+              paintHours: null
+            },
+            {
+              lineNumber: 22,
+              operation: "Rpr",
+              description: "ROPE LT Qtr glass FORD bright/black",
+              partNumber: "DS7Z5429711A",
+              quantity: null,
+              extendedPrice: null,
+              laborHours: 0.5,
+              paintHours: null
+            }
+          ]
+        },
+        {
+          areaName: "REAR LAMPS",
+          images: this.getRandomEvidenceImages(4),
+          claimItems: [
+            {
+              lineNumber: 24,
+              operation: "R&I",
+              description: "RT Tail lamp assy",
+              partNumber: "HS7Z13404J",
+              quantity: null,
+              extendedPrice: null,
+              laborHours: 0.2,
+              paintHours: null
+            },
+            {
+              lineNumber: 25,
+              operation: "R&I",
+              description: "LT Tail lamp assy",
+              partNumber: "HS7Z13405J",
+              quantity: null,
+              extendedPrice: null,
+              laborHours: 0.2,
+              paintHours: null
+            }
+          ]
+        },
+        {
+          areaName: "REAR BUMPER",
+          images: this.getRandomEvidenceImages(5),
+          claimItems: [
+            {
+              lineNumber: 27,
+              operation: "R&I",
+              description: "R&I bumper cover",
+              partNumber: "KS7Z17K835SAPTM",
+              quantity: null,
+              extendedPrice: null,
+              laborHours: 1.1,
+              paintHours: null
+            }
+          ]
+        },
+        {
+          areaName: "MISCELLANEOUS OPERATIONS",
+          images: this.getRandomEvidenceImages(6),
+          claimItems: [
+            {
+              lineNumber: 29,
+              operation: "Subl",
+              description: "Hazardous Waste",
+              partNumber: null,
+              quantity: 1,
+              extendedPrice: 5.00,
+              laborHours: null,
+              paintHours: null
+            },
+            {
+              lineNumber: 30,
+              operation: "Cover",
+              description: "car for Overspray",
+              partNumber: null,
+              quantity: 1,
+              extendedPrice: 5.00,
+              laborHours: 0.2,
+              paintHours: null
+            }
+          ]
+        }
+      ],
+      summary: {
+        subtotal: 472.50,
+        laborHours: 8.4,
+        paintHours: 6.9
+      }
+    };
+
+    // Randomly assign images to some areas after data is loaded
+    this.assignRandomImagesToAreas();
+  }
+
+  // Assign random images to some areas for the UI
+  private assignRandomImagesToAreas(): void {
+    if (!this.estimateData?.estimateData) return;
+
+    const mockImages = this.generateMockEvidenceImages();
+
+    // Randomly select 40-60% of areas to have images
+    const totalAreas = this.estimateData.estimateData.length;
+    const areasWithImages = Math.floor(totalAreas * (0.4 + Math.random() * 0.2));
+
+    // Randomly select which areas get images
+    const selectedAreaIndexes: number[] = [];
+    while (selectedAreaIndexes.length < areasWithImages) {
+      const randomIndex = Math.floor(Math.random() * totalAreas);
+      if (!selectedAreaIndexes.includes(randomIndex)) {
+        selectedAreaIndexes.push(randomIndex);
+      }
+    }
+
+    // Assign random images to selected areas
+    selectedAreaIndexes.forEach(areaIndex => {
+      const area = this.estimateData!.estimateData[areaIndex];
+      const shuffledImages = [...mockImages].sort(() => 0.5 - Math.random());
+      const numImages = Math.floor(Math.random() * 3) + 1; // 1-3 images per area
+
+      area.images = shuffledImages.slice(0, numImages).map((img, index) => ({
+        ...img,
+        id: areaIndex * 10 + index + 1, // Unique ID
+        description: `${area.areaName.toLowerCase()} damage - ${img.description}`
+      }));
+    });
+
+    console.log(`Assigned images to ${areasWithImages} out of ${totalAreas} areas`);
+  }
+
+  // Generate 8 mock evidence images
+  public generateMockEvidenceImages(): any[] {
+    return [
+      {
+        id: 1,
+        fileName: 'damage_front_left.jpg',
+        description: 'Front left side collision damage showing severe impact to rocker panel',
+        damageType: 'Impact Damage',
+        severity: 'High',
+        timestamp: new Date('2025-01-15T10:30:00'),
+        imageUrl: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=300&fit=crop&crop=center',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=150&h=100&fit=crop&crop=center'
+      },
+      {
+        id: 2,
+        fileName: 'scratches_door_panel.jpg',
+        description: 'Deep scratches along door panel requiring paint work',
+        damageType: 'Scratch Damage',
+        severity: 'Medium',
+        timestamp: new Date('2025-01-15T10:35:00'),
+        imageUrl: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=400&h=300&fit=crop&crop=center',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=150&h=100&fit=crop&crop=center'
+      },
+      {
+        id: 3,
+        fileName: 'bumper_cracked.jpg',
+        description: 'Cracked rear bumper with missing fragments',
+        damageType: 'Structural Damage',
+        severity: 'High',
+        timestamp: new Date('2025-01-15T10:40:00'),
+        imageUrl: 'https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=400&h=300&fit=crop&crop=center',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=150&h=100&fit=crop&crop=center'
+      },
+      {
+        id: 4,
+        fileName: 'mirror_broken.jpg',
+        description: 'Side mirror housing completely shattered',
+        damageType: 'Mirror Damage',
+        severity: 'Medium',
+        timestamp: new Date('2025-01-15T10:45:00'),
+        imageUrl: 'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=400&h=300&fit=crop&crop=center',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=150&h=100&fit=crop&crop=center'
+      },
+      {
+        id: 5,
+        fileName: 'paint_chipped.jpg',
+        description: 'Paint chips and rust formation on quarter panel',
+        damageType: 'Paint Damage',
+        severity: 'Low',
+        timestamp: new Date('2025-01-15T10:50:00'),
+        imageUrl: 'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=400&h=300&fit=crop&crop=center',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=150&h=100&fit=crop&crop=center'
+      },
+      {
+        id: 6,
+        fileName: 'headlight_damaged.jpg',
+        description: 'Headlight assembly cracked and non-functional',
+        damageType: 'Light Damage',
+        severity: 'Medium',
+        timestamp: new Date('2025-01-15T10:55:00'),
+        imageUrl: 'https://images.unsplash.com/photo-1502877338535-766e1452684a?w=400&h=300&fit=crop&crop=center',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1502877338535-766e1452684a?w=150&h=100&fit=crop&crop=center'
+      },
+      {
+        id: 7,
+        fileName: 'dent_rear_quarter.jpg',
+        description: 'Large dent in rear quarter panel affecting structural integrity',
+        damageType: 'Dent Damage',
+        severity: 'High',
+        timestamp: new Date('2025-01-15T11:00:00'),
+        imageUrl: 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=400&h=300&fit=crop&crop=center',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=150&h=100&fit=crop&crop=center'
+      },
+      {
+        id: 8,
+        fileName: 'wheel_damage.jpg',
+        description: 'Rim damage and tire puncture from collision impact',
+        damageType: 'Wheel Damage',
+        severity: 'Medium',
+        timestamp: new Date('2025-01-15T11:05:00'),
+        imageUrl: 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=400&h=300&fit=crop&crop=center',
+        thumbnailUrl: 'https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=150&h=100&fit=crop&crop=center'
+      }
+    ];
+  }
+
+  // Evidence Gallery Methods
+  toggleEvidenceRow(lineNumber: number): void {
+    if (this.expandedRows.has(lineNumber)) {
+      this.expandedRows.delete(lineNumber);
+      this.addDebugLog('INFO', 'Evidence Gallery', `Collapsed evidence gallery for line ${lineNumber}`);
+    } else {
+      this.expandedRows.add(lineNumber);
+      this.addDebugLog('INFO', 'Evidence Gallery', `Expanded evidence gallery for line ${lineNumber}`);
+    }
+  }
+
+  // Editor Evidence Gallery Methods
+  getEvidenceImagesForEditor(): any[] {
+    const currentLineNumber = this.estimateLineForm.get('lineNumber')?.value;
+    if (currentLineNumber && currentLineNumber > 0) {
+      return this.getEvidenceImages(currentLineNumber);
+    }
+    // For new lines, return a random selection of images
+    return this.getRandomEvidenceImages(4);
+  }
+
+  getRandomEvidenceImages(count: number): any[] {
+    const allImages = this.generateMockEvidenceImages();
+    const shuffled = [...allImages].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, count);
+  }
+
+  addRandomEvidenceToEditor(): void {
+    const currentLineNumber = this.estimateLineForm.get('lineNumber')?.value;
+    if (currentLineNumber && currentLineNumber > 0) {
+      // Add random images to the current line
+      const existingImages = this.getEvidenceImages(currentLineNumber);
+      const newRandomImages = this.getRandomEvidenceImages(2);
+
+      // Combine existing with new random images
+      const combinedImages = [...existingImages, ...newRandomImages];
+      this.evidenceImages.set(currentLineNumber, combinedImages);
+
+      this.addDebugLog('INFO', 'Editor Evidence', `Added ${newRandomImages.length} random evidence photos to line ${currentLineNumber}`);
+    } else {
+      // For new lines, just show a message
+      this.addDebugLog('INFO', 'Editor Evidence', 'Please set a line number before adding evidence photos');
+    }
+  }
+
+  deleteEvidenceImageFromEditor(imageId: number): void {
+    const currentLineNumber = this.estimateLineForm.get('lineNumber')?.value;
+    if (currentLineNumber && currentLineNumber > 0) {
+      this.deleteEvidenceImage(currentLineNumber, imageId);
+      this.addDebugLog('INFO', 'Editor Evidence', `Deleted evidence image ${imageId} from line ${currentLineNumber}`);
+    }
+  }
+
+  isRowExpanded(lineNumber: number): boolean {
+    return this.expandedRows.has(lineNumber);
+  }
+
+  getEvidenceImages(lineNumber: number): any[] {
+    return this.evidenceImages.get(lineNumber) || [];
+  }
+
+  deleteEvidenceImage(lineNumber: number, imageId: number): void {
+    const images = this.evidenceImages.get(lineNumber) || [];
+    const updatedImages = images.filter((img: any) => img.id !== imageId);
+    this.evidenceImages.set(lineNumber, updatedImages);
+    this.addDebugLog('WARNING', 'Evidence Image Deleted', `Deleted image ${imageId} from line ${lineNumber}`);
+  }
+
+  // Claims Form Methods
+  toggleFormEdit(): void {
+    this.isFormEditable = !this.isFormEditable;
+    if (!this.isFormEditable) {
+      this.claimsForm.disable();
+    } else {
+      this.claimsForm.enable();
+    }
+  }
+
+  onClaimsFormSubmit(): void {
+    if (this.claimsForm.valid) {
+      console.log('Claims form submitted:', this.claimsForm.value);
+      alert('Claims form saved successfully!');
+    } else {
+      console.log('Form is invalid:', this.claimsForm.errors);
+    }
+  }
+
+  resetClaimsForm(): void {
+    this.claimsForm.patchValue({
+      claimNumber: 'CLM-2025-001',
+      policyNumber: 'POL-2025-001',
+      incidentDate: '2025-01-15',
+      reportedDate: '2025-01-16',
+      make: 'Toyota',
+      model: 'Camry',
+      year: '2020',
+      damageDescription: 'Front bumper damage from parking incident. Bumper completely detached and hanging loose. Additional damage to headlight assembly.',
+      estimatedCost: 2500,
+      actualCost: 0,
+      status: 'Pending',
+      priority: 'High',
+      adjusterNotes: 'Initial assessment completed. Awaiting body shop estimate. Photos and police report attached.'
+    });
+  }
+
+  // Estimate CRUD Methods
+  toggleEstimateEdit(): void {
+    this.isEstimateEditable = !this.isEstimateEditable;
+
+    // Close all expanded evidence photo galleries when estimates are locked
+    if (!this.isEstimateEditable) {
+      this.expandedRows.clear();
+    }
+
+    this.addDebugLog('INFO', 'Estimate Edit Toggle', `Estimate editing ${this.isEstimateEditable ? 'enabled' : 'disabled'}`);
+  }
+
+  addLineToArea(areaIndex: number): void {
+    console.log('Adding new line to area index:', areaIndex);
+
+    if (!this.estimateData?.estimateData || areaIndex >= this.estimateData.estimateData.length) {
+      console.error('Invalid area index:', areaIndex);
+      return;
+    }
+
+    const area = this.estimateData.estimateData[areaIndex];
+
+    // Show modal immediately
+    this.isEditingLine = false;
+    this.editingLine = null;
+    this.showEditModal = true;
+
+    // Defer form setup to next tick
+    setTimeout(() => {
+      // Calculate the line number for the new line in this area
+      let lineNumber = 1;
+
+      // Count all lines before this area
+      if (this.estimateData?.estimateData) {
+        for (let i = 0; i < areaIndex; i++) {
+          lineNumber += 1; // Area header
+          lineNumber += this.estimateData.estimateData[i].claimItems.length; // Items in area
+        }
+      }
+
+      // Add 1 for current area header, then add 1 for new line position
+      lineNumber += 1 + area.claimItems.length;
+
+      this.estimateLineForm.reset();
+      this.estimateLineForm.patchValue({
+        lineNumber: lineNumber,
+        operation: 'R&I',
+        area: area.areaName, // Pre-populate with the area name
+        description: 'New line item',
+        partNumber: 'TBD',
+        quantity: 1,
+        extendedPrice: 0,
+        laborHours: 1,
+        paintHours: 0
+      });
+
+      console.log('Form setup completed for new line in area:', area.areaName);
+    }, 0);
+
+    this.addDebugLog('INFO', 'Add Line to Area', `Adding new line to area: ${area.areaName}`);
+  }
+
+  addLineAfter(lineNumber: number): void {
+    console.log('addLineAfter called with lineNumber:', lineNumber);
+
+    // Show modal immediately
+    this.isEditingLine = false;
+    this.editingLine = null;
+    this.showEditModal = true;
+
+    // Defer form setup to next tick
+    setTimeout(() => {
+      // Calculate the line number to insert after the specified line
+      const newLineNumber = lineNumber + 1;
+
+      this.estimateLineForm.reset();
+      this.estimateLineForm.patchValue({
+        lineNumber: newLineNumber,
+        operation: 'R&I',
+        area: 'PILLARS, ROCKER & FLOOR',
+        description: 'New line item',
+        partNumber: 'TBD',
+        quantity: 1,
+        extendedPrice: 0,
+        laborHours: 1,
+        paintHours: 0
+      });
+
+      console.log('Form setup completed for line after:', lineNumber);
+    }, 0);
+
+    this.addDebugLog('INFO', 'Add Line', `Adding new line after line ${lineNumber}`);
+  }
+
+
+
+  editLine(lineNumber: number): void {
+    console.log('Editing line number:', lineNumber);
+
+    // Show modal immediately
+    this.isEditingLine = true;
+    this.editingLine = { lineNumber: lineNumber };
+    this.showEditModal = true;
+
+    // Defer form setup to next tick
+    setTimeout(() => {
+      // Find the actual line data
+      const linePosition = this.findLinePosition(lineNumber);
+
+      if (linePosition && this.estimateData?.estimateData) {
+        const area = this.estimateData.estimateData[linePosition.areaIndex];
+        const item = area.claimItems[linePosition.itemIndex];
+
+        // Load actual data from the existing line
+        this.estimateLineForm.patchValue({
+          lineNumber: lineNumber,
+          operation: item.operation || 'R&I',
+          description: item.description || '',
+          partNumber: item.partNumber || '',
+          quantity: item.quantity || 0,
+          extendedPrice: item.extendedPrice || 0,
+          laborHours: item.laborHours || 0,
+          paintHours: item.paintHours || 0,
+          area: area.areaName || 'PILLARS, ROCKER & FLOOR'
+        });
+
+        console.log('Form setup completed for editing line:', lineNumber);
+      } else {
+        console.error('Could not find line data for line number:', lineNumber);
+        // Fallback to default values
+        this.estimateLineForm.patchValue({
+          lineNumber: lineNumber,
+          operation: 'R&I',
+          description: 'Line item',
+          partNumber: 'TBD',
+          quantity: 1,
+          extendedPrice: 0,
+          laborHours: 1,
+          paintHours: 0,
+          area: 'PILLARS, ROCKER & FLOOR'
+        });
+      }
+    }, 0);
+
+    this.addDebugLog('INFO', 'Edit Line', `Editing line ${lineNumber}`);
+
+    // Ensure evidence images are available for this line
+    if (!this.evidenceImages.has(lineNumber)) {
+      const randomImages = this.getRandomEvidenceImages(3);
+      this.evidenceImages.set(lineNumber, randomImages);
+    }
+  }
+
+  deleteLine(lineNumber: number): void {
+    if (confirm(`Are you sure you want to delete line ${lineNumber}?`)) {
+      this.deleteLineFromData(lineNumber);
+      this.addDebugLog('WARNING', 'Delete Line', `Deleted line ${lineNumber}`);
+      alert(`Line ${lineNumber} has been deleted.`);
+    }
+  }
+
+  private deleteLineFromData(lineNumber: number): void {
+    if (!this.estimateData?.estimateData) return;
+
+    let currentLine = 1;
+    let found = false;
+
+    // Find and remove the line by position
+    for (const area of this.estimateData.estimateData) {
+      for (let i = 0; i < area.claimItems.length; i++) {
+        if (currentLine === lineNumber) {
+          area.claimItems.splice(i, 1);
+
+          // Remove area if it's empty
+          if (area.claimItems.length === 0) {
+            const areaIndex = this.estimateData.estimateData.indexOf(area);
+            this.estimateData.estimateData.splice(areaIndex, 1);
+          }
+          found = true;
+          break;
+        }
+        currentLine++;
+      }
+      if (found) break;
+    }
+
+    // Update summary after deletion
+    this.updateEstimateSummary();
+  }
+
+  closeEditModal(): void {
+    this.showEditModal = false;
+    this.isEditingLine = false;
+    this.editingLine = null;
+    this.estimateLineForm.reset();
+    this.addDebugLog('INFO', 'Modal Close', 'Edit modal closed');
+  }
+
+  saveEstimateLine(): void {
+    console.log('saveEstimateLine called');
+    console.log('Form valid:', this.estimateLineForm.valid);
+    console.log('Form value:', this.estimateLineForm.value);
+    console.log('Form errors:', this.estimateLineForm.errors);
+    console.log('isEditingLine:', this.isEditingLine);
+
+    if (this.estimateLineForm.valid) {
+      const formData = this.estimateLineForm.value;
+
+      if (this.isEditingLine) {
+        // Update existing line
+        console.log('Updating existing line:', formData.lineNumber);
+        this.updateExistingLine(formData);
+        this.addDebugLog('SUCCESS', 'Line Updated', `Line ${formData.lineNumber} updated: ${formData.description}`);
+        alert(`Line ${formData.lineNumber} has been updated successfully.`);
+      } else {
+        // Add new line
+        console.log('Adding new line:', formData.lineNumber);
+        this.addNewLineToData(formData);
+        this.addDebugLog('SUCCESS', 'Line Added', `New line ${formData.lineNumber} added: ${formData.description}`);
+        alert(`New line ${formData.lineNumber} has been added successfully.`);
+      }
+      this.closeEditModal();
+    } else {
+      console.log('Form validation failed');
+      console.log('Individual field errors:');
+      Object.keys(this.estimateLineForm.controls).forEach(key => {
+        const control = this.estimateLineForm.get(key);
+        if (control && control.errors) {
+          console.log(`${key}:`, control.errors);
+        }
+      });
+      this.addDebugLog('ERROR', 'Form Validation', 'Estimate line form validation failed');
+      alert('Please fill in all required fields before saving.');
+    }
+  }
+
+  private addNewLineToData(formData: any): void {
+    if (!this.estimateData?.estimateData) return;
+
+    // Find the area to add the line to
+    let targetArea = this.estimateData.estimateData.find(area => area.areaName === formData.area);
+
+    // If area doesn't exist, create it
+    if (!targetArea) {
+      targetArea = {
+        areaName: formData.area,
+        claimItems: []
+      };
+      this.estimateData.estimateData.push(targetArea);
+    }
+
+    // Create new claim item (without lineNumber since it's calculated dynamically)
+    const newItem = {
+      operation: formData.operation || '',
+      description: formData.description || '',
+      partNumber: formData.partNumber || '',
+      quantity: formData.quantity || 0,
+      extendedPrice: formData.extendedPrice || 0,
+      laborHours: formData.laborHours || 0,
+      paintHours: formData.paintHours || 0
+    };
+
+    // Add to the area
+    targetArea.claimItems.push(newItem);
+
+    // Update summary
+    this.updateEstimateSummary();
+  }
+
+  private updateExistingLine(formData: any): void {
+    console.log('updateExistingLine called with:', formData);
+    if (!this.estimateData?.estimateData) return;
+
+    const linePosition = this.findLinePosition(formData.lineNumber);
+    console.log('Found line position:', linePosition);
+
+    if (linePosition && this.estimateData?.estimateData) {
+      const area = this.estimateData.estimateData[linePosition.areaIndex];
+      const item = area.claimItems[linePosition.itemIndex];
+
+      console.log('Updating item:', item);
+      console.log('In area:', area.areaName);
+
+      // Update the existing item
+      area.claimItems[linePosition.itemIndex] = {
+        ...item,
+        operation: formData.operation || '',
+        description: formData.description || '',
+        partNumber: formData.partNumber || '',
+        quantity: formData.quantity || 0,
+        extendedPrice: formData.extendedPrice || 0,
+        laborHours: formData.laborHours || 0,
+        paintHours: formData.paintHours || 0
+      };
+
+      console.log('Item updated successfully');
+    } else {
+      console.error('Could not find line number:', formData.lineNumber);
+    }
+
+    // Update summary
+    this.updateEstimateSummary();
+  }
+
+  private findLinePosition(targetLineNumber: number): { areaIndex: number, itemIndex: number } | null {
+    if (!this.estimateData?.estimateData) return null;
+
+    let currentLine = 1;
+
+    for (let areaIndex = 0; areaIndex < this.estimateData.estimateData.length; areaIndex++) {
+      const area = this.estimateData.estimateData[areaIndex];
+
+      // Skip area header line
+      currentLine += 1;
+
+      // Check each item in this area
+      for (let itemIndex = 0; itemIndex < area.claimItems.length; itemIndex++) {
+        if (currentLine === targetLineNumber) {
+          return { areaIndex, itemIndex };
+        }
+        currentLine += 1;
+      }
+    }
+
+    return null;
+  }
+
+  private updateEstimateSummary(): void {
+    if (!this.estimateData?.estimateData) return;
+
+    let subtotal = 0;
+    let totalLaborHours = 0;
+    let totalPaintHours = 0;
+
+    this.estimateData.estimateData.forEach(area => {
+      area.claimItems.forEach(item => {
+        subtotal += item.extendedPrice || 0;
+        totalLaborHours += item.laborHours || 0;
+        totalPaintHours += item.paintHours || 0;
+      });
+    });
+
+    if (!this.estimateData.summary) {
+      this.estimateData.summary = { subtotal: 0, laborHours: 0, paintHours: 0 };
+    }
+
+    this.estimateData.summary.subtotal = subtotal;
+    this.estimateData.summary.laborHours = totalLaborHours;
+    this.estimateData.summary.paintHours = totalPaintHours;
+  }
+
+  // Debug Log Methods
+  addDebugLog(level: string, action: string, details: string): void {
+    const logEntry = {
+      level: level,
+      action: action,
+      details: details,
+      timestamp: new Date()
+    };
+    this.debugLogs.unshift(logEntry);
+
+    // Keep only last 50 log entries
+    if (this.debugLogs.length > 50) {
+      this.debugLogs = this.debugLogs.slice(0, 50);
+    }
+  }
+
+  clearDebugLog(): void {
+    this.debugLogs = [];
+    this.addDebugLog('INFO', 'Log Cleared', 'Debug log has been cleared');
+  }
+
+  getLogLevelClass(level: string): string {
+    switch (level?.toUpperCase()) {
+      case 'SUCCESS': return 'badge bg-success';
+      case 'INFO': return 'badge bg-info';
+      case 'WARNING': return 'badge bg-warning';
+      case 'ERROR': return 'badge bg-danger';
+      default: return 'badge bg-secondary';
+    }
+  }
+
+  copyLogToClipboard(log: any): void {
+    const logText = `[${log.timestamp.toLocaleString()}] ${log.level}: ${log.action} - ${log.details}`;
+    navigator.clipboard.writeText(logText).then(() => {
+      this.addDebugLog('INFO', 'Copy to Clipboard', 'Log entry copied to clipboard');
+    });
+  }
+
+  // Modal methods
+  openAccessModal(): void {
+    this.showAccessModal = true;
+    this.clearMessages();
+  }
+
+  closeAccessModal(): void {
+    this.showAccessModal = false;
+    this.clearMessages();
+  }
+
+  openClaimsModal(): void {
+    this.showClaimsModal = true;
+    this.clearMessages();
+  }
+
+  closeClaimsModal(): void {
+    this.showClaimsModal = false;
+    this.clearMessages();
+  }
+
+  openVehicleModal(): void {
+    this.showVehicleModal = true;
+    this.clearMessages();
+  }
+
+  closeVehicleModal(): void {
+    this.showVehicleModal = false;
+    this.clearMessages();
+  }
+
+  clearMessages(): void {
+    this.errorMessage = '';
+  }
+
+  // Print and Export methods
+  printEstimateTable(): void {
+    console.log('printEstimateTable called');
+    console.log('estimateData available:', !!this.estimateData);
+    console.log('vehicle available:', !!this.vehicle);
+
+    // Ensure data is loaded
+    if (!this.estimateData) {
+      console.log('Loading mock estimate data for print...');
+      this.loadMockEstimateData();
+    }
+
+    if (!this.vehicle) {
+      console.log('Mocking vehicle data for print...');
+      this.vehicle = {
+        id: 1,
+        make: 'GMC',
+        model: 'Terrain',
+        year: 2021,
+        plate: 'MD-123456',
+        miles: 45000
+      } as any;
+    }
+
+    console.log('Generating complete print content...');
+    const fullPrintHTML = this.generateCompletePrintHTML();
+
+    // Create a temporary container for print content
+    const printContainer = document.createElement('div');
+    printContainer.id = 'print-estimate-content';
+    printContainer.innerHTML = fullPrintHTML;
+    printContainer.style.display = 'none'; // Hide from screen
+    document.body.appendChild(printContainer);
+
+    // Add print-specific CSS to the document
+    const printStyles = document.createElement('style');
+    printStyles.id = 'print-estimate-styles';
+    printStyles.innerHTML = `
+      @media print {
+        /* Hide everything on the page */
+        body * {
+          visibility: hidden !important;
+          display: none !important;
+        }
+        
+        /* Show only our print content */
+        #print-estimate-content,
+        #print-estimate-content * {
+          visibility: visible !important;
+          display: block !important;
+        }
+        
+        /* Position the print content */
+        #print-estimate-content {
+          position: absolute !important;
+          left: 0 !important;
+          top: 0 !important;
+          width: 100% !important;
+          margin: 0 !important;
+          padding: 10px !important;
+          background: white !important;
+        }
+        
+        /* Print-specific styling */
+        #print-estimate-content {
+          font-family: Arial, sans-serif !important;
+          font-size: 12px !important;
+          line-height: 1.4 !important;
+          color: black !important;
+        }
+        
+                 /* Shop Header Styles */
+         #print-estimate-content .shop-header {
+           display: flex !important;
+           align-items: flex-start !important;
+           gap: 15px !important;
+           margin-bottom: 20px !important;
+           border-bottom: 2px solid #000 !important;
+           padding-bottom: 15px !important;
+         }
+         
+         /* Print Logo Styles */
+         #print-estimate-content .shop-logo-print {
+           display: flex !important;
+           flex-direction: column !important;
+           align-items: center !important;
+           gap: 5px !important;
+           min-width: 80px !important;
+         }
+         #print-estimate-content .logo-circle-print {
+           width: 50px !important;
+           height: 50px !important;
+           background: #0066cc !important;
+           border-radius: 50% !important;
+           display: flex !important;
+           align-items: center !important;
+           justify-content: center !important;
+           font-size: 18px !important;
+         }
+         #print-estimate-content .logo-text-print {
+           text-align: center !important;
+           line-height: 1.1 !important;
+         }
+         #print-estimate-content .logo-primary-print {
+           font-weight: bold !important;
+           font-size: 9px !important;
+           color: #0066cc !important;
+           letter-spacing: 0.5px !important;
+         }
+         #print-estimate-content .logo-secondary-print,
+         #print-estimate-content .logo-tertiary-print {
+           font-weight: 600 !important;
+           font-size: 7px !important;
+           color: #004499 !important;
+           letter-spacing: 0.3px !important;
+         }
+         
+         /* Shop Info Print Styles */
+         #print-estimate-content .shop-info-print {
+           flex: 1 !important;
+           text-align: center !important;
+         }
+        #print-estimate-content .shop-name {
+          font-size: 18px !important;
+          font-weight: bold !important;
+          margin-bottom: 5px !important;
+        }
+        #print-estimate-content .shop-description {
+          font-size: 11px !important;
+          margin-bottom: 5px !important;
+        }
+        #print-estimate-content .shop-address {
+          font-size: 12px !important;
+          margin-bottom: 5px !important;
+        }
+        #print-estimate-content .workfile-info {
+          display: flex !important;
+          justify-content: space-between !important;
+          margin-top: 10px !important;
+          font-size: 11px !important;
+        }
+        
+        /* Section Headers */
+        #print-estimate-content .preliminary-header {
+          text-align: center !important;
+          font-size: 16px !important;
+          font-weight: bold !important;
+          margin: 20px 0 !important;
+          padding: 10px 0 !important;
+          border-top: 1px solid #000 !important;
+          border-bottom: 1px solid #000 !important;
+        }
+        #print-estimate-content .section-header {
+          font-size: 13px !important;
+          font-weight: bold !important;
+          margin: 15px 0 8px 0 !important;
+          padding: 5px 0 !important;
+          border-bottom: 1px solid #666 !important;
+        }
+        
+                 /* Two-Column Layout (PDF Export Style) */
+         #print-estimate-content .two-column-layout {
+           display: flex !important;
+           margin-bottom: 15px !important;
+           gap: 20px !important;
+         }
+         #print-estimate-content .left-column,
+         #print-estimate-content .right-column {
+           flex: 1 !important;
+           font-size: 11px !important;
+         }
+         #print-estimate-content .info-line {
+           margin-bottom: 4px !important;
+           line-height: 1.3 !important;
+         }
+        
+        /* Estimate Table Styles */
+        #print-estimate-content .estimate-table {
+          width: 100% !important;
+          border-collapse: collapse !important;
+          table-layout: fixed !important;
+          font-size: 10px !important;
+          margin: 15px 0 !important;
+          display: table !important;
+        }
+        #print-estimate-content .estimate-table th,
+        #print-estimate-content .estimate-table td {
+          border: 1px solid #000 !important;
+          padding: 4px 2px !important;
+          text-align: left !important;
+          vertical-align: top !important;
+          word-wrap: break-word !important;
+          display: table-cell !important;
+        }
+        #print-estimate-content .estimate-table th {
+          background-color: #f0f0f0 !important;
+          font-weight: bold !important;
+          font-size: 9px !important;
+        }
+        #print-estimate-content .estimate-table thead {
+          display: table-header-group !important;
+        }
+        #print-estimate-content .estimate-table tbody {
+          display: table-row-group !important;
+        }
+        #print-estimate-content .estimate-table tr {
+          display: table-row !important;
+        }
+        #print-estimate-content .estimate-table .col-line { width: 7% !important; }
+        #print-estimate-content .estimate-table .col-operation { width: 10% !important; }
+        #print-estimate-content .estimate-table .col-description { width: 38% !important; }
+        #print-estimate-content .estimate-table .col-part { width: 18% !important; }
+        #print-estimate-content .estimate-table .col-qty { width: 7% !important; }
+        #print-estimate-content .estimate-table .col-extended { width: 10% !important; }
+        #print-estimate-content .estimate-table .col-labor { width: 5% !important; }
+        #print-estimate-content .estimate-table .col-paint { width: 5% !important; }
+        #print-estimate-content .area-header {
+          background-color: #e0e0e0 !important;
+          font-weight: bold !important;
+          text-align: center !important;
+        }
+        
+        /* Summary Styles */
+        #print-estimate-content .estimate-summary {
+          margin-top: 20px !important;
+          border-top: 2px solid #000 !important;
+          padding-top: 10px !important;
+          font-size: 12px !important;
+        }
+        #print-estimate-content .estimate-summary div {
+          margin-bottom: 3px !important;
+        }
+        
+        /* Force color printing */
+        * {
+          -webkit-print-color-adjust: exact !important;
+          color-adjust: exact !important;
+        }
+      }
+      
+      @media screen {
+        #print-estimate-content {
+          display: none !important;
+        }
+      }
+    `;
+    document.head.appendChild(printStyles);
+
+    // Trigger print
+    setTimeout(() => {
+      try {
+        window.print();
+      } catch (error) {
+        console.error('Print failed:', error);
+      }
+
+      // Clean up after print
+      setTimeout(() => {
+        if (document.getElementById('print-estimate-content')) {
+          document.body.removeChild(printContainer);
+        }
+        if (document.getElementById('print-estimate-styles')) {
+          document.head.removeChild(printStyles);
+        }
+      }, 1000);
+    }, 200);
+  }
+
+  private generateCompletePrintHTML(): string {
+    if (!this.estimateData) return '';
+
+    const shopInfo = this.estimateData.shopInfo;
+    const customerInfo = this.estimateData.customerInfo;
+    const jobInfo = this.estimateData.jobInfo;
+    const insuranceInfo = this.estimateData.insuranceInfo;
+    const vehicleInfo = this.estimateData.vehicleInfo;
+    const repairFacility = this.estimateData.repairFacility;
+
+    let html = `
+      <!-- Shop Header Section with Logo -->
+      <div class="shop-header">
+        <div class="shop-logo-print">
+          <div class="logo-circle-print">
+            <div class="logo-icon-print">🔧🚗</div>
+          </div>
+          <div class="logo-text-print">
+            <div class="logo-primary-print">AUTO POINT</div>
+            <div class="logo-secondary-print">COLLISION REPAIRS</div>
+            <div class="logo-tertiary-print">& CAR PAINT</div>
+          </div>
+        </div>
+        <div class="shop-info-print">
+          <div class="shop-name">${shopInfo?.name || ''}</div>
+          <div class="shop-description">${shopInfo?.description || ''}</div>
+          <div class="shop-address">${shopInfo?.address || ''}</div>
+          <div class="shop-address">Phone: ${shopInfo?.phone || ''}</div>
+        </div>
+        <div class="workfile-info">
+          <span>Workfile ID: ${shopInfo?.workfileId || ''}</span>
+          <span>PartsShare: ${shopInfo?.partsShare || ''}</span>
+        </div>
+      </div>
+
+      <!-- Preliminary Estimate Header -->
+      <div class="preliminary-header">${shopInfo?.invoiceType || 'Preliminary Estimate'}</div>
+
+      <!-- Customer & Job Information Section -->
+      <div class="section-header">Customer & Job Information</div>
+      <div class="two-column-layout">
+        <div class="left-column">
+          <div class="info-line">Customer: ${customerInfo?.name || ''}</div>
+          <div class="info-line">Phone: ${customerInfo?.phone || ''} (${customerInfo?.phoneType || ''})</div>
+          <div class="info-line">Owner: ${customerInfo?.name || ''}</div>
+          <div class="info-line">Insured: ${customerInfo?.name || ''}</div>
+          <div class="info-line">Policy #: ${jobInfo?.policyNumber || 'TBD'}</div>
+          <div class="info-line">Date of Loss: ${jobInfo?.dateOfLoss || 'TBD'}</div>
+          <div class="info-line">Point of Impact: ${jobInfo?.pointOfImpact || 'TBD'}</div>
+          <div class="info-line">Insurance: ${insuranceInfo?.company || ''}</div>
+        </div>
+        <div class="right-column">
+          <div class="info-line">Job Number: ${jobInfo?.jobNumber || 'TBD'}</div>
+          <div class="info-line">Written By: ${jobInfo?.writtenBy || ''}</div>
+          <div class="info-line">Adjuster: ${jobInfo?.adjuster || ''}</div>
+          <div class="info-line">Claim #: ${jobInfo?.claimNumber || ''}</div>
+          <div class="info-line">Type of Loss: ${jobInfo?.typeOfLoss || 'TBD'}</div>
+          <div class="info-line">Days to Repair: ${jobInfo?.daysToRepair || 0}</div>
+          <div class="info-line">Inspection: ${jobInfo?.inspectionLocation || ''}</div>
+          <div class="info-line">Facility: ${repairFacility?.name || ''}</div>
+        </div>
+      </div>
+
+      <!-- Vehicle Information Section -->
+      <div class="section-header">VEHICLE</div>
+      <div class="two-column-layout">
+        <div class="left-column">
+          <div class="info-line">Year: ${vehicleInfo?.year || ''}</div>
+          <div class="info-line">Make: ${vehicleInfo?.make || ''}</div>
+          <div class="info-line">Model: ${vehicleInfo?.model || ''}</div>
+          <div class="info-line">Body Style: ${vehicleInfo?.bodyStyle || ''}</div>
+          <div class="info-line">Engine: ${vehicleInfo?.engine || ''}</div>
+          <div class="info-line">Color: ${vehicleInfo?.color || ''}</div>
+          <div class="info-line">State: ${vehicleInfo?.state || ''}</div>
+          <div class="info-line">Condition: ${vehicleInfo?.condition || 'TBD'}</div>
+        </div>
+        <div class="right-column">
+          <div class="info-line">VIN: ${vehicleInfo?.vin || ''}</div>
+          <div class="info-line">Interior Color: ${vehicleInfo?.interiorColor || 'TBD'}</div>
+          <div class="info-line">Exterior Color: ${vehicleInfo?.exteriorColor || ''}</div>
+          <div class="info-line">Mileage In: ${vehicleInfo?.mileageIn || 'TBD'}</div>
+          <div class="info-line">Mileage Out: ${vehicleInfo?.mileageOut || 'TBD'}</div>
+          <div class="info-line">License: ${vehicleInfo?.license || 'TBD'}</div>
+          <div class="info-line">Production Date: ${vehicleInfo?.productionDate || 'TBD'}</div>
+          <div class="info-line">Job #: ${vehicleInfo?.jobNumber || 'TBD'}</div>
+        </div>
+      </div>
+
+      <!-- Estimate Details Section -->
+      <div class="section-header">Estimate Details</div>
+    `;
+
+    // Add the estimate table
+    html += this.generateEstimateTableHTML();
+
+    return html;
+  }
+
+  private generateEstimateTableHTML(): string {
+    console.log('Generating estimate table HTML');
+    console.log('estimateData:', this.estimateData);
+    console.log('vehicle:', this.vehicle);
+
+    if (!this.estimateData || !this.estimateData.estimateData) {
+      console.log('No estimate data available');
+      return '<p>No estimate data available</p>';
+    }
+
+    let tableHTML = `
+      <table class="estimate-table" id="printEstimate">
+        <thead>
+          <tr>
+            <th class="col-line">Line</th>
+            <th class="col-operation">Operation</th>
+            <th class="col-description">Description</th>
+            <th class="col-part">Part Number</th>
+            <th class="col-qty">Qty</th>
+            <th class="col-extended">Extended</th>
+            <th class="col-labor">Labor</th>
+            <th class="col-paint">Paint</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+
+    let lineCounter = 1; // Start continuous line numbering from 1
+
+    this.estimateData.estimateData.forEach(area => {
+      // Area header row
+      tableHTML += `
+        <tr class="area-header">
+          <td>${lineCounter}</td>
+          <td colspan="7">${area.areaName}</td>
+        </tr>
+      `;
+      lineCounter++; // Increment for area header
+
+      // Area items
+      area.claimItems.forEach(item => {
+        tableHTML += `
+          <tr>
+            <td>${lineCounter}</td>
+            <td>${item.operation || ''}</td>
+            <td>${item.description || ''}</td>
+            <td>${item.partNumber || ''}</td>
+            <td>${item.quantity || ''}</td>
+            <td>${item.extendedPrice ? '$' + item.extendedPrice.toFixed(2) : ''}</td>
+            <td>${item.laborHours || ''}</td>
+            <td>${item.paintHours || ''}</td>
+          </tr>
+        `;
+        lineCounter++; // Increment for next line
+      });
+    });
+
+    tableHTML += `
+        </tbody>
+      </table>
+    `;
+
+    // Add summary if available
+    if (this.estimateData.summary) {
+      tableHTML += `
+        <div class="estimate-summary" style="margin-top: 20px; border-top: 2px solid #000; padding-top: 10px;">
+          <div style="font-weight: bold; margin-bottom: 5px;">Summary:</div>
+          <div>Subtotal: $${this.estimateData.summary.subtotal.toFixed(2)}</div>
+          <div>Labor Hours: ${this.estimateData.summary.laborHours}</div>
+          <div>Paint Hours: ${this.estimateData.summary.paintHours}</div>
+        </div>
+      `;
+    }
+
+    console.log('Generated table HTML length:', tableHTML.length);
+    return tableHTML;
+  }
+
+  exportEstimateToPDF(): void {
+    console.log('Exporting estimate to PDF...');
+
+    // Ensure data is loaded
+    if (!this.estimateData) {
+      this.loadMockEstimateData();
+    }
+
+    const { jsPDF } = require('jspdf');
+    const pdf = new jsPDF('portrait', 'mm', 'a4');
+
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+    const margin = 10;
+    const usableWidth = pageWidth - (2 * margin);
+
+    let yPos = margin;
+
+    // Shop Header with Logo
+    if (this.estimateData?.shopInfo) {
+      const shopInfo = this.estimateData.shopInfo;
+
+      // Logo (simple circle with text)
+      pdf.setFillColor(0, 102, 204); // Blue color
+      pdf.circle(margin + 15, yPos + 10, 8, 'F'); // Logo circle
+
+      // Logo text
+      pdf.setFontSize(6);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(0, 102, 204);
+      pdf.text('AUTO POINT', margin + 35, yPos + 5);
+      pdf.setFontSize(5);
+      pdf.text('COLLISION REPAIRS', margin + 35, yPos + 8);
+      pdf.text('& CAR PAINT', margin + 35, yPos + 11);
+
+      // Reset text color
+      pdf.setTextColor(0, 0, 0);
+      yPos += 15;
+
+      // Shop Name (larger, bold)
+      pdf.setFontSize(16);
+      pdf.setFont('helvetica', 'bold');
+      const shopNameLines = pdf.splitTextToSize(shopInfo.name || '', usableWidth);
+      shopNameLines.forEach((line: string) => {
+        pdf.text(line, pageWidth / 2, yPos, { align: 'center' });
+        yPos += 6;
+      });
+
+      // Shop Description
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'normal');
+      pdf.text(shopInfo.description || '', pageWidth / 2, yPos, { align: 'center' });
+      yPos += 5;
+
+      // Shop Address and Phone
+      pdf.text(shopInfo.address || '', pageWidth / 2, yPos, { align: 'center' });
+      yPos += 5;
+      pdf.text(`Phone: ${shopInfo.phone || ''}`, pageWidth / 2, yPos, { align: 'center' });
+      yPos += 5;
+
+      // Workfile Info
+      pdf.setFontSize(9);
+      pdf.text(`Workfile ID: ${shopInfo.workfileId || ''}`, margin, yPos);
+      pdf.text(`PartsShare: ${shopInfo.partsShare || ''}`, pageWidth - margin - 40, yPos);
+      yPos += 8;
+
+      // Line separator
+      pdf.line(margin, yPos, pageWidth - margin, yPos);
+      yPos += 8;
+
+      // Preliminary Estimate Header
+      pdf.setFontSize(14);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text(shopInfo.invoiceType || 'Preliminary Estimate', pageWidth / 2, yPos, { align: 'center' });
+      yPos += 8;
+
+      // Line separator
+      pdf.line(margin, yPos, pageWidth - margin, yPos);
+      yPos += 10;
+    }
+
+    // Customer & Job Information Section
+    if (this.estimateData?.customerInfo && this.estimateData?.jobInfo) {
+      pdf.setFontSize(12);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('Customer & Job Information', margin, yPos);
+      yPos += 8;
+
+      pdf.setFontSize(9);
+      pdf.setFont('helvetica', 'normal');
+
+      const customerInfo = this.estimateData.customerInfo;
+      const jobInfo = this.estimateData.jobInfo;
+      const insuranceInfo = this.estimateData.insuranceInfo;
+      const repairFacility = this.estimateData.repairFacility;
+
+      // Customer info (left column)
+      const leftCol = margin;
+      const rightCol = pageWidth / 2 + 5;
+
+      pdf.text(`Customer: ${customerInfo.name || ''}`, leftCol, yPos);
+      pdf.text(`Job Number: ${jobInfo.jobNumber || 'TBD'}`, rightCol, yPos);
+      yPos += 4;
+
+      pdf.text(`Phone: ${customerInfo.phone || ''} (${customerInfo.phoneType || ''})`, leftCol, yPos);
+      pdf.text(`Written By: ${jobInfo.writtenBy || ''}`, rightCol, yPos);
+      yPos += 4;
+
+      pdf.text(`Owner: ${customerInfo.name || ''}`, leftCol, yPos);
+      pdf.text(`Adjuster: ${jobInfo.adjuster || ''}`, rightCol, yPos);
+      yPos += 4;
+
+      pdf.text(`Insured: ${customerInfo.name || ''}`, leftCol, yPos);
+      pdf.text(`Claim #: ${jobInfo.claimNumber || ''}`, rightCol, yPos);
+      yPos += 4;
+
+      pdf.text(`Policy #: ${jobInfo.policyNumber || 'TBD'}`, leftCol, yPos);
+      pdf.text(`Type of Loss: ${jobInfo.typeOfLoss || 'TBD'}`, rightCol, yPos);
+      yPos += 4;
+
+      pdf.text(`Date of Loss: ${jobInfo.dateOfLoss || 'TBD'}`, leftCol, yPos);
+      pdf.text(`Days to Repair: ${jobInfo.daysToRepair || 0}`, rightCol, yPos);
+      yPos += 4;
+
+      pdf.text(`Point of Impact: ${jobInfo.pointOfImpact || 'TBD'}`, leftCol, yPos);
+      const inspectionText = pdf.splitTextToSize(`Inspection: ${jobInfo.inspectionLocation || ''}`, (pageWidth / 2) - 10);
+      pdf.text(inspectionText, rightCol, yPos);
+      yPos += 4;
+
+      pdf.text(`Insurance: ${insuranceInfo?.company || ''}`, leftCol, yPos);
+      const facilityText = pdf.splitTextToSize(`Facility: ${repairFacility?.name || ''}`, (pageWidth / 2) - 10);
+      pdf.text(facilityText, rightCol, yPos);
+      yPos += 8;
+    }
+
+    // Vehicle Information Section
+    if (this.estimateData?.vehicleInfo) {
+      pdf.setFontSize(12);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('VEHICLE', margin, yPos);
+      yPos += 8;
+
+      pdf.setFontSize(9);
+      pdf.setFont('helvetica', 'normal');
+
+      const vehicleInfo = this.estimateData.vehicleInfo;
+      const leftCol = margin;
+      const rightCol = pageWidth / 2 + 5;
+
+      pdf.text(`Year: ${vehicleInfo.year || ''}`, leftCol, yPos);
+      pdf.text(`VIN: ${vehicleInfo.vin || ''}`, rightCol, yPos);
+      yPos += 4;
+
+      pdf.text(`Make: ${vehicleInfo.make || ''}`, leftCol, yPos);
+      pdf.text(`Interior Color: ${vehicleInfo.interiorColor || 'TBD'}`, rightCol, yPos);
+      yPos += 4;
+
+      pdf.text(`Model: ${vehicleInfo.model || ''}`, leftCol, yPos);
+      pdf.text(`Exterior Color: ${vehicleInfo.exteriorColor || ''}`, rightCol, yPos);
+      yPos += 4;
+
+      pdf.text(`Body Style: ${vehicleInfo.bodyStyle || ''}`, leftCol, yPos);
+      pdf.text(`Mileage In: ${vehicleInfo.mileageIn || 'TBD'}`, rightCol, yPos);
+      yPos += 4;
+
+      const engineText = pdf.splitTextToSize(`Engine: ${vehicleInfo.engine || ''}`, (pageWidth / 2) - 10);
+      pdf.text(engineText, leftCol, yPos);
+      pdf.text(`Mileage Out: ${vehicleInfo.mileageOut || 'TBD'}`, rightCol, yPos);
+      yPos += 4;
+
+      pdf.text(`Color: ${vehicleInfo.color || ''}`, leftCol, yPos);
+      pdf.text(`License: ${vehicleInfo.license || 'TBD'}`, rightCol, yPos);
+      yPos += 4;
+
+      pdf.text(`State: ${vehicleInfo.state || ''}`, leftCol, yPos);
+      pdf.text(`Production Date: ${vehicleInfo.productionDate || 'TBD'}`, rightCol, yPos);
+      yPos += 4;
+
+      pdf.text(`Condition: ${vehicleInfo.condition || 'TBD'}`, leftCol, yPos);
+      pdf.text(`Job #: ${vehicleInfo.jobNumber || 'TBD'}`, rightCol, yPos);
+      yPos += 10;
+    }
+
+    // Line separator before estimate details
+    pdf.line(margin, yPos, pageWidth - margin, yPos);
+    yPos += 8;
+
+    // Estimate Details Header
+    pdf.setFontSize(12);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text('Estimate Details', margin, yPos);
+    yPos += 8;
+
+    // Check if we need a new page
+    if (yPos > pageHeight - 60) {
+      pdf.addPage();
+      yPos = margin;
+    }
+
+    // Table Headers
+    pdf.setFontSize(9);
+    pdf.setFont('helvetica', 'bold');
+
+    const colWidths = [12, 18, 68, 32, 12, 18, 12, 12]; // Adjusted for portrait
+    const colPositions = [margin];
+    for (let i = 0; i < colWidths.length - 1; i++) {
+      colPositions.push(colPositions[i] + colWidths[i]);
+    }
+
+    const headers = ['Line', 'Operation', 'Description', 'Part Number', 'Qty', 'Extended', 'Labor', 'Paint'];
+
+    // Top separator line for header
+    pdf.setDrawColor(120, 120, 120);
+    pdf.setLineWidth(0.3);
+    pdf.line(margin, yPos - 2, pageWidth - margin, yPos - 2);
+    yPos += 2;
+
+    // Draw header text without background
+    headers.forEach((header, index) => {
+      pdf.text(header, colPositions[index] + 2, yPos);
+    });
+    yPos += 6;
+
+    // Bottom separator line for header
+    pdf.setDrawColor(120, 120, 120);
+    pdf.setLineWidth(0.3);
+    pdf.line(margin, yPos - 1, pageWidth - margin, yPos - 1);
+    yPos += 2;
+
+    // Table Content
+    pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(8);
+
+    if (this.estimateData?.estimateData) {
+      let lineCounter = 1; // Start continuous line numbering from 1
+
+      this.estimateData.estimateData.forEach(area => {
+        // Check for page break
+        if (yPos > pageHeight - 20) {
+          pdf.addPage();
+          yPos = margin;
+
+          // Redraw headers on new page
+          pdf.setFont('helvetica', 'bold');
+          pdf.setFontSize(9);
+
+          // Top separator line for header
+          pdf.setDrawColor(120, 120, 120);
+          pdf.setLineWidth(0.3);
+          pdf.line(margin, yPos - 2, pageWidth - margin, yPos - 2);
+          yPos += 2;
+
+          // Draw header text without background
+          headers.forEach((header, index) => {
+            pdf.text(header, colPositions[index] + 2, yPos);
+          });
+          yPos += 6;
+
+          // Bottom separator line for header
+          pdf.setDrawColor(120, 120, 120);
+          pdf.setLineWidth(0.3);
+          pdf.line(margin, yPos - 1, pageWidth - margin, yPos - 1);
+          yPos += 2;
+          pdf.setFont('helvetica', 'normal');
+          pdf.setFontSize(8);
+        }
+
+        // Area header with line number - clean styling without background
+        pdf.setFont('helvetica', 'bold');
+
+        // Add line number for area header
+        pdf.text(lineCounter.toString(), colPositions[0] + 2, yPos);
+        pdf.text(area.areaName, colPositions[1] + 2, yPos);
+
+        // pdf.rect(margin, yPos - 3, usableWidth, 6); // No border for modern look
+        yPos += 5;
+        lineCounter++; // Increment for area header
+
+        // Area items
+        pdf.setFont('helvetica', 'normal');
+        let itemRowCount = 0;
+        area.claimItems.forEach(item => {
+          if (yPos > pageHeight - 15) {
+            pdf.addPage();
+            yPos = margin;
+
+            // Redraw headers on new page
+            pdf.setFont('helvetica', 'bold');
+            pdf.setFontSize(8);
+            pdf.setFillColor(240, 240, 240);
+            pdf.rect(margin, yPos - 3, usableWidth, 6, 'F');
+            headers.forEach((header, index) => {
+              pdf.text(header, colPositions[index] + 1, yPos);
+            });
+            yPos += 6;
+            pdf.rect(margin, yPos - 9, usableWidth, 6);
+            pdf.setFont('helvetica', 'normal');
+            pdf.setFontSize(7);
+          }
+
+          const rowData = [
+            lineCounter.toString(),
+            item.operation || '',
+            item.description || '',
+            item.partNumber || '',
+            item.quantity?.toString() || '',
+            item.extendedPrice ? `$${item.extendedPrice.toFixed(2)}` : '',
+            item.laborHours?.toString() || '',
+            item.paintHours?.toString() || ''
+          ];
+
+          lineCounter++; // Increment for next line
+
+          // Add subtle alternating row background for better readability
+          if (itemRowCount % 2 === 0) {
+            pdf.setFillColor(252, 252, 252);
+            pdf.rect(margin, yPos - 2, usableWidth, 5, 'F');
+          }
+          itemRowCount++;
+
+          // Handle long descriptions
+          const maxDescLength = 45;
+          if (rowData[2].length > maxDescLength) {
+            rowData[2] = rowData[2].substring(0, maxDescLength) + '...';
+          }
+
+          rowData.forEach((data, index) => {
+            if (data) {
+              pdf.text(data, colPositions[index] + 2, yPos);
+            }
+          });
+
+          // No row border for modern look - add subtle spacing
+          // pdf.rect(margin, yPos - 3, usableWidth, 6);
+          yPos += 5;
+        });
+
+        // Add light separator after each area
+        pdf.setDrawColor(200, 200, 200);
+        pdf.setLineWidth(0.1);
+        pdf.line(margin, yPos, pageWidth - margin, yPos);
+        yPos += 3;
+      });
+    }
+
+    // Summary
+    if (this.estimateData?.summary) {
+      yPos += 5;
+      pdf.setFont('helvetica', 'bold');
+      pdf.text(`Subtotal: $${this.estimateData.summary.subtotal.toFixed(2)}`, margin, yPos);
+      yPos += 4;
+      pdf.text(`Labor Hours: ${this.estimateData.summary.laborHours}`, margin, yPos);
+      yPos += 4;
+      pdf.text(`Paint Hours: ${this.estimateData.summary.paintHours}`, margin, yPos);
+    }
+
+    // Save the PDF
+    pdf.save('insurance-estimate.pdf');
+    console.log('PDF export completed');
+  }
+
+  printClaimsForm(): void {
+    console.log('Printing claims form...');
+
+    const claimsHTML = this.generateCompleteClaimsHTML();
+
+    // Create a temporary container for print content
+    const printContainer = document.createElement('div');
+    printContainer.id = 'print-claims-content';
+    printContainer.innerHTML = claimsHTML;
+    printContainer.style.display = 'none'; // Hide from screen
+    document.body.appendChild(printContainer);
+
+    // Add print-specific CSS to the document
+    const printStyles = document.createElement('style');
+    printStyles.id = 'print-claims-styles';
+    printStyles.innerHTML = `
+      @media print {
+        /* Hide everything on the page */
+        body * {
+          visibility: hidden !important;
+          display: none !important;
+        }
+        
+        /* Show only our print content */
+        #print-claims-content,
+        #print-claims-content * {
+          visibility: visible !important;
+          display: block !important;
+        }
+        
+        /* Position the print content */
+        #print-claims-content {
+          position: absolute !important;
+          left: 0 !important;
+          top: 0 !important;
+          width: 100% !important;
+          margin: 0 !important;
+          padding: 10px !important;
+          background: white !important;
+          font-family: Arial, sans-serif !important;
+          font-size: 12px !important;
+          line-height: 1.4 !important;
+          color: black !important;
+        }
+        
+        /* Claims Form Header */
+        #print-claims-content .form-header {
+          text-align: center !important;
+          margin-bottom: 20px !important;
+          border-bottom: 2px solid #000 !important;
+          padding-bottom: 15px !important;
+        }
+        #print-claims-content .form-title {
+          font-size: 18px !important;
+          font-weight: bold !important;
+          margin-bottom: 10px !important;
+        }
+        
+        /* Section Headers */
+        #print-claims-content .section-header {
+          font-size: 14px !important;
+          font-weight: bold !important;
+          margin: 20px 0 10px 0 !important;
+          padding: 8px 0 !important;
+          border-bottom: 2px solid #000 !important;
+          text-align: center !important;
+        }
+        
+        /* Claims Info Tables */
+        #print-claims-content .claims-info {
+          margin-bottom: 15px !important;
+        }
+        #print-claims-content .claims-table {
+          width: 100% !important;
+          border-collapse: collapse !important;
+          margin-bottom: 15px !important;
+          font-size: 11px !important;
+          display: table !important;
+        }
+        #print-claims-content .claims-table td {
+          padding: 8px !important;
+          border: 1px solid #000 !important;
+          vertical-align: top !important;
+          display: table-cell !important;
+        }
+        #print-claims-content .claims-table .label {
+          background-color: #f5f5f5 !important;
+          font-weight: bold !important;
+          width: 25% !important;
+        }
+        #print-claims-content .claims-table tr {
+          display: table-row !important;
+        }
+        
+        /* Description and Text Areas */
+        #print-claims-content .description-section {
+          margin: 15px 0 !important;
+        }
+        #print-claims-content .description-content {
+          border: 1px solid #000 !important;
+          padding: 10px !important;
+          min-height: 40px !important;
+          background-color: #fafafa !important;
+        }
+        
+        /* Signature Section */
+        #print-claims-content .signature-section {
+          margin-top: 30px !important;
+          border-top: 2px solid #000 !important;
+          padding-top: 15px !important;
+          display: flex !important;
+          justify-content: space-between !important;
+        }
+        #print-claims-content .signature-line {
+          border-bottom: 1px solid #000 !important;
+          width: 200px !important;
+          margin-bottom: 5px !important;
+        }
+        
+        /* Force color printing */
+        * {
+          -webkit-print-color-adjust: exact !important;
+          color-adjust: exact !important;
+        }
+      }
+      
+      @media screen {
+        #print-claims-content {
+          display: none !important;
+        }
+      }
+    `;
+    document.head.appendChild(printStyles);
+
+    // Trigger print
+    setTimeout(() => {
+      try {
+        window.print();
+      } catch (error) {
+        console.error('Print failed:', error);
+      }
+
+      // Clean up after print
+      setTimeout(() => {
+        if (document.getElementById('print-claims-content')) {
+          document.body.removeChild(printContainer);
+        }
+        if (document.getElementById('print-claims-styles')) {
+          document.head.removeChild(printStyles);
+        }
+      }, 1000);
+    }, 200);
+  }
+
+  private generateCompleteClaimsHTML(): string {
+    const formValues = this.claimsForm?.value || {};
+    const currentDate = new Date().toLocaleDateString();
+
+    return `
+      <!-- Claims Form Header -->
+      <div class="form-header">
+        <div class="form-title">Insurance Claims Form</div>
+      </div>
+
+      <!-- Claim Information Section -->
+      <div class="section-header">Claim Information</div>
+      <div class="claims-info">
+        <table class="claims-table">
+          <tr>
+            <td class="label">Claim Number:</td>
+            <td>${formValues.claimNumber || ''}</td>
+            <td class="label">Policy Number:</td>
+            <td>${formValues.policyNumber || ''}</td>
+          </tr>
+          <tr>
+            <td class="label">Incident Date:</td>
+            <td>${formValues.incidentDate || ''}</td>
+            <td class="label">Reported Date:</td>
+            <td>${formValues.reportedDate || ''}</td>
+          </tr>
+          <tr>
+            <td class="label">Make:</td>
+            <td>${formValues.make || ''}</td>
+            <td class="label">Model:</td>
+            <td>${formValues.model || ''}</td>
+          </tr>
+          <tr>
+            <td class="label">Year:</td>
+            <td>${formValues.year || ''}</td>
+            <td class="label">VIN:</td>
+            <td>${formValues.vin || ''}</td>
+          </tr>
+          <tr>
+            <td class="label">License Plate:</td>
+            <td>${formValues.licensePlate || ''}</td>
+            <td class="label">State:</td>
+            <td>${formValues.state || ''}</td>
+          </tr>
+          <tr>
+            <td class="label">Driver Name:</td>
+            <td>${formValues.driverName || ''}</td>
+            <td class="label">Driver License:</td>
+            <td>${formValues.driverLicense || ''}</td>
+          </tr>
+          <tr>
+            <td class="label">Contact Phone:</td>
+            <td>${formValues.contactPhone || ''}</td>
+            <td class="label">Contact Email:</td>
+            <td>${formValues.contactEmail || ''}</td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- Incident Description Section -->
+      <div class="section-header">Incident Description</div>
+      <div class="description-section">
+        <div class="description-content">
+          ${formValues.description || 'No description provided'}
+        </div>
+      </div>
+
+      <!-- Police Report Information Section -->
+      <div class="section-header">Police Report Information</div>
+      <div class="claims-info">
+        <table class="claims-table">
+          <tr>
+            <td class="label">Police Report Number:</td>
+            <td>${formValues.policeReportNumber || ''}</td>
+            <td class="label">Police Department:</td>
+            <td>${formValues.policeDepartment || ''}</td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- Damage Information Section -->
+      <div class="section-header">Damage Information</div>
+      <div class="description-section">
+        <div class="description-content">
+          ${formValues.damageDescription || 'No damage description provided'}
+        </div>
+      </div>
+
+      <!-- Cost Information Section -->
+      <div class="claims-info">
+        <table class="claims-table">
+          <tr>
+            <td class="label">Estimated Repair Cost:</td>
+            <td>$${formValues.estimatedCost || '0.00'}</td>
+            <td class="label">Form Date:</td>
+            <td>${currentDate}</td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- Signature Section -->
+      <div class="signature-section">
+        <div>
+          <div>Signature:</div>
+          <div class="signature-line"></div>
+        </div>
+        <div>
+          <div>Date:</div>
+          <div>${currentDate}</div>
+        </div>
+      </div>
+    `;
+  }
+
+  exportClaimsToPDF(): void {
+    console.log('Exporting claims form to PDF...');
+
+    const { jsPDF } = require('jspdf');
+    const pdf = new jsPDF('portrait', 'mm', 'a4');
+
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const margin = 10;
+    let yPos = margin;
+
+    // Claims Form Header
+    pdf.setFontSize(18);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text('Insurance Claims Form', pageWidth / 2, yPos, { align: 'center' });
+    yPos += 15;
+
+    // Line separator
+    pdf.line(margin, yPos, pageWidth - margin, yPos);
+    yPos += 10;
+
+    // Claims Information
+    if (this.claimsForm) {
+      const formValues = this.claimsForm.value;
+
+      pdf.setFontSize(12);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('Claim Information', margin, yPos);
+      yPos += 10;
+
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'normal');
+
+      const leftCol = margin;
+      const rightCol = pageWidth / 2 + 5;
+
+      pdf.text(`Claim Number: ${formValues.claimNumber || ''}`, leftCol, yPos);
+      pdf.text(`Policy Number: ${formValues.policyNumber || ''}`, rightCol, yPos);
+      yPos += 6;
+
+      pdf.text(`Incident Date: ${formValues.incidentDate || ''}`, leftCol, yPos);
+      pdf.text(`Reported Date: ${formValues.reportedDate || ''}`, rightCol, yPos);
+      yPos += 6;
+
+      pdf.text(`Make: ${formValues.make || ''}`, leftCol, yPos);
+      pdf.text(`Model: ${formValues.model || ''}`, rightCol, yPos);
+      yPos += 6;
+
+      pdf.text(`Year: ${formValues.year || ''}`, leftCol, yPos);
+      pdf.text(`VIN: ${formValues.vin || ''}`, rightCol, yPos);
+      yPos += 6;
+
+      pdf.text(`License Plate: ${formValues.licensePlate || ''}`, leftCol, yPos);
+      pdf.text(`State: ${formValues.state || ''}`, rightCol, yPos);
+      yPos += 6;
+
+      pdf.text(`Driver Name: ${formValues.driverName || ''}`, leftCol, yPos);
+      pdf.text(`Driver License: ${formValues.driverLicense || ''}`, rightCol, yPos);
+      yPos += 6;
+
+      pdf.text(`Contact Phone: ${formValues.contactPhone || ''}`, leftCol, yPos);
+      pdf.text(`Contact Email: ${formValues.contactEmail || ''}`, rightCol, yPos);
+      yPos += 10;
+
+      // Description
+      if (formValues.description) {
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('Incident Description:', margin, yPos);
+        yPos += 6;
+
+        pdf.setFont('helvetica', 'normal');
+        const descriptionLines = pdf.splitTextToSize(formValues.description, pageWidth - 2 * margin);
+        descriptionLines.forEach((line: string) => {
+          pdf.text(line, margin, yPos);
+          yPos += 5;
+        });
+        yPos += 5;
+      }
+
+      // Police Report
+      if (formValues.policeReportNumber) {
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('Police Report Information:', margin, yPos);
+        yPos += 6;
+
+        pdf.setFont('helvetica', 'normal');
+        pdf.text(`Police Report Number: ${formValues.policeReportNumber}`, margin, yPos);
+        yPos += 5;
+        pdf.text(`Police Department: ${formValues.policeDepartment || ''}`, margin, yPos);
+        yPos += 10;
+      }
+
+      // Damage Information
+      if (formValues.damageDescription) {
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('Damage Information:', margin, yPos);
+        yPos += 6;
+
+        pdf.setFont('helvetica', 'normal');
+        const damageLines = pdf.splitTextToSize(formValues.damageDescription, pageWidth - 2 * margin);
+        damageLines.forEach((line: string) => {
+          pdf.text(line, margin, yPos);
+          yPos += 5;
+        });
+        yPos += 5;
+      }
+
+      // Estimated Cost
+      if (formValues.estimatedCost) {
+        pdf.setFont('helvetica', 'bold');
+        pdf.text(`Estimated Repair Cost: $${formValues.estimatedCost}`, margin, yPos);
+        yPos += 10;
+      }
+    }
+
+    // Add current date and signature line
+    const currentDate = new Date().toLocaleDateString();
+    pdf.setFont('helvetica', 'normal');
+    pdf.text(`Date: ${currentDate}`, margin, yPos);
+    yPos += 15;
+
+    pdf.line(margin, yPos, margin + 80, yPos);
+    pdf.text('Signature', margin, yPos + 5);
+
+    // Save the PDF
+    pdf.save('insurance-claims-form.pdf');
+    console.log('Claims PDF export completed');
+  }
+
+  // Keyboard shortcut for quick access
+  @HostListener('document:keydown', ['$event'])
+  onKeyDown(event: KeyboardEvent): void {
+    if (event.key === 'Enter' && this.showAccessModal && this.accessForm.valid) {
+      this.onSubmit();
+    }
+  }
+
+
+
+  // Test method to debug estimate data
+  testEstimateData(): void {
+    console.log('=== ESTIMATE DATA DEBUG ===');
+    console.log('estimateData:', this.estimateData);
+    console.log('vehicle:', this.vehicle);
+
+    if (this.estimateData) {
+      console.log('estimateData.estimateData:', this.estimateData.estimateData);
+      console.log('estimateData.estimateData.length:', this.estimateData.estimateData.length);
+
+      this.estimateData.estimateData.forEach((area: any, index: number) => {
+        console.log(`Area ${index}:`, area);
+        console.log(`  Area name: ${area.areaName}`);
+        console.log(`  Claim items: ${area.claimItems.length}`);
+        area.claimItems.forEach((item: any, itemIndex: number) => {
+          console.log(`    Item ${itemIndex}:`, item);
+        });
+      });
+    } else {
+      console.log('No estimate data available');
+      console.log('Loading mock data...');
+      this.loadMockEstimateData();
+
+      setTimeout(() => {
+        console.log('After loading mock data:');
+        console.log('estimateData:', this.estimateData);
+      }, 100);
+    }
+
+    // Test HTML generation
+    const testHTML = this.generateEstimateTableHTML();
+    console.log('Generated HTML length:', testHTML.length);
+    console.log('Generated HTML preview:', testHTML.substring(0, 1000));
+  }
+
+  // Download all claim files as a zip archive
+  async downloadClaimAsZip(): Promise<void> {
+    console.log('Downloading claim as zip...');
+
+    try {
+      // Import JSZip
+      const JSZip = (await import('jszip')).default;
+      const zip = new JSZip();
+
+      // Create folders for organization
+      const documentsFolder = zip.folder('Documents');
+      const imagesFolder = zip.folder('Images');
+      const estimatesFolder = zip.folder('Estimates');
+
+      // Generate and add PDF estimate
+      console.log('Generating estimate PDF...');
+      const estimatePdfBlob = await this.generateEstimatePDFForZip();
+      if (estimatePdfBlob) {
+        estimatesFolder?.file('estimate-report.pdf', estimatePdfBlob);
+      }
+
+      // Generate and add claims form PDF
+      console.log('Generating claims PDF...');
+      const claimsPdfBlob = await this.generateClaimsPDFForZip();
+      if (claimsPdfBlob) {
+        documentsFolder?.file('claims-form.pdf', claimsPdfBlob);
+      }
+
+      // Add text summaries for reference
+      const claimSummary = this.generateClaimSummary();
+      documentsFolder?.file('claim-summary.txt', claimSummary);
+
+      const vehicleInfo = this.generateVehicleInfo();
+      documentsFolder?.file('vehicle-info.txt', vehicleInfo);
+
+      // Add collision images (mock images as text descriptions for demo)
+      if (this.collisionImages && this.collisionImages.length > 0) {
+        this.collisionImages.forEach((img, index) => {
+          const imgContent = `Image: ${img.description || 'Collision damage'}\nType: ${img.damageType || 'Impact'}\nSeverity: ${img.severity || 'Medium'}\nTimestamp: ${img.timestamp ? new Date(img.timestamp).toLocaleString() : 'N/A'}\nURL: ${img.imageUrl || 'N/A'}`;
+          imagesFolder?.file(`collision-image-${index + 1}.txt`, imgContent);
+        });
+      }
+
+      // Add evidence images from estimate lines
+      if (this.evidenceImages && this.evidenceImages.size > 0) {
+        this.evidenceImages.forEach((images, lineNumber) => {
+          const lineFolder = imagesFolder?.folder(`Line-${lineNumber}-Evidence`);
+          images.forEach((img, index) => {
+            const imgContent = `Line ${lineNumber} Evidence Image ${index + 1}\nDescription: ${img.description || 'Evidence image'}\nType: ${img.damageType || 'Damage'}\nSeverity: ${img.severity || 'Medium'}\nTimestamp: ${img.timestamp ? new Date(img.timestamp).toLocaleString() : 'N/A'}\nURL: ${img.imageUrl || 'N/A'}`;
+            lineFolder?.file(`evidence-${index + 1}.txt`, imgContent);
+          });
+        });
+      }
+
+      // Add documents metadata (for demo, we'll create text descriptions)
+      if (this.documents && this.documents.length > 0) {
+        this.documents.forEach((doc, index) => {
+          const docContent = `Document: ${doc.description}\nType: ${doc.docTypeName}\nUploaded By: ${doc.uploadedBy}\nDate: ${doc.createdAt ? new Date(doc.createdAt).toLocaleString() : 'N/A'}\nFile: ${doc.fileName}\nSequence: ${doc.sequenceNumber}`;
+          documentsFolder?.file(`document-${index + 1}-${doc.fileName || 'info'}.txt`, docContent);
+        });
+      }
+
+      // Generate and download the zip file
+      console.log('Generating zip file...');
+      const zipBlob = await zip.generateAsync({ type: 'blob' });
+
+      const url = window.URL.createObjectURL(zipBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `insurance-claim-${this.vehicle?.make || 'vehicle'}-${this.vehicle?.model || 'claim'}-${this.vehicle?.year || new Date().getFullYear()}-${new Date().toISOString().split('T')[0]}.zip`;
+      link.click();
+      window.URL.revokeObjectURL(url);
+
+      console.log('Zip file downloaded successfully');
+    } catch (error) {
+      console.error('Error creating zip file:', error);
+      this.errorMessage = 'Error creating zip file. Please try again.';
+    }
+  }
+
+  // Generate estimate PDF specifically for zip archive
+  private async generateEstimatePDFForZip(): Promise<Blob | null> {
+    try {
+      const { jsPDF } = await import('jspdf');
+      const pdf = new jsPDF('portrait', 'mm', 'a4');
+
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 10;
+      const usableWidth = pageWidth - (2 * margin);
+
+      let yPos = margin;
+
+      // Shop Header with Logo
+      if (this.estimateData?.shopInfo) {
+        const shopInfo = this.estimateData.shopInfo;
+
+        // Logo (simple circle with text)
+        pdf.setFillColor(0, 102, 204); // Blue color
+        pdf.circle(margin + 15, yPos + 10, 8, 'F'); // Logo circle
+
+        // Logo text
+        pdf.setFontSize(6);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(0, 102, 204);
+        pdf.text('AUTO POINT', margin + 35, yPos + 5);
+        pdf.setFontSize(5);
+        pdf.text('COLLISION REPAIRS', margin + 35, yPos + 8);
+        pdf.text('& CAR PAINT', margin + 35, yPos + 11);
+
+        // Reset text color
+        pdf.setTextColor(0, 0, 0);
+        yPos += 15;
+
+        // Shop Name (larger, bold)
+        pdf.setFontSize(16);
+        pdf.setFont('helvetica', 'bold');
+        const shopNameLines = pdf.splitTextToSize(shopInfo.name || '', usableWidth);
+        shopNameLines.forEach((line: string) => {
+          pdf.text(line, pageWidth / 2, yPos, { align: 'center' });
+          yPos += 6;
+        });
+
+        // Shop Description
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'normal');
+        pdf.text(shopInfo.description || '', pageWidth / 2, yPos, { align: 'center' });
+        yPos += 5;
+
+        // Shop Address and Phone
+        pdf.text(shopInfo.address || '', pageWidth / 2, yPos, { align: 'center' });
+        yPos += 5;
+        pdf.text(`Phone: ${shopInfo.phone || ''}`, pageWidth / 2, yPos, { align: 'center' });
+        yPos += 5;
+
+        // Workfile Info
+        pdf.setFontSize(9);
+        pdf.text(`Workfile ID: ${shopInfo.workfileId || ''}`, margin, yPos);
+        pdf.text(`PartsShare: ${shopInfo.partsShare || ''}`, pageWidth - margin - 40, yPos);
+        yPos += 8;
+
+        // Line separator
+        pdf.line(margin, yPos, pageWidth - margin, yPos);
+        yPos += 8;
+
+        // Preliminary Estimate Header
+        pdf.setFontSize(14);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text(shopInfo.invoiceType || 'Preliminary Estimate', pageWidth / 2, yPos, { align: 'center' });
+        yPos += 8;
+
+        // Line separator
+        pdf.line(margin, yPos, pageWidth - margin, yPos);
+        yPos += 10;
+      }
+
+      // Customer & Job Information Section
+      if (this.estimateData?.customerInfo && this.estimateData?.jobInfo) {
+        pdf.setFontSize(12);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('Customer & Job Information', margin, yPos);
+        yPos += 8;
+
+        pdf.setFontSize(9);
+        pdf.setFont('helvetica', 'normal');
+
+        const customerInfo = this.estimateData.customerInfo;
+        const jobInfo = this.estimateData.jobInfo;
+        const insuranceInfo = this.estimateData.insuranceInfo;
+        const repairFacility = this.estimateData.repairFacility;
+
+        // Customer info (left column)
+        const leftCol = margin;
+        const rightCol = pageWidth / 2 + 5;
+
+        pdf.text(`Customer: ${customerInfo.name || ''}`, leftCol, yPos);
+        pdf.text(`Job Number: ${jobInfo.jobNumber || 'TBD'}`, rightCol, yPos);
+        yPos += 4;
+
+        pdf.text(`Phone: ${customerInfo.phone || ''} (${customerInfo.phoneType || ''})`, leftCol, yPos);
+        pdf.text(`Written By: ${jobInfo.writtenBy || ''}`, rightCol, yPos);
+        yPos += 4;
+
+        pdf.text(`Owner: ${customerInfo.name || ''}`, leftCol, yPos);
+        pdf.text(`Adjuster: ${jobInfo.adjuster || ''}`, rightCol, yPos);
+        yPos += 4;
+
+        pdf.text(`Insured: ${customerInfo.name || ''}`, leftCol, yPos);
+        pdf.text(`Claim #: ${jobInfo.claimNumber || ''}`, rightCol, yPos);
+        yPos += 4;
+
+        pdf.text(`Policy #: ${jobInfo.policyNumber || 'TBD'}`, leftCol, yPos);
+        pdf.text(`Type of Loss: ${jobInfo.typeOfLoss || 'TBD'}`, rightCol, yPos);
+        yPos += 4;
+
+        pdf.text(`Date of Loss: ${jobInfo.dateOfLoss || 'TBD'}`, leftCol, yPos);
+        pdf.text(`Days to Repair: ${jobInfo.daysToRepair || 0}`, rightCol, yPos);
+        yPos += 4;
+
+        pdf.text(`Point of Impact: ${jobInfo.pointOfImpact || 'TBD'}`, leftCol, yPos);
+        const inspectionText = pdf.splitTextToSize(`Inspection: ${jobInfo.inspectionLocation || ''}`, (pageWidth / 2) - 10);
+        pdf.text(inspectionText, rightCol, yPos);
+        yPos += 4;
+
+        pdf.text(`Insurance: ${insuranceInfo?.company || ''}`, leftCol, yPos);
+        const facilityText = pdf.splitTextToSize(`Facility: ${repairFacility?.name || ''}`, (pageWidth / 2) - 10);
+        pdf.text(facilityText, rightCol, yPos);
+        yPos += 8;
+      }
+
+      // Vehicle Information Section
+      if (this.estimateData?.vehicleInfo) {
+        pdf.setFontSize(12);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('VEHICLE', margin, yPos);
+        yPos += 8;
+
+        pdf.setFontSize(9);
+        pdf.setFont('helvetica', 'normal');
+
+        const vehicleInfo = this.estimateData.vehicleInfo;
+        const leftCol = margin;
+        const rightCol = pageWidth / 2 + 5;
+
+        pdf.text(`Year: ${vehicleInfo.year || ''}`, leftCol, yPos);
+        pdf.text(`VIN: ${vehicleInfo.vin || ''}`, rightCol, yPos);
+        yPos += 4;
+
+        pdf.text(`Make: ${vehicleInfo.make || ''}`, leftCol, yPos);
+        pdf.text(`Interior Color: ${vehicleInfo.interiorColor || 'TBD'}`, rightCol, yPos);
+        yPos += 4;
+
+        pdf.text(`Model: ${vehicleInfo.model || ''}`, leftCol, yPos);
+        pdf.text(`Exterior Color: ${vehicleInfo.exteriorColor || ''}`, rightCol, yPos);
+        yPos += 4;
+
+        pdf.text(`Body Style: ${vehicleInfo.bodyStyle || ''}`, leftCol, yPos);
+        pdf.text(`Mileage In: ${vehicleInfo.mileageIn || 'TBD'}`, rightCol, yPos);
+        yPos += 4;
+
+        const engineText = pdf.splitTextToSize(`Engine: ${vehicleInfo.engine || ''}`, (pageWidth / 2) - 10);
+        pdf.text(engineText, leftCol, yPos);
+        pdf.text(`Mileage Out: ${vehicleInfo.mileageOut || 'TBD'}`, rightCol, yPos);
+        yPos += 4;
+
+        pdf.text(`Color: ${vehicleInfo.color || ''}`, leftCol, yPos);
+        pdf.text(`License: ${vehicleInfo.license || 'TBD'}`, rightCol, yPos);
+        yPos += 4;
+
+        pdf.text(`State: ${vehicleInfo.state || ''}`, leftCol, yPos);
+        pdf.text(`Production Date: ${vehicleInfo.productionDate || 'TBD'}`, rightCol, yPos);
+        yPos += 4;
+
+        pdf.text(`Condition: ${vehicleInfo.condition || 'TBD'}`, leftCol, yPos);
+        pdf.text(`Job #: ${vehicleInfo.jobNumber || 'TBD'}`, rightCol, yPos);
+        yPos += 10;
+      }
+
+      // Line separator before estimate details
+      pdf.line(margin, yPos, pageWidth - margin, yPos);
+      yPos += 8;
+
+      // Estimate Details Header
+      pdf.setFontSize(12);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('Estimate Details', margin, yPos);
+      yPos += 8;
+
+      // Check if we need a new page
+      if (yPos > pageHeight - 60) {
+        pdf.addPage();
+        yPos = margin;
+      }
+
+      // Add the estimate table content (existing code)
+      pdf.setFontSize(8);
+      pdf.setFont('helvetica', 'bold');
+
+      const colWidths = [12, 18, 68, 32, 12, 18, 12, 12];
+      const colPositions = [margin];
+      for (let i = 0; i < colWidths.length - 1; i++) {
+        colPositions.push(colPositions[i] + colWidths[i]);
+      }
+
+      const headers = ['Line', 'Operation', 'Description', 'Part Number', 'Qty', 'Extended', 'Labor', 'Paint'];
+
+      // Draw header background
+      pdf.setFillColor(240, 240, 240);
+      pdf.rect(margin, yPos - 3, usableWidth, 6, 'F');
+
+      // Draw header text
+      headers.forEach((header, index) => {
+        pdf.text(header, colPositions[index] + 1, yPos);
+      });
+      yPos += 6;
+
+      // Draw header border
+      pdf.setDrawColor(0, 0, 0);
+      pdf.rect(margin, yPos - 9, usableWidth, 6);
+
+      // Table Content
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(7);
+
+      if (this.estimateData?.estimateData) {
+        let lineCounter = 1; // Start continuous line numbering from 1
+
+        this.estimateData.estimateData.forEach(area => {
+          // Check for page break
+          if (yPos > pageHeight - 20) {
+            pdf.addPage();
+            yPos = margin;
+
+            // Redraw headers on new page
+            pdf.setFont('helvetica', 'bold');
+            pdf.setFontSize(8);
+            pdf.setFillColor(240, 240, 240);
+            pdf.rect(margin, yPos - 3, usableWidth, 6, 'F');
+            headers.forEach((header, index) => {
+              pdf.text(header, colPositions[index] + 1, yPos);
+            });
+            yPos += 6;
+            pdf.rect(margin, yPos - 9, usableWidth, 6);
+            pdf.setFont('helvetica', 'normal');
+            pdf.setFontSize(7);
+          }
+
+          // Area header with line number
+          pdf.setFont('helvetica', 'bold');
+          pdf.setFillColor(224, 224, 224);
+          pdf.rect(margin, yPos - 3, usableWidth, 6, 'F');
+
+          // Add line number for area header
+          pdf.text(lineCounter.toString(), colPositions[0] + 1, yPos);
+          pdf.text(area.areaName, colPositions[1] + 1, yPos);
+
+          pdf.rect(margin, yPos - 3, usableWidth, 6);
+          yPos += 6;
+          lineCounter++; // Increment for area header
+
+          // Area items
+          pdf.setFont('helvetica', 'normal');
+          area.claimItems.forEach(item => {
+            if (yPos > pageHeight - 15) {
+              pdf.addPage();
+              yPos = margin;
+
+              // Redraw headers on new page
+              pdf.setFont('helvetica', 'bold');
+              pdf.setFontSize(8);
+              pdf.setFillColor(240, 240, 240);
+              pdf.rect(margin, yPos - 3, usableWidth, 6, 'F');
+              headers.forEach((header, index) => {
+                pdf.text(header, colPositions[index] + 1, yPos);
+              });
+              yPos += 6;
+              pdf.rect(margin, yPos - 9, usableWidth, 6);
+              pdf.setFont('helvetica', 'normal');
+              pdf.setFontSize(7);
+            }
+
+            const rowData = [
+              lineCounter.toString(),
+              item.operation || '',
+              item.description || '',
+              item.partNumber || '',
+              item.quantity?.toString() || '',
+              item.extendedPrice ? `$${item.extendedPrice.toFixed(2)}` : '',
+              item.laborHours?.toString() || '',
+              item.paintHours?.toString() || ''
+            ];
+
+            lineCounter++; // Increment for next line
+
+            // Handle long descriptions
+            const maxDescLength = 45;
+            if (rowData[2].length > maxDescLength) {
+              rowData[2] = rowData[2].substring(0, maxDescLength) + '...';
+            }
+
+            rowData.forEach((data, index) => {
+              if (data) {
+                pdf.text(data, colPositions[index] + 1, yPos);
+              }
+            });
+
+            // Draw row border
+            pdf.rect(margin, yPos - 3, usableWidth, 6);
+            yPos += 6;
+          });
+        });
+      }
+
+      // Summary
+      if (this.estimateData?.summary) {
+        yPos += 5;
+        pdf.setFont('helvetica', 'bold');
+        pdf.text(`Subtotal: $${this.estimateData.summary.subtotal.toFixed(2)}`, margin, yPos);
+        yPos += 4;
+        pdf.text(`Labor Hours: ${this.estimateData.summary.laborHours}`, margin, yPos);
+        yPos += 4;
+        pdf.text(`Paint Hours: ${this.estimateData.summary.paintHours}`, margin, yPos);
+      }
+
+      return pdf.output('blob');
+    } catch (error) {
+      console.error('Error generating estimate PDF for zip:', error);
+      return null;
+    }
+  }
+
+  // Generate claims PDF specifically for zip archive
+  private async generateClaimsPDFForZip(): Promise<Blob | null> {
+    try {
+      const { jsPDF: JsPDF } = await import('jspdf');
+      const doc = new JsPDF('portrait', 'mm', 'a4');
+
+      // Set font
+      doc.setFont('helvetica');
+      doc.setFontSize(16);
+
+      // Title
+      doc.text('Insurance Claims Form', 105, 25, { align: 'center' });
+
+      // Vehicle info
+      doc.setFontSize(12);
+      const vehicleInfo = `${this.vehicle?.make || ''} ${this.vehicle?.model || ''} ${this.vehicle?.year || ''}`;
+      doc.text(vehicleInfo, 105, 35, { align: 'center' });
+
+      doc.setFontSize(10);
+      let yPos = 50;
+
+      // Add claims form data
+      if (this.claimsForm) {
+        doc.text(`Claim Number: ${this.claimsForm.get('claimNumber')?.value || 'N/A'}`, 20, yPos);
+        yPos += 8;
+        doc.text(`Policy Number: ${this.claimsForm.get('policyNumber')?.value || 'N/A'}`, 20, yPos);
+        yPos += 8;
+        doc.text(`Incident Date: ${this.claimsForm.get('incidentDate')?.value || 'N/A'}`, 20, yPos);
+        yPos += 8;
+        doc.text(`Reported Date: ${this.claimsForm.get('reportedDate')?.value || 'N/A'}`, 20, yPos);
+        yPos += 8;
+        doc.text(`Vehicle: ${this.claimsForm.get('make')?.value || ''} ${this.claimsForm.get('model')?.value || ''} ${this.claimsForm.get('year')?.value || ''}`, 20, yPos);
+        yPos += 8;
+        doc.text(`Estimated Cost: $${this.claimsForm.get('estimatedCost')?.value || '0'}`, 20, yPos);
+        yPos += 8;
+        doc.text(`Actual Cost: $${this.claimsForm.get('actualCost')?.value || '0'}`, 20, yPos);
+        yPos += 8;
+        doc.text(`Status: ${this.claimsForm.get('status')?.value || 'N/A'}`, 20, yPos);
+        yPos += 8;
+        doc.text(`Priority: ${this.claimsForm.get('priority')?.value || 'N/A'}`, 20, yPos);
+        yPos += 12;
+
+        doc.text('Damage Description:', 20, yPos);
+        yPos += 6;
+        const damageDesc = this.claimsForm.get('damageDescription')?.value || 'N/A';
+        const lines = doc.splitTextToSize(damageDesc, 170);
+        doc.text(lines, 20, yPos);
+        yPos += lines.length * 5 + 10;
+
+        doc.text('Adjuster Notes:', 20, yPos);
+        yPos += 6;
+        const adjusterNotes = this.claimsForm.get('adjusterNotes')?.value || 'N/A';
+        const notesLines = doc.splitTextToSize(adjusterNotes, 170);
+        doc.text(notesLines, 20, yPos);
+      }
+
+      return doc.output('blob');
+    } catch (error) {
+      console.error('Error generating claims PDF for zip:', error);
+      return null;
+    }
+  }
+
+  // Generate claim summary text
+  private generateClaimSummary(): string {
+    let summary = 'INSURANCE CLAIM SUMMARY\n';
+    summary += '========================\n\n';
+
+    if (this.insuranceClaims && this.insuranceClaims.length > 0) {
+      this.insuranceClaims.forEach((claim, index) => {
+        summary += `Claim ${index + 1}:\n`;
+        summary += `  Number: ${claim.claimNumber || 'N/A'}\n`;
+        summary += `  Status: ${claim.status || 'N/A'}\n`;
+        summary += `  Company: ${claim.insuranceCompany || 'N/A'}\n`;
+        summary += `  Comments: ${claim.comments || 'N/A'}\n`;
+        summary += `  Claim Date: ${claim.claimDate ? new Date(claim.claimDate).toLocaleDateString() : 'N/A'}\n`;
+        summary += `  Last Updated: ${claim.lastUpdated ? new Date(claim.lastUpdated).toLocaleDateString() : 'N/A'}\n`;
+        summary += `  Created: ${claim.createdAt ? new Date(claim.createdAt).toLocaleDateString() : 'N/A'}\n`;
+        summary += `  Active: ${claim.isActive ? 'Yes' : 'No'}\n\n`;
+      });
+    }
+
+    return summary;
+  }
+
+  // Generate vehicle information text
+  private generateVehicleInfo(): string {
+    let info = 'VEHICLE INFORMATION\n';
+    info += '==================\n\n';
+
+    if (this.vehicle) {
+      info += `Make: ${this.vehicle.make || 'N/A'}\n`;
+      info += `Model: ${this.vehicle.model || 'N/A'}\n`;
+      info += `Year: ${this.vehicle.year || 'N/A'}\n`;
+      info += `VIN: ${this.vehicle.vin || 'N/A'}\n`;
+      info += `Color: ${this.vehicle.color || 'N/A'}\n`;
+      info += `License Plate: ${this.vehicle.plate || 'N/A'}\n`;
+      info += `Mileage: ${this.vehicle.miles || 'N/A'}\n`;
+      info += `Engine: ${this.vehicle.engineDesc || 'N/A'}\n`;
+      info += `Trim: ${this.vehicle.trim || 'N/A'}\n`;
+      info += `Submodel: ${this.vehicle.submodel || 'N/A'}\n`;
+      info += `Status: ${this.vehicle.status?.toString() || 'N/A'}\n`;
+      info += `Insurance Company: ${this.vehicle.insuranceCompany || 'N/A'}\n`;
+      info += `Claim Number: ${this.vehicle.claimNumber || 'N/A'}\n`;
+      info += `Current Job: ${this.vehicle.currentJobNumber || 'N/A'}\n`;
+      info += `Days in Shop: ${this.vehicle.daysInShop?.toString() || 'N/A'}\n`;
+      info += `Target Date: ${this.vehicle.targetDate ? new Date(this.vehicle.targetDate).toLocaleDateString() : 'N/A'}\n`;
+      info += `Created: ${this.vehicle.createdAt ? new Date(this.vehicle.createdAt).toLocaleDateString() : 'N/A'}\n`;
+      info += `Updated: ${this.vehicle.updatedAt ? new Date(this.vehicle.updatedAt).toLocaleDateString() : 'N/A'}\n`;
+
+      if (this.vehicle.damages && this.vehicle.damages.length > 0) {
+        info += `Damages:\n`;
+        this.vehicle.damages.forEach(damage => {
+          info += `  - ${damage}\n`;
+        });
+      }
+
+      if (this.vehicle.comments) {
+        info += `Comments: ${this.vehicle.comments}\n`;
+      }
+    }
+
+    return info;
+  }
+
+
+
+
+
+  // Method to get line number for area header
+  getAreaLineNumber(areaIndex: number): number {
+    if (!this.estimateData?.estimateData) return 1;
+
+    let lineNumber = 1;
+
+    // Count all areas and items before this area
+    for (let i = 0; i < areaIndex; i++) {
+      lineNumber += 1; // For the area header itself
+      lineNumber += this.estimateData.estimateData[i].claimItems.length; // For all items in this area
+    }
+
+    return lineNumber;
+  }
+
+  // Method to get line number for item (accounting for area headers)
+  getItemLineNumber(areaIndex: number, itemIndex: number): number {
+    if (!this.estimateData?.estimateData) return 0;
+
+    let lineNumber = 1;
+
+    // Count all areas and items before this area
+    for (let i = 0; i < areaIndex; i++) {
+      lineNumber += 1; // For the area header itself
+      lineNumber += this.estimateData.estimateData[i].claimItems.length; // For all items in this area
+    }
+
+    // Add 1 for the current area header
+    lineNumber += 1;
+
+    // Add the current item index
+    lineNumber += itemIndex;
+
+    return lineNumber;
+  }
+
+  // Method to get total number of lines (areas + items)
+  getTotalLineCount(): number {
+    if (!this.estimateData?.estimateData) return 0;
+
+    let total = 0;
+    this.estimateData.estimateData.forEach(area => {
+      total += 1; // For the area header
+      total += area.claimItems.length; // For all items in this area
+    });
+
+    return total;
+  }
+
+
+
+  // Check if an area has images
+  hasImages(areaIndex: number): boolean {
+    if (!this.estimateData?.estimateData || areaIndex >= this.estimateData.estimateData.length) {
+      return false;
+    }
+
+    // Check if the area has images assigned
+    const area = this.estimateData.estimateData[areaIndex];
+    return !!(area.images && area.images.length > 0);
+  }
+
+  // Add random photos to an area
+  addRandomPhotosToArea(areaIndex: number): void {
+    if (!this.estimateData?.estimateData || areaIndex >= this.estimateData.estimateData.length) {
+      return;
+    }
+
+    const area = this.estimateData.estimateData[areaIndex];
+    const mockImages = this.generateMockEvidenceImages();
+
+    // Generate 1-3 new random images
+    const shuffledImages = [...mockImages].sort(() => 0.5 - Math.random());
+    const numNewImages = Math.floor(Math.random() * 3) + 1;
+
+    // Create new images with unique IDs
+    const existingIds = area.images ? area.images.map(img => img.id) : [];
+    const maxId = existingIds.length > 0 ? Math.max(...existingIds) : 0;
+
+    const newImages = shuffledImages.slice(0, numNewImages).map((img, index) => ({
+      ...img,
+      id: maxId + index + 1,
+      description: `${area.areaName.toLowerCase()} damage - ${img.description}`
+    }));
+
+    // Add to existing images or create new array
+    if (!area.images) {
+      area.images = [];
+    }
+    area.images.push(...newImages);
+
+    console.log(`Added ${numNewImages} photos to ${area.areaName}`);
+  }
+
+  // Remove an image from an area
+  removeImageFromArea(areaIndex: number, imageId: number): void {
+    if (!this.estimateData?.estimateData || areaIndex >= this.estimateData.estimateData.length) {
+      return;
+    }
+
+    const area = this.estimateData.estimateData[areaIndex];
+    if (!area.images) {
+      return;
+    }
+
+    // Find and remove the image
+    const imageIndex = area.images.findIndex(img => img.id === imageId);
+    if (imageIndex !== -1) {
+      area.images.splice(imageIndex, 1);
+      console.log(`Removed image ${imageId} from ${area.areaName}`);
+    }
+  }
+
+  // Image Editor Methods
+  openImageEditor(areaIndex: number, image: any): void {
+    console.log('Opening image editor for:', image);
+    this.currentEditingImage = { ...image }; // Clone the image
+    this.currentEditingAreaIndex = areaIndex;
+    this.showImageEditor = true;
+    this.editorTool = 'select';
+    this.isImageLoading = true;
+
+    // Use a more reliable approach to wait for modal to be fully rendered
+    this.waitForModalAndLoadImage();
+  }
+
+  private waitForModalAndLoadImage(): void {
+    console.log('Starting modal wait process');
+
+    // Use a combination of approaches for maximum reliability
+    this.waitWithMultipleStrategies();
+  }
+
+  private waitWithMultipleStrategies(): void {
+    let loaded = false;
+
+    // Strategy 1: Direct ViewChild check with retries
+    this.tryViewChildApproach(() => {
+      if (!loaded) {
+        loaded = true;
+        this.loadImageToCanvas(0);
+      }
+    });
+
+    // Strategy 2: DOM query as fallback after longer delay
+    setTimeout(() => {
+      if (!loaded) {
+        this.tryDOMQueryApproach(() => {
+          if (!loaded) {
+            loaded = true;
+            this.loadImageToCanvas(0);
+          }
+        });
+      }
+    }, 500);
+
+    // Strategy 3: Force load after even longer delay
+    setTimeout(() => {
+      if (!loaded) {
+        console.log('Using force load strategy');
+        loaded = true;
+        this.forceLoadImage();
+      }
+    }, 1000);
+  }
+
+  private tryViewChildApproach(callback: () => void): void {
+    let attempts = 0;
+    const maxAttempts = 15;
+
+    const checkViewChild = () => {
+      attempts++;
+      console.log(`ViewChild approach attempt ${attempts}`);
+
+      if (this.imageEditorModalBody &&
+        this.imageEditorModalBody.nativeElement &&
+        this.imageCanvas &&
+        this.imageCanvas.nativeElement &&
+        this.currentEditingImage) {
+
+        console.log('ViewChild approach successful');
+        callback();
+        return;
+      }
+
+      if (attempts < maxAttempts && this.showImageEditor) {
+        setTimeout(checkViewChild, 150);
+      }
+    };
+
+    setTimeout(checkViewChild, 100);
+  }
+
+  private tryDOMQueryApproach(callback: () => void): void {
+    console.log('Trying DOM query approach');
+    const canvas = document.querySelector('#imageEditorModal canvas') as HTMLCanvasElement;
+    const modalBody = document.querySelector('#imageEditorModal .modal-body');
+
+    if (canvas && modalBody && this.currentEditingImage) {
+      console.log('DOM query approach successful');
+      // Temporarily use DOM query approach for loading
+      this.loadImageToDOMCanvas(canvas);
+      callback();
+    }
+  }
+
+  private forceLoadImage(): void {
+    console.log('Force loading image - trying all available methods');
+
+    // Try ViewChild first
+    if (this.imageCanvas && this.imageCanvas.nativeElement) {
+      console.log('Force load using ViewChild');
+      this.loadImageToCanvas(0);
+      return;
+    }
+
+    // Fallback to DOM query
+    const canvas = document.querySelector('#imageEditorModal canvas') as HTMLCanvasElement;
+    if (canvas && this.currentEditingImage) {
+      console.log('Force load using DOM query');
+      this.loadImageToDOMCanvas(canvas);
+    } else {
+      console.error('All force load methods failed');
+    }
+  }
+
+  private loadImageToDOMCanvas(canvas: HTMLCanvasElement): void {
+    if (!canvas || !this.currentEditingImage) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    console.log('Loading image to DOM canvas:', this.currentEditingImage.imageUrl);
+
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      console.log('Image loaded successfully for DOM canvas');
+      this.isImageLoading = false;
+
+      const container = canvas.parentElement;
+      const containerWidth = container ? container.clientWidth - 20 : 600;
+      const maxWidth = Math.max(containerWidth, 600);
+      const maxHeight = 500;
+      let width = img.width;
+      let height = img.height;
+
+      if (width > maxWidth || height > maxHeight) {
+        const aspectRatio = width / height;
+        if (width > height) {
+          width = maxWidth;
+          height = width / aspectRatio;
+        } else {
+          height = maxHeight;
+          width = height * aspectRatio;
+        }
+      }
+
+      this.canvasWidth = width;
+      this.canvasHeight = height;
+      canvas.width = width;
+      canvas.height = height;
+      ctx.drawImage(img, 0, 0, width, height);
+      console.log('Image drawn to DOM canvas successfully');
+    };
+
+    img.onerror = () => {
+      console.error('Failed to load image for DOM canvas:', this.currentEditingImage.imageUrl);
+      this.isImageLoading = false;
+    };
+
+    img.src = this.currentEditingImage.imageUrl;
+  }
+
+  closeImageEditor(): void {
+    console.log('Closing image editor');
+    this.showImageEditor = false;
+    this.currentEditingImage = null;
+    this.currentEditingAreaIndex = -1;
+    this.editorTool = 'select';
+    this.isImageLoading = false;
+
+    // Clear canvas if it exists
+    if (this.imageCanvas && this.imageCanvas.nativeElement) {
+      const canvas = this.imageCanvas.nativeElement;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+    }
+  }
+
+  setEditorTool(tool: string): void {
+    this.editorTool = tool;
+  }
+
+  loadImageToCanvas(retryCount: number = 0): void {
+    // Check if ViewChild is available
+    if (!this.imageCanvas || !this.imageCanvas.nativeElement || !this.currentEditingImage) {
+      console.log('Canvas element or image not available, retrying...', retryCount);
+
+      // Retry up to 5 times with increasing delays
+      if (retryCount < 5) {
+        setTimeout(() => {
+          this.loadImageToCanvas(retryCount + 1);
+        }, 200 * (retryCount + 1)); // Increasing delay: 200ms, 400ms, 600ms, etc.
+      } else {
+        console.error('Failed to load canvas after 5 retries');
+      }
+      return;
+    }
+
+    const canvas = this.imageCanvas.nativeElement;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      console.error('Could not get canvas context');
+      return;
+    }
+
+    console.log('Loading image to canvas:', this.currentEditingImage.imageUrl);
+
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      console.log('Image loaded successfully, drawing to canvas');
+      this.isImageLoading = false;
+
+      // Get the container width to make canvas fill the available space
+      const container = canvas.parentElement;
+      const containerWidth = container ? container.clientWidth - 20 : 600; // 20px for padding
+
+      // Calculate canvas size to fit container while maintaining aspect ratio
+      const maxWidth = Math.max(containerWidth, 600);
+      const maxHeight = 500;
+      let width = img.width;
+      let height = img.height;
+
+      if (width > maxWidth || height > maxHeight) {
+        const aspectRatio = width / height;
+        if (width > height) {
+          width = maxWidth;
+          height = width / aspectRatio;
+        } else {
+          height = maxHeight;
+          width = height * aspectRatio;
+        }
+      }
+
+      this.canvasWidth = width;
+      this.canvasHeight = height;
+      canvas.width = width;
+      canvas.height = height;
+
+      // Draw the image
+      ctx.drawImage(img, 0, 0, width, height);
+      console.log('Image drawn to canvas successfully');
+    };
+
+    img.onerror = () => {
+      console.error('Failed to load image:', this.currentEditingImage.imageUrl);
+      this.isImageLoading = false;
+    };
+
+    img.src = this.currentEditingImage.imageUrl;
+  }
+
+  onCanvasMouseDown(event: MouseEvent): void {
+    if (this.editorTool === 'select') return;
+
+    const canvas = event.target as HTMLCanvasElement;
+    const rect = canvas.getBoundingClientRect();
+    this.lastX = event.clientX - rect.left;
+    this.lastY = event.clientY - rect.top;
+    this.isDrawing = true;
+
+    if (this.editorTool === 'text' && this.textToAdd) {
+      this.addTextToCanvas(this.lastX, this.lastY);
+    }
+  }
+
+  onCanvasMouseMove(event: MouseEvent): void {
+    if (!this.isDrawing || this.editorTool !== 'draw') return;
+
+    const canvas = event.target as HTMLCanvasElement;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const currentX = event.clientX - rect.left;
+    const currentY = event.clientY - rect.top;
+
+    ctx.beginPath();
+    ctx.moveTo(this.lastX, this.lastY);
+    ctx.lineTo(currentX, currentY);
+    ctx.strokeStyle = this.selectedColor;
+    ctx.lineWidth = this.brushSize;
+    ctx.lineCap = 'round';
+    ctx.stroke();
+
+    this.lastX = currentX;
+    this.lastY = currentY;
+  }
+
+  onCanvasMouseUp(event: MouseEvent): void {
+    if (!this.isDrawing) return;
+    this.isDrawing = false;
+
+    if (this.editorTool === 'circle' || this.editorTool === 'arrow') {
+      const canvas = event.target as HTMLCanvasElement;
+      const rect = canvas.getBoundingClientRect();
+      const endX = event.clientX - rect.left;
+      const endY = event.clientY - rect.top;
+
+      if (this.editorTool === 'circle') {
+        this.drawCircle(this.lastX, this.lastY, endX, endY);
+      } else if (this.editorTool === 'arrow') {
+        this.drawArrow(this.lastX, this.lastY, endX, endY);
+      }
+    }
+  }
+
+  addTextToCanvas(x: number, y: number): void {
+    const canvas = document.querySelector('#imageEditorModal canvas') as HTMLCanvasElement;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx || !this.textToAdd) return;
+
+    ctx.font = '16px Arial';
+    ctx.fillStyle = this.selectedColor;
+    ctx.fillText(this.textToAdd, x, y);
+  }
+
+  drawCircle(startX: number, startY: number, endX: number, endY: number): void {
+    const canvas = document.querySelector('#imageEditorModal canvas') as HTMLCanvasElement;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const radius = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
+    ctx.beginPath();
+    ctx.arc(startX, startY, radius, 0, 2 * Math.PI);
+    ctx.strokeStyle = this.selectedColor;
+    ctx.lineWidth = this.brushSize;
+    ctx.stroke();
+  }
+
+  drawArrow(startX: number, startY: number, endX: number, endY: number): void {
+    const canvas = document.querySelector('#imageEditorModal canvas') as HTMLCanvasElement;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const headLength = 20;
+    const angle = Math.atan2(endY - startY, endX - startX);
+
+    // Draw the main line
+    ctx.beginPath();
+    ctx.moveTo(startX, startY);
+    ctx.lineTo(endX, endY);
+    ctx.strokeStyle = this.selectedColor;
+    ctx.lineWidth = this.brushSize;
+    ctx.stroke();
+
+    // Draw arrowhead
+    ctx.beginPath();
+    ctx.moveTo(endX, endY);
+    ctx.lineTo(endX - headLength * Math.cos(angle - Math.PI / 6), endY - headLength * Math.sin(angle - Math.PI / 6));
+    ctx.moveTo(endX, endY);
+    ctx.lineTo(endX - headLength * Math.cos(angle + Math.PI / 6), endY - headLength * Math.sin(angle + Math.PI / 6));
+    ctx.stroke();
+  }
+
+  clearCanvas(): void {
+    console.log('Clearing canvas and reloading original image');
+    this.loadImageToCanvas(0); // Reload original image
+  }
+
+  resetImage(): void {
+    console.log('Resetting image to original');
+    this.loadImageToCanvas(0);
+  }
+
+  updateEvidenceImage(): void {
+    console.log('Updating evidence image - reloading from source');
+    // Force reload the image from the original source
+    this.loadImageToCanvas(0);
+  }
+
+  updateAnnotations(): void {
+    console.log('Updating annotations - applying current changes');
+
+    // Get the current canvas state with annotations
+    if (!this.imageCanvas || !this.imageCanvas.nativeElement) {
+      console.error('Cannot update annotations: canvas not available');
+      return;
+    }
+
+    const canvas = this.imageCanvas.nativeElement;
+    const annotatedImageDataUrl = canvas.toDataURL('image/png');
+
+    // Update the current editing image with the annotated version
+    if (this.currentEditingImage) {
+      this.currentEditingImage.imageUrl = annotatedImageDataUrl;
+      this.currentEditingImage.thumbnailUrl = annotatedImageDataUrl;
+      console.log('Annotations updated successfully');
+
+      // Provide visual feedback
+      this.showSuccessMessage('Annotations updated successfully!');
+    }
+  }
+
+  private showSuccessMessage(message: string): void {
+    // Simple success feedback - you can enhance this with a toast notification
+    const originalTitle = document.querySelector('#imageEditorModalLabel')?.textContent;
+    const titleElement = document.querySelector('#imageEditorModalLabel');
+
+    if (titleElement) {
+      titleElement.textContent = message;
+      titleElement.classList.add('text-success');
+
+      setTimeout(() => {
+        titleElement.textContent = originalTitle || 'Edit Evidence Photo';
+        titleElement.classList.remove('text-success');
+      }, 2000);
+    }
+  }
+
+  manualReloadImage(): void {
+    console.log('Manual reload requested by user');
+    this.forceLoadImage();
+  }
+
+  saveEditedImage(): void {
+    if (!this.imageCanvas || !this.imageCanvas.nativeElement) {
+      console.error('Cannot save image: canvas not available');
+      return;
+    }
+
+    const canvas = this.imageCanvas.nativeElement;
+
+    // Convert canvas to data URL
+    const editedImageDataUrl = canvas.toDataURL('image/png');
+
+    // Check if this is a gallery image (currentEditingAreaIndex === -1) or area image
+    if (this.currentEditingAreaIndex === -1) {
+      // Handle gallery image editing
+      console.log('Saving edited gallery image');
+      const galleryImageIndex = this.collisionImages.findIndex(img => img.id === this.currentEditingImage.id);
+      if (galleryImageIndex !== -1) {
+        // Update the gallery image with edited version
+        this.collisionImages[galleryImageIndex] = {
+          ...this.collisionImages[galleryImageIndex],
+          imageUrl: editedImageDataUrl,
+          thumbnailUrl: editedImageDataUrl,
+          description: this.currentEditingImage.description,
+          fileName: `edited_${this.collisionImages[galleryImageIndex].fileName}`,
+          lastModified: new Date()
+        };
+        console.log('Gallery image updated successfully');
+        this.addDebugLog('INFO', 'Gallery Image Edited', `Updated ${this.currentEditingImage.damageType} in gallery`);
+      }
+    } else {
+      // Handle area image editing (existing functionality)
+      if (this.estimateData?.estimateData && this.currentEditingAreaIndex < this.estimateData.estimateData.length) {
+        const area = this.estimateData.estimateData[this.currentEditingAreaIndex];
+        if (area.images) {
+          const imageIndex = area.images.findIndex(img => img.id === this.currentEditingImage.id);
+          if (imageIndex !== -1) {
+            // Update both the thumbnail and full image with the edited version
+            area.images[imageIndex] = {
+              ...area.images[imageIndex],
+              imageUrl: editedImageDataUrl,
+              thumbnailUrl: editedImageDataUrl,
+              description: this.currentEditingImage.description,
+              fileName: `edited_${area.images[imageIndex].fileName}`,
+              lastModified: new Date()
+            };
+            console.log('Area image updated successfully');
+            this.addDebugLog('INFO', 'Area Image Edited', `Updated image in ${area.areaName}`);
+          }
+        }
+      }
+    }
+
+    console.log('Image saved with annotations');
+    this.closeImageEditor();
+  }
+
+  /**
+   * Calculate total amount of all insurance claims
+   */
+  getTotalClaimsAmount(): number {
+    if (!this.insuranceClaims || this.insuranceClaims.length === 0) {
+      return 0;
+    }
+    return this.insuranceClaims.reduce((total, claim: any) => {
+      return total + ((claim as any).amount || 0);
+    }, 0);
+  }
+
+  /**
+   * Print all insurance claims
+   */
+  printInsuranceClaims(): void {
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      console.error('Failed to open print window');
+      return;
+    }
+
+    let html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Insurance Estimate Details - Print</title>
+        <style>
+          body { font-family: Arial, sans-serif; padding: 20px; }
+          h1 { color: #333; border-bottom: 2px solid #333; padding-bottom: 10px; }
+          table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+          th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+          th { background-color: #f2f2f2; font-weight: bold; }
+          .total-row { background-color: #f9f9f9; font-weight: bold; }
+          .badge { padding: 4px 8px; border-radius: 4px; }
+          .badge-PENDING { background-color: #ffc107; color: #000; }
+          .badge-APPROVED { background-color: #28a745; color: #fff; }
+          .badge-DENIED { background-color: #dc3545; color: #fff; }
+        </style>
+      </head>
+      <body>
+        <h1>Insurance Estimate Details</h1>
+        <p><strong>Vehicle:</strong> ${this.vehicle?.make || ''} ${this.vehicle?.model || ''} ${this.vehicle?.year || ''}</p>
+        <p><strong>VIN:</strong> ${this.vehicle?.vin || 'N/A'}</p>
+        <p><strong>Print Date:</strong> ${new Date().toLocaleString()}</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Status</th>
+              <th>Claim #</th>
+              <th>Date</th>
+              <th>Updated</th>
+              <th>Amount</th>
+              <th>Comments</th>
+            </tr>
+          </thead>
+          <tbody>
+    `;
+
+    this.insuranceClaims.forEach((claim: any) => {
+      html += `
+        <tr>
+          <td><span class="badge badge-${claim.status || 'UNKNOWN'}">${claim.status || 'UNKNOWN'}</span></td>
+          <td>${claim.claimNumber || 'N/A'}</td>
+          <td>${claim.claimDate ? new Date(claim.claimDate).toLocaleDateString() : 'N/A'}</td>
+          <td>${claim.lastUpdated ? new Date(claim.lastUpdated).toLocaleDateString() : 'N/A'}</td>
+          <td>$${((claim as any).amount || 0).toFixed(2)}</td>
+          <td>${claim.comments || '-'}</td>
+        </tr>
+      `;
+    });
+
+    html += `
+          </tbody>
+          <tfoot>
+            <tr class="total-row">
+              <td colspan="4" style="text-align: right;"><strong>Total:</strong></td>
+              <td><strong>$${this.getTotalClaimsAmount().toFixed(2)}</strong></td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+      </body>
+      </html>
+    `;
+
+    printWindow.document.write(html);
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => {
+      printWindow.print();
+    }, 250);
+  }
+
+
+  /**
+   * View claim details in a modal or expand view
+   */
+  viewClaimDetails(claim: any): void {
+    console.log('View claim details:', claim);
+    // You can implement a modal here to show full claim details
+    alert(`Claim Details:\n\nClaim #: ${claim.claimNumber || 'N/A'}\nStatus: ${claim.status || 'UNKNOWN'}\nDate: ${claim.claimDate ? new Date(claim.claimDate).toLocaleDateString() : 'N/A'}\nAmount: $${(claim.amount || 0).toFixed(2)}\n\nComments:\n${claim.comments || 'No comments'}`);
+  }
+
+  /**
+   * Print a single claim
+   */
+  printSingleClaim(claim: any): void {
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      console.error('Failed to open print window');
+      return;
+    }
+
+    let html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Claim ${claim.claimNumber || 'N/A'} - Print</title>
+        <style>
+          body { font-family: Arial, sans-serif; padding: 20px; }
+          h1 { color: #333; border-bottom: 2px solid #333; padding-bottom: 10px; }
+          .claim-detail { margin: 10px 0; }
+          .claim-detail strong { display: inline-block; width: 150px; }
+          .badge { padding: 4px 8px; border-radius: 4px; }
+          .badge-PENDING { background-color: #ffc107; color: #000; }
+          .badge-APPROVED { background-color: #28a745; color: #fff; }
+          .badge-DENIED { background-color: #dc3545; color: #fff; }
+        </style>
+      </head>
+      <body>
+        <h1>Insurance Claim Details</h1>
+        <div class="claim-detail"><strong>Vehicle:</strong> ${this.vehicle?.make || ''} ${this.vehicle?.model || ''} ${this.vehicle?.year || ''}</div>
+        <div class="claim-detail"><strong>VIN:</strong> ${this.vehicle?.vin || 'N/A'}</div>
+        <div class="claim-detail"><strong>Claim #:</strong> ${claim.claimNumber || 'N/A'}</div>
+        <div class="claim-detail"><strong>Status:</strong> <span class="badge badge-${claim.status || 'UNKNOWN'}">${claim.status || 'UNKNOWN'}</span></div>
+        <div class="claim-detail"><strong>Date:</strong> ${claim.claimDate ? new Date(claim.claimDate).toLocaleDateString() : 'N/A'}</div>
+        <div class="claim-detail"><strong>Updated:</strong> ${claim.lastUpdated ? new Date(claim.lastUpdated).toLocaleDateString() : 'N/A'}</div>
+        <div class="claim-detail"><strong>Amount:</strong> $${(claim.amount || 0).toFixed(2)}</div>
+        <div class="claim-detail"><strong>Comments:</strong><br>${claim.comments || 'No comments'}</div>
+        <div class="claim-detail"><strong>Print Date:</strong> ${new Date().toLocaleString()}</div>
+      </body>
+      </html>
+    `;
+
+    printWindow.document.write(html);
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => {
+      printWindow.print();
+    }, 250);
+  }
+
+}
+
+
+  private buildEstimateDataFromAutoPartsAndJobs(): void {
+    if (!this.vehicle) {
+      console.log('buildEstimateDataFromAutoPartsAndJobs: no vehicle loaded.');
+      return;
+    }
+
+    // Load auto parts and jobs for the vehicle
+    forkJoin({
+      autoparts: this.autopartService.getAutopartForVehicle(this.vehicle.id),
+      jobs: this.jobService.getAllVehicleJobs2(this.vehicle.id)
+    }).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: ({ autoparts, jobs }) => {
+        console.log('Auto parts loaded:', autoparts?.length || 0);
+        console.log('Jobs loaded:', jobs?.length || 0);
+
+        // Create estimate items from auto parts
+        const partItems: EstimateClaimItem[] = (autoparts || []).map((part: any, index: number) => ({
+          lineNumber: index + 1,
+          operation: 'PART', // For auto parts
+          description: part.title || part.name || part.partNumber || 'Auto Part',
+          partNumber: part.partNumber || null,
+          quantity: part.quantity || 1,
+          extendedPrice: part.salePrice || part.price || 0,
+          laborHours: null,
+          paintHours: null,
+          note: part.notes || part.description || ''
+        }));
+
+        // Create estimate items from jobs
+        const jobItems: EstimateClaimItem[] = (jobs || []).map((job: any, index: number) => ({
+          lineNumber: partItems.length + index + 1,
+          operation: 'LABOR', // For jobs/labor
+          description: job.name || job.description || 'Service/Labor',
+          partNumber: null, // Jobs typically don't have part numbers
+          quantity: 1,
+          extendedPrice: job.price || 0,
+          laborHours: job.laborHours || null,
+          paintHours: job.paintHours || null,
+          note: job.notes || ''
+        }));
+
+        // Combine both arrays
+        const claimItems: EstimateClaimItem[] = [...partItems, ...jobItems];
+
+        const subtotal = claimItems.reduce((sum, item) => sum + (item.extendedPrice || 0), 0);
+
+        this.estimateData = {
+          shopInfo: {
+            name: this.vehicle.insuranceCompany || '',
+            address: '', // Can be filled from company details later
+            phone: '',
+            workfileId: this.vehicle.token || '',
+            partsShare: this.vehicle.token || '',
+            description: this.vehicle.description2 || this.vehicle.description || '',
+            invoiceType: 'Auto Parts and Jobs'
+          },
+          customerInfo: undefined,
+          jobInfo: undefined,
+          insuranceInfo: {
+            company: this.vehicle.insuranceCompany || '',
+            adjuster: ''
+          },
+          vehicleInfo: {
+            year: this.vehicle.year,
+            make: this.vehicle.make,
+            model: this.vehicle.model,
+            bodyStyle: '',
+            engine: this.vehicle.engineDesc || '',
+            color: this.vehicle.color,
+            vin: this.vehicle.vin || '',
+            interiorColor: '',
+            exteriorColor: this.vehicle.color,
+            mileageIn: this.vehicle.miles || '',
+            mileageOut: '',
+            vehicleOut: '',
+            license: this.vehicle.plate || '',
+            state: '',
+            productionDate: '',
+            condition: '',
+            jobNumber: this.vehicle.currentJobNumber || ''
+          },
+          repairFacility: undefined,
+          estimateData: [
+            {
+              areaName: 'Auto Parts and Jobs',
+              claimItems,
+              images: this.vehicle.imageModels || [],
+              description: 'Generated from auto parts and jobs for this vehicle.'
+            }
+          ],
+          summary: {
+            subtotal,
+            laborHours: claimItems.reduce((sum, item) => sum + (item.laborHours || 0), 0),
+            paintHours: claimItems.reduce((sum, item) => sum + (item.paintHours || 0), 0)
+          }
+        };
+
+        console.log('estimateData built from auto parts and jobs:', this.estimateData);
+      },
+      error: (error) => {
+        console.error('Error loading auto parts or jobs:', error);
+        // Fallback to original behavior if loading fails
+        this.loadMockEstimateData();
+      }
+    });
+  }
+

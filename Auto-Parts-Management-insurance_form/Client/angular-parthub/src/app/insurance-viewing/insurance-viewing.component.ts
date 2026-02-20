@@ -1,12 +1,14 @@
 import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, forkJoin } from 'rxjs';
 
 import { InsuranceService } from '../_services/insurance.service';
 import { ReceiptService } from '../_services/receipt.service';
 import { VehicleService } from '../_services/vehicle.service';
 import { EventBusService } from '../_shared/event-bus.service';
+import { AutopartService } from '../_services/autopart.service';
+import { JobService } from '../_services/job.service';
 import { EventData } from '../_shared/event.class';
 import { InsuranceClaim } from '../models/insurance.claim.model';
 import { InsuranceClaimViewResponse } from '../models/insurance.claim.view.response.model';
@@ -223,6 +225,8 @@ export class InsuranceViewingComponent implements OnInit, OnDestroy, AfterViewIn
     private eventBusService: EventBusService,
     private insuranceService: InsuranceService,
     private vehicleService: VehicleService,
+    private autopartService: AutopartService,
+    private jobService: JobService,
     private receiptService: ReceiptService,
   ) {
     this.accessForm = this.fb.group({
@@ -4900,4 +4904,119 @@ export class InsuranceViewingComponent implements OnInit, OnDestroy, AfterViewIn
     }, 250);
   }
 
+
+  private buildEstimateDataFromAutoPartsAndJobs(): void {
+    if (!this.vehicle) {
+      console.log('buildEstimateDataFromAutoPartsAndJobs: no vehicle loaded.');
+      return;
+    }
+
+    // Use a local non-null reference to satisfy strict typing
+    const vehicle = this.vehicle!;
+
+    // Load auto parts and jobs for the vehicle
+    forkJoin({
+      autoparts: this.autopartService.getAutopartForVehicle(vehicle.id),
+      jobs: this.jobService.getAllVehicleJobs2(vehicle.id)
+    }).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: ({ autoparts, jobs }) => {
+        const autopartsArr: any[] = Array.isArray(autoparts) ? autoparts : [];
+        const jobsArr: any[] = Array.isArray(jobs) ? jobs : [];
+
+        console.log('Auto parts loaded:', autopartsArr.length || 0);
+        console.log('Jobs loaded:', jobsArr.length || 0);
+
+        // Create estimate items from auto parts
+        const partItems: EstimateClaimItem[] = autopartsArr.map((part: any, index: number) => ({
+          lineNumber: index + 1,
+          operation: 'PART',
+          description: part.title || part.name || part.partNumber || 'Auto Part',
+          partNumber: part.partNumber || null,
+          quantity: part.quantity || 1,
+          extendedPrice: part.salePrice || part.price || 0,
+          laborHours: null,
+          paintHours: null,
+          note: part.notes || part.description || ''
+        }));
+
+        // Create estimate items from jobs
+        const jobItems: EstimateClaimItem[] = jobsArr.map((job: any, index: number) => ({
+          lineNumber: partItems.length + index + 1,
+          operation: 'LABOR',
+          description: job.name || job.description || 'Service/Labor',
+          partNumber: null,
+          quantity: 1,
+          extendedPrice: job.price || 0,
+          laborHours: job.laborHours || null,
+          paintHours: job.paintHours || null,
+          note: job.notes || ''
+        }));
+
+        // Combine both arrays
+        const claimItems: EstimateClaimItem[] = [...partItems, ...jobItems];
+
+        const subtotal = claimItems.reduce((sum, item) => sum + (item.extendedPrice || 0), 0);
+
+        this.estimateData = {
+          shopInfo: {
+            name: vehicle.insuranceCompany || '',
+            address: '',
+            phone: '',
+            workfileId: vehicle.token || '',
+            partsShare: vehicle.token || '',
+            description: vehicle.description2 || vehicle.description || '',
+            invoiceType: 'Auto Parts and Jobs'
+          },
+          customerInfo: undefined,
+          jobInfo: undefined,
+          insuranceInfo: {
+            company: vehicle.insuranceCompany || '',
+            adjuster: ''
+          },
+          vehicleInfo: {
+            year: vehicle.year,
+            make: vehicle.make,
+            model: vehicle.model,
+            bodyStyle: '',
+            engine: vehicle.engineDesc || '',
+            color: vehicle.color || '',
+            vin: vehicle.vin || '',
+            interiorColor: '',
+            exteriorColor: vehicle.color || '',
+            mileageIn: vehicle.miles || '',
+            mileageOut: '',
+            vehicleOut: '',
+            license: vehicle.plate || '',
+            state: '',
+            productionDate: '',
+            condition: '',
+            jobNumber: vehicle.currentJobNumber || ''
+          },
+          repairFacility: undefined,
+          estimateData: [
+            {
+              areaName: 'Auto Parts and Jobs',
+              claimItems,
+              images: vehicle.imageModels || [],
+              description: 'Generated from auto parts and jobs for this vehicle.'
+            }
+          ],
+          summary: {
+            subtotal,
+            laborHours: claimItems.reduce((sum, item) => sum + (item.laborHours || 0), 0),
+            paintHours: claimItems.reduce((sum, item) => sum + (item.paintHours || 0), 0)
+          }
+        };
+
+        console.log('estimateData built from auto parts and jobs:', this.estimateData);
+      },
+      error: (error) => {
+        console.error('Error loading auto parts or jobs:', error);
+        // Fallback to original behavior if loading fails
+        this.loadMockEstimateData();
+      }
+    });
+  }
 }

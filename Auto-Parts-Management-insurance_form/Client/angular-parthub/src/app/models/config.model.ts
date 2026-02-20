@@ -5,8 +5,8 @@ export class Config {
 
     //baseUrl: any = "http://localhost:8080/api";
 
-    baseUrl: any = "https://localhost:8444/api";
-    websoketAddress: any = "wss://localhost:8444/ws/notes"
+    // baseUrl: any = "https://localhost:8445/api";
+    // websoketAddress: any = "wss://localhost:8445/ws/notes"
 
     // baseUrl: any = "https://50.76.0.89:8444/api";
     // websoketAddress: any = "wss:/50.76.0.89:8445/ws/notes";
@@ -14,8 +14,8 @@ export class Config {
     // baseUrl: any = "https://50.76.0.85:8444/api";
     // websoketAddress: any = "wss:/50.76.0.85:8445/ws/notes";
 
-    // baseUrl: any = "https://baycounter.com:8445/api";
-    // websoketAddress: any = "wss:/baycounter.com:8444/ws/notes";
+    baseUrl: any = "https://baycounter.com:8445/api";
+    websoketAddress: any = "wss:/baycounter.com:8444/ws/notes";
 
     domainName = "BayCounter.com";
     //domainName = "PartsLinks.com";
