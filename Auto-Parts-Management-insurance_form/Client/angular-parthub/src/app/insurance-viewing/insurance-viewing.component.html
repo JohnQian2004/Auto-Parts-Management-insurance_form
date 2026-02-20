@@ -131,13 +131,18 @@
                             <div class="row mb-4">
                                 <div class="col-12">
                                     <div class="card">
-                                        <div class="card-header bg-danger text-white">
-                                            <h5 class="mb-0">
-                                                <i class="fas fa-car-crash me-2"></i>
-                                                Collision Damage Gallery
-                                            </h5>
-                                            <small class="text-white-50">Click on any image to view full size with
-                                                details</small>
+                                        <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h5 class="mb-0">
+                                                    <i class="fas fa-car-crash me-2"></i>
+                                                    Collision Damage Gallery
+                                                </h5>
+                                                <small class="text-white-50">Click on any image to view full size with
+                                                    details</small>
+                                            </div>
+                                            <button class="btn btn-light btn-sm" (click)="openAnnotationModal()" title="Add New Image with Annotation">
+                                                <i class="fas fa-plus me-1"></i> Add Image
+                                            </button>
                                         </div>
                                         <div class="card-body">
                                             <div class="row g-3">
@@ -1664,6 +1669,127 @@
                             <i class="fas fa-save me-1"></i> Save Changes
                         </button>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Annotation Modal -->
+    <div class="modal fade" id="annotationModal" tabindex="-1" aria-labelledby="annotationModalLabel" aria-hidden="true"
+        *ngIf="showAnnotationModal" (click)="closeAnnotationModal()">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content" (click)="$event.stopPropagation()">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="annotationModalLabel">
+                        <i class="fas fa-pen-alt me-2"></i>Add Image with Annotation
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" (click)="closeAnnotationModal()"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="annotationFileInput" class="form-label">Select Image</label>
+                                <input type="file" class="form-control" id="annotationFileInput"
+                                    (change)="onAnnotationFileSelected($event)" accept="image/*">
+                                <div class="form-text">Supported formats: JPG, PNG, GIF, BMP</div>
+                            </div>
+                            
+                            <div class="mb-3" *ngIf="selectedImageForAnnotation">
+                                <label class="form-label">Preview</label>
+                                <div class="border rounded p-2 bg-light">
+                                    <img [src]="selectedImageForAnnotation.url" class="img-fluid" alt="Selected image"
+                                        style="max-height: 200px;">
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="annotationDescription" class="form-label">Description</label>
+                                <textarea class="form-control" id="annotationDescription" rows="3"
+                                    [(ngModel)]="annotationDescription"
+                                    placeholder="Enter description for this image..."></textarea>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <h6>Annotation Tools</h6>
+                                <div class="btn-group d-block mb-2" role="group">
+                                    <button type="button" class="btn btn-outline-primary btn-sm"
+                                        [class.active]="annotationTool === 'select'" (click)="annotationTool = 'select'"
+                                        title="Select Tool">
+                                        <i class="fas fa-mouse-pointer"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-outline-primary btn-sm"
+                                        [class.active]="annotationTool === 'draw'" (click)="annotationTool = 'draw'"
+                                        title="Draw Tool">
+                                        <i class="fas fa-paint-brush"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-outline-primary btn-sm"
+                                        [class.active]="annotationTool === 'text'" (click)="annotationTool = 'text'"
+                                        title="Text Tool">
+                                        <i class="fas fa-font"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-outline-primary btn-sm"
+                                        [class.active]="annotationTool === 'circle'" (click)="annotationTool = 'circle'"
+                                        title="Circle Tool">
+                                        <i class="fas fa-circle"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-outline-primary btn-sm"
+                                        [class.active]="annotationTool === 'arrow'" (click)="annotationTool = 'arrow'"
+                                        title="Arrow Tool">
+                                        <i class="fas fa-arrow-right"></i>
+                                    </button>
+                                </div>
+                                
+                                <div class="mb-2">
+                                    <label class="form-label">Color</label>
+                                    <div class="d-flex flex-wrap gap-1">
+                                        <button *ngFor="let color of editorColors" type="button"
+                                            class="btn btn-sm rounded-circle color-btn"
+                                            [style.background-color]="color"
+                                            [class.active]="annotationColor === color"
+                                            (click)="annotationColor = color"
+                                            [attr.aria-label]="'Select ' + color">
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-2">
+                                    <label class="form-label">Size: {{ annotationSize }}</label>
+                                    <input type="range" class="form-range" min="1" max="10" [(ngModel)]="annotationSize">
+                                </div>
+                                
+                                <div *ngIf="annotationTool === 'text'" class="mb-2">
+                                    <label class="form-label">Text</label>
+                                    <input type="text" class="form-control form-control-sm" [(ngModel)]="annotationText"
+                                        placeholder="Enter text to annotate...">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3" *ngIf="selectedImageForAnnotation">
+                        <label class="form-label">Annotation Canvas</label>
+                        <div class="border rounded bg-light p-2">
+                            <canvas #annotationCanvas width="400" height="300" 
+                                class="img-fluid border rounded"
+                                (mousedown)="onAnnotationCanvasMouseDown($event)"
+                                (mousemove)="onAnnotationCanvasMouseMove($event)"
+                                (mouseup)="onAnnotationCanvasMouseUp($event)"
+                                (mouseleave)="onAnnotationCanvasMouseLeave($event)">
+                            </canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" (click)="closeAnnotationModal()">
+                        <i class="fas fa-times me-1"></i> Cancel
+                    </button>
+                    <button type="button" class="btn btn-success" (click)="saveAnnotation()"
+                        [disabled]="!selectedImageForAnnotation">
+                        <i class="fas fa-save me-1"></i> Save Image
+                    </button>
                 </div>
             </div>
         </div>

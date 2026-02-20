@@ -128,6 +128,7 @@ export class InsuranceViewingComponent implements OnInit, OnDestroy, AfterViewIn
   // ViewChild for canvas element and modal body
   @ViewChild('imageCanvas', { static: false }) imageCanvas!: ElementRef<HTMLCanvasElement>;
   @ViewChild('imageEditorModalBody', { static: false }) imageEditorModalBody!: ElementRef<HTMLDivElement>;
+  @ViewChild('annotationCanvas', { static: false }) annotationCanvas!: ElementRef<HTMLCanvasElement>;
 
   // Route parameters
   companyCode: string = '';
@@ -218,6 +219,30 @@ export class InsuranceViewingComponent implements OnInit, OnDestroy, AfterViewIn
     '#ff0000', '#00ff00', '#0000ff', '#ffff00',
     '#ff00ff', '#00ffff', '#000000', '#ffffff'
   ];
+
+  // Annotation Modal Properties
+  showAnnotationModal: boolean = false;
+  selectedImageForAnnotation: any = null;
+  annotationDescription: string = '';
+  annotationText: string = '';
+  annotationTool: string = 'select'; // 'select', 'draw', 'text', 'circle', 'arrow'
+  annotationColor: string = '#ff0000';
+  annotationSize: number = 3;
+  isAnnotating: boolean = false;
+  annotationStartX: number = 0;
+  annotationStartY: number = 0;
+  
+  // Store annotations as objects to be persisted
+  annotations: Array<{
+    type: string; // 'text', 'draw', 'circle', 'arrow'
+    x: number;
+    y: number;
+    x2?: number;
+    y2?: number;
+    text?: string;
+    color: string;
+    size: number;
+  }> = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -4699,55 +4724,510 @@ export class InsuranceViewingComponent implements OnInit, OnDestroy, AfterViewIn
       console.error('Cannot save image: canvas not available');
       return;
     }
+    if (!this.vehicle || !this.vehicle.id) {
+      console.error('Cannot save image: vehicle not loaded');
+      return;
+    }
 
     const canvas = this.imageCanvas.nativeElement;
 
-    // Convert canvas to data URL
-    const editedImageDataUrl = canvas.toDataURL('image/png');
+    // Convert canvas to data URL for backend persistence
+    const editedImageDataUrl = canvas.toDataURL('image/jpeg');
 
-    // Check if this is a gallery image (currentEditingAreaIndex === -1) or area image
-    if (this.currentEditingAreaIndex === -1) {
-      // Handle gallery image editing
-      console.log('Saving edited gallery image');
-      const galleryImageIndex = this.collisionImages.findIndex(img => img.id === this.currentEditingImage.id);
-      if (galleryImageIndex !== -1) {
-        // Update the gallery image with edited version
-        this.collisionImages[galleryImageIndex] = {
-          ...this.collisionImages[galleryImageIndex],
-          imageUrl: editedImageDataUrl,
-          thumbnailUrl: editedImageDataUrl,
-          description: this.currentEditingImage.description,
-          fileName: `edited_${this.collisionImages[galleryImageIndex].fileName}`,
-          lastModified: new Date()
-        };
-        console.log('Gallery image updated successfully');
-        this.addDebugLog('INFO', 'Gallery Image Edited', `Updated ${this.currentEditingImage.damageType} in gallery`);
-      }
-    } else {
-      // Handle area image editing (existing functionality)
-      if (this.estimateData?.estimateData && this.currentEditingAreaIndex < this.estimateData.estimateData.length) {
-        const area = this.estimateData.estimateData[this.currentEditingAreaIndex];
-        if (area.images) {
-          const imageIndex = area.images.findIndex(img => img.id === this.currentEditingImage.id);
-          if (imageIndex !== -1) {
-            // Update both the thumbnail and full image with the edited version
-            area.images[imageIndex] = {
-              ...area.images[imageIndex],
-              imageUrl: editedImageDataUrl,
-              thumbnailUrl: editedImageDataUrl,
-              description: this.currentEditingImage.description,
-              fileName: `edited_${area.images[imageIndex].fileName}`,
+    const payload: any = {
+      docType: this.currentEditingImage?.docType ?? 0,
+      description: this.currentEditingImage?.description ?? '',
+      picByte: editedImageDataUrl
+    };
+
+    const vehicleIdStr = '' + this.vehicle.id;
+
+    this.vehicleService.uploadImage(payload, vehicleIdStr).subscribe({
+      next: (saved: any) => {
+        const fullUrl = `${this.baseUrlImage}/${saved.id}`;
+        const thumbUrl = `${this.baseUrlResizeImage}/${saved.id}`;
+
+        if (this.currentEditingAreaIndex === -1) {
+          console.log('Saving edited gallery image');
+          const galleryImageIndex = this.collisionImages.findIndex((img: any) => img.id === this.currentEditingImage.id);
+          if (galleryImageIndex !== -1) {
+            this.collisionImages[galleryImageIndex] = {
+              ...this.collisionImages[galleryImageIndex],
+              id: saved.id,
+              imageUrl: fullUrl,
+              thumbnailUrl: thumbUrl,
+              description: payload.description,
+              fileName: `edited_${this.collisionImages[galleryImageIndex].fileName}`,
               lastModified: new Date()
             };
-            console.log('Area image updated successfully');
-            this.addDebugLog('INFO', 'Area Image Edited', `Updated image in ${area.areaName}`);
+            console.log('Gallery image updated successfully');
+            this.addDebugLog('INFO', 'Gallery Image Edited', `Persisted ${this.currentEditingImage?.damageType || 'image'} in gallery`);
+          } else {
+            this.collisionImages.unshift({
+              id: saved.id,
+              imageUrl: fullUrl,
+              thumbnailUrl: thumbUrl,
+              description: payload.description,
+              fileName: `edited_${saved.fileName || 'image.jpeg'}`,
+              lastModified: new Date(),
+              damageType: this.currentEditingImage?.damageType || ''
+            } as any);
+            console.log('Gallery image added successfully');
+          }
+        } else {
+          if (this.estimateData?.estimateData && this.currentEditingAreaIndex < this.estimateData.estimateData.length) {
+            const area = this.estimateData.estimateData[this.currentEditingAreaIndex];
+            if (area.images) {
+              const imageIndex = area.images.findIndex((img: any) => img.id === this.currentEditingImage.id);
+              const updated = {
+                ...(imageIndex !== -1 ? area.images[imageIndex] : {}),
+                id: saved.id,
+                imageUrl: fullUrl,
+                thumbnailUrl: thumbUrl,
+                description: payload.description,
+                fileName: `edited_${(imageIndex !== -1 ? area.images[imageIndex].fileName : 'image.jpeg')}`,
+                lastModified: new Date()
+              };
+              if (imageIndex !== -1) {
+                area.images[imageIndex] = updated;
+                console.log('Area image updated successfully');
+                this.addDebugLog('INFO', 'Area Image Edited', `Persisted image in ${area.areaName}`);
+              } else {
+                area.images.push(updated);
+                console.log('Area image added successfully');
+              }
+            }
           }
         }
+
+        if (this.vehicle) {
+          if (!this.vehicle.imageModels) this.vehicle.imageModels = [];
+          const vIdx = this.vehicle.imageModels.findIndex((im: any) => im.id === this.currentEditingImage.id);
+          if (vIdx !== -1) this.vehicle.imageModels[vIdx] = saved; else this.vehicle.imageModels.push(saved);
+        }
+
+        console.log('Image saved with annotations (backend persisted)');
+        this.closeImageEditor();
+      },
+      error: (err: any) => {
+        console.error('Failed to persist annotated image', err);
       }
+    });
+  }
+
+  // Annotation Modal Methods
+  openAnnotationModal(): void {
+    console.log('Opening annotation modal');
+    this.showAnnotationModal = true;
+    this.annotationDescription = '';
+    this.annotationText = '';
+  }
+
+  closeAnnotationModal(): void {
+    console.log('Closing annotation modal');
+    this.showAnnotationModal = false;
+    this.selectedImageForAnnotation = null;
+    this.annotationDescription = '';
+    this.annotationText = '';
+    this.annotations = []; // Clear annotations when closing modal
+  }
+
+  onAnnotationFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.selectedImageForAnnotation = {
+          file: file,
+          url: e.target.result,
+          name: file.name
+        };
+        console.log('Image selected for annotation:', file.name);
+        
+        // Initialize the canvas with the selected image after a brief delay to ensure the canvas is rendered
+        setTimeout(() => {
+          this.initializeAnnotationCanvas();
+        }, 100);
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  private initializeAnnotationCanvas(): void {
+    if (!this.selectedImageForAnnotation || !this.annotationCanvas) {
+      return;
     }
 
-    console.log('Image saved with annotations');
-    this.closeImageEditor();
+    const canvas = this.annotationCanvas.nativeElement;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      // Set canvas dimensions to match the image proportions while keeping it within bounds
+      const maxWidth = 400;
+      const maxHeight = 300;
+      let width = img.width;
+      let height = img.height;
+
+      if (width > maxWidth) {
+        height *= maxWidth / width;
+        width = maxWidth;
+      }
+      
+      if (height > maxHeight) {
+        width *= maxHeight / height;
+        height = maxHeight;
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+      
+      // Draw the image on the canvas
+      ctx.drawImage(img, 0, 0, width, height);
+      
+      // Redraw any existing annotations
+      this.redrawAnnotations();
+    };
+    img.src = this.selectedImageForAnnotation.url;
+  }
+  
+  private redrawAnnotations(): void {
+    if (!this.annotationCanvas || !this.annotations.length) {
+      return;
+    }
+    
+    const canvas = this.annotationCanvas.nativeElement;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    
+    // We need to redraw the base image first, then the annotations
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      // Redraw the base image
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      
+      // Now redraw all annotations
+      this.annotations.forEach(annotation => {
+        switch (annotation.type) {
+          case 'text':
+            ctx.font = `${annotation.size * 4}px Arial`;
+            ctx.fillStyle = annotation.color;
+            ctx.fillText(annotation.text || '', annotation.x, annotation.y);
+            break;
+          case 'draw':
+            if (annotation.x2 !== undefined && annotation.y2 !== undefined) {
+              ctx.beginPath();
+              ctx.moveTo(annotation.x, annotation.y);
+              ctx.lineTo(annotation.x2, annotation.y2);
+              ctx.strokeStyle = annotation.color;
+              ctx.lineWidth = annotation.size;
+              ctx.lineCap = 'round';
+              ctx.stroke();
+            }
+            break;
+          case 'circle':
+            if (annotation.x2 !== undefined && annotation.y2 !== undefined) {
+              const radius = Math.sqrt(Math.pow(annotation.x2 - annotation.x, 2) + Math.pow(annotation.y2 - annotation.y, 2));
+              ctx.beginPath();
+              ctx.arc(annotation.x, annotation.y, radius, 0, 2 * Math.PI);
+              ctx.strokeStyle = annotation.color;
+              ctx.lineWidth = annotation.size;
+              ctx.stroke();
+            }
+            break;
+          case 'arrow':
+            if (annotation.x2 !== undefined && annotation.y2 !== undefined) {
+              const headLength = 20;
+              const angle = Math.atan2(annotation.y2 - annotation.y, annotation.x2 - annotation.x);
+
+              // Draw the main line
+              ctx.beginPath();
+              ctx.moveTo(annotation.x, annotation.y);
+              ctx.lineTo(annotation.x2, annotation.y2);
+              ctx.strokeStyle = annotation.color;
+              ctx.lineWidth = annotation.size;
+              ctx.stroke();
+
+              // Draw arrowhead
+              ctx.beginPath();
+              ctx.moveTo(annotation.x2, annotation.y2);
+              ctx.lineTo(annotation.x2 - headLength * Math.cos(angle - Math.PI / 6), annotation.y2 - headLength * Math.sin(angle - Math.PI / 6));
+              ctx.moveTo(annotation.x2, annotation.y2);
+              ctx.lineTo(annotation.x2 - headLength * Math.cos(angle + Math.PI / 6), annotation.y2 - headLength * Math.sin(angle + Math.PI / 6));
+              ctx.stroke();
+            }
+            break;
+        }
+      });
+    };
+    img.src = this.selectedImageForAnnotation?.url || '';
+  }
+
+  async saveAnnotation(): Promise<void> {
+    if (!this.selectedImageForAnnotation) {
+      console.error('No image selected for annotation');
+      return;
+    }
+
+    if (!this.vehicle || !this.vehicle.id) {
+      console.error('No vehicle loaded for image upload');
+      return;
+    }
+
+    // Prepare the description with annotation information
+    let description = this.annotationDescription;
+    
+    // If there are annotations, append annotation info to the description
+    if (this.annotations.length > 0) {
+      const annotationSummary = `Annotations: ${this.annotations.length} items`;
+      description = description ? `${description}. ${annotationSummary}` : annotationSummary;
+    }
+
+    // Get the annotated image from the canvas
+    if (this.annotationCanvas && this.annotationCanvas.nativeElement) {
+      const canvas = this.annotationCanvas.nativeElement;
+      
+      // Convert canvas to blob
+      canvas.toBlob((blob) => {
+        if (blob) {
+          // Create a new file with the annotated image
+          const annotatedFile = new File([blob], this.selectedImageForAnnotation.file.name, { type: 'image/jpeg' });
+          
+          // Create FormData with the annotated file and description
+          const formData = new FormData();
+          formData.append('file', annotatedFile);
+          formData.append('description', description);
+
+          console.log('Uploading annotated image to vehicle:', this.vehicle?.id);
+          this.vehicleService.uploadImageWithFileUserId(formData, this.vehicle!.id, 1).subscribe({
+            next: (response: any) => {
+              console.log('Annotation saved successfully:', response);
+              
+              // Add the new image to collision images
+              const fullUrl = `${this.baseUrlImage}/${response.id}`;
+              const thumbUrl = `${this.baseUrlResizeImage}/${response.id}`;
+              
+              const newImage = {
+                id: response.id,
+                imageUrl: fullUrl,
+                thumbnailUrl: thumbUrl,
+                description: description,
+                fileName: this.selectedImageForAnnotation.name,
+                lastModified: new Date(),
+                timestamp: new Date()
+              };
+              
+              this.collisionImages.unshift(newImage);
+              
+              // Also add to vehicle's imageModels if available
+              if (this.vehicle) {
+                if (!this.vehicle.imageModels) this.vehicle.imageModels = [];
+                this.vehicle.imageModels.push(response);
+              }
+              
+              this.closeAnnotationModal();
+              // Reset annotations array
+              this.annotations = [];
+              this.addDebugLog('INFO', 'Annotation Added', `New annotated image added to collision gallery`);
+            },
+            error: (error: any) => {
+              console.error('Error uploading annotated image:', error);
+            }
+          });
+        } else {
+          console.error('Failed to create blob from canvas');
+        }
+      }, 'image/jpeg', 0.9);
+    } else {
+      // If canvas isn't available, upload the original file with description
+      const formData = new FormData();
+      formData.append('file', this.selectedImageForAnnotation.file);
+      formData.append('description', description);
+
+      this.vehicleService.uploadImageWithFileUserId(formData, this.vehicle!.id, 1).subscribe({
+        next: (response: any) => {
+          console.log('Image saved successfully:', response);
+          
+          // Add the new image to collision images
+          const fullUrl = `${this.baseUrlImage}/${response.id}`;
+          const thumbUrl = `${this.baseUrlResizeImage}/${response.id}`;
+          
+          const newImage = {
+            id: response.id,
+            imageUrl: fullUrl,
+            thumbnailUrl: thumbUrl,
+            description: description,
+            fileName: this.selectedImageForAnnotation.name,
+            lastModified: new Date(),
+            timestamp: new Date()
+          };
+          
+          this.collisionImages.unshift(newImage);
+          
+          // Also add to vehicle's imageModels if available
+          if (this.vehicle) {
+            if (!this.vehicle.imageModels) this.vehicle.imageModels = [];
+            this.vehicle.imageModels.push(response);
+          }
+          
+          this.closeAnnotationModal();
+          this.addDebugLog('INFO', 'Image Added', `New image added to collision gallery`);
+        },
+        error: (error: any) => {
+          console.error('Error uploading image:', error);
+        }
+      });
+    }
+  }
+
+
+
+  // Annotation Canvas Event Handlers
+  onAnnotationCanvasMouseDown(event: MouseEvent): void {
+    if (!this.selectedImageForAnnotation || !this.annotationCanvas) return;
+    
+    const canvas = this.annotationCanvas.nativeElement;
+    const rect = canvas.getBoundingClientRect();
+    this.annotationStartX = event.clientX - rect.left;
+    this.annotationStartY = event.clientY - rect.top;
+    this.isAnnotating = true;
+
+    if (this.annotationTool === 'text' && this.annotationText) {
+      // Record the text annotation
+      this.annotations.push({
+        type: 'text',
+        x: this.annotationStartX,
+        y: this.annotationStartY,
+        text: this.annotationText,
+        color: this.annotationColor,
+        size: this.annotationSize
+      });
+      // Draw it on canvas
+      this.addAnnotationTextToCanvas(canvas, this.annotationStartX, this.annotationStartY);
+    }
+  }
+
+  onAnnotationCanvasMouseMove(event: MouseEvent): void {
+    if (!this.isAnnotating || this.annotationTool !== 'draw') return;
+
+    const canvas = this.annotationCanvas.nativeElement;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const currentX = event.clientX - rect.left;
+    const currentY = event.clientY - rect.top;
+
+    // Draw the line segment
+    ctx.beginPath();
+    ctx.moveTo(this.annotationStartX, this.annotationStartY);
+    ctx.lineTo(currentX, currentY);
+    ctx.strokeStyle = this.annotationColor;
+    ctx.lineWidth = this.annotationSize;
+    ctx.lineCap = 'round';
+    ctx.stroke();
+
+    // Record the draw action as a series of small segments
+    this.annotations.push({
+      type: 'draw',
+      x: this.annotationStartX,
+      y: this.annotationStartY,
+      x2: currentX,
+      y2: currentY,
+      color: this.annotationColor,
+      size: this.annotationSize
+    });
+
+    this.annotationStartX = currentX;
+    this.annotationStartY = currentY;
+  }
+
+  onAnnotationCanvasMouseUp(event: MouseEvent): void {
+    if (!this.isAnnotating) return;
+    this.isAnnotating = false;
+
+    const canvas = this.annotationCanvas.nativeElement;
+    const rect = canvas.getBoundingClientRect();
+    const endX = event.clientX - rect.left;
+    const endY = event.clientY - rect.top;
+
+    if (this.annotationTool === 'circle') {
+      // Record the circle annotation
+      this.annotations.push({
+        type: 'circle',
+        x: this.annotationStartX,
+        y: this.annotationStartY,
+        x2: endX,
+        y2: endY,
+        color: this.annotationColor,
+        size: this.annotationSize
+      });
+      this.drawAnnotationCircle(canvas, this.annotationStartX, this.annotationStartY, endX, endY);
+    } else if (this.annotationTool === 'arrow') {
+      // Record the arrow annotation
+      this.annotations.push({
+        type: 'arrow',
+        x: this.annotationStartX,
+        y: this.annotationStartY,
+        x2: endX,
+        y2: endY,
+        color: this.annotationColor,
+        size: this.annotationSize
+      });
+      this.drawAnnotationArrow(canvas, this.annotationStartX, this.annotationStartY, endX, endY);
+    }
+  }
+
+  onAnnotationCanvasMouseLeave(event: MouseEvent): void {
+    this.isAnnotating = false;
+  }
+
+  private addAnnotationTextToCanvas(canvas: HTMLCanvasElement, x: number, y: number): void {
+    const ctx = canvas.getContext('2d');
+    if (!ctx || !this.annotationText) return;
+
+    ctx.font = `${this.annotationSize * 4}px Arial`;
+    ctx.fillStyle = this.annotationColor;
+    ctx.fillText(this.annotationText, x, y);
+  }
+
+  private drawAnnotationCircle(canvas: HTMLCanvasElement, startX: number, startY: number, endX: number, endY: number): void {
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const radius = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
+    ctx.beginPath();
+    ctx.arc(startX, startY, radius, 0, 2 * Math.PI);
+    ctx.strokeStyle = this.annotationColor;
+    ctx.lineWidth = this.annotationSize;
+    ctx.stroke();
+  }
+
+  private drawAnnotationArrow(canvas: HTMLCanvasElement, startX: number, startY: number, endX: number, endY: number): void {
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const headLength = 20;
+    const angle = Math.atan2(endY - startY, endX - startX);
+
+    // Draw the main line
+    ctx.beginPath();
+    ctx.moveTo(startX, startY);
+    ctx.lineTo(endX, endY);
+    ctx.strokeStyle = this.annotationColor;
+    ctx.lineWidth = this.annotationSize;
+    ctx.stroke();
+
+    // Draw arrowhead
+    ctx.beginPath();
+    ctx.moveTo(endX, endY);
+    ctx.lineTo(endX - headLength * Math.cos(angle - Math.PI / 6), endY - headLength * Math.sin(angle - Math.PI / 6));
+    ctx.moveTo(endX, endY);
+    ctx.lineTo(endX - headLength * Math.cos(angle + Math.PI / 6), endY - headLength * Math.sin(angle + Math.PI / 6));
+    ctx.stroke();
   }
 
   /**
