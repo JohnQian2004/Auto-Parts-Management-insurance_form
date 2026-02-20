@@ -47,6 +47,7 @@ import com.xoftex.parthub.models.ImageModel;
 import com.xoftex.parthub.models.ImageModelJob;
 import com.xoftex.parthub.models.ImageModelVehicle;
 import com.xoftex.parthub.models.Job;
+import com.xoftex.parthub.models.JobHistory;
 import com.xoftex.parthub.models.JobRequestType;
 import com.xoftex.parthub.models.Note;
 import com.xoftex.parthub.models.PayrollHistory;
@@ -73,6 +74,7 @@ import com.xoftex.parthub.repository.SupplementRepository;
 import com.xoftex.parthub.repository.UserRepository;
 import com.xoftex.parthub.repository.VehicleHistoryRepository;
 import com.xoftex.parthub.repository.VehicleRepository;
+import com.xoftex.parthub.repository.JobHistoryRepository;
 import com.xoftex.parthub.security.jwt.JwtUtils;
 import com.xoftex.parthub.services.NoteWebSocketHandler;
 
@@ -135,6 +137,9 @@ public class JobController {
     @Autowired
     JwtUtils jwtUtils;
 
+    @Autowired
+    JobHistoryRepository jobHistoryRepository;
+
     @Value("${image.root.path}")
     // String filePath = "C:\\Projects\\images\\";
     String filePath = "";
@@ -188,6 +193,11 @@ public class JobController {
             }
 
             job = this.jobRepository.save(jobIn);
+            
+            // Create history record for the job creation/update
+            // Determine if this is create (0) or update (1) based on whether the job existed before
+            int historyType = (jobIn.getId() == 0 || !this.jobRepository.existsById(jobIn.getId())) ? 0 : 1;
+            createJobHistory(job, historyType, jobIn.getUserId(), jobIn.getEmployeeId());
 
             VehicleHistory vehicleHistory = new VehicleHistory();
             vehicleHistory.setName("Job " + jobIn.getReason() + " " + jobIn.getName());
@@ -296,6 +306,11 @@ public class JobController {
                 }
 
                 job = this.jobRepository.save(jobIn);
+                
+                // Create history record for the job creation/update
+                // Determine if this is create (0) or update (1) based on whether the job existed before
+                int historyType = (jobIn.getId() == 0 || !this.jobRepository.existsById(jobIn.getId())) ? 0 : 1;
+                createJobHistory(job, historyType, jobIn.getUserId(), jobIn.getEmployeeId());
 
                 VehicleHistory vehicleHistory = new VehicleHistory();
                 vehicleHistory.setName("Job " + jobIn.getReason() + " " + jobIn.getName());
@@ -398,6 +413,11 @@ public class JobController {
         }
 
         job = this.jobRepository.save(jobIn);
+        
+        // Create history record for the job creation/update
+        // Determine if this is create (0) or update (1) based on whether the job existed before
+        int historyType = (jobIn.getId() == 0 || !this.jobRepository.existsById(jobIn.getId())) ? 0 : 1;
+        createJobHistory(job, historyType, jobIn.getUserId(), jobIn.getEmployeeId());
 
         VehicleHistory vehicleHistory = new VehicleHistory();
         vehicleHistory.setName("Job " + jobIn.getReason() + " " + jobIn.getName());
@@ -723,6 +743,9 @@ public class JobController {
 
             job = this.jobRepository.save(job);
 
+            // Create history record for the job status update
+            createJobHistory(job, 1, job.getUserId(), job.getEmployeeId());
+
             VehicleHistory vehicleHistory = new VehicleHistory();
             vehicleHistory.setName("Job " + job.getName());
             vehicleHistory.setType(1); // 0) add 1) update 2) delete
@@ -770,6 +793,9 @@ public class JobController {
                 }
 
                 job = this.jobRepository.save(job);
+
+                // Create history record for the job status update
+                createJobHistory(job, 1, job.getUserId(), job.getEmployeeId());
 
                 VehicleHistory vehicleHistory = new VehicleHistory();
                 vehicleHistory.setName("Job employee [" + job.getName() + "] ");
@@ -1093,6 +1119,9 @@ public class JobController {
             vehicleHistory.setObjectKey(id);
             this.vehicleHistoryRepository.save(vehicleHistory);
 
+            // Create history record for the job deletion before deleting the entity
+            createJobHistory(job, 2, job.getUserId(), job.getEmployeeId());
+
             this.jobRepository.delete(job);
             return new ResponseEntity<>(null, HttpStatus.OK);
         } else {
@@ -1120,6 +1149,9 @@ public class JobController {
             vehicleHistory.setObjectKey(id);
             this.vehicleHistoryRepository.save(vehicleHistory);
 
+            // Create history record for the job deletion before deleting the entity
+            createJobHistory(job, 2, job.getUserId(), job.getEmployeeId());
+
             // if (option == 1) {
             // // keep the job
             // VehicleHistory vehicleHistoryJob = new VehicleHistory();
@@ -1141,5 +1173,49 @@ public class JobController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
+    }
+    
+    /**
+     * Creates a history record for a job
+     */
+    private void createJobHistory(Job job, int type, long userId, long employeeId) {
+        try {
+            JobHistory history = new JobHistory();
+            history.setJobId(job.getId());
+            history.setObjectKey(job.getId()); // Reference to the job
+            history.setType(type); // 0: add, 1: update, 2: delete
+            history.setUserId(userId);
+            history.setEmployeeId(employeeId);
+            history.setName("Job " + job.getName()); // Description of the entity
+            history.setValue(job.toString()); // Store the full state as JSON string
+            history.setCompanyUuid(job.getToken()); // Use token as company identifier
+            
+            jobHistoryRepository.save(history);
+        } catch (Exception e) {
+            System.err.println("Error creating job history: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Creates a history record for a job with custom value
+     */
+    private void createJobHistory(Job job, int type, long userId, long employeeId, String customValue) {
+        try {
+            JobHistory history = new JobHistory();
+            history.setJobId(job.getId());
+            history.setObjectKey(job.getId()); // Reference to the job
+            history.setType(type); // 0: add, 1: update, 2: delete
+            history.setUserId(userId);
+            history.setEmployeeId(employeeId);
+            history.setName("Job " + job.getName()); // Description of the entity
+            history.setValue(customValue != null ? customValue : job.toString()); // Custom value or default
+            history.setCompanyUuid(job.getToken()); // Use token as company identifier
+            
+            jobHistoryRepository.save(history);
+        } catch (Exception e) {
+            System.err.println("Error creating job history: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 }

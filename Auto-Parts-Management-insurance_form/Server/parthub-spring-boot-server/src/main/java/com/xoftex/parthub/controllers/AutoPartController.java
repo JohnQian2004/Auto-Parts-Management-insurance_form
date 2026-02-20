@@ -1,9 +1,7 @@
 package com.xoftex.parthub.controllers;
 
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -13,7 +11,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -36,20 +33,19 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.google.gson.Gson;
 import com.xoftex.parthub.exception.ResourceNotFoundException;
 import com.xoftex.parthub.models.Address;
 import com.xoftex.parthub.models.Autopart;
+import com.xoftex.parthub.models.AutopartHistory;
 import com.xoftex.parthub.models.Company;
+import com.xoftex.parthub.models.EAddressType;
+import com.xoftex.parthub.models.Employee;
+import com.xoftex.parthub.models.Fitment;
 import com.xoftex.parthub.models.ImageModel;
-import com.xoftex.parthub.models.ImageModelJob;
 import com.xoftex.parthub.models.ItemType;
-import com.xoftex.parthub.models.Job;
-import com.xoftex.parthub.models.Payment;
 import com.xoftex.parthub.models.Receipt;
 import com.xoftex.parthub.models.SavedItem;
 import com.xoftex.parthub.models.SearchCarrier;
@@ -57,11 +53,12 @@ import com.xoftex.parthub.models.SequenceCarrier;
 import com.xoftex.parthub.models.User;
 import com.xoftex.parthub.models.VehicleHistory;
 import com.xoftex.parthub.models.ZipCode;
-
 import com.xoftex.parthub.payload.request.FitmentRequest;
 import com.xoftex.parthub.payload.response.UserSatisticsResponse;
 import com.xoftex.parthub.repository.AutoPartRepository;
+import com.xoftex.parthub.repository.AutopartHistoryRepository;
 import com.xoftex.parthub.repository.CompanyRepository;
+import com.xoftex.parthub.repository.EmployeeRepository;
 import com.xoftex.parthub.repository.FitmentRepository;
 import com.xoftex.parthub.repository.ImageModelRepository;
 import com.xoftex.parthub.repository.ItemTypeRepository;
@@ -74,11 +71,6 @@ import com.xoftex.parthub.security.jwt.JwtUtils;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
-
-import com.xoftex.parthub.models.EAddressType;
-import com.xoftex.parthub.models.Employee;
-import com.xoftex.parthub.models.Fitment;
-import com.xoftex.parthub.repository.EmployeeRepository;
 
 @Tag(name = "Auto Parts", description = "Auto Part management APIs")
 // for Angular Client (withCredentials)
@@ -125,6 +117,9 @@ public class AutoPartController {
 
     @Autowired
     private JwtUtils jwtUtils;
+
+    @Autowired
+    AutopartHistoryRepository autopartHistoryRepository;
 
     @Value("${image.root.path}")
     // String filePath = "C:\\Projects\\images\\";
@@ -1783,6 +1778,10 @@ public class AutoPartController {
             autopart = autoPartRepository
                     .save(autopart);
 
+            // Create history record for the creation
+            createAutopartHistory(autopart, 0, autopart.getUserId() != null ? autopart.getUserId() : 0,
+                    autopart.getEmployeeId() != null ? autopart.getEmployeeId() : 0);
+
             // does once during newly created
             if (autopartIn.getId() == 0 && autopartIn.getReason() != null && autopartIn.getReason().equals("posting")
                     && autopartIn.getPartNumber() != null && !autopartIn.getPartNumber().equals("")
@@ -2165,6 +2164,10 @@ public class AutoPartController {
 
             autopart = autoPartRepository.save(autopart);
 
+            // Create history record for the update
+            createAutopartHistory(autopart, 1, autopart.getUserId() != null ? autopart.getUserId() : 0,
+                    autopart.getEmployeeId() != null ? autopart.getEmployeeId() : 0);
+
             // Optional<User> userOptional =
             // this.userRepository.findById(autopart.getUserId());
             // if (userOptional.isPresent()) {
@@ -2498,6 +2501,10 @@ public class AutoPartController {
                     this.vehicleHistoryRepository.save(vehicleHistory);
                 }
 
+                // Create history record for the deletion before deleting the entity
+                createAutopartHistory(autopart, 2, autopart.getUserId() != null ? autopart.getUserId() : 0,
+                        autopart.getEmployeeId() != null ? autopart.getEmployeeId() : 0);
+
                 autoPartRepository.delete(autopart);
 
                 List<SavedItem> savedItems = this.savedItemRepository.findByAutopartId(id);
@@ -2803,4 +2810,47 @@ public class AutoPartController {
         return jwt;
     }
 
+    /**
+     * Creates a history record for an autopart
+     */
+    private void createAutopartHistory(Autopart autopart, int type, long userId, long employeeId) {
+        try {
+            AutopartHistory history = new com.xoftex.parthub.models.AutopartHistory();
+            history.setAutopartId(autopart.getId());
+            history.setObjectKey(autopart.getId()); // Reference to the autopart
+            history.setType(type); // 0: add, 1: update, 2: delete
+            history.setUserId(userId);
+            history.setEmployeeId(employeeId);
+            history.setName("Autopart " + autopart.getTitle()); // Description of the entity
+            history.setValue(autopart.toString()); // Store the full state as JSON string
+            history.setCompanyUuid(autopart.getToken()); // Use token as company identifier
+
+            autopartHistoryRepository.save(history);
+        } catch (Exception e) {
+            System.err.println("Error creating autopart history: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Creates a history record for an autopart with custom value
+     */
+    private void createAutopartHistory(Autopart autopart, int type, long userId, long employeeId, String customValue) {
+        try {
+            AutopartHistory history = new AutopartHistory();
+            history.setAutopartId(autopart.getId());
+            history.setObjectKey(autopart.getId()); // Reference to the autopart
+            history.setType(type); // 0: add, 1: update, 2: delete
+            history.setUserId(userId);
+            history.setEmployeeId(employeeId);
+            history.setName("Autopart " + autopart.getTitle()); // Description of the entity
+            history.setValue(customValue != null ? customValue : autopart.toString()); // Custom value or default
+            history.setCompanyUuid(autopart.getToken()); // Use token as company identifier
+
+            autopartHistoryRepository.save(history);
+        } catch (Exception e) {
+            System.err.println("Error creating autopart history: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 }

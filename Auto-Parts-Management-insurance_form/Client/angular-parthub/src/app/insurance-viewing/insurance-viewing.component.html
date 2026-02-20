@@ -1675,8 +1675,9 @@
     </div>
 
     <!-- Annotation Modal -->
-    <div class="modal fade" id="annotationModal" tabindex="-1" aria-labelledby="annotationModalLabel" aria-hidden="true"
-        *ngIf="showAnnotationModal" (click)="closeAnnotationModal()">
+    <div class="modal fade" [class.show]="showAnnotationModal" [style.display]="showAnnotationModal ? 'block' : 'none'"
+        id="annotationModal" tabindex="-1" aria-labelledby="annotationModalLabel" [attr.aria-hidden]="!showAnnotationModal"
+        (click)="closeAnnotationModal()">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content" (click)="$event.stopPropagation()">
                 <div class="modal-header bg-primary text-white">
