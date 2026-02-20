@@ -22,6 +22,7 @@ export interface EstimateClaimItem {
   operation: string;
   description: string;
   partNumber: string | null;
+  oemNumber?: string | null;
   quantity: number | null;
   extendedPrice: number | null;
   laborHours: number | null;
@@ -2758,6 +2759,7 @@ export class InsuranceViewingComponent implements OnInit, OnDestroy, AfterViewIn
             <th class="col-operation">Operation</th>
             <th class="col-description">Description</th>
             <th class="col-part">Part Number</th>
+            <th class="col-oem">OEM Number</th>
             <th class="col-qty">Qty</th>
             <th class="col-extended">Extended</th>
             <th class="col-labor">Labor</th>
@@ -2787,6 +2789,7 @@ export class InsuranceViewingComponent implements OnInit, OnDestroy, AfterViewIn
             <td>${item.operation || ''}</td>
             <td>${item.description || ''}</td>
             <td>${item.partNumber || ''}</td>
+            <td>${item.oemNumber || ''}</td>
             <td>${item.quantity || ''}</td>
             <td>${item.extendedPrice ? '$' + item.extendedPrice.toFixed(2) : ''}</td>
             <td>${item.laborHours || ''}</td>
@@ -3021,13 +3024,13 @@ export class InsuranceViewingComponent implements OnInit, OnDestroy, AfterViewIn
     pdf.setFontSize(9);
     pdf.setFont('helvetica', 'bold');
 
-    const colWidths = [12, 18, 68, 32, 12, 18, 12, 12]; // Adjusted for portrait
+    const colWidths = [12, 18, 60, 28, 28, 12, 18, 12, 12]; // Added OEM column and adjusted
     const colPositions = [margin];
     for (let i = 0; i < colWidths.length - 1; i++) {
       colPositions.push(colPositions[i] + colWidths[i]);
     }
 
-    const headers = ['Line', 'Operation', 'Description', 'Part Number', 'Qty', 'Extended', 'Labor', 'Paint'];
+    const headers = ['Line', 'Operation', 'Description', 'Part Number', 'OEM Number', 'Qty', 'Extended', 'Labor', 'Paint'];
 
     // Top separator line for header
     pdf.setDrawColor(120, 120, 120);
@@ -3123,6 +3126,7 @@ export class InsuranceViewingComponent implements OnInit, OnDestroy, AfterViewIn
             item.operation || '',
             item.description || '',
             item.partNumber || '',
+            item.oemNumber || '',
             item.quantity?.toString() || '',
             item.extendedPrice ? `$${item.extendedPrice.toFixed(2)}` : '',
             item.laborHours?.toString() || '',
@@ -3898,13 +3902,13 @@ export class InsuranceViewingComponent implements OnInit, OnDestroy, AfterViewIn
       pdf.setFontSize(8);
       pdf.setFont('helvetica', 'bold');
 
-      const colWidths = [12, 18, 68, 32, 12, 18, 12, 12];
+      const colWidths = [12, 18, 60, 28, 28, 12, 18, 12, 12];
       const colPositions = [margin];
       for (let i = 0; i < colWidths.length - 1; i++) {
         colPositions.push(colPositions[i] + colWidths[i]);
       }
 
-      const headers = ['Line', 'Operation', 'Description', 'Part Number', 'Qty', 'Extended', 'Labor', 'Paint'];
+      const headers = ['Line', 'Operation', 'Description', 'Part Number', 'OEM Number', 'Qty', 'Extended', 'Labor', 'Paint'];
 
       // Draw header background
       pdf.setFillColor(240, 240, 240);
@@ -3986,6 +3990,7 @@ export class InsuranceViewingComponent implements OnInit, OnDestroy, AfterViewIn
               item.operation || '',
               item.description || '',
               item.partNumber || '',
+              item.oemNumber || '',
               item.quantity?.toString() || '',
               item.extendedPrice ? `$${item.extendedPrice.toFixed(2)}` : '',
               item.laborHours?.toString() || '',
@@ -4934,6 +4939,21 @@ export class InsuranceViewingComponent implements OnInit, OnDestroy, AfterViewIn
           operation: 'PART',
           description: part.title || part.name || part.partNumber || 'Auto Part',
           partNumber: part.partNumber || null,
+          oemNumber: (() => {
+            const pool = [part?.oemNumber, part?.oem, part?.title, part?.name, part?.description, part?.notes]
+              .filter((v: any) => typeof v === 'string' && v.trim().length > 0)
+              .join(' ');
+            if (!pool) return null;
+            const regexes = [
+              /OEM\s*[#:]?\s*([A-Z0-9\-]{5,})/i,
+              /\b([A-Z0-9\-]{5,})\b(?=\s*OEM\b)/i
+            ];
+            for (const r of regexes) {
+              const m = pool.match(r);
+              if (m) return (m[1] || m[0]).trim();
+            }
+            return null;
+          })(),
           quantity: part.quantity || 1,
           extendedPrice: part.salePrice || part.price || 0,
           laborHours: null,
@@ -4944,7 +4964,17 @@ export class InsuranceViewingComponent implements OnInit, OnDestroy, AfterViewIn
         // Create estimate items from jobs
         const jobItems: EstimateClaimItem[] = jobsArr.map((job: any, index: number) => ({
           lineNumber: partItems.length + index + 1,
-          operation: 'LABOR',
+          operation: (() => {
+            const text = ((job?.name || job?.description || '') as string).toLowerCase();
+            if (/(repl|replace|replacement)/i.test(text)) return 'Repl';
+            if (/(rpr|repair)/i.test(text)) return 'Rpr';
+            if (/(bleed)/i.test(text)) return 'Bleed';
+            if (/(r&?i|remove\s*&?\s*install|remove and install|remove\b.*install\b|remove|install)/i.test(text)) return 'R&I';
+            if (/(blend|blnd)/i.test(text)) return 'Blnd';
+            if (/(clear coat|add)/i.test(text)) return 'Add';
+            if (/(labor|lt)/i.test(text)) return 'LT';
+            return 'LABOR';
+          })(),
           description: job.name || job.description || 'Service/Labor',
           partNumber: null,
           quantity: 1,
