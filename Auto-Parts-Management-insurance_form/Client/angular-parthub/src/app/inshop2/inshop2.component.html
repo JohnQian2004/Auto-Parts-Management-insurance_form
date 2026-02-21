@@ -3227,6 +3227,10 @@
                           </ng-container>
                         </a></li>
                     </ng-container>
+                    <li><a (click)="openSendToInsuranceModal()" class="dropdown-item p-3 fs-12"
+                        href="javascript:;"><i class="fa fa-paper-plane fs-11 me-2 text-primary-abs"></i>
+                        Send to Insurance
+                      </a></li>
                   </ul>
                 </div>
 
@@ -3636,6 +3640,10 @@
 
                 <div class="dropdown h-40 fs-13 mt-2 btn btn-primary px-1 border-radius-4 ms-md-2"
                   *ngIf="user.allowAddUpdateEstimate == true">
+                  <button><a (click)="openSendToInsuranceModal()" class="dropdown-item p-3 fs-12" href="javascript:;"><i
+                        class="fa fa-paper-plane fs-11 me-2 text-primary-abs"></i>
+                      Send to Insurance
+                    </a></button>
                   <button class="dropdown-toggle btn-primary" type="button" data-bs-toggle="dropdown"
                     aria-expanded="false"><i class="fa fa-plus me-2"></i> Add Item
                     <i class="fa fa-angle-down ms-2"></i></button>
@@ -3653,6 +3661,7 @@
                           </ng-container>
                         </a></li>
                     </ng-container>
+
                   </ul>
                 </div>
 
@@ -11207,4 +11216,40 @@
     </div>
   </div>
 
+</div>
+
+<!-- Send to Insurance Modal -->
+<div class="modal fade" id="sendToInsuranceModal" tabindex="-1" aria-labelledby="sendToInsuranceModalLabel"
+  [class.show]="showSendToInsuranceModal" [style.display]="showSendToInsuranceModal ? 'block' : 'none'"
+  [attr.aria-hidden]="!showSendToInsuranceModal">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="sendToInsuranceModalLabel">Send to Insurance</h5>
+        <button type="button" class="btn-close" (click)="closeSendToInsuranceModal()" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="insuranceEmail" class="form-label">Insurance Company Email</label>
+          <input type="email" class="form-control" id="insuranceEmail" [(ngModel)]="insuranceEmail"
+            placeholder="Enter insurance company email">
+        </div>
+        <div class="mb-3">
+          <label for="insuranceMessage" class="form-label">Message</label>
+          <textarea class="form-control" id="insuranceMessage" [(ngModel)]="insuranceMessage" rows="4"
+            placeholder="Enter message to insurance company"></textarea>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Insurance Link</label>
+          <div class="alert alert-info">
+            https://baycounter.com:4200/#/insurance-viewing/{{vehicle?.insuranceCompanyId}}/{{vehicle?.id}}/{{vehicle?.year}}
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeSendToInsuranceModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="sendToInsurance()">Send Email</button>
+      </div>
+    </div>
+  </div>
 </div>

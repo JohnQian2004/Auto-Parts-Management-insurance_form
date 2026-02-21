@@ -114,6 +114,11 @@ export class Inshop2Component implements OnInit, AfterViewInit {
   showPassword: boolean = false;
   showPaswordNewConfirmed: boolean = false;
   showPasswordNew: boolean = false;
+  
+  // Insurance modal properties
+  showSendToInsuranceModal: boolean = false;
+  insuranceEmail: string = '';
+  insuranceMessage: string = '';
 
   errorMessageProfile = "";
   errorMessageResetPassword = "";
@@ -11674,6 +11679,101 @@ export class Inshop2Component implements OnInit, AfterViewInit {
       }
     });
 
+  }
+
+  /**
+   * Opens the send to insurance modal
+   */
+  openSendToInsuranceModal(): void {
+    if (this.vehicle && this.vehicle.id && this.vehicle.year) {
+      // Need to get the insurance UUID by resolving the insurance company name
+      this.resolveInsuranceUuidAndOpenModal();
+    } else {
+      console.error('Unable to prepare insurance URL: missing required information');
+      alert('Unable to prepare insurance link: vehicle information is incomplete');
+    }
+  }
+
+  /**
+   * Resolves the insurance UUID by looking up the insurance company and then opens the modal
+   */
+  private resolveInsuranceUuidAndOpenModal(): void {
+    // If we already have insuranceCompanyId, use it directly
+    if (this.vehicle?.insuranceCompanyId && this.vehicle.insuranceCompanyId !== 0) {
+      this.constructInsuranceUrlAndOpenModal(this.vehicle.insuranceCompanyId as any);
+      return;
+    }
+
+    // Otherwise, try to resolve from insurance company name
+    if (this.vehicle?.insuranceCompany) {
+      // Look up the insurance company in the existing insurancers array
+      const matchingInsurer = this.insurancers.find(i => i.name === this.vehicle.insuranceCompany);
+      if (matchingInsurer && matchingInsurer.token) {
+        this.constructInsuranceUrlAndOpenModal(matchingInsurer.token);
+      } else {
+        console.warn('Could not find matching insurer for company name:', this.vehicle.insuranceCompany);
+        // If we can't find the insurer, we'll use a default approach or inform the user
+        alert('Could not find insurance company UUID. Please ensure insurance company is properly configured.');
+      }
+    } else {
+      console.warn('No insurance company information available on vehicle');
+      alert('No insurance company information available on vehicle');
+    }
+  }
+
+  /**
+   * Constructs the insurance URL and opens the modal
+   */
+  private constructInsuranceUrlAndOpenModal(insuranceCompanyId: string): void {
+    if (this.vehicle && this.vehicle.token && this.vehicle.year) {
+      const insuranceUrl = `https://baycounter.com:4200/#/insurance-viewing/${insuranceCompanyId}/${this.vehicle.token}/${this.vehicle.year}`;
+      
+      // Pre-populate the message with vehicle and customer info
+      const vehicleInfo = `${this.vehicle.year} ${this.vehicle.make} ${this.vehicle.model}`;
+      const customerInfo = `${this.vehicle.customer?.firstName} ${this.vehicle.customer?.lastName}`;
+      
+      this.insuranceMessage = `Please find attached link for ${vehicleInfo} and ${customerInfo} and claim Id: ${this.vehicle.id}`;
+      this.insuranceEmail = this.vehicle.customer?.email || '';
+      
+      console.log('Insurance URL prepared:', insuranceUrl);
+      console.log('Prepared message:', this.insuranceMessage);
+      
+      // Show the modal
+      this.showSendToInsuranceModal = true;
+    }
+  }
+
+  /**
+   * Sends the insurance link via email
+   */
+  sendToInsurance(): void {
+    if (!this.vehicle || !this.vehicle.insuranceCompanyId || !this.vehicle.id || !this.vehicle.year) {
+      alert('Vehicle information is incomplete. Cannot send to insurance.');
+      return;
+    }
+
+    // Construct the insurance URL
+    const insuranceUrl = `https://baycounter.com:4200/#/insurance-viewing/${this.vehicle.insuranceCompanyId}/${this.vehicle.id}/${this.vehicle.year}`;
+    
+    // Create mailto link with pre-filled subject and body
+    const subject = encodeURIComponent(`Insurance Claim for ${this.vehicle.year} ${this.vehicle.make} ${this.vehicle.model}`);
+    const body = encodeURIComponent(`${this.insuranceMessage}\n\nAccess Link: ${insuranceUrl}`);
+    const mailtoLink = `mailto:${this.insuranceEmail}?subject=${subject}&body=${body}`;
+    
+    // Open the user's default email client
+    window.location.href = mailtoLink;
+    
+    // Close the modal
+    this.closeSendToInsuranceModal();
+  }
+
+  /**
+   * Closes the send to insurance modal
+   */
+  closeSendToInsuranceModal(): void {
+    this.showSendToInsuranceModal = false;
+    this.insuranceEmail = '';
+    this.insuranceMessage = '';
   }
 }
 
