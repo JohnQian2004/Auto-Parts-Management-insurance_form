@@ -54,7 +54,7 @@ export class InsurancerService {
 
   updateInsurancerToken(insurancerId: any, token: string): Observable<Insurancer> {
     const updateData = { token: token };
-    return this.http.put<Insurancer>(this.API_URL + "/" + insurancerId + "/token", updateData, httpOptions);
+    return this.http.post<Insurancer>(this.API_URL + "/" + insurancerId + "/token", updateData, httpOptions);
   }
 
   // Additional methods for insurance management

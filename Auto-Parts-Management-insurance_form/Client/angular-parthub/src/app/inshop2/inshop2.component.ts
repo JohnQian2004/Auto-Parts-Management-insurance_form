@@ -119,6 +119,7 @@ export class Inshop2Component implements OnInit, AfterViewInit {
   showSendToInsuranceModal: boolean = false;
   insuranceEmail: string = '';
   insuranceMessage: string = '';
+  generatedInsuranceUrl: SafeResourceUrl = '';
 
   errorMessageProfile = "";
   errorMessageResetPassword = "";
@@ -11685,39 +11686,22 @@ export class Inshop2Component implements OnInit, AfterViewInit {
    * Opens the send to insurance modal
    */
   openSendToInsuranceModal(): void {
-    if (this.vehicle && this.vehicle.id && this.vehicle.year) {
-      // Need to get the insurance UUID by resolving the insurance company name
-      this.resolveInsuranceUuidAndOpenModal();
-    } else {
-      console.error('Unable to prepare insurance URL: missing required information');
-      alert('Unable to prepare insurance link: vehicle information is incomplete');
-    }
-  }
-
-  /**
-   * Resolves the insurance UUID by looking up the insurance company and then opens the modal
-   */
-  private resolveInsuranceUuidAndOpenModal(): void {
-    // If we already have insuranceCompanyId, use it directly
-    if (this.vehicle?.insuranceCompanyId && this.vehicle.insuranceCompanyId !== 0) {
-      this.constructInsuranceUrlAndOpenModal(this.vehicle.insuranceCompanyId as any);
+    if (!this.vehicle || !this.vehicle.token || !this.vehicle.year) {
+      alert('Vehicle information is incomplete. Cannot prepare insurance link.');
       return;
     }
 
-    // Otherwise, try to resolve from insurance company name
-    if (this.vehicle?.insuranceCompany) {
-      // Look up the insurance company in the existing insurancers array
-      const matchingInsurer = this.insurancers.find(i => i.name === this.vehicle.insuranceCompany);
-      if (matchingInsurer && matchingInsurer.token) {
-        this.constructInsuranceUrlAndOpenModal(matchingInsurer.token);
-      } else {
-        console.warn('Could not find matching insurer for company name:', this.vehicle.insuranceCompany);
-        // If we can't find the insurer, we'll use a default approach or inform the user
-        alert('Could not find insurance company UUID. Please ensure insurance company is properly configured.');
-      }
+    if (!this.vehicle.insuranceCompany) {
+      alert('No insurance company specified for this vehicle.');
+      return;
+    }
+
+    const insuranceToken = this.getInsuranceCompanyToken(this.vehicle.insuranceCompany);
+
+    if (insuranceToken) {
+      this.constructInsuranceUrlAndOpenModal(insuranceToken);
     } else {
-      console.warn('No insurance company information available on vehicle');
-      alert('No insurance company information available on vehicle');
+      alert('Could not find a valid token for the insurance company: ' + this.vehicle.insuranceCompany + '. Please check settings.');
     }
   }
 
@@ -11726,15 +11710,16 @@ export class Inshop2Component implements OnInit, AfterViewInit {
    */
   private constructInsuranceUrlAndOpenModal(insuranceCompanyId: string): void {
     if (this.vehicle && this.vehicle.token && this.vehicle.year) {
-      const insuranceUrl = `https://baycounter.com:4200/#/insurance-viewing/${insuranceCompanyId}/${this.vehicle.token}/${this.vehicle.year}`;
+      const insuranceUrl = window.location.origin + `/#/insurance-viewing/${insuranceCompanyId}/${this.vehicle.token}/${this.vehicle.year}`;
       
       // Pre-populate the message with vehicle and customer info
       const vehicleInfo = `${this.vehicle.year} ${this.vehicle.make} ${this.vehicle.model}`;
       const customerInfo = `${this.vehicle.customer?.firstName} ${this.vehicle.customer?.lastName}`;
       
-      this.insuranceMessage = `Please find attached link for ${vehicleInfo} and ${customerInfo} and claim Id: ${this.vehicle.id}`;
+      this.insuranceMessage = `Please find attached link for ${vehicleInfo} and ${customerInfo} and vehicle Id: ${this.vehicle.token}`;
       this.insuranceEmail = this.vehicle.customer?.email || '';
-      
+      this.generatedInsuranceUrl = this.sanitizationService.bypassSecurityTrustResourceUrl(insuranceUrl);
+
       console.log('Insurance URL prepared:', insuranceUrl);
       console.log('Prepared message:', this.insuranceMessage);
       
@@ -11744,16 +11729,36 @@ export class Inshop2Component implements OnInit, AfterViewInit {
   }
 
   /**
+   * Retrieves the insurance company token from settings by company name
+   */
+  private getInsuranceCompanyToken(companyName: string): string | null {
+    if (this.setting && this.setting.insurancers) {
+      const matchingInsurer = this.setting.insurancers.find(i => i.name === companyName);
+      if (matchingInsurer && matchingInsurer.token) {
+        console.log('Found matching insurer:', matchingInsurer.token);
+        return matchingInsurer.token;
+      }
+    }
+   return null;
+  }
+
+  /**
    * Sends the insurance link via email
    */
   sendToInsurance(): void {
-    if (!this.vehicle || !this.vehicle.insuranceCompanyId || !this.vehicle.id || !this.vehicle.year) {
+    if (!this.vehicle || !this.vehicle.token || !this.vehicle.id || !this.vehicle.year) {
       alert('Vehicle information is incomplete. Cannot send to insurance.');
       return;
     }
 
+    const insuranceToken = this.getInsuranceCompanyToken(this.vehicle.insuranceCompany);
+    if (!insuranceToken) {
+      alert('Could not find insurance company UUID. Please ensure insurance company is properly configured.');
+      return;
+    }
+
     // Construct the insurance URL
-    const insuranceUrl = `https://baycounter.com:4200/#/insurance-viewing/${this.vehicle.insuranceCompanyId}/${this.vehicle.id}/${this.vehicle.year}`;
+    const insuranceUrl = window.location.origin + `/#/insurance-viewing/${insuranceToken}/${this.vehicle.token}/${this.vehicle.year}`;
     
     // Create mailto link with pre-filled subject and body
     const subject = encodeURIComponent(`Insurance Claim for ${this.vehicle.year} ${this.vehicle.make} ${this.vehicle.model}`);

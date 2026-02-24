@@ -120,7 +120,11 @@ export class InsuranceManagementComponent implements OnInit, OnDestroy {
 
   onSubmit(): void {
     if (this.insurancerForm.valid) {
-      this.createInsurancer();
+      if (this.selectedInsurancer) {
+        this.onUpdate();
+      } else {
+        this.createInsurancer();
+      }
     }
   }
 
@@ -240,6 +244,11 @@ export class InsuranceManagementComponent implements OnInit, OnDestroy {
             this.successMessage = 'Insurance company updated successfully!';
             this.closeModal();
             this.isSubmitting = false;
+
+            // If the updated insurancer does not have a token, generate one automatically
+            if (!updatedInsurancer.token) {
+              this.generateToken(updatedInsurancer);
+            }
 
             // Clear success message after 5 seconds
             setTimeout(() => {

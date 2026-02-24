@@ -11242,8 +11242,12 @@
         <div class="mb-3">
           <label class="form-label">Insurance Link</label>
           <div class="alert alert-info">
-            https://baycounter.com:4200/#/insurance-viewing/{{vehicle?.insuranceCompanyId}}/{{vehicle?.id}}/{{vehicle?.year}}
+            <a [href]="generatedInsuranceUrl" target="_blank">{{ generatedInsuranceUrl.changingThisBreaksApplicationSecurity }}</a>
           </div>
+          <button type="button" class="btn btn-primary mt-2" (click)="sendToInsurance()">Send</button>
+        </div>
+        <div class="mb-3">
+            <iframe [src]="generatedInsuranceUrl" width="100%" height="600px" style="border:none;"></iframe>
         </div>
       </div>
       <div class="modal-footer">
