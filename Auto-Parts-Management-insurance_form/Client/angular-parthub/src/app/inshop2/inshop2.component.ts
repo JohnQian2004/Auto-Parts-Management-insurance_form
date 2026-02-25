@@ -55,7 +55,9 @@ import { SettingService } from '../_services/setting.service';
 import { Setting } from '../models/setting.model';
 import { EmployeeRole } from '../models/employee.role.model';
 import { ReceiptService } from '../_services/receipt.service';
+import { Receipt2Service } from '../_services/receipt2.service';
 import { Receipt } from '../models/receipt.model';
+import { Receipt2 } from '../models/receipt2.model';
 import { jsPDF } from "jspdf";
 import htmlToPdfmake from 'html-to-pdfmake';
 import * as pdfMake from 'pdfmake/build/pdfmake';
@@ -337,6 +339,27 @@ export class Inshop2Component implements OnInit, AfterViewInit {
 
   receipts: Receipt[] = new Array();
   receipt: Receipt = new Receipt();
+  receipts2: Receipt2[] = new Array();
+  receipt2: Receipt2 = new Receipt2();
+
+  getTotal2() {
+    let total = 0;
+    for (var i = 0; i < this.receipts2.length; i++) {
+      if (this.receipts2[i].amount) {
+        total += (this.receipts2[i].amount * this.receipts2[i].quantity);
+      }
+    }
+    return total;
+  }
+
+  getTax2() {
+    return this.getTotal2() * this.companyDefaultTaxRate / 100;
+  }
+
+  getTotalDue2() {
+    return this.getTotal2() + this.getTax2();
+  }
+
 
   claims: Claim[] = new Array();
   claim: Claim = new Claim();
@@ -350,6 +373,7 @@ export class Inshop2Component implements OnInit, AfterViewInit {
   currentJobId: any;
   currentPaymentId: any;
   currentReceiptId: any;
+  currentReceipt2Id: any;
   currentHistoryId: any;
 
   serviceJobs: Service[] = new Array();
@@ -531,6 +555,7 @@ export class Inshop2Component implements OnInit, AfterViewInit {
     private settingService: SettingService,
     private noteService: NoteService,
     private receiptService: ReceiptService,
+    private receipt2Service: Receipt2Service,
     private authService: AuthService,
     private http: HttpClient,
     private sanitizationService: DomSanitizer,
@@ -2336,6 +2361,8 @@ export class Inshop2Component implements OnInit, AfterViewInit {
 
         console.log(result);
         this.vehicle = result;
+        this.getAllVehicleReceipt(this.vehicle.id);
+        this.getAllVehicleReceipts2(this.vehicle.id);
         if (this.vehicles.length > 0) {
           for (let i = 0; i < this.vehicles.length; i++) {
             if (this.vehicle.id == this.vehicles[i].id) {
@@ -4096,6 +4123,7 @@ export class Inshop2Component implements OnInit, AfterViewInit {
               }
               this.getAllVehicleClaims(this.vehicle.id);
               this.getAllVehicleReceipt(this.vehicle.id);
+          this.getAllVehicleReceipts2(this.vehicle.id);
 
               //this.getAutopartForVehicle(this.vehicle.id, true);
             },
@@ -10316,7 +10344,6 @@ export class Inshop2Component implements OnInit, AfterViewInit {
   }
 
   getAllVehicleReceipt(vehicleId: any): void {
-
     // console.log("getAllVehicleReceipt")
     this.receiptService.getAllVehicleReceipts(vehicleId).subscribe({
       next: result => {
@@ -10330,6 +10357,65 @@ export class Inshop2Component implements OnInit, AfterViewInit {
 
       }
     })
+  }
+
+  addReceipt() {
+    this.receipt = new Receipt();
+    this.receipt.vehicleId = this.vehicle.id;
+    this.receipt.userId = this.user.id;
+  }
+
+  addReceipt2() {
+    this.receipt2 = new Receipt2();
+    this.receipt2.vehicleId = this.vehicle.id;
+    this.receipt2.userId = this.user.id;
+  }
+
+  editReceipt2(receipt2: Receipt2, index: number) {
+    this.receipt2 = { ...receipt2 };
+    this.currentReceipt2Id = index;
+  }
+
+  deleteReceipt2(id: any, index: number) {
+    this.receipt2Service.deleteReceipt(id).subscribe(() => {
+      this.receipts2.splice(index, 1);
+    });
+  }
+
+  sortReceipts2(column: string) {
+    // Implement sorting logic for receipts2 if needed
+  }
+
+  droppedReceipt2(event: CdkDragDrop<string[]>) {
+    moveItemInArray(this.receipts2, event.previousIndex, event.currentIndex);
+    this.receipts2.forEach((receipt2, index) => {
+      receipt2.sequenceNumber = index + 1;
+    });
+
+    const sequenceCarriers: SequenceCarrier[] = this.receipts2.map((receipt2, index) => {
+      return {
+        id: receipt2.id,
+        sequenceNumber: index + 1,
+        index: 0,       // Add default value
+        pageNumber: 0,  // Add default value
+        pageSize: 0     // Add default value
+      };
+    });
+
+    this.receipt2Service.updateSequence(this.vehicle.id, sequenceCarriers).subscribe(() => {
+    });
+  }
+
+  getAllVehicleReceipts2(vehicleId: any): void {
+    this.receipt2Service.getAllVehicleReceipts(vehicleId).subscribe({
+      next: data => {
+        if (data != null) {
+          this.receipts2 = data;
+          this.receipts2 = this.receipts2.sort((a, b) => a.sequenceNumber - b.sequenceNumber);
+        }
+      },
+      error: (e) => console.error(e)
+    });
   }
 
   randomString(): string {
