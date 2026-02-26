@@ -126,11 +126,15 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
             .requestMatchers("/api/customers/**").permitAll()
             .requestMatchers("/api/settings/**").permitAll()
             .requestMatchers("/api/settings/company/**").permitAll()
-            // Explicitly allow receipt vehicle endpoint for insurance viewing (public access)
+            // Explicitly allow receipt vehicle endpoint for insurance viewing (public
+            // access)
             // Must be before the general /api/receipts/** pattern
             .requestMatchers("/api/receipts/vehicle/*").permitAll()
             .requestMatchers("/api/receipts/vehicle/**").permitAll()
             .requestMatchers("/api/receipts/**").permitAll()
+            .requestMatchers("/api/receipts2/vehicle/*").permitAll()
+            .requestMatchers("/api/receipts2/vehicle/**").permitAll()
+            .requestMatchers("/api/receipts2/**").permitAll()
             .requestMatchers("/api/claims/**").permitAll()
             .requestMatchers("/api/insurancers/**").permitAll()
             .requestMatchers("/api/insurance/**").permitAll()

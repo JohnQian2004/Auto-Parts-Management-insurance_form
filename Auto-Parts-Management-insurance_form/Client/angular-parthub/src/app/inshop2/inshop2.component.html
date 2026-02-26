@@ -3150,6 +3150,12 @@
               ({{receipts.length}})</button>
           </li>
           <li class="nav-item me-3" role="presentation">
+            <button class="nav-link p-3 rounded-pill fs-12 text-uppercase fw-bold shadow" id="receipts-tab"
+              data-bs-toggle="pill" data-bs-target="#invoice-damages" type="button" role="tab"
+              aria-controls="invoice-damages" aria-selected="false"><i class="fa fa-circle me-1"></i> Invoice
+              ({{receipts2.length}})</button>
+          </li>
+          <li class="nav-item me-3" role="presentation">
             <button class="nav-link p-3 rounded-pill fs-12 text-uppercase fw-bold shadow" id="histories-tab"
               data-bs-toggle="pill" data-bs-target="#histories-damages" type="button" role="tab"
               (click)="getVehicleHistory(vehicle.id)" aria-controls="histories-tab"
@@ -6615,6 +6621,325 @@
             <br />
             <br />
           </div>
+          <div class="tab-pane fade show" id="invoice-damages" role="tabpanel" #taggroup
+            aria-labelledby="invoice-damages-tab">
+            <div class="d-flex align-items-center v-align-middle justify-content-start pt-5">
+              <h2 class="heading-color fw-700 text-uppercase pt-3 px-2 fs-16 pb-3">Vehicle Receipt Items For: <strong
+                  class="text-primary fw-700" data-bs-toggle="modal" data-bs-target="#editVehicle"
+                  style="cursor: pointer;" title="Click to view details">{{vehicle.year}}
+                  {{vehicle.make}}
+                  {{vehicle.model}} {{vehicle.color}} ({{receipts2.length}}) </strong>
+              </h2>
+              <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle bg-danger text-white fs-14 fw-semibold" type="button"
+                  id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                  <span title="Total Receipt">${{getTotal2()}}</span> <span>-</span>
+                  <span title="Total Estimates">${{getVehicleTotalEstimates(vehicle)}}</span>
+                  <i class="fa fa-angle-down ms-2"></i>
+                </button>
+                <div class="dropdown-menu bg-light" style="min-width: 400px" aria-labelledby="dropdownMenuButton">
+                  <div class="row">
+                    <div class="col-6 px-1">
+                      <a class="dropdown-item">Items</a>
+                      <div class="dropdown-divider"></div>
+
+                      <a class="dropdown-item">Estimates</a>
+                      <a class="dropdown-item">Parts ({{autopartsSearch.length}})</a>
+                      <a class="dropdown-item fw-700">Est. - Parts</a>
+                      <a class="dropdown-item"></a>
+
+                      <a class="dropdown-item">Jobs ({{jobs.length}})</a>
+                      <a class="dropdown-item">Management</a>
+                      <!-- <a class="dropdown-item">Sales Commission</a> -->
+                      <a class="dropdown-item">Tax ({{this.company.taxRate*100}}%)</a>
+                      <div class="dropdown-divider"></div>
+
+                      <a class="dropdown-item fw-700">Total Costs</a>
+                      <a class="dropdown-item fw-700">Gross</a>
+
+                      <!-- <a class="dropdown-item">After Tax</a> -->
+                    </div>
+                    <div class="col-6 px-1">
+                      <a class="dropdown-item">#</a>
+                      <div class="dropdown-divider"></div>
+
+                      <a class="dropdown-item">${{getVehicleTotalEstimates(vehicle)}} (${{vehicle.price}} +
+                        ${{getTotalSupplements(vehicle)}})</a>
+                      <a class="dropdown-item text-danger">${{getTotalPartCosts(vehicle.id)}}</a>
+                      <a class="dropdown-item fw-700">${{getVehicleRemaining(vehicle)}}
+                        (${{getVehicleTotalEstimates(vehicle)}}-${{getTotalPartCosts(vehicle.id)}})</a>
+                      <a class="dropdown-item"></a>
+
+
+                      <a class="dropdown-item text-danger">${{getTotalJobPrice(jobs)}}</a>
+                      <a class="dropdown-item text-danger">${{getVehicleCostManagement(vehicle)}}
+                        ({{this.company.managementRate * 100}}% of
+                        ${{getVehicleRemaining(vehicle)}})</a>
+                      <!-- <a class="dropdown-item text-danger">${{getSalesCommission(vehicle)}} (7% of
+                          ${{vehicle.supplymentPrice}})</a> -->
+                      <a class="dropdown-item">${{getSaleTax(vehicle)}} ({{this.company.taxRate * 100}}% of
+                        {{getVehicleTotalEstimates(vehicle)}})</a>
+                      <div class="dropdown-divider"></div>
+
+                      <a class="dropdown-item fw-700 text-danger">${{getVehicleTotalCosts(vehicle, jobs)}}</a>
+                      <a class="dropdown-item fw-700">${{getVehicleGross(vehicle, jobs)}}</a>
+
+
+                    </div>
+                  </div>
+
+                </div>
+
+              </div>
+            </div>
+            <div class="d-lg-flex align-items-center justify-content-between px-1 mt-3">
+              <div class="d-flex align-items-center gap-3 w-80 v-receipt flex-wrap">
+                <select class="form-select h-48 px-3 border-radius-8" [(ngModel)]="vehicle.paymentMethod" #paymentMethod
+                  title="Payment Methods" (change)="onChangeVehiclePaymentMethod($event, paymentMethod.value)">
+                  <option value="0" disabled selected>Select Payment Method</option>
+                  <option [value]="paymentMethod.id" *ngFor="let paymentMethod of paymentMethods;let i=index;">
+                    {{paymentMethod.name}}</option>
+                </select>
+                <select class="form-select h-48 px-3 border-radius-8" [(ngModel)]="disclaimerId" #optionDisclaimerId
+                  title="Disclaimers" (change)="onChangeDisclaimer($event)">
+                  <option value="0" disabled selected>Select Disclaimer</option>
+                  <option [value]="disclaimer.id" *ngFor="let disclaimer of disclaimers;let i=index;">
+                    {{disclaimer.name}} <span *ngIf="disclaimer.isDefault ==true">(default)</span></option>
+                </select>
+                <select class="form-select h-48 px-3 border-radius-8" [(ngModel)]="warrantyId" #optionWarrantyId
+                  title="Warranties" (change)="OnChangeWarranty($event)">
+                  <option value="0" disabled selected>Select Warranty</option>
+                  <option [value]="warranty.id" [selected]="warranty.isDefault == true"
+                    *ngFor="let warranty of warranties;let i=index;">
+                    {{warranty.name}} <span *ngIf="warranty.isDefault ==true">(default)</span></option>
+                </select>
+                <div class="d-flex align-items-center gap-2">
+                  <label class="form-label fs-13 mb-0 me-2 fw-semibold">Parts Markup Percentage:</label>
+                  <select class="form-select h-48 px-3 border-radius-8" [(ngModel)]="vehicle.markupPrecentage"
+                    title="Parts Markup Percentage" (change)="onPartsMarkupPercentageChange()"
+                    [disabled]="vehicle.id == 0">
+                    <option [value]="i" *ngFor="let i of partsMarkupPercentageOptions">{{i}}%</option>
+                  </select>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                  <label class="form-label fs-13 mb-0 me-2 fw-semibold">Discount Percentage:</label>
+                  <select class="form-select h-48 px-3 border-radius-8" [(ngModel)]="vehicle.discountPercentage"
+                    title="Discount Percentage" (change)="onDiscountPercentageChange()" [disabled]="vehicle.id == 0">
+                    <option [value]="i" *ngFor="let i of discountPercentageOptions">{{i}}%</option>
+                  </select>
+                </div>
+                <div class="form-check form-switch d-flex ms-3 mw-150">
+                  <input class="form-check-input mt-0" type="checkbox" role="switch" id="tax"
+                    title="Apply Tax or No Tax" (change)="onChangeNoTax($event)" />
+                  <label class="form-check-label fa-13 mt-1 ms-4" for="tax">No Tax</label>
+                </div>
+              </div>
+              <div class="add-r">
+                <button *ngIf="user.allowAddReceipt == true"
+                  class="h-40 fs-13 mt-2 btn btn-primary px-4 border-radius-4" type="button"
+                  (click)="createReceipt2()"><i class="fa fa-plus me-2"></i> Add Receipt Item</button>
+                <button [disabled]="receipts2.length == 0" (click)="printPage('print-content-receipt', 'Receipt')"
+                  class="h-40 fs-13 mt-2 btn btn-secondary-abs px-4 border-radius-4 ms-md-3"><i
+                    class="fa fa-print me-2"></i> Print Receipt</button>
+
+              </div>
+            </div>
+            <div class="row mt-4">
+              <div class="mt-4 pt-1">
+                <div class="col-12 p-3 bg-white shadow border border-radius-8">
+
+                  <div class="table-responsive jobs-table bg-white border-radius-8 shadow" cdkDropList
+                    (cdkDropListDropped)="droppedReceipt2($event)">
+                    <table class="table table-bordered border-radius-8 w-100">
+                      <thead>
+                        <tr>
+                          <th class="bg-secondary p-4 fs-13 text-center text-white v-align-middle mw-100"
+                            style="width: 100px; border-right: 2px solid #6c757d;">Subtotal</th>
+                          <th class="bg-secondary p-4 fs-13 text-center text-white v-align-middle mw-50"
+                            style="width: 50px;">#
+                          </th>
+                          <th class="bg-secondary p-4 fs-13 text-center text-white v-align-middle">Item</th>
+                          <th *ngIf="hasEID()== true"
+                            class="bg-secondary p-4 fs-13 text-center text-white v-align-middle mw-50"
+                            style="width: 50px;">EID/AID
+                          </th>
+                          <th class="bg-secondary p-4 fs-13 text-center text-white v-align-middle"
+                            title="Click to go to Configuration" [routerLink]="'/item-types'"
+                            style="cursor:pointer; width:150px">Item Type</th>
+                          <th class="bg-secondary p-4 fs-13 text-center text-white v-align-middle w-10"
+                            style="width: 50px;">
+                            Quantity</th>
+                          <th class="bg-secondary p-4 fs-13 text-center text-white v-align-middle mw-100"
+                            style="width:100px"><i class="fa-solid fa-dollar-sign"></i></th>
+                          <th class="bg-secondary p-4 fs-13 text-center text-white v-align-middle mw-100"
+                            style="width: 100px;">Markup</th>
+                          <th class="bg-secondary p-4 fs-13 text-center text-white v-align-middle mw-50"><i
+                              class="fa-solid fa-clock"></i>
+                          </th>
+                          <th class="bg-secondary p-4 fs-13 text-center text-white v-align-middle mw-50"><i
+                              class="fa-solid fa-user"></i>
+                          </th>
+                          <th class="bg-secondary p-4 fs-13 text-center text-white v-align-middle" style="width:100px;">
+                            Action
+                          </th>
+                        </tr>
+
+
+                      </thead>
+                      <tbody>
+                        <tr class="alert-info" *ngFor="let receipt of receipts2; let i=index"
+                          (click)="setReceiptId2(receipt.id)"
+                          [style.background-color]="receipt.id == currentReceipt2Id? '#FFF3CD' : (true ? '#CFF4FC' : '#CFF4FC')">
+                          <td class="fs-13 p-2 text-center v-align-middle" style="border-right: 2px solid #6c757d;">
+                            ${{getReceiptSubTotal2(receipt)}}</td>
+                          <td class="fs-13 p-2 text-center v-align-middle" [cdkDragDisabled]="isMobile==true" cdkDrag
+                            title="Drag and drop index number to change the order">
+                            {{i+1}}
+                          </td>
+                          <td class="fs-13 p-2"
+                            [attr.title]="{'Please specify item information':receipt.notes == ''|| receipt.notes == null }">
+                            <textarea [(ngModel)]="receipt.notes" class="form-control"
+                              [ngClass]="{'blink border-danger': receipt.notes == ''|| receipt.notes == null }"
+                              placeholder="Please Specify" (keyup.enter)="onEnterReceipt2('notes',receipt)" rows="1"
+                              oninput='this.style.height = "";this.style.height = this.scrollHeight + "px"'
+                              maxlength="200" [disabled]="user.allowAddReceipt == false"></textarea>
+                          </td>
+                          <td *ngIf="hasEID()== true" class="fs-13 p-2 fw-500 text-center v-align-middle">
+                            <span *ngIf="receipt.claimId > 0" title="Click to view estimate item"
+                              (click)="openTab('claims-tab')">{{receipt.claimId}}</span>
+                            <span *ngIf="receipt.autopartId > 0" title="Click to view auto parts detail"
+                              (click)="openTab('autoparts-tab')">{{receipt.autopartId}}</span>
+                          </td>
+                          <td class="p-2 text-center">
+                            <select class="form-select h-48 px-3 border-radius-8"
+                              [disabled]="user.allowAddReceipt == false" [(ngModel)]="receipt.itemType"
+                              (change)="onEnterReceipt2('item type',receipt)">
+                              <option value="0" disabled selected>Select Type</option>
+                              <option value="0" *ngIf="receipt.itemType > 0">Un-select Type</option>
+                              <option [value]="itemType.id" *ngFor="let itemType of itemTypes;let i=index;">
+                                {{itemType.name}}
+                              </option>
+                            </select>
+                          </td>
+                          <td class="fs-13 p-2"><input (keyup.enter)="onEnterReceipt2('quantity',receipt)"
+                              [(ngModel)]="receipt.quantity" onKeyPress="if(this.value.length==10) return false"
+                              pattern="[0-9]" type="number" class="form-control form-control-sm h-40 border-radius-4" />
+                          </td>
+                          <td class="fs-13 p-2"><input (keyup.enter)="onEnterReceipt2('amount',receipt)"
+                              [(ngModel)]="receipt.amount" onKeyPress="if(this.value.length==10) return false"
+                              pattern="[0-9]" type="number" class="form-control form-control-sm h-40 border-radius-4" />
+                          </td>
+                          <td class="fs-13 p-2 text-center v-align-middle">
+                            <span *ngIf="receipt.autopartId > 0">
+                              ${{(getReceiptSubTotal2(receipt) * (1 + (vehicle.markupPrecentage || 25) /
+                              100)).toFixed(2)}}
+                            </span>
+                            <span *ngIf="receipt.autopartId == 0 || !receipt.autopartId">-</span>
+                          </td>
+                          <td class="fs-13 p-2 text-center v-align-middle">
+                            {{receipt.createdAt | date: 'MM/dd/yyyy HH:mm'}}
+                          </td>
+                          <td class="fs-13 p-2 text-center  v-align-middle">
+                            <ng-container *ngFor="let user of users;let i=index;">
+                              <span *ngIf="user.id == receipt.userId">
+                                {{(user.firstName + " " + user.lastName) | shortName:2}}
+                              </span>
+                            </ng-container>
+
+
+                          </td>
+                          <td class="p-2 text-center">
+                            <div class="d-flex align-items-center justifyc-cntent-center gap-2">
+                              <button class="btn btn-outline-danger btn-sm" [disabled]="user.allowAddReceipt == false"
+                                title="Delete" (click)="deleteVehicleReceipt2(null, receipt)"><i
+                                  class="fa fa-trash"></i></button>
+                              <button class="btn btn-outline-success btn-sm" [disabled]="user.allowAddReceipt == false"
+                                title="Save" (click)="onEnterReceipt2('update', receipt)"><i
+                                  class="fa fa-save"></i></button>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr style="border-top: 2px solid #6c757d;">
+                          <td class="fs-15 p-3 text-center v-align-middle fw-700"
+                            style="border-right: 2px solid #6c757d; border-top: 2px solid #6c757d;">${{getSubtotal2()}}
+                          </td>
+                          <td colspan="10" class="fs-15 p-3 text-end fw-700" style="border-top: 2px solid #6c757d;"
+                            *ngIf="hasEID()== false">
+                            Grand Total:
+                          </td>
+                          <td colspan="11" class="fs-15 p-3 text-end fw-700" style="border-top: 2px solid #6c757d;"
+                            *ngIf="hasEID()== true">
+                            Grand Total:
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-lg-6 col-md-8">
+                <div *ngIf="getSubtotal2() > 0">
+                  <h3 class="fs-20 fw-700 my-3">Payment Method</h3>
+                  <ng-container *ngFor="let paymentMethod of this.paymentMethods">
+                    <p class="fs-14" *ngIf="paymentMethod.id==vehicle.paymentMethod">{{paymentMethod.name}}</p>
+                  </ng-container>
+                </div>
+                <h3 class="fs-20 fw-700 my-4 pt-3" *ngIf="warrantyText != ''">Warranties</h3>
+                <p [innerHtml]=" warrantyText" *ngIf="warrantyText != ''" class="wave fs-13 line-height-130">
+                </p>
+                <h3 class="fs-20 fw-700 my-4 pt-3">Terms &amp; Conditions</h3>
+                <p [innerHtml]="disclaimerText" *ngIf="disclaimerText != ''" class="wave fs-13 line-height-130"></p>
+              </div>
+              <div class="col-lg-3 col-md-12"></div>
+              <div class="col-lg-3 col-md-4" *ngIf="getSubtotal2() > 0">
+                <ul>
+                  <li class="d-flex justify-content-between my-4"><strong class="fs-15">Subtotal:</strong>
+                    <p class="fs-15 text-black px-1 fw-700">${{getSubtotal2()}}</p>
+                  </li>
+                  <li class="d-flex justify-content-between my-4" *ngIf="getPartsMarkupSubtotal2() > 0">
+                    <strong class="fs-15">Parts Markup Subtotal:</strong>
+                    <p class="fs-15 text-black px-1 fw-700">${{getPartsMarkupSubtotal2()}}</p>
+                  </li>
+                  <li class="d-flex justify-content-between my-4"><strong class="fs-15">Tax ({{company.taxRate
+                      *100}}%):</strong>
+                    <p class="fs-15 text-black  px-1 fw-700">${{getTax2() }}</p>
+                  </li>
+                  <li class="d-flex justify-content-between my-4" *ngIf="getDiscountAmount2() > 0">
+                    <strong class="fs-15">Discount ({{vehicle.discountPercentage || 0}}%):</strong>
+                    <p class="fs-15 text-black px-1 fw-700">-${{getDiscountAmount2()}}</p>
+                  </li>
+                  <li
+                    class="d-flex justify-content-between d-block bg-navy  pt-3 pb-3 ps-5 text-white fw-700 fs-16 left-pill my-2">
+                    <strong class="fs-15">Total:</strong>
+                    <p class="fs-15 px-1">${{getTotalWithDiscount2()}}</p>
+                  </li>
+                  <!-- <li class="d-flex justify-content-between my-4 fw-700 text-black">
+                    <strong class="fs-18 fw-700">Total Payments: </strong>
+                    <p class="fs-18 fw-700">${{getTotalPayments2()}}</p>
+                  </li> -->
+                  <li
+                    class="d-flex justify-content-between d-block bg-navy  pt-3 pb-3 ps-5 text-white fw-700 fs-16 left-pill my-2">
+                    <strong class="fs-15">Payments:</strong>
+                    <p class="fs-15 px-1">${{getTotalPayments2()}}</p>
+                  </li>
+                  <li
+                    class="d-flex justify-content-between d-block bg-navy  pt-3 pb-3 ps-5 text-white fw-700 fs-16 left-pill">
+                    <strong class="fs-15">Balance:</strong>
+                    <p class="fs-15 px-1">${{getTotalBallance2()}}</p>
+                  </li>
+                  <li
+                    class="d-flex justify-content-between d-block bg-success  pt-3 pb-3 ps-5 text-white fw-700 fs-18 left-pill my-2">
+                    <strong class="fs-16">Total Due:</strong>
+                    <p class="fs-16 px-1">${{getTotalDue2()}}</p>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <br />
+            <br />
+          </div>
           <div class="tab-pane fade show" id="histories-damages" role="tabpanel" #taggroup
             aria-labelledby="histories-damages-tab">
 
@@ -6790,6 +7115,10 @@
             <button (click)="editModeVehicle = false; openTab('receipts-tab')" title="Vehicle Invoice Items"
               data-bs-dismiss="modal" aria-label="Close Form"
               class="btn rounded-0 btn-sm btn-secondary-abs">Invoices({{receipts.length}})</button>
+
+            <button (click)="editModeVehicle = false; openTab('invoices-tab')" title="Vehicle Invoice2 Items"
+              data-bs-dismiss="modal" aria-label="Close Form"
+              class="btn rounded-0 btn-sm btn-secondary-abs">Invoices({{receipts2.length}})</button>
 
             <button (click)="editModeVehicle = false; openTab('histories-tab'); getVehicleHistory(vehicle.id)"
               title="Vehicle Change Histories" data-bs-dismiss="modal" aria-label="Vehicle Histoiers"
@@ -11242,12 +11571,13 @@
         <div class="mb-3">
           <label class="form-label">Insurance Link</label>
           <div class="alert alert-info">
-            <a [href]="generatedInsuranceUrl" target="_blank">{{ generatedInsuranceUrl.changingThisBreaksApplicationSecurity }}</a>
+            <a [href]="generatedInsuranceUrl" target="_blank">{{
+              generatedInsuranceUrl.changingThisBreaksApplicationSecurity }}</a>
           </div>
           <button type="button" class="btn btn-primary mt-2" (click)="sendToInsurance()">Send</button>
         </div>
         <div class="mb-3">
-            <iframe [src]="generatedInsuranceUrl" width="100%" height="600px" style="border:none;"></iframe>
+          <iframe [src]="generatedInsuranceUrl" width="100%" height="600px" style="border:none;"></iframe>
         </div>
       </div>
       <div class="modal-footer">

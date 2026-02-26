@@ -1,0 +1,25 @@
+-- Create receipts2 table (duplicate of receipts table structure)
+CREATE TABLE IF NOT EXISTS receipts2 (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    name VARCHAR(255),
+    invoice_number VARCHAR(255),
+    amount FLOAT DEFAULT 0.0,
+    quantity INT DEFAULT 1,
+    comments TEXT,
+    user_id BIGINT,
+    vehicle_id BIGINT,
+    claim_id BIGINT DEFAULT 0,
+    autopart_id BIGINT DEFAULT 0,
+    status INT DEFAULT 0,
+    item_type INT DEFAULT 0,
+    token VARCHAR(36),
+    archived BOOLEAN DEFAULT FALSE,
+    sequence_number INT DEFAULT 0,
+    notes VARCHAR(500),
+    INDEX idx_vehicle_id (vehicle_id),
+    INDEX idx_user_id (user_id),
+    INDEX idx_claim_id (claim_id),
+    INDEX idx_autopart_id (autopart_id)
+);

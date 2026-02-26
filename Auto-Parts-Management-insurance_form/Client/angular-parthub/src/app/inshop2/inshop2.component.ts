@@ -342,25 +342,6 @@ export class Inshop2Component implements OnInit, AfterViewInit {
   receipts2: Receipt2[] = new Array();
   receipt2: Receipt2 = new Receipt2();
 
-  getTotal2() {
-    let total = 0;
-    for (var i = 0; i < this.receipts2.length; i++) {
-      if (this.receipts2[i].amount) {
-        total += (this.receipts2[i].amount * this.receipts2[i].quantity);
-      }
-    }
-    return total;
-  }
-
-  getTax2() {
-    return this.getTotal2() * this.companyDefaultTaxRate / 100;
-  }
-
-  getTotalDue2() {
-    return this.getTotal2() + this.getTax2();
-  }
-
-
   claims: Claim[] = new Array();
   claim: Claim = new Claim();
 
@@ -1132,6 +1113,7 @@ export class Inshop2Component implements OnInit, AfterViewInit {
         }
 
         this.getAllVehicleReceipt(this.vehicle.id);
+        this.getAllVehicleReceipts2(this.vehicle.id);
 
       },
       error: (e) => console.error(e)
@@ -3363,6 +3345,7 @@ export class Inshop2Component implements OnInit, AfterViewInit {
     this.getVehicleJobs2(this.vehicle.id);
     this.getVehiclePayments(this.vehicle.id);
     this.getAllVehicleReceipt(this.vehicle.id);
+    this.getAllVehicleReceipts2(this.vehicle.id);
     this.getAllVehicleClaims(this.vehicle.id);
     this.getAutopartForVehicle(this.vehicle.id, true);
     this.getAllVehiclePurchaseOrderVehicles(this.vehicle.id);
@@ -3842,6 +3825,7 @@ export class Inshop2Component implements OnInit, AfterViewInit {
         claim.id = this.claimAi.id;
         //this.getAutopartForVehicle(this.vehicle.id, false);
         this.getAllVehicleReceipt(this.vehicle.id);
+        this.getAllVehicleReceipts2(this.vehicle.id);
         this.getAllVehicleClaims(this.vehicle.id);
       }
     })
@@ -4809,6 +4793,7 @@ export class Inshop2Component implements OnInit, AfterViewInit {
         this.errorMessage = "Created Successfully";
         this.getAutopartForVehicle(this.vehicle.id, false);
         this.getAllVehicleReceipt(this.vehicle.id);
+        this.getAllVehicleReceipts2(this.vehicle.id);
       },
       error: (e) => console.error(e)
     });
@@ -5975,6 +5960,7 @@ export class Inshop2Component implements OnInit, AfterViewInit {
         }
         // this.getVehiclePayments(this.vehicle.id);
         this.getAllVehicleReceipt(this.vehicle.id);
+        this.getAllVehicleReceipts2(this.vehicle.id);
       }
     })
   }
@@ -10407,7 +10393,7 @@ export class Inshop2Component implements OnInit, AfterViewInit {
   }
 
   getAllVehicleReceipts2(vehicleId: any): void {
-    this.receipt2Service.getAllVehicleReceipts(vehicleId).subscribe({
+    this.receipt2Service.getAllVehicleReceipts2(vehicleId).subscribe({
       next: data => {
         if (data != null) {
           this.receipts2 = data;
@@ -10416,6 +10402,195 @@ export class Inshop2Component implements OnInit, AfterViewInit {
       },
       error: (e) => console.error(e)
     });
+  }
+
+  createReceipt2(): void {
+    let receipt2: Receipt2 = new Receipt2();
+    receipt2.name = "change Me";
+    receipt2.userId = this.user.id;
+    receipt2.quantity = 1;
+    receipt2.vehicleId = this.vehicle.id;
+    receipt2.notes = "";
+    receipt2.invoiceNumber = this.randomString();
+
+    this.receipt2Service.createReceipt2(this.user.id, receipt2).subscribe({
+      next: result => {
+        if (result) {
+          console.log(result);
+          this.getAllVehicleReceipts2(this.vehicle.id);
+        }
+      }
+    })
+  }
+
+  setReceiptId2(receiptId: any): void {
+    this.currentReceipt2Id = receiptId;
+    console.log(this.currentReceipt2Id);
+  }
+
+  getReceiptSubTotal2(receipt: any): any {
+    return +((receipt.quantity * receipt.amount).toFixed(2));
+  }
+
+  onEnterReceipt2(reason: any, receipt: Receipt2): void {
+    receipt.reason = reason;
+    this.receipt2Service.createReceipt2(this.currentUser.id, receipt).subscribe({
+      next: result => {
+        if (result) {
+          this.receipt2 = result;
+          if (this.receipt2.claimId > 0) {
+            this.getAllVehicleClaims(this.vehicle.id);
+          }
+          if (this.receipt2.autopartId > 0) {
+            this.getAutopartForVehicle(this.vehicle.id, true);
+          }
+        }
+      }
+    })
+  }
+
+  deleteVehicleReceipt2($event: any, receipt: Receipt2) {
+    console.log("deleteVehicleReceipt2" + receipt.id);
+
+    if (receipt.claimId > 0 || receipt.autopartId > 0) {
+      var message = "";
+      const customTitle = 'Remove Invoice [' + receipt.notes + "]";
+
+      if (receipt.claimId > 0) {
+        message = "Remove estimate [" + receipt.claimId + "] at the same time ?";
+      }
+
+      if (receipt.autopartId > 0) {
+        message = "Remove auto parts [" + receipt.autopartId + "] at the same time ?";
+      }
+
+      const buttonType = "yesNoCancel"
+
+      this.confirmationService.confirm(message, customTitle, buttonType, (confirmed: boolean) => {
+        if (confirmed == undefined) {
+          console.log("cancelled");
+          return;
+        }
+        else if (confirmed) {
+          this.receipt2Service.deleteReceiptWithOptionWithUserId2(this.user.id, receipt.id).subscribe({
+            next: result => {
+              console.log(result);
+              this.getAllVehicleReceipts2(this.vehicle.id);
+              this.getAllVehicleClaims(this.vehicle.id);
+              this.getAutopartForVehicle(this.vehicle.id, true);
+            }
+          })
+        } else {
+          this.receipt2Service.deleteReceipt2(receipt.id).subscribe({
+            next: result => {
+              console.log(result);
+              this.getAllVehicleReceipts2(this.vehicle.id);
+            }
+          })
+        }
+      });
+    } else {
+      var message = "";
+      const customTitle = 'Remove Invoice [' + receipt.notes + "]";
+      message = "Are you sure to remove this invoice item ?";
+      const buttonType = "yesNo"
+
+      this.confirmationService.confirm(message, customTitle, buttonType, (confirmed: boolean) => {
+        if (confirmed) {
+          this.receipt2Service.deleteReceiptWithUserId2(this.user.id, receipt.id).subscribe({
+            next: result => {
+              console.log(result);
+              this.getAllVehicleReceipts2(this.vehicle.id);
+            }
+          })
+        } else {
+          return;
+        }
+      });
+    }
+  }
+
+  getSubtotal2(): number {
+    var total: number = 0;
+    if (this.receipts2.length > 0) {
+      for (let receipt of this.receipts2) {
+        total += (receipt.quantity * receipt.amount);
+      }
+      return +(total.toFixed(2));
+    } else {
+      return total;
+    }
+  }
+
+  getPartsMarkupSubtotal2(): number {
+    var total: number = 0;
+    if (this.receipts2.length > 0) {
+      const markupPercentage = this.vehicle.markupPrecentage || 50;
+      for (let receipt of this.receipts2) {
+        if (receipt.autopartId > 0) {
+          const subtotal = receipt.quantity * receipt.amount;
+          const markupAmount = subtotal * (markupPercentage / 100);
+          total += markupAmount;
+        }
+      }
+      return +(total.toFixed(2));
+    }
+    return 0;
+  }
+
+  getTax2(): number {
+    var total: number = 0;
+    for (let receipt of this.receipts2) {
+      total += (receipt.quantity * receipt.amount);
+    }
+    return +(Math.round(total * this.company.taxRate)).toFixed(2);
+  }
+
+  getTotal2(): number {
+    return +(this.getSubtotal2() + this.getTax2()).toFixed(2);
+  }
+
+  getDiscountAmount2(): number {
+    const subtotal = this.getSubtotal2();
+    const partsMarkupSubtotal = this.getPartsMarkupSubtotal2();
+    const tax = this.getTax2();
+    const totalBeforeDiscount = subtotal + partsMarkupSubtotal + tax;
+    const discountPercentage = this.vehicle.discountPercentage || 0;
+    const discountAmount = totalBeforeDiscount * (discountPercentage / 100);
+    return +(discountAmount.toFixed(2));
+  }
+
+  getTotalWithDiscount2(): number {
+    const subtotal = this.getSubtotal2();
+    const partsMarkupSubtotal = this.getPartsMarkupSubtotal2();
+    const tax = this.getTax2();
+    const totalBeforeDiscount = subtotal + partsMarkupSubtotal + tax;
+    const discountPercentage = this.vehicle.discountPercentage || 0;
+    const discountAmount = totalBeforeDiscount * (discountPercentage / 100);
+    const finalTotal = totalBeforeDiscount - discountAmount;
+    return +(finalTotal.toFixed(2));
+  }
+
+  getTotalPayments2(): number {
+    var total: number = 0;
+    if (this.payments.length > 0) {
+      for (let payment of this.payments) {
+        total += payment.amount;
+      }
+      return +(total.toFixed(2));
+    } else {
+      return total;
+    }
+  }
+
+  getTotalBallance2(): number {
+    return +((this.getSubtotal2() + this.getTax2()) - this.getTotalPayments2()).toFixed(2);
+  }
+
+  getTotalDue2(): number {
+    const totalWithDiscount = this.getTotalWithDiscount2();
+    const payments = this.getTotalPayments2();
+    return +((totalWithDiscount - payments).toFixed(2));
   }
 
   randomString(): string {
@@ -10444,6 +10619,7 @@ export class Inshop2Component implements OnInit, AfterViewInit {
           this.vehicle.reason = "";
           // Trigger receipts update to recalculate prices
           this.getAllVehicleReceipt(this.vehicle.id);
+          this.getAllVehicleReceipts2(this.vehicle.id);
         },
         error: (e) => {
           console.error(e);
@@ -10470,6 +10646,7 @@ export class Inshop2Component implements OnInit, AfterViewInit {
           this.vehicle.reason = "";
           // Trigger receipts update to recalculate prices
           this.getAllVehicleReceipt(this.vehicle.id);
+          this.getAllVehicleReceipts2(this.vehicle.id);
         },
         error: (e) => {
           console.error(e);
@@ -11018,6 +11195,7 @@ export class Inshop2Component implements OnInit, AfterViewInit {
     this.getVehicleJobs2(this.vehicle.id);
     this.getVehiclePayments(this.vehicle.id);
     this.getAllVehicleReceipt(this.vehicle.id);
+    this.getAllVehicleReceipts2(this.vehicle.id);
 
   }
 
