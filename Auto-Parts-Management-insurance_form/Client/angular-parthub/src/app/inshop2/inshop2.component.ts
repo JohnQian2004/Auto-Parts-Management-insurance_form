@@ -3225,6 +3225,7 @@ export class Inshop2Component implements OnInit, AfterViewInit {
     this.getVehicleJobs2(vehicle.id);
     this.getVehiclePayments(vehicle.id);
     this.getAllVehicleReceipt(vehicle.id);
+    this.getAllVehicleReceipts2(vehicle.id);
     this.getAllVehicleClaims(vehicle.id);
     this.getAutopartForVehicle(vehicle.id, true);
     this.getAllVehiclePurchaseOrderVehicles(vehicle.id);
