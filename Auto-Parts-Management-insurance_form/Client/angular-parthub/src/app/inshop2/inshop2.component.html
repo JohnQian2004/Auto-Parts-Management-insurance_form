@@ -7171,9 +7171,17 @@
                   </tr>
                   <tr>
                     <th class="fs-13 w-25 bg-light">Vehicle Status</th>
-                    <td class="fs-13 w-25" style="word-break: break-word;"><ng-container
-                        *ngFor="let option of statuss; let i=index"><strong
-                          *ngIf="vehicle.status==option.id">{{option.name}}</strong></ng-container></td>
+                    <td class="fs-13 w-25" style="word-break: break-word;">
+                      <ng-container *ngFor="let option of statuss; let i=index">
+                        <strong *ngIf="vehicle.status==option.id">{{option.name}}</strong>
+                      </ng-container>
+                      <button (click)="openSmsForm()" class="btn btn-sm btn-primary ms-2" title="Send SMS to Customer">
+                        <i class="fa fa-sms"></i> Send SMS
+                      </button>
+                      <button (click)="openSmsHistory()" class="btn btn-sm btn-info ms-1" title="View SMS History">
+                        <i class="fa fa-history"></i> SMS History ({{smsMessages.length}})
+                      </button>
+                    </td>
                     <th class="fs-13 w-25 bg-light">Parking Location</th>
                     <td class="fs-13 w-25" style="word-break: break-word;"><ng-container
                         *ngFor="let location of locations; let i=index">
@@ -8256,6 +8264,117 @@
       </div>
     </div>
   </div>
+
+  <!-- SMS Send Form Modal -->
+  <div class="modal fade" [class.show]="showSmsForm" [style.display]="showSmsForm ? 'block' : 'none'" 
+    id="smsFormModal" tabindex="-1" aria-labelledby="smsFormModalLabel" [attr.aria-hidden]="!showSmsForm">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content border-radius-8">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title" id="smsFormModalLabel">
+            <i class="fa fa-sms"></i> Send SMS to Customer
+            <span *ngIf="smsSimulatorMode" class="badge bg-warning text-dark ms-2">
+              <i class="fa fa-flask"></i> SIMULATOR MODE
+            </span>
+          </h5>
+          <button type="button" class="btn-close btn-close-white" (click)="closeSmsForm()" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4">
+          <div *ngIf="smsSimulatorMode" class="alert alert-info mb-3">
+            <i class="fa fa-info-circle"></i> <strong>Simulator Mode Active</strong><br>
+            SMS will be simulated without actual Twilio. An auto-reply will be generated in 2-5 seconds.
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold">Vehicle Information</label>
+            <p class="text-muted">{{vehicle.year}} {{vehicle.make}} {{vehicle.model}} - {{vehicle.color}}</p>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold">Customer</label>
+            <p class="text-muted">{{vehicle.customer?.firstName}} {{vehicle.customer?.lastName}}</p>
+          </div>
+          <div class="mb-3">
+            <label for="smsPhoneNumber" class="form-label fw-bold">Phone Number <span class="text-danger">*</span></label>
+            <input type="tel" class="form-control" id="smsPhoneNumber" [(ngModel)]="smsPhoneNumber" 
+              placeholder="Enter phone number" required>
+          </div>
+          <div class="mb-3">
+            <label for="smsMessageText" class="form-label fw-bold">Message <span class="text-danger">*</span></label>
+            <textarea class="form-control" id="smsMessageText" [(ngModel)]="smsMessageText" 
+              rows="6" placeholder="Enter your message" required maxlength="1600"></textarea>
+            <small class="text-muted">{{smsMessageText?.length || 0}}/1600 characters</small>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeSmsForm()">Cancel</button>
+          <button type="button" class="btn btn-primary" (click)="sendSmsMessage()">
+            <i class="fa fa-paper-plane"></i> Send SMS
+            <span *ngIf="smsSimulatorMode">(Simulated)</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SMS History Modal -->
+  <div class="modal fade" [class.show]="showSmsHistory" [style.display]="showSmsHistory ? 'block' : 'none'" 
+    id="smsHistoryModal" tabindex="-1" aria-labelledby="smsHistoryModalLabel" [attr.aria-hidden]="!showSmsHistory">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content border-radius-8">
+        <div class="modal-header bg-info text-white">
+          <h5 class="modal-title" id="smsHistoryModalLabel">
+            <i class="fa fa-history"></i> SMS History - {{vehicle.year}} {{vehicle.make}} {{vehicle.model}}
+          </h5>
+          <button type="button" class="btn-close btn-close-white" (click)="closeSmsHistory()" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4" style="max-height: 600px; overflow-y: auto;">
+          <div *ngIf="smsMessages.length === 0" class="text-center text-muted py-5">
+            <i class="fa fa-inbox fa-3x mb-3"></i>
+            <p>No SMS messages found for this vehicle.</p>
+          </div>
+          <div *ngFor="let msg of smsMessages" class="card mb-3 shadow-sm">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <div>
+                  <span class="badge" [class.bg-success]="msg.direction === 'outbound'" 
+                    [class.bg-primary]="msg.direction === 'inbound'">
+                    <i class="fa" [class.fa-arrow-up]="msg.direction === 'outbound'" 
+                      [class.fa-arrow-down]="msg.direction === 'inbound'"></i>
+                    {{msg.direction === 'outbound' ? 'Sent' : 'Received'}}
+                  </span>
+                  <span class="badge ms-2" [class.bg-success]="msg.status === 'delivered' || msg.status === 'received'" 
+                    [class.bg-warning]="msg.status === 'sent'" 
+                    [class.bg-danger]="msg.status === 'failed'">
+                    {{msg.status}}
+                  </span>
+                  <span *ngIf="msg.vehicleStatus" class="badge bg-secondary ms-2">{{msg.vehicleStatus}}</span>
+                </div>
+                <small class="text-muted">{{formatSmsDate(msg.createdAt)}}</small>
+              </div>
+              <div class="mb-2">
+                <strong>Phone:</strong> {{msg.phoneNumber}}
+              </div>
+              <div class="alert alert-light mb-2" style="white-space: pre-wrap;">{{msg.message}}</div>
+              <div *ngIf="msg.errorMessage" class="alert alert-danger mb-2">
+                <strong>Error:</strong> {{msg.errorMessage}}
+              </div>
+              <div class="text-end" *ngIf="msg.direction === 'inbound'">
+                <button class="btn btn-sm btn-primary" (click)="replyToSms(msg)">
+                  <i class="fa fa-reply"></i> Reply
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeSmsHistory()">Close</button>
+          <button type="button" class="btn btn-primary" (click)="openSmsForm()">
+            <i class="fa fa-sms"></i> Send New SMS
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="modal fade" id="myAccount" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
     aria-labelledby="myAccountLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">

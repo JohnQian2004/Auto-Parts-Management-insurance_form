@@ -135,6 +135,8 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
             .requestMatchers("/api/receipts2/vehicle/*").permitAll()
             .requestMatchers("/api/receipts2/vehicle/**").permitAll()
             .requestMatchers("/api/receipts2/**").permitAll()
+            .requestMatchers("/api/sms/webhook").permitAll()
+            .requestMatchers("/api/sms/**").permitAll()
             .requestMatchers("/api/claims/**").permitAll()
             .requestMatchers("/api/insurancers/**").permitAll()
             .requestMatchers("/api/insurance/**").permitAll()

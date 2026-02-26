@@ -199,4 +199,7 @@ public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
         int countByArchivedAndCompanyIdNot(boolean achived, long companyId);
 
         long countByCompanyIdNotAndCreatedAtBetween(int i, Date from, Date to);
+
+        @Query("SELECT v FROM Vehicle v WHERE v.customer.phone = :phone ORDER BY v.createdAt DESC")
+        List<Vehicle> findByCustomerPhone(@Param("phone") String phone);
 }

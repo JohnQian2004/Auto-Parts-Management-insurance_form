@@ -56,8 +56,10 @@ import { Setting } from '../models/setting.model';
 import { EmployeeRole } from '../models/employee.role.model';
 import { ReceiptService } from '../_services/receipt.service';
 import { Receipt2Service } from '../_services/receipt2.service';
+import { SmsService } from '../_services/sms.service';
 import { Receipt } from '../models/receipt.model';
 import { Receipt2 } from '../models/receipt2.model';
+import { SmsMessage } from '../models/smsmessage.model';
 import { jsPDF } from "jspdf";
 import htmlToPdfmake from 'html-to-pdfmake';
 import * as pdfMake from 'pdfmake/build/pdfmake';
@@ -342,6 +344,14 @@ export class Inshop2Component implements OnInit, AfterViewInit {
   receipts2: Receipt2[] = new Array();
   receipt2: Receipt2 = new Receipt2();
 
+  smsMessages: SmsMessage[] = new Array();
+  smsMessage: SmsMessage = new SmsMessage();
+  showSmsForm: boolean = false;
+  showSmsHistory: boolean = false;
+  smsPhoneNumber: string = '';
+  smsMessageText: string = '';
+  smsSimulatorMode: boolean = true;
+
   claims: Claim[] = new Array();
   claim: Claim = new Claim();
 
@@ -537,6 +547,7 @@ export class Inshop2Component implements OnInit, AfterViewInit {
     private noteService: NoteService,
     private receiptService: ReceiptService,
     private receipt2Service: Receipt2Service,
+    private smsService: SmsService,
     private authService: AuthService,
     private http: HttpClient,
     private sanitizationService: DomSanitizer,
@@ -3229,6 +3240,7 @@ export class Inshop2Component implements OnInit, AfterViewInit {
     this.getAllVehicleClaims(vehicle.id);
     this.getAutopartForVehicle(vehicle.id, true);
     this.getAllVehiclePurchaseOrderVehicles(vehicle.id);
+    this.loadSmsHistory();
     //this.getPdfFiles(vehicle.id)
 
     this.url = location.origin + "/#/vehicle2/" + this.vehicle.token;
@@ -10607,6 +10619,125 @@ export class Inshop2Component implements OnInit, AfterViewInit {
     }
 
     return randomstring;
+  }
+
+  // SMS Methods
+  openSmsForm(): void {
+    this.showSmsForm = true;
+    this.showSmsHistory = false;
+    this.smsPhoneNumber = this.vehicle.customer?.phone || '';
+    this.checkSimulatorMode();
+    
+    // Get vehicle status name
+    let statusName = '';
+    for (let status of this.statuss) {
+      if (status.id === this.vehicle.status) {
+        statusName = status.name || '';
+        break;
+      }
+    }
+    
+    // Pre-fill message with vehicle info and status
+    this.smsMessageText = `Hi ${this.vehicle.customer?.firstName || 'Customer'},\n\nYour ${this.vehicle.year} ${this.vehicle.make} ${this.vehicle.model} status: ${statusName}\n\nThank you!`;
+  }
+
+  checkSimulatorMode(): void {
+    this.smsService.getSimulatorStatus().subscribe({
+      next: (status: any) => {
+        this.smsSimulatorMode = status.simulatorEnabled;
+        console.log('SMS Mode:', status.mode);
+      },
+      error: () => {
+        this.smsSimulatorMode = true; // Default to simulator
+      }
+    });
+  }
+
+  closeSmsForm(): void {
+    this.showSmsForm = false;
+    this.smsMessageText = '';
+  }
+
+  sendSmsMessage(): void {
+    if (!this.smsPhoneNumber || !this.smsMessageText) {
+      alert('Please enter phone number and message');
+      return;
+    }
+
+    const smsMessage = new SmsMessage();
+    smsMessage.vehicleId = this.vehicle.id;
+    smsMessage.userId = this.user.id;
+    smsMessage.phoneNumber = this.smsPhoneNumber;
+    smsMessage.message = this.smsMessageText;
+    
+    // Get vehicle status name
+    for (let status of this.statuss) {
+      if (status.id === this.vehicle.status) {
+        smsMessage.vehicleStatus = status.name || '';
+        break;
+      }
+    }
+
+    this.smsService.sendSms(smsMessage).subscribe({
+      next: result => {
+        console.log('SMS sent:', result);
+        if (this.smsSimulatorMode) {
+          alert('SMS sent successfully! (SIMULATOR MODE)\n\nAn auto-reply will arrive in 2-5 seconds.');
+        } else {
+          alert('SMS sent successfully!');
+        }
+        this.closeSmsForm();
+        this.loadSmsHistory();
+        
+        // Auto-refresh history after 6 seconds to show simulated reply
+        if (this.smsSimulatorMode) {
+          setTimeout(() => {
+            this.loadSmsHistory();
+          }, 6000);
+        }
+      },
+      error: error => {
+        console.error('Error sending SMS:', error);
+        alert('Failed to send SMS. Please check configuration.');
+      }
+    });
+  }
+
+  openSmsHistory(): void {
+    this.showSmsHistory = true;
+    this.showSmsForm = false;
+    this.loadSmsHistory();
+  }
+
+  closeSmsHistory(): void {
+    this.showSmsHistory = false;
+  }
+
+  loadSmsHistory(): void {
+    if (this.vehicle.id > 0) {
+      this.smsService.getVehicleSmsMessages(this.vehicle.id).subscribe({
+        next: messages => {
+          this.smsMessages = messages;
+          console.log('SMS history loaded:', messages);
+        },
+        error: error => {
+          console.error('Error loading SMS history:', error);
+        }
+      });
+    }
+  }
+
+  replyToSms(message: SmsMessage): void {
+    this.showSmsForm = true;
+    this.showSmsHistory = false;
+    this.smsPhoneNumber = message.phoneNumber;
+    this.smsMessageText = '';
+  }
+
+  formatSmsDate(date: any): string {
+    if (!date) return '';
+    const d = new Date(date);
+    return d.toLocaleString();
   }
 
   onMarkupPercentageChange(): void {
