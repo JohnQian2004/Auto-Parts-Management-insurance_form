@@ -56,10 +56,10 @@ import { Setting } from '../models/setting.model';
 import { EmployeeRole } from '../models/employee.role.model';
 import { ReceiptService } from '../_services/receipt.service';
 import { Receipt2Service } from '../_services/receipt2.service';
-import { SmsService } from '../_services/sms.service';
+import { SmsMessageService } from '../_services/sms-message.service';
 import { Receipt } from '../models/receipt.model';
 import { Receipt2 } from '../models/receipt2.model';
-import { SmsMessage } from '../models/smsmessage.model';
+import { SmsMessage } from '../models/sms-message.model';
 import { jsPDF } from "jspdf";
 import htmlToPdfmake from 'html-to-pdfmake';
 import * as pdfMake from 'pdfmake/build/pdfmake';
@@ -345,12 +345,7 @@ export class Inshop2Component implements OnInit, AfterViewInit {
   receipt2: Receipt2 = new Receipt2();
 
   smsMessages: SmsMessage[] = new Array();
-  smsMessage: SmsMessage = new SmsMessage();
-  showSmsForm: boolean = false;
-  showSmsHistory: boolean = false;
-  smsPhoneNumber: string = '';
-  smsMessageText: string = '';
-  smsSimulatorMode: boolean = true;
+  newSmsMessage: SmsMessage = new SmsMessage();
 
   claims: Claim[] = new Array();
   claim: Claim = new Claim();
@@ -547,7 +542,7 @@ export class Inshop2Component implements OnInit, AfterViewInit {
     private noteService: NoteService,
     private receiptService: ReceiptService,
     private receipt2Service: Receipt2Service,
-    private smsService: SmsService,
+    private smsMessageService: SmsMessageService,
     private authService: AuthService,
     private http: HttpClient,
     private sanitizationService: DomSanitizer,
@@ -3250,6 +3245,32 @@ export class Inshop2Component implements OnInit, AfterViewInit {
     this.aiImages = new Array();
 
 
+  }
+
+  sendSms(): void {
+    this.newSmsMessage.vehicleId = this.vehicle.id;
+    this.newSmsMessage.userId = this.user.id;
+    this.newSmsMessage.phoneNumber = this.customer.phone;
+    this.smsMessageService.sendSms(this.newSmsMessage).subscribe({
+      next: data => {
+        this.loadSmsHistory();
+        this.newSmsMessage = new SmsMessage();
+      },
+      error: err => {
+        this.errorMessage = err.error.message;
+      }
+    });
+  }
+
+  loadSmsHistory(): void {
+    this.smsMessageService.getVehicleSmsMessages(this.vehicle.id).subscribe({
+      next: data => {
+        this.smsMessages = data;
+      },
+      error: err => {
+        this.errorMessage = err.error.message;
+      }
+    });
   }
 
   counterQrcode: any = 0;
