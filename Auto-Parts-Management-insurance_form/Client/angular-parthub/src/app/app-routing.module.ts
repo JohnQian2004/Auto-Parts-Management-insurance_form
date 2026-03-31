@@ -22,6 +22,7 @@ import { SavedItemComponent } from './saved-item/saved-item.component';
 
 import { AddCustomersComponent } from './add-customers/add-customers.component';
 import { AddNewVehicleComponent } from './add-new-vehicle/add-new-vehicle.component';
+import { CustomerIntakeComponent } from './customer-intake/customer-intake.component';
 import { AddUserComponent } from './add-user/add-user.component';
 import { ApprovalStatusComponent } from './approval-status/approval-status.component';
 import { ArrivalModeComponent } from './arrival-mode/arrival-mode.component';
@@ -95,6 +96,7 @@ const routes: Routes = [
   // { path: 'home', component: HomeComponent },
   { path: 'dashboard', component: DashboardComponent },
   { path: 'add-new-vehicle', component: AddNewVehicleComponent },
+  { path: 'customer-intake/:shopUuid', component: CustomerIntakeComponent },
   { path: 'users-parts-market', component: UsersPartsMarketComponent },
   { path: 'users-parts-market2', component: UsersPartsMarket2Component },
   { path: 'users-parts-market3', component: UsersPartsMarket3Component },

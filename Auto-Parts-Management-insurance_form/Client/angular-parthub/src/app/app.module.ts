@@ -44,6 +44,7 @@ import { AngularEditorModule } from '@kolkov/angular-editor';
 import { NgChartsModule } from 'ng2-charts';
 import { AddCustomersComponent } from './add-customers/add-customers.component';
 import { AddNewVehicleComponent } from './add-new-vehicle/add-new-vehicle.component';
+import { CustomerIntakeComponent } from './customer-intake/customer-intake.component';
 import { AddUserComponent } from './add-user/add-user.component';
 import { ArrivalModeComponent } from './arrival-mode/arrival-mode.component';
 import { CustomersComponent } from './customers/customers.component';
@@ -175,6 +176,7 @@ import { VehicleDetailTestComponent } from './vehicle-detail-test/vehicle-detail
     CompanyDashboardComponent,
     ForgetPasswordComponent,
     AddNewVehicleComponent,
+    CustomerIntakeComponent,
     CustomersComponent,
     AddCustomersComponent,
     InvoicesComponent,
