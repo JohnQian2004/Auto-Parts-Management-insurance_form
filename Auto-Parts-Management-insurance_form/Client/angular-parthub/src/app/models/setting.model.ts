@@ -42,6 +42,8 @@ export class Setting {
   disclaimers: Disclaimer[] = new Array();
 
   company: Company = new Company();
+  /** From API: same as company.token, always sent on settings payload for customer-intake links */
+  customerIntakeShopUuid?: string;
   warranties: Warranty[] = new Array();
 
   columnInfos: ColumnInfo[] = new Array();

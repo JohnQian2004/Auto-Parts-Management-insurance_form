@@ -1,4 +1,5 @@
 import { ChangeDetectorRef, Component, ElementRef, HostListener, OnInit, Renderer2, ViewChild } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Vehicle } from '../models/vehicle.model';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AutopartService } from '../_services/autopart.service';
@@ -74,6 +75,7 @@ import { InTakeWayService } from '../_services/in.take.way.service';
 import { CompanyService } from '../_services/company.service';
 import { EventBusService } from '../_shared/event-bus.service';
 import { EventData } from '../_shared/event.class';
+import { Observable, throwError } from 'rxjs';
 
 
 declare var bootstrap: any;
@@ -1249,6 +1251,18 @@ export class CustomerIntakeComponent implements OnInit {
       return true;
   }
 
+  /** Public intake route uses server `customer-intake/{uuid}`; otherwise shop user id in URL. */
+  private persistVehicle(vehicle: Vehicle): Observable<Vehicle> {
+    if (this.shopIntakeUuid) {
+      return this.vehicleService.createCustomerIntakeVehicle(this.shopIntakeUuid, vehicle);
+    }
+    const uid = this.currentUser?.id ?? this.company?.userId;
+    if (uid == null || uid === 0) {
+      return throwError(() => new Error('No user context for vehicle save'));
+    }
+    return this.vehicleService.createAndUpdateVehicle(uid, vehicle);
+  }
+
   setStep(step: any): void {
     this.step = step;
   }
@@ -1257,7 +1271,7 @@ export class CustomerIntakeComponent implements OnInit {
 
     vehicle.reason = "special";
     vehicle.special = !vehicle.special;
-    this.vehicleService.createAndUpdateVehicle(this.currentUser.id, vehicle).subscribe({
+    this.persistVehicle(vehicle).subscribe({
       next: result => {
         console.log(result);
         this.vehicle = result;
@@ -1530,10 +1544,30 @@ export class CustomerIntakeComponent implements OnInit {
 
       vehicle.sequenceNumber = 0;
 
-      vehicle.companyId = this.user.companyId;
-      vehicle.customer.companyId = this.user.companyId;
+      const uid = this.user?.companyId;
+      const companyIdForVehicle =
+        (uid != null && uid !== 0 ? uid : null) ??
+        this.company?.id ??
+        this.vehicle?.companyId;
+      if (companyIdForVehicle == null || companyIdForVehicle === '' || companyIdForVehicle === 0) {
+        this.errorMessageVehicle =
+          'Shop information is missing. Please open this page using your shop’s customer intake link.';
+        return;
+      }
 
-      this.vehicleService.createAndUpdateVehicle(this.currentUser.id, vehicle).subscribe({
+      if (!this.shopIntakeUuid) {
+        const actorUserId = this.currentUser?.id ?? this.company?.userId;
+        if (actorUserId == null || actorUserId === undefined) {
+          this.errorMessageVehicle =
+            'Please sign in to save your vehicle. Use the shop’s login link, or ask staff for help.';
+          return;
+        }
+      }
+
+      vehicle.companyId = companyIdForVehicle;
+      vehicle.customer.companyId = companyIdForVehicle;
+
+      this.persistVehicle(vehicle).subscribe({
 
         next: async result => {
 
@@ -1555,6 +1589,16 @@ export class CustomerIntakeComponent implements OnInit {
             }
           }, 0);
 
+        },
+        error: (err: HttpErrorResponse | Error) => {
+          const status = err instanceof HttpErrorResponse ? err.status : 0;
+          if (status === 404) {
+            this.errorMessageVehicle = 'Shop link is invalid or expired. Ask the shop for a new customer intake link.';
+          } else if (status === 400) {
+            this.errorMessageVehicle = 'Shop setup is incomplete. Please contact the shop.';
+          } else {
+            this.errorMessageVehicle = 'Could not save your vehicle. Check your connection or try again.';
+          }
         }
       });
 
@@ -1736,7 +1780,7 @@ export class CustomerIntakeComponent implements OnInit {
     if (vehicle.id > 0) {
 
       vehicle.reason = "rentalDate";
-      this.vehicleService.createAndUpdateVehicle(this.currentUser.id, vehicle).subscribe({
+      this.persistVehicle(vehicle).subscribe({
         next: result => {
           if (result) {
             this.vehicle = result;
@@ -1753,7 +1797,7 @@ export class CustomerIntakeComponent implements OnInit {
     if (vehicle.id > 0) {
 
       vehicle.reason = "targetDate";
-      this.vehicleService.createAndUpdateVehicle(this.currentUser.id, vehicle).subscribe({
+      this.persistVehicle(vehicle).subscribe({
         next: result => {
           if (result) {
             this.vehicle = result;
@@ -1768,7 +1812,7 @@ export class CustomerIntakeComponent implements OnInit {
   onChangeVehicleCalendar2($event: any, vehicle: Vehicle): void {
     vehicle.targetDate = $event.target.value;
     vehicle.reason = "targetDate";
-    this.vehicleService.createAndUpdateVehicle(this.currentUser.id, vehicle).subscribe({
+    this.persistVehicle(vehicle).subscribe({
       next: result => {
         if (result) {
           this.vehicle = result;
@@ -2725,7 +2769,7 @@ export class CustomerIntakeComponent implements OnInit {
     console.log("archiveVehicle");
     this.vehicle.archived = true;
     this.vehicle.reason = "archive";
-    this.vehicleService.createAndUpdateVehicle(this.currentUser.id, this.vehicle).subscribe({
+    this.persistVehicle(this.vehicle).subscribe({
       next: result => {
         console.log("archiveVehicle", result);
         this.vehicle = result;
@@ -2750,7 +2794,7 @@ export class CustomerIntakeComponent implements OnInit {
     console.log("change target date");
 
     this.vehicle.reason = "change targetDate";
-    this.vehicleService.createAndUpdateVehicle(this.currentUser.id, this.vehicle).subscribe({
+    this.persistVehicle(this.vehicle).subscribe({
       next: result => {
         console.log("change target date", result);
         this.vehicle = result;
@@ -2777,7 +2821,7 @@ export class CustomerIntakeComponent implements OnInit {
     console.log("onChangeCurrentJob");
     this.vehicle.currentJobNumber = jobId;
     this.vehicle.reason = "assign current job";
-    this.vehicleService.createAndUpdateVehicle(this.currentUser.id, this.vehicle).subscribe({
+    this.persistVehicle(this.vehicle).subscribe({
       next: result => {
         console.log("onChangeCurrentJob", result);
         this.vehicle = result;
@@ -2795,7 +2839,7 @@ export class CustomerIntakeComponent implements OnInit {
     this.vehicle.status = status;
     this.vehicle.reason = "status";
     if (this.vehicle.id > 0) {
-      this.vehicleService.createAndUpdateVehicle(this.currentUser.id, this.vehicle).subscribe({
+      this.persistVehicle(this.vehicle).subscribe({
         next: result => {
           console.log("onChangeStatus", result);
           this.vehicle = result;
@@ -2811,7 +2855,7 @@ export class CustomerIntakeComponent implements OnInit {
     console.log("onChangeAssignedTo");
     this.vehicle.assignedTo = employeeId;
     this.vehicle.reason = "assigned To";
-    this.vehicleService.createAndUpdateVehicle(this.currentUser.id, this.vehicle).subscribe({
+    this.persistVehicle(this.vehicle).subscribe({
       next: result => {
         console.log("onChangeAssignedTo", result);
         this.vehicle = result;
@@ -2829,7 +2873,7 @@ export class CustomerIntakeComponent implements OnInit {
     this.vehicle.jobRequestType = jobRequestType;
     this.vehicle.reason = "job request type";
     if (this.vehicle.id > 0) {
-      this.vehicleService.createAndUpdateVehicle(this.currentUser.id, this.vehicle).subscribe({
+      this.persistVehicle(this.vehicle).subscribe({
         next: result => {
           console.log("onChangeJobRequestType", result);
           this.vehicle = result;
@@ -2846,7 +2890,7 @@ export class CustomerIntakeComponent implements OnInit {
     this.vehicle.approvalStatus = approvalStatus;
     this.vehicle.reason = "approval status";
     if (this.vehicle.id > 0) {
-      this.vehicleService.createAndUpdateVehicle(this.currentUser.id, this.vehicle).subscribe({
+      this.persistVehicle(this.vehicle).subscribe({
         next: result => {
           console.log("onChangeJobRequestType", result);
           this.vehicle = result;
@@ -2863,7 +2907,7 @@ export class CustomerIntakeComponent implements OnInit {
     this.vehicle.inTakeWay = inTakeWay;
     this.vehicle.reason = "inTake Way";
     if (this.vehicle.id > 0) {
-      this.vehicleService.createAndUpdateVehicle(this.currentUser.id, this.vehicle).subscribe({
+      this.persistVehicle(this.vehicle).subscribe({
         next: result => {
           console.log("onChangeInTakeWay", result);
           this.vehicle = result;
@@ -2880,7 +2924,7 @@ export class CustomerIntakeComponent implements OnInit {
     this.vehicle.keyLocation = keyLocation;
     this.vehicle.reason = "key Location";
     if (this.vehicle.id > 0) {
-      this.vehicleService.createAndUpdateVehicle(this.currentUser.id, this.vehicle).subscribe({
+      this.persistVehicle(this.vehicle).subscribe({
         next: result => {
           console.log("onChangeKeyLocation", result);
           this.vehicle = result;
@@ -2929,7 +2973,7 @@ export class CustomerIntakeComponent implements OnInit {
     this.vehicle.paymentMethodId = paymentMethodId;
     this.vehicle.reason = "Payment Method";
     if (this.vehicle.id > 0) {
-      this.vehicleService.createAndUpdateVehicle(this.currentUser.id, this.vehicle).subscribe({
+      this.persistVehicle(this.vehicle).subscribe({
         next: result => {
           console.log("onChangeVehiclePaymentMethod", result);
           this.vehicle = result;
@@ -2969,7 +3013,7 @@ export class CustomerIntakeComponent implements OnInit {
     else
       vehicle.reason = "paid";
     if (this.vehicle.id > 0) {
-      this.vehicleService.createAndUpdateVehicle(this.currentUser.id, vehicle).subscribe({
+      this.persistVehicle(vehicle).subscribe({
         next: result => {
           console.log("changePaidStatus", result);
           this.vehicle = result;
@@ -2985,7 +3029,7 @@ export class CustomerIntakeComponent implements OnInit {
     console.log("setSpecialFlag");
     this.vehicle.reason = "special";
     if (this.vehicle.id > 0) {
-      this.vehicleService.createAndUpdateVehicle(this.currentUser.id, this.vehicle).subscribe({
+      this.persistVehicle(this.vehicle).subscribe({
         next: result => {
           console.log("setSpecialFlag", result);
           this.vehicle = result;
@@ -3002,7 +3046,7 @@ export class CustomerIntakeComponent implements OnInit {
     this.vehicle.location = location;
     this.vehicle.reason = "location";
     if (this.vehicle.id > 0) {
-      this.vehicleService.createAndUpdateVehicle(this.currentUser.id, this.vehicle).subscribe({
+      this.persistVehicle(this.vehicle).subscribe({
         next: result => {
           console.log("onChangeLocation", result);
           this.vehicle = result;
@@ -3019,7 +3063,7 @@ export class CustomerIntakeComponent implements OnInit {
     this.vehicle.paymentStatus = paymentStatus;
     this.vehicle.reason = "paymentStatus";
     if (this.vehicle.id > 0) {
-      this.vehicleService.createAndUpdateVehicle(this.currentUser.id, this.vehicle).subscribe({
+      this.persistVehicle(this.vehicle).subscribe({
         next: result => {
           console.log("onChangePaymentStatus", result);
           this.vehicle = result;
@@ -3037,7 +3081,7 @@ export class CustomerIntakeComponent implements OnInit {
     this.vehicle.paymentMethod = paymentMethod;
     this.vehicle.reason = "paymentMethod";
     if (this.vehicle.id > 0) {
-      this.vehicleService.createAndUpdateVehicle(this.currentUser.id, this.vehicle).subscribe({
+      this.persistVehicle(this.vehicle).subscribe({
         next: result => {
           console.log("onChangePaymentMethod", result);
           this.vehicle = result;

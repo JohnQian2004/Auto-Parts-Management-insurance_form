@@ -121,18 +121,41 @@ public class VehicleController {
 
   private static final Logger LOG = LoggerFactory.getLogger(VehicleController.class);
 
-  @PostMapping("/{id}")
-  @PreAuthorize("hasAnyRole('USER', 'MODERATOR','ADMIN','SHOP', 'RECYCLER')")
-  public ResponseEntity<Vehicle> createVehicle(@PathVariable("id") long id, @RequestBody Vehicle vehicleIn) {
+  /**
+   * Public customer intake: save vehicle for the shop identified by company {@code token} (UUID).
+   * No JWT required. Shop is resolved from the URL; {@code vehicleIn.companyId} is forced to match.
+   * The acting user is {@link Company#getUserId()} (shop owner account).
+   */
+  @PostMapping("/customer-intake/{shopUuid}")
+  public ResponseEntity<Vehicle> createVehicleCustomerIntake(@PathVariable("shopUuid") String shopUuid,
+      @RequestBody Vehicle vehicleIn) {
 
-    Optional<User> userOptional = this.userRepository.findById(id);
+    Optional<Company> companyOpt = this.companyRepository.findByToken(shopUuid);
+    if (companyOpt.isEmpty()) {
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+    Company company = companyOpt.get();
+    if (company.getUserId() == null || company.getUserId() == 0L) {
+      LOG.warn("customer-intake: company id={} has no userId", company.getId());
+      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+    if (this.userRepository.findById(company.getUserId()).isEmpty()) {
+      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+    vehicleIn.setCompanyId(company.getId());
+    if (vehicleIn.getCustomer() != null) {
+      vehicleIn.getCustomer().setCompanyId(company.getId());
+    }
+    return createVehicleCore(company.getUserId(), vehicleIn);
+  }
+
+  /**
+   * Shared implementation for {@link #createVehicle} and {@link #createVehicleCustomerIntake}.
+   */
+  private ResponseEntity<Vehicle> createVehicleCore(long id, Vehicle vehicleIn) {
+
     Vehicle vehicle = new Vehicle();
     Customer customer = new Customer();
-
-    User user = new User();
-    if (userOptional.isPresent()) {
-
-      user = userOptional.get();
 
       if (vehicleIn.getInsuranceCompanyId() == null) {
         vehicleIn.setInsuranceCompanyId((long) 0);
@@ -250,15 +273,21 @@ public class VehicleController {
       if (vehicle.getTargetDate() != null)
         vehicle.setTargetDateCountDown((int) this.getDifferenceDaysRental(new Date(), vehicle.getTargetDate()));
 
-    } else {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
-
     LOG.info("id:" + vehicle.getId() + " " + vehicle.getYear() + " " + vehicle.getMake() + " " + vehicle.getModel()
         + " " + vehicle.getColor());
 
     return new ResponseEntity<>(vehicle, HttpStatus.CREATED);
 
+  }
+
+  @PostMapping("/{id}")
+  @PreAuthorize("hasAnyRole('USER', 'MODERATOR','ADMIN','SHOP', 'RECYCLER')")
+  public ResponseEntity<Vehicle> createVehicle(@PathVariable("id") long id, @RequestBody Vehicle vehicleIn) {
+    Optional<User> userOptional = this.userRepository.findById(id);
+    if (!userOptional.isPresent()) {
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+    return createVehicleCore(id, vehicleIn);
   }
 
   @PostMapping("/external/{id}")

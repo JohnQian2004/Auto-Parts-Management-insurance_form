@@ -88,6 +88,15 @@ export class VehicleService {
     return this.http.post<any>(this.API_URL + "/external/" + userId, vehicle, httpOptions);
   }
 
+  /** Public customer intake: no JWT; shop resolved by company token (UUID) in the URL. */
+  createCustomerIntakeVehicle(shopUuid: string, vehicle: Vehicle): Observable<Vehicle> {
+    return this.http.post<Vehicle>(
+      `${this.API_URL}/customer-intake/${encodeURIComponent(shopUuid)}`,
+      vehicle,
+      httpOptions
+    );
+  }
+
 
   getVehicle(vehicleId: any): Observable<Vehicle> {
 

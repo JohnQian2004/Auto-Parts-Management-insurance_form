@@ -17,6 +17,9 @@ export class Company {
 
     userId?: number;
 
+    /** Public shop link UUID (server `Company.token`), used for customer-intake URLs */
+    token?: string;
+
     taxRate: number = 0;
 
     managementRate: number = 0;

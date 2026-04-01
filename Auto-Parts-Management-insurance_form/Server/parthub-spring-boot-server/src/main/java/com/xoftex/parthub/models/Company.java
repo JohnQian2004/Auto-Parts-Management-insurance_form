@@ -1,7 +1,5 @@
 package com.xoftex.parthub.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 
@@ -39,8 +37,8 @@ public class Company extends AuditModel {
 
     private String notes;
 
+    /** Public shop link id (customer intake URL); safe to expose to authenticated clients */
     @Column(name = "token", length = 36)
-    @JsonIgnore
     private String token;
 
     private Long userId;

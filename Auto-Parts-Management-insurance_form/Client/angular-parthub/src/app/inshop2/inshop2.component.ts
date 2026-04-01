@@ -2522,6 +2522,14 @@ export class Inshop2Component implements OnInit, AfterViewInit {
         if (result) {
 
           this.setting = result;
+          // Point `company` at loaded `setting.company` immediately so fields like `token` are available before the rest of this handler runs.
+          if (this.setting.company) {
+            this.company = this.setting.company;
+          }
+          const intakeUuid = this.setting.customerIntakeShopUuid?.trim();
+          if (intakeUuid && this.company) {
+            this.company.token = intakeUuid;
+          }
           this.employeeRoles = this.setting.employeeRoles;
           this.jobRequestTypes = this.setting.JobRequestTypes;
           this.paymentMethods = this.setting.paymentMethods;
@@ -10903,6 +10911,55 @@ export class Inshop2Component implements OnInit, AfterViewInit {
 
   openVehicleUrl(url: string) {
     window.open(location.origin + "/#/vehicle/" + url, "_blank");
+  }
+
+  /** Shop UUID for customer-intake URL (see API `Setting.customerIntakeShopUuid`, then nested company.token). */
+  private getShopIntakeToken(): string | undefined {
+    const raw =
+      this.setting?.customerIntakeShopUuid ??
+      this.setting?.company?.token ??
+      this.company?.token ??
+      (this.setting as any)?.customerIntakeShopUuid ??
+      (this.setting?.company as any)?.Token ??
+      (this.company as any)?.Token;
+    const s = typeof raw === "string" ? raw.trim() : "";
+    return s || undefined;
+  }
+
+  /** Opens customer intake URL for this shop: `/#/customer-intake/{company.token}` */
+  openShopCustomerIntakeUrl(): void {
+    const open = (shopUuid: string) => {
+      window.open(location.origin + "/#/customer-intake/" + encodeURIComponent(shopUuid), "_blank");
+    };
+    const t = this.getShopIntakeToken();
+    if (t) {
+      if (this.company) {
+        this.company.token = t;
+      }
+      open(t);
+      return;
+    }
+    const cid = this.setting?.company?.id ?? this.company?.id ?? this.user?.companyId;
+    if (cid == null || cid === 0) {
+      alert("Shop information is not loaded yet. Refresh the page and try again.");
+      return;
+    }
+    this.companyService.getCompany(cid).subscribe({
+      next: (c) => {
+        const tok = c?.token?.trim() ?? (c as any)?.Token?.trim();
+        if (tok) {
+          if (this.company) {
+            this.company.token = tok;
+          }
+          open(tok);
+        } else {
+          alert(
+            "Could not resolve the shop intake link. Wait for settings to finish loading, then try again."
+          );
+        }
+      },
+      error: () => alert("Could not load shop details. Check your connection and try again."),
+    });
   }
 
 

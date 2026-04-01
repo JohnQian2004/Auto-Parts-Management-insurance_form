@@ -139,6 +139,13 @@ public class SettingController {
 
   private static final Logger LOG = LoggerFactory.getLogger(SettingController.class);
 
+  /** Expose shop link UUID on the Setting payload (not only nested under company). */
+  private static void attachCustomerIntakeShopUuid(Setting setting) {
+    if (setting != null && setting.company != null) {
+      setting.customerIntakeShopUuid = setting.company.getToken();
+    }
+  }
+
   @GetMapping("/company/{companyId}")
   @PreAuthorize("hasAnyRole('USER', 'MODERATOR','ADMIN','SHOP', 'RECYCLER')")
   public ResponseEntity<Setting> getSetting(@PathVariable("companyId") long companyId) {
@@ -174,8 +181,7 @@ public class SettingController {
       setting.itemTypes = this.itemTypeRepository.findByCompanyIdOrderByNameAsc(companyId);
       setting.docTypes = this.docTypeRepository.findByCompanyIdOrderByNameAsc(companyId);
 
-
-       
+      attachCustomerIntakeShopUuid(setting);
 
       return new ResponseEntity<>(setting, HttpStatus.OK);
     } catch (Exception ex) {
@@ -222,6 +228,8 @@ public class SettingController {
         setting.columnInfos = this.columnInfoRepository.findByCompanyIdOrderByNameAsc(companyId);
         setting.itemTypes = this.itemTypeRepository.findByCompanyIdOrderByNameAsc(companyId);
         setting.docTypes = this.docTypeRepository.findByCompanyIdOrderByNameAsc(companyId);
+
+        attachCustomerIntakeShopUuid(setting);
 
         return new ResponseEntity<>(setting, HttpStatus.OK);
       }
@@ -295,6 +303,7 @@ public class SettingController {
         } catch (Exception ex) {
           System.out.print(ex.getMessage());
         }
+        attachCustomerIntakeShopUuid(setting);
         return new ResponseEntity<>(setting, HttpStatus.OK);
       }
     } catch (Exception ex) {

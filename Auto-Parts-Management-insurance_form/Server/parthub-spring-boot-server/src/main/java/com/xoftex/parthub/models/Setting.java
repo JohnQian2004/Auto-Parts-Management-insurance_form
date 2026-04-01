@@ -26,6 +26,12 @@ public class Setting {
     public List<DocType> docTypes;
     public Company company;
 
+    /**
+     * Same as {@link Company#getToken()} — duplicated here so clients always receive the public
+     * customer-intake link id even when {@code company.token} is omitted from JSON (e.g. legacy serialization).
+     */
+    public String customerIntakeShopUuid;
+
     public Setting() {
 
     }
