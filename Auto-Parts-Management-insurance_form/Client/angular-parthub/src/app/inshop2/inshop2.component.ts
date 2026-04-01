@@ -10926,17 +10926,65 @@ export class Inshop2Component implements OnInit, AfterViewInit {
     return s || undefined;
   }
 
-  /** Opens customer intake URL for this shop: `/#/customer-intake/{company.token}` */
-  openShopCustomerIntakeUrl(): void {
-    const open = (shopUuid: string) => {
-      window.open(location.origin + "/#/customer-intake/" + encodeURIComponent(shopUuid), "_blank");
+  /** Full customer-intake URL using current origin, e.g. `https://localhost:4200/#/customer-intake/{token}` */
+  private buildCustomerIntakeUrl(shopToken: string): string {
+    return `${location.origin}/#/customer-intake/${encodeURIComponent(shopToken.trim())}`;
+  }
+
+  private escapeHtmlForPrint(s: string): string {
+    return s
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  /**
+   * Opens a print dialog with a QR code for the shop customer-intake URL
+   * (`#/customer-intake/{setting.company.token}`) and the URL shown as text.
+   */
+  printShopCustomerIntakeQr(): void {
+    const runPrint = (fullUrl: string) => {
+      const w = window.open("", "_blank", "left=0,top=0,width=900,height=900,toolbar=0,scrollbars=0,status=0");
+      if (!w) {
+        alert("Please allow pop-ups to print the QR code.");
+        return;
+      }
+      const doc = w.document;
+      doc.open();
+      doc.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>Shop — Customer intake QR</title>');
+      doc.write(
+        '<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">'
+      );
+      doc.write(
+        "<style>body{padding:32px;text-align:center;background:#fff;font-family:system-ui,sans-serif;} h1{font-size:1.25rem;margin-bottom:.5rem;} .url{word-break:break-all;font-size:13px;margin-top:1.25rem;color:#222;max-width:640px;margin-left:auto;margin-right:auto;} canvas{margin:0 auto;display:block;}</style>"
+      );
+      doc.write("</head><body>");
+      doc.write("<h1>Customer intake</h1>");
+      doc.write('<p class="text-muted small mb-3">Scan with a phone to open the intake form.</p>');
+      doc.write('<canvas id="shopIntakeQr"></canvas>');
+      doc.write('<p class="url">' + this.escapeHtmlForPrint(fullUrl) + "</p>");
+      doc.write('<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"><\/script>');
+      doc.write("<script>");
+      doc.write("var href = " + JSON.stringify(fullUrl) + ";");
+      doc.write(
+        'QRCode.toCanvas(document.getElementById("shopIntakeQr"), href, { width: 240, margin: 2 }, function(e){'
+      );
+      doc.write("if(e) console.error(e);");
+      doc.write("setTimeout(function(){ window.print(); }, 400);");
+      doc.write("});");
+      doc.write("<\/script>");
+      doc.write("</body></html>");
+      doc.close();
+      w.focus();
     };
+
     const t = this.getShopIntakeToken();
     if (t) {
       if (this.company) {
         this.company.token = t;
       }
-      open(t);
+      runPrint(this.buildCustomerIntakeUrl(t));
       return;
     }
     const cid = this.setting?.company?.id ?? this.company?.id ?? this.user?.companyId;
@@ -10951,7 +10999,7 @@ export class Inshop2Component implements OnInit, AfterViewInit {
           if (this.company) {
             this.company.token = tok;
           }
-          open(tok);
+          runPrint(this.buildCustomerIntakeUrl(tok));
         } else {
           alert(
             "Could not resolve the shop intake link. Wait for settings to finish loading, then try again."

@@ -23,6 +23,7 @@ import com.xoftex.parthub.models.SmsMessage;
 import com.xoftex.parthub.models.Vehicle;
 import com.xoftex.parthub.repository.SmsMessageRepository;
 import com.xoftex.parthub.repository.VehicleRepository;
+import com.xoftex.parthub.service.TwilioSimulatorService;
 import com.xoftex.parthub.service.TwilioSmsService;
 
 @CrossOrigin("*")
@@ -52,7 +53,7 @@ public class SmsMessageController {
                 LOG.info("Using SIMULATOR mode for SMS");
                 
                 // Send via simulator
-                TwilioSmsService.SimulatedSmsResponse simResponse = 
+                TwilioSimulatorService.SimulatedSmsResponse simResponse = 
                     twilioSmsService.sendSmsSimulated(
                         smsMessage.getPhoneNumber(),
                         smsMessage.getMessage());
@@ -73,7 +74,7 @@ public class SmsMessageController {
                             Thread.sleep(2000 + (long)(Math.random() * 3000)); // 2-5 seconds
                             
                             // Generate auto-reply
-                            TwilioSmsService.SimulatedSmsResponse replyResponse = 
+                            TwilioSimulatorService.SimulatedSmsResponse replyResponse = 
                                 twilioSmsService.simulateIncomingReply(
                                     smsMessage.getPhoneNumber(),
                                     smsMessage.getMessage());

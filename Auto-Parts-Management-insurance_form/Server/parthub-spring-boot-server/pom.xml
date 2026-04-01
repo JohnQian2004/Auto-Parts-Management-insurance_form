@@ -129,6 +129,13 @@
             <version>22.28.0</version>
         </dependency>
 
+        <!-- Twilio SMS (SmsMessageController, TwilioSmsService) -->
+        <dependency>
+            <groupId>com.twilio.sdk</groupId>
+            <artifactId>twilio</artifactId>
+            <version>10.6.4</version>
+        </dependency>
+
         <!-- <dependency>
                 <groupId>javax.persistence</groupId>
                 <artifactId>javax.persistence-api</artifactId>
