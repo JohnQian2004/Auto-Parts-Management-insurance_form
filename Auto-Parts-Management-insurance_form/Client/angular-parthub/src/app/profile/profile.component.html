@@ -321,6 +321,8 @@
               Details</button>
             <button [disabled]="user.allowAddCompany==false" (click)="resentRegistrationLink()"
               class="btn btn-secondary-abs h-45 px-4 rounded-4 fs-14 fw-600">Resend Registration Link</button>
+            <button type="button" [disabled]="user.allowAddCompany==false" (click)="printShopCustomerIntakeQr()"
+              class="btn btn-outline-dark h-45 px-4 rounded-4 fs-14 fw-600">Print Shop QR Code</button>
           </div>
         </div>
 

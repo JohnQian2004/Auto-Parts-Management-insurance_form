@@ -2274,6 +2274,13 @@ export class ProfileComponent implements OnInit, AfterViewInit {
         if (result) {
 
           this.setting = result;
+          if (this.setting.company) {
+            this.company = this.setting.company;
+          }
+          const intakeUuid = this.setting.customerIntakeShopUuid?.trim();
+          if (intakeUuid && this.company) {
+            this.company.token = intakeUuid;
+          }
           this.employeeRoles = this.setting.employeeRoles;
           this.jobRequestTypes = this.setting.JobRequestTypes;
           this.paymentMethods = this.setting.paymentMethods;
@@ -2301,6 +2308,100 @@ export class ProfileComponent implements OnInit, AfterViewInit {
       }
     })
   }
+
+  /** Shop UUID for customer-intake (same as inshop2). */
+  private getShopIntakeToken(): string | undefined {
+    const raw =
+      this.setting?.customerIntakeShopUuid ??
+      this.setting?.company?.token ??
+      this.company?.token ??
+      (this.setting as any)?.customerIntakeShopUuid ??
+      (this.setting?.company as any)?.Token ??
+      (this.company as any)?.Token;
+    const s = typeof raw === "string" ? raw.trim() : "";
+    return s || undefined;
+  }
+
+  private buildCustomerIntakeUrl(shopToken: string): string {
+    return `${location.origin}/#/customer-intake/${encodeURIComponent(shopToken.trim())}`;
+  }
+
+  private escapeHtmlForPrint(s: string): string {
+    return s
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  /** Print dialog with QR for `/#/customer-intake/{token}` (matches inshop2 Print Shop QR Code). */
+  printShopCustomerIntakeQr(): void {
+    const runPrint = (fullUrl: string) => {
+      const w = window.open("", "_blank", "left=0,top=0,width=900,height=900,toolbar=0,scrollbars=0,status=0");
+      if (!w) {
+        alert("Please allow pop-ups to print the QR code.");
+        return;
+      }
+      const doc = w.document;
+      doc.open();
+      doc.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>Shop — Customer intake QR</title>');
+      doc.write(
+        '<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">'
+      );
+      doc.write(
+        "<style>body{padding:32px;text-align:center;background:#fff;font-family:system-ui,sans-serif;} h1{font-size:1.25rem;margin-bottom:.5rem;} .url{word-break:break-all;font-size:13px;margin-top:1.25rem;color:#222;max-width:640px;margin-left:auto;margin-right:auto;} canvas{margin:0 auto;display:block;}</style>"
+      );
+      doc.write("</head><body>");
+      doc.write("<h1>Customer intake</h1>");
+      doc.write('<p class="text-muted small mb-3">Scan with a phone to open the intake form.</p>');
+      doc.write('<canvas id="shopIntakeQr"></canvas>');
+      doc.write('<p class="url">' + this.escapeHtmlForPrint(fullUrl) + "</p>");
+      doc.write('<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"><\/script>');
+      doc.write("<script>");
+      doc.write("var href = " + JSON.stringify(fullUrl) + ";");
+      doc.write(
+        'QRCode.toCanvas(document.getElementById("shopIntakeQr"), href, { width: 240, margin: 2 }, function(e){'
+      );
+      doc.write("if(e) console.error(e);");
+      doc.write("setTimeout(function(){ window.print(); }, 400);");
+      doc.write("});");
+      doc.write("<\/script>");
+      doc.write("</body></html>");
+      doc.close();
+      w.focus();
+    };
+
+    const t = this.getShopIntakeToken();
+    if (t) {
+      if (this.company) {
+        this.company.token = t;
+      }
+      runPrint(this.buildCustomerIntakeUrl(t));
+      return;
+    }
+    const cid = this.setting?.company?.id ?? this.company?.id ?? this.user?.companyId;
+    if (cid == null || cid === 0) {
+      alert("Shop information is not loaded yet. Refresh the page and try again.");
+      return;
+    }
+    this.companyService.getCompany(cid).subscribe({
+      next: (c) => {
+        const tok = c?.token?.trim() ?? (c as any)?.Token?.trim();
+        if (tok) {
+          if (this.company) {
+            this.company.token = tok;
+          }
+          runPrint(this.buildCustomerIntakeUrl(tok));
+        } else {
+          alert(
+            "Could not resolve the shop intake link. Wait for settings to finish loading, then try again."
+          );
+        }
+      },
+      error: () => alert("Could not load shop details. Check your connection and try again."),
+    });
+  }
+
   onSaveNote($event: any): void {
 
     const note = {
